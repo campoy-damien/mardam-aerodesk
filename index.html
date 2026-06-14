@@ -1011,7 +1011,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="hspacer"></div>
   <div class="header-right">
     <div class="alert-pill" id="alertPill">⚠ <span id="alertN">0</span></div>
-    <div class="drive-pill" id="drivePill" onclick="openM('m-drive')">
+    <div class="drive-pill" id="drivePill" onclick="openM('m-drive');if(typeof refreshGdriveUI==='function')refreshGdriveUI()">
       <div class="drive-dot" id="driveDot"></div>
       <span id="driveLbl">Google Drive</span>
     </div>
@@ -3280,6 +3280,58 @@ function _detectDevice(){
   if(/Android/.test(ua)) return 'Android';
   if(/Mac/.test(ua)) return 'Mac';
   return 'Appareil';
+}
+
+// ── Gestion connexion Google Drive (boutons du modal) ──
+function connectGAS(){
+  const url=(document.getElementById('gasUrl')?.value||'').trim();
+  if(!url || !url.startsWith('https://script.google.com/')){
+    toast('⚠️ Colle une URL de déploiement valide (https://script.google.com/...)');
+    return;
+  }
+  if(!S.gdrive) S.gdrive={};
+  S.gdrive.connected=true;
+  S.gdrive.gasUrl=url;
+  S.gdrive.device=_detectDevice();
+  save();
+  toast('✅ Google Drive connecté');
+  if(typeof refreshGdriveUI==='function') refreshGdriveUI();
+  // Première récupération + sauvegarde
+  setTimeout(()=>pullFromDrive(false),600);
+}
+
+function disconnectGAS(){
+  confirmDel('Déconnecter Google Drive ?','La synchronisation automatique sera désactivée. Tes données locales sont conservées.',()=>{
+    if(S.gdrive){ S.gdrive.connected=false; }
+    save();
+    toast('Google Drive déconnecté');
+    if(typeof refreshGdriveUI==='function') refreshGdriveUI();
+  });
+}
+
+function gasPush(){
+  if(!S.gdrive?.connected || !S.gdrive?.gasUrl){ toast('⚠️ Drive non connecté'); return; }
+  schedDriveSync();
+  toast('🔄 Sauvegarde vers Drive en cours…');
+}
+
+function gasPull(){
+  if(!S.gdrive?.connected || !S.gdrive?.gasUrl){ toast('⚠️ Drive non connecté'); return; }
+  toast('⬇️ Récupération depuis Drive…');
+  pullFromDrive(false);
+}
+
+// Met à jour l'affichage du modal Drive (connecté / non connecté)
+function refreshGdriveUI(){
+  const notConf=document.getElementById('gasNotConf');
+  const conf=document.getElementById('gasConf');
+  const connected=S.gdrive?.connected && S.gdrive?.gasUrl;
+  if(notConf) notConf.style.display=connected?'none':'block';
+  if(conf) conf.style.display=connected?'block':'none';
+  const ls=document.getElementById('gasLastSync');
+  if(ls && S.gdrive?.lastSync) ls.textContent=_timeAgo(S.gdrive.lastSync);
+  const url=document.getElementById('gasUrl');
+  if(url && S.gdrive?.gasUrl) url.value=S.gdrive.gasUrl;
 }
 
 function schedDriveSync(){
