@@ -1076,7 +1076,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="sh-title">Suivi des <em>Formations</em></div>
     <div class="btn-row">
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsIn').click()">📥 Import Excel</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()">📥 Import suivi RH (2 fichiers)</button>
       <button class="btn btn-mint btn-sm" onclick="exportFormXls()">📤 Export Excel</button>
     </div>
   </div>
@@ -2967,12 +2967,13 @@ function saveToFile(data) {
 
 <!-- Hidden inputs -->
 <input type="file" id="xlsIn"  accept=".xlsx,.xls" style="display:none" onchange="handleXlsImport(event)">
+<input type="file" id="xlsRhIn" accept=".xlsx,.xls,.xlsm" multiple style="display:none" onchange="handleRhImport(event)">
 <input type="file" id="jsonIn" accept=".json"       style="display:none" onchange="handleJsonImport(event)">
 <script>
 /* ═══════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════ */
-const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','Welcome HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback'];
+const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','Welcome HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback','Aircraft Dismantling','Visite Médicale'];
 const AUTORISATIONS_LIST = ['AMEC','ASTO','IMEC','ISTO','AELE','IELE','ASTR','ISTR','ACOM','ICOM','AENB','IENB','ABAT','IBAT','RUN','PART21','IPNT'];
 const MO = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const D3 = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
@@ -3115,6 +3116,269 @@ function importFormationsExcel(){
   save();renderForms();renderDash();
   toast(`✅ Import terminé — ${added} formations ajoutées, ${updated} mises à jour, ${skipped} non trouvées`);
   closeM('m-import-formations');
+}
+
+// ═══════════════════════════════════════════════════════════
+// IMPORT SUIVI RH (2 fichiers Qualité + SSE) — site LFBF uniquement
+// ═══════════════════════════════════════════════════════════
+
+// Mapping intitulé Excel → nom de formation dans l'app
+const RH_MAP_QUALITE={
+  'EWIS':'EWIS',
+  'CDCCL':'CDCCL',
+  'Safety Training':'SAFETY TRAINING',
+  'PART 145 & MOE':'MOE / PART 145',
+  'English':'English Test',
+  'Competencies':'Compétences',
+  'Aircraft Dismantling Process':'Aircraft Dismantling',
+  'Welcome':'Welcome HSE'
+  // Ignorés : HF & SMS, Delta Safety Training, Global Refresh
+};
+const RH_MAP_SSE={
+  'Welcome':'Welcome HSE',
+  'RISQUES CHIMIQUES':'Risque chimiques',
+  'TRAVAIL EN HAUTEUR':'Travail en hauteur',
+  'MEDICAL VISIT':'Visite Médicale',
+  'MANLIFT / PLATFORM':'CACES NACELLE',
+  'FORKLIFT':'CACES CHARIOT',          // toutes colonnes Forklift mutualisées
+  'TELESCOPIC FORKLIFT':'CACES TELESCO',
+  'SELF PROPOLLED STACKERS':'CACES GERBEUR',
+  'SELF PROPELLED STACKERS':'CACES GERBEUR',
+  'TRACMA':'CACES TRACMA',
+  'PUSHBACK':'Pushback'
+  // Ignorés : Order Picker, Overhead Crane
+};
+
+let _rhImportData=null; // données préparées en attente de confirmation
+
+function handleRhImport(ev){
+  const files=Array.from(ev.target.files||[]);
+  if(!files.length){return;}
+  if(files.length>2){ toast('⚠️ Sélectionnez au maximum 2 fichiers (Qualité + SSE)'); ev.target.value=''; return; }
+  toast('⏳ Lecture des fichiers…');
+  _loadSheetJS(()=>{
+    Promise.all(files.map(readRhFile))
+      .then(results=>{
+        const merged=mergeRhResults(results);
+        prepareRhPreview(merged);
+      })
+      .catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
+  });
+  ev.target.value='';
+}
+
+function readRhFile(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        resolve(parseRhWorkbook(wb,file.name));
+      }catch(err){reject(err);}
+    };
+    r.onerror=()=>reject(new Error('lecture impossible'));
+    r.readAsArrayBuffer(file);
+  });
+}
+
+// Identifie le type de fichier et extrait les formations LFBF
+function parseRhWorkbook(wb,fname){
+  const sheets=wb.SheetNames;
+  // Détecter la feuille pertinente
+  const qSheet=sheets.find(s=>/Trainings follow-up/i.test(s));
+  const sSheet=sheets.find(s=>/Qualifications SSE follow-up/i.test(s));
+  if(qSheet) return parseSheet(wb.Sheets[qSheet],'qualite',fname);
+  if(sSheet) return parseSheet(wb.Sheets[sSheet],'sse',fname);
+  // Fallback : tenter par nom de fichier
+  if(/qualit/i.test(fname)){
+    const s=sheets.find(s=>/follow-up/i.test(s)); if(s) return parseSheet(wb.Sheets[s],'qualite',fname);
+  }
+  if(/sse/i.test(fname)){
+    const s=sheets.find(s=>/follow-up/i.test(s)); if(s) return parseSheet(wb.Sheets[s],'sse',fname);
+  }
+  return {type:'inconnu',fname,rows:[]};
+}
+
+function parseSheet(sheet,kind,fname){
+  const aoa=XLSX.utils.sheet_to_json(sheet,{header:1,raw:false,defval:null});
+  if(aoa.length<3) return {type:kind,fname,rows:[]};
+  const catRow=aoa[0]||[], subRow=aoa[1]||[];
+  // Construire la liste des colonnes formation : {idx, appName}
+  const map = kind==='qualite'?RH_MAP_QUALITE:RH_MAP_SSE;
+  // Propager la catégorie (cellules fusionnées laissent des trous)
+  const cats=[]; let last='';
+  for(let i=0;i<Math.max(catRow.length,subRow.length);i++){
+    if(catRow[i]) last=String(catRow[i]).replace(/\s+/g,' ').trim();
+    cats[i]=last;
+  }
+  // Pour chaque colonne dont le sous-en-tête est "Date", trouver le mapping
+  const formCols=[];
+  for(let i=0;i<cats.length;i++){
+    const sub=(subRow[i]||'').toString().trim().toLowerCase();
+    if(sub!=='date') continue;
+    const cat=cats[i]||'';
+    // Trouver une clé de map contenue dans la catégorie
+    let appName=null;
+    for(const key in map){
+      if(cat.toUpperCase().includes(key.toUpperCase())){ appName=map[key]; break; }
+    }
+    if(appName) formCols.push({idx:i,appName,cat});
+  }
+  // Extraire les lignes LFBF
+  const rows=[];
+  for(let r=2;r<aoa.length;r++){
+    const line=aoa[r]; if(!line||!line[0]) continue;
+    const tri=String(line[0]).trim().toUpperCase();
+    const site=(line[1]||'').toString().trim().toUpperCase();
+    if(site!=='LFBF') continue;
+    const nom=(line[5]||'').toString().trim();
+    const prenom=(line[4]||'').toString().trim();
+    const forms={};
+    formCols.forEach(fc=>{
+      const v=line[fc.idx];
+      if(v && String(v).trim() && String(v).trim().toUpperCase()!=='N/A'){
+        const d=parseRhDate(v);
+        if(d){ // garde la date la plus tardive si doublon (ex: Forklift mutualisé)
+          if(!forms[fc.appName] || d>forms[fc.appName]) forms[fc.appName]=d;
+        }
+      }
+    });
+    rows.push({tri,nom,prenom,forms});
+  }
+  return {type:kind,fname,rows};
+}
+
+// Parse une date Excel (string '2027-09-22 00:00:00' ou Date ou nombre série)
+function parseRhDate(v){
+  if(v instanceof Date) return fmt(v);
+  const s=String(v).trim();
+  // format 'YYYY-MM-DD ...'
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+  // format 'DD/MM/YYYY'
+  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+  return null;
+}
+
+// Fusionne les résultats des 2 fichiers par trigramme
+function mergeRhResults(results){
+  const byTri={};
+  results.forEach(res=>{
+    (res.rows||[]).forEach(row=>{
+      if(!byTri[row.tri]) byTri[row.tri]={tri:row.tri,nom:row.nom,prenom:row.prenom,forms:{}};
+      Object.entries(row.forms).forEach(([appName,date])=>{
+        // garder la date la plus tardive si présente dans les deux fichiers (ex: Welcome)
+        if(!byTri[row.tri].forms[appName] || date>byTri[row.tri].forms[appName])
+          byTri[row.tri].forms[appName]=date;
+      });
+    });
+  });
+  return {byTri,sources:results.map(r=>r.type+(r.rows?` (${r.rows.length} LFBF)`:''))};
+}
+
+// Prépare l'aperçu et l'affiche
+function prepareRhPreview(merged){
+  const {byTri,sources}=merged;
+  const plan=[]; // {emp, changes:[{type,old,new,action}]}
+  const notFound=[]; // trigrammes du fichier absents de l'app
+  const nameMismatch=[]; // trigramme trouvé mais nom différent
+
+  Object.values(byTri).forEach(rec=>{
+    const emp=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===rec.tri);
+    if(!emp){ notFound.push(rec); return; }
+    // Vérif nom (sécurité) — comparer nom de famille
+    const empNom=(emp.nom||'').toUpperCase().replace(/[^A-Z]/g,'');
+    const xlsNom=(rec.nom||'').toUpperCase().replace(/[^A-Z]/g,'');
+    const nameOk = !xlsNom || !empNom || empNom.includes(xlsNom.slice(0,4)) || xlsNom.includes(empNom.slice(0,4));
+    const changes=[];
+    Object.entries(rec.forms).forEach(([type,date])=>{
+      const existing=(S.formations||[]).find(f=>f.empId===emp.id&&f.type===type);
+      if(existing){
+        if(existing.dateExpiration!==date) changes.push({type,old:existing.dateExpiration||'—',new:date,action:'maj'});
+      }else{
+        changes.push({type,old:null,new:date,action:'ajout'});
+      }
+    });
+    if(changes.length){
+      plan.push({emp,rec,changes,nameOk});
+      if(!nameOk) nameMismatch.push({tri:rec.tri,appNom:emp.nom+' '+emp.prenom,xlsNom:rec.nom+' '+rec.prenom});
+    }
+  });
+
+  _rhImportData={plan,notFound,nameMismatch,sources};
+  renderRhPreview();
+}
+
+function renderRhPreview(){
+  const {plan,notFound,nameMismatch,sources}=_rhImportData;
+  let totMaj=0,totAjout=0;
+  plan.forEach(p=>p.changes.forEach(c=>c.action==='maj'?totMaj++:totAjout++));
+
+  const planRows=plan.map(p=>{
+    const warn=p.nameOk?'':'<span title="Nom différent du fichier" style="color:#ff4d6d;font-weight:800">⚠</span> ';
+    const chips=p.changes.map(c=>{
+      const col=c.action==='ajout'?'#34c759':'#ffd060';
+      const lbl=c.action==='ajout'?'＋':'↻';
+      return `<span style="display:inline-block;margin:2px 3px;padding:2px 7px;border-radius:6px;font-size:10px;background:${col}1a;border:1px solid ${col}55;color:${col}">${lbl} ${c.type} → ${disp(c.new)}</span>`;
+    }).join('');
+    return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:12px;font-weight:700;color:#e0e8ff">${warn}${p.emp.nom} ${p.emp.prenom} <span style="color:#8090a8;font-weight:400">(${p.emp.trigramme})</span></div>
+      <div style="margin-top:3px">${chips}</div>
+    </div>`;
+  }).join('');
+
+  const notFoundHtml=notFound.length?`
+    <div style="margin-top:12px;padding:10px 12px;background:rgba(255,77,109,0.06);border:1px solid rgba(255,77,109,0.2);border-radius:10px">
+      <div style="font-size:12px;font-weight:800;color:#ff8fa3;margin-bottom:4px">⚠ ${notFound.length} trigramme(s) du fichier absent(s) de l'app (ignorés)</div>
+      <div style="font-size:11px;color:#a0b0c8">${notFound.map(n=>n.tri+' ('+n.nom+')').join(', ')}</div>
+    </div>`:'';
+
+  const mismatchHtml=nameMismatch.length?`
+    <div style="margin-top:10px;padding:10px 12px;background:rgba(255,208,96,0.06);border:1px solid rgba(255,208,96,0.25);border-radius:10px">
+      <div style="font-size:12px;font-weight:800;color:#ffd060;margin-bottom:4px">⚠ ${nameMismatch.length} nom(s) à vérifier (trigramme OK mais nom différent)</div>
+      <div style="font-size:11px;color:#a0b0c8">${nameMismatch.map(m=>`${m.tri} : app="${m.appNom}" vs fichier="${m.xlsNom}"`).join('<br>')}</div>
+    </div>`:'';
+
+  document.getElementById('rhPreviewBody').innerHTML=`
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:90px;text-align:center;padding:10px;background:rgba(52,199,89,0.08);border-radius:10px">
+        <div style="font-size:22px;font-weight:900;color:#34c759">${totAjout}</div><div style="font-size:10px;color:#8090a8">ajoutées</div>
+      </div>
+      <div style="flex:1;min-width:90px;text-align:center;padding:10px;background:rgba(255,208,96,0.08);border-radius:10px">
+        <div style="font-size:22px;font-weight:900;color:#ffd060">${totMaj}</div><div style="font-size:10px;color:#8090a8">mises à jour</div>
+      </div>
+      <div style="flex:1;min-width:90px;text-align:center;padding:10px;background:rgba(0,160,255,0.08);border-radius:10px">
+        <div style="font-size:22px;font-weight:900;color:#00a0ff">${plan.length}</div><div style="font-size:10px;color:#8090a8">personnes</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#8090a8;margin-bottom:8px">Sources : ${sources.join(' · ')} · Site filtré : <strong style="color:#00a0ff">LFBF</strong></div>
+    ${mismatchHtml}${notFoundHtml}
+    <div style="margin-top:12px;max-height:42vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px">
+      ${planRows||'<div style="padding:20px;text-align:center;color:#8090a8;font-size:13px">Aucun changement détecté — les formations sont déjà à jour.</div>'}
+    </div>`;
+  document.getElementById('m-rh-import').style.display='flex';
+}
+
+function confirmRhImport(){
+  if(!_rhImportData) return;
+  let maj=0,ajout=0;
+  _rhImportData.plan.forEach(p=>{
+    p.changes.forEach(c=>{
+      if(c.action==='maj'){
+        const f=(S.formations||[]).find(x=>x.empId===p.emp.id&&x.type===c.type);
+        if(f){ f.dateExpiration=c.new; f.notes=(f.notes?f.notes+' · ':'')+'MàJ RH '+disp(fmt(new Date())); maj++; }
+      }else{
+        if(!S.formations) S.formations=[];
+        S.formations.push({id:uid(),empId:p.emp.id,type:c.type,dateObtention:'',dateExpiration:c.new,notes:'Import RH '+disp(fmt(new Date()))});
+        ajout++;
+      }
+    });
+  });
+  save();renderForms();renderDash();
+  document.getElementById('m-rh-import').style.display='none';
+  _rhImportData=null;
+  toast(`✅ Import RH terminé — ${ajout} ajoutées, ${maj} mises à jour`);
 }
 function doLogin(){
   const u=(document.getElementById('lUser').value||'').trim().toLowerCase();
@@ -9779,6 +10043,21 @@ if(document.readyState==='loading'){
   <div style="font-size:12px;color:var(--t3);margin-bottom:18px">Ces formations étaient planifiées. Ont-elles été réalisées ?</div>
   <div id="formConfirmList"></div>
   <button onclick="document.getElementById('m-form-confirm').style.display='none'" style="width:100%;margin-top:8px;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">Plus tard</button>
+</div></div>
+
+<!-- Modal aperçu import RH -->
+<div id="m-rh-import" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:16px">
+<div style="background:#0d1628;border:1px solid rgba(0,160,255,0.3);border-radius:18px;padding:22px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <span style="font-size:24px">📥</span>
+    <div style="font-size:17px;font-weight:900;color:#fff">Aperçu de l'import RH</div>
+  </div>
+  <div style="font-size:12px;color:var(--t3);margin-bottom:16px">Vérifie les changements avant de les appliquer. Rien n'est modifié tant que tu n'as pas confirmé.</div>
+  <div id="rhPreviewBody"></div>
+  <div style="display:flex;gap:8px;margin-top:18px">
+    <button onclick="confirmRhImport()" style="flex:1;padding:11px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.45);border-radius:10px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px">✅ Confirmer l'import</button>
+    <button onclick="document.getElementById('m-rh-import').style.display='none';_rhImportData=null" style="flex:1;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px">Annuler</button>
+  </div>
 </div></div>
 
 <!-- Modal confirmation — EN DERNIER pour z-index correct -->
