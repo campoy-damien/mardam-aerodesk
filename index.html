@@ -3217,9 +3217,12 @@ function parseSheet(sheet,kind,fname){
     const sub=(subRow[i]||'').toString().trim().toLowerCase();
     if(sub!=='date') continue;
     const cat=cats[i]||'';
-    // Trouver une clé de map contenue dans la catégorie
+    // Trouver une clé de map contenue dans la catégorie.
+    // IMPORTANT : tester les clés les PLUS LONGUES d'abord pour éviter qu'une clé
+    // générique (FORKLIFT) ne capture une catégorie spécifique (TELESCOPIC FORKLIFT).
     let appName=null;
-    for(const key in map){
+    const keys=Object.keys(map).sort((a,b)=>b.length-a.length);
+    for(const key of keys){
       if(cat.toUpperCase().includes(key.toUpperCase())){ appName=map[key]; break; }
     }
     if(appName) formCols.push({idx:i,appName,cat});
