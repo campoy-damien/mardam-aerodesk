@@ -1641,11 +1641,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
   <!-- Suggestions rapides -->
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="ai-suggestions">
-    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Ai-je la capacité pour un chantier en novembre ?</button>
+    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Simulation : 5 techniciens du 01/09 au 30/09</button>
     <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Quelles formations expirent bientôt ?</button>
-    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Quel est l'état d'avancement de mes chantiers ?</button>
-    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Combien de techniciens sont disponibles cette semaine ?</button>
-    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Résume mon équipe actuelle</button>
+    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">État des chantiers</button>
+    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Combien de techniciens dispo cette semaine ?</button>
+    <button onclick="aiAsk(this.textContent)" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">Quels chantiers manquent de monde ?</button>
   </div>
 
   <!-- Zone de conversation -->
@@ -1653,7 +1653,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div id="ai-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
       <div style="text-align:center;color:var(--t4);font-size:12px;padding:20px">
         <div style="font-size:32px;margin-bottom:8px">✦</div>
-        <div>Bonjour Damien ! Je connais toutes vos données en temps réel.<br>Posez-moi n'importe quelle question sur votre équipe, vos chantiers ou votre planning.</div>
+        <div><strong style="color:#c0e0ff">Assistant interne</strong> — gratuit, hors-ligne, basé sur vos données.<br>Formations qui expirent, personnel disponible, état des chantiers, recherche d'une personne, et simulations de faisabilité de chantier.</div>
       </div>
     </div>
 
@@ -3200,67 +3200,85 @@ function parseRhWorkbook(wb,fname){
 }
 
 function parseSheet(sheet,kind,fname){
-  const aoa=XLSX.utils.sheet_to_json(sheet,{header:1,raw:false,defval:null});
-  if(aoa.length<3) return {type:kind,fname,rows:[]};
+  const aoa=XLSX.utils.sheet_to_json(sheet,{header:1,raw:false,defval:null,blankrows:false});
+  if(aoa.length<3) return {type:kind,fname,rows:[],cols:[]};
   const catRow=aoa[0]||[], subRow=aoa[1]||[];
-  // Construire la liste des colonnes formation : {idx, appName}
   const map = kind==='qualite'?RH_MAP_QUALITE:RH_MAP_SSE;
+  const maxLen=Math.max(catRow.length,subRow.length);
   // Propager la catégorie (cellules fusionnées laissent des trous)
   const cats=[]; let last='';
-  for(let i=0;i<Math.max(catRow.length,subRow.length);i++){
-    if(catRow[i]) last=String(catRow[i]).replace(/\s+/g,' ').trim();
+  for(let i=0;i<maxLen;i++){
+    if(catRow[i]!=null && String(catRow[i]).trim()) last=String(catRow[i]).replace(/\s+/g,' ').trim();
     cats[i]=last;
   }
-  // Pour chaque colonne dont le sous-en-tête est "Date", trouver le mapping
+  // Colonnes formation : sous-en-tête contient "date"
+  const keys=Object.keys(map).sort((a,b)=>b.length-a.length);
   const formCols=[];
-  for(let i=0;i<cats.length;i++){
-    const sub=(subRow[i]||'').toString().trim().toLowerCase();
-    if(sub!=='date') continue;
-    const cat=cats[i]||'';
-    // Trouver une clé de map contenue dans la catégorie.
-    // IMPORTANT : tester les clés les PLUS LONGUES d'abord pour éviter qu'une clé
-    // générique (FORKLIFT) ne capture une catégorie spécifique (TELESCOPIC FORKLIFT).
+  for(let i=0;i<maxLen;i++){
+    const sub=(subRow[i]!=null?String(subRow[i]):'').trim().toLowerCase();
+    if(!sub.includes('date')) continue;
+    const cat=(cats[i]||'').toUpperCase();
     let appName=null;
-    const keys=Object.keys(map).sort((a,b)=>b.length-a.length);
     for(const key of keys){
-      if(cat.toUpperCase().includes(key.toUpperCase())){ appName=map[key]; break; }
+      if(cat.includes(key.toUpperCase())){ appName=map[key]; break; }
     }
-    if(appName) formCols.push({idx:i,appName,cat});
+    if(appName) formCols.push({idx:i,appName,cat:cats[i]});
   }
-  // Extraire les lignes LFBF
+  // Détecter dynamiquement Trigramme / Site / Nom / Prénom
+  const findCol=(labels)=>{
+    for(let i=0;i<subRow.length;i++){
+      const v=(subRow[i]!=null?String(subRow[i]):'').trim().toLowerCase();
+      if(labels.some(l=>v.includes(l))) return i;
+    }
+    return -1;
+  };
+  let triCol=findCol(['trigram']); if(triCol<0) triCol=0;
+  let siteCol=findCol(['site']); if(siteCol<0) siteCol=1;
+  let nomCol=findCol(['last name','nom']); if(nomCol<0) nomCol=5;
+  let prenomCol=findCol(['first name','prénom','prenom']); if(prenomCol<0) prenomCol=4;
+
   const rows=[];
   for(let r=2;r<aoa.length;r++){
-    const line=aoa[r]; if(!line||!line[0]) continue;
-    const tri=String(line[0]).trim().toUpperCase();
-    const site=(line[1]||'').toString().trim().toUpperCase();
+    const line=aoa[r]; if(!line||line[triCol]==null||!String(line[triCol]).trim()) continue;
+    const site=(line[siteCol]!=null?String(line[siteCol]):'').trim().toUpperCase();
     if(site!=='LFBF') continue;
-    const nom=(line[5]||'').toString().trim();
-    const prenom=(line[4]||'').toString().trim();
+    const tri=String(line[triCol]).trim().toUpperCase();
+    const nom=(line[nomCol]!=null?String(line[nomCol]):'').trim();
+    const prenom=(line[prenomCol]!=null?String(line[prenomCol]):'').trim();
     const forms={};
     formCols.forEach(fc=>{
-      const v=line[fc.idx];
-      if(v && String(v).trim() && String(v).trim().toUpperCase()!=='N/A'){
-        const d=parseRhDate(v);
-        if(d){ // garde la date la plus tardive si doublon (ex: Forklift mutualisé)
-          if(!forms[fc.appName] || d>forms[fc.appName]) forms[fc.appName]=d;
-        }
-      }
+      const d=parseRhDate(line[fc.idx]);
+      if(d){ if(!forms[fc.appName] || d>forms[fc.appName]) forms[fc.appName]=d; }
     });
     rows.push({tri,nom,prenom,forms});
   }
-  return {type:kind,fname,rows};
+  return {type:kind,fname,rows,cols:formCols.map(c=>c.appName)};
 }
 
-// Parse une date Excel (string '2027-09-22 00:00:00' ou Date ou nombre série)
+// Parse une date Excel (Date, chaîne, ou nombre série Excel)
 function parseRhDate(v){
+  if(v==null) return null;
   if(v instanceof Date) return fmt(v);
   const s=String(v).trim();
+  if(!s || s.toUpperCase()==='N/A') return null;
   // format 'YYYY-MM-DD ...'
-  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let m=s.match(/(\d{4})-(\d{2})-(\d{2})/);
   if(m) return `${m[1]}-${m[2]}-${m[3]}`;
   // format 'DD/MM/YYYY'
-  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-  if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return `${m[3]}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+  // format 'MM/DD/YYYY' (US) — fallback déjà couvert ci-dessus, on tente l'inverse
+  // Nombre série Excel (ex: 46000) → date
+  if(/^\d+(\.\d+)?$/.test(s)){
+    const n=parseFloat(s);
+    if(n>20000 && n<80000){ // plage raisonnable (≈2024-2100)
+      const d=new Date(Math.round((n-25569)*86400*1000)); // base Excel 1900
+      if(!isNaN(d.getTime())) return fmt(d);
+    }
+  }
+  // Dernier recours : Date.parse
+  const dp=new Date(s);
+  if(!isNaN(dp.getTime())) return fmt(dp);
   return null;
 }
 
@@ -3277,12 +3295,12 @@ function mergeRhResults(results){
       });
     });
   });
-  return {byTri,sources:results.map(r=>r.type+(r.rows?` (${r.rows.length} LFBF)`:''))};
+  return {byTri,sources:results.map(r=>r.type+(r.rows?` (${r.rows.length} LFBF)`:'')),colsDetected:[...new Set(results.flatMap(r=>r.cols||[]))]};
 }
 
 // Prépare l'aperçu et l'affiche
 function prepareRhPreview(merged){
-  const {byTri,sources}=merged;
+  const {byTri,sources,colsDetected}=merged;
   const plan=[]; // {emp, changes:[{type,old,new,action}]}
   const notFound=[]; // trigrammes du fichier absents de l'app
   const nameMismatch=[]; // trigramme trouvé mais nom différent
@@ -3309,7 +3327,7 @@ function prepareRhPreview(merged){
     }
   });
 
-  _rhImportData={plan,notFound,nameMismatch,sources};
+  _rhImportData={plan,notFound,nameMismatch,sources,colsDetected};
   renderRhPreview();
 }
 
@@ -3356,6 +3374,7 @@ function renderRhPreview(){
       </div>
     </div>
     <div style="font-size:11px;color:#8090a8;margin-bottom:8px">Sources : ${sources.join(' · ')} · Site filtré : <strong style="color:#00a0ff">LFBF</strong></div>
+    ${_rhImportData.colsDetected?`<div style="font-size:10px;color:#607090;margin-bottom:8px">Colonnes détectées : ${_rhImportData.colsDetected.join(', ')||'<span style="color:#ff4d6d">AUCUNE ⚠</span>'}</div>`:''}
     ${mismatchHtml}${notFoundHtml}
     <div style="margin-top:12px;max-height:42vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px">
       ${planRows||'<div style="padding:20px;text-align:center;color:#8090a8;font-size:13px">Aucun changement détecté — les formations sont déjà à jour.</div>'}
@@ -4929,29 +4948,23 @@ function lancerSimulation(){
   // Calcul visuel simulé
   renderSimCapaTable(simParams);
 
-  // Appel IA
-  const ctx=buildSimContext(simParams);
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1200,
-      system:ctx.system,
-      messages:[{role:'user',content:ctx.question}]
-    })
-  })
-  .then(r=>r.json())
-  .then(data=>{
-    spinner.style.display='none';
-    const txt=data.content?.[0]?.text||'Analyse indisponible.';
-    const formatted=txt.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:#c0e0ff">$1</strong>');
-    iaText.innerHTML=formatted;
-  })
-  .catch(()=>{
-    spinner.style.display='none';
-    iaText.innerHTML='<span style="color:#ff4d6d">❌ Erreur lors de l\'analyse IA. Vérifiez votre connexion.</span>';
-  });
+  // Analyse 100% interne (plus d'appel externe payant)
+  spinner.style.display='none';
+  iaText.innerHTML=aiSimInternalAnalysis(simParams);
+}
+
+// Analyse interne de la simulation (onglet Simulation)
+function aiSimInternalAnalysis(params){
+  try{
+    const nb=parseInt(params.nbTech||params.technicien||params.techniciens);
+    if(params.debut&&params.fin){
+      const d1=parseLocal(params.debut),d2=parseLocal(params.fin);
+      let mons=[],mon=getMon(d1);
+      while(mon<=d2){ mons.push(wkN(mon)); mon=addD(mon,7); }
+      return aiRunSimulationWeeks(nb||null,mons);
+    }
+  }catch(e){}
+  return 'Renseignez le nombre de techniciens et la période pour obtenir l\'analyse de faisabilité (capacité disponible vs charge déjà validée).';
 }
 
 function buildSimContext(p){
@@ -8777,84 +8790,969 @@ function aiAsk(question){
   if(!messagesEl) return;
   if(aiHistory.length===0) messagesEl.innerHTML='';
 
-  // User bubble
+  // Bulle utilisateur
   aiAddMessage(`<div style="display:flex;justify-content:flex-end;margin-bottom:4px">
     <div style="background:linear-gradient(135deg,#2979ff,#00d2ff);color:#000;border-radius:18px 18px 4px 18px;padding:10px 16px;max-width:80%;font-size:13px;font-weight:600">${question}</div>
   </div>`);
 
-  // Thinking
-  const thinkId='think-'+Date.now();
-  aiAddMessage(`<div id="${thinkId}" style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+  aiHistory.push({role:'user',content:question});
+  if(aiHistory.length>20) aiHistory=aiHistory.slice(-20);
+
+  // Moteur interne : calcule la réponse depuis les données
+  const html=aiAnswer(question);
+
+  aiAddMessage(`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:4px">
     <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2979ff,#00d2ff);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✦</div>
-    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px 18px 18px 18px;padding:10px 16px;font-size:13px;color:var(--t3)">Analyse en cours…</div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:13px;color:var(--t1);line-height:1.7;max-width:88%">${html}</div>
   </div>`);
 
-  const btn=document.getElementById('ai-send-btn');
-  if(btn){btn.disabled=true;btn.style.opacity='0.5';}
+  setTimeout(()=>{messagesEl.scrollTop=messagesEl.scrollHeight;},50);
+  document.getElementById('ai-input')?.focus();
+}
 
-  const messages=[...aiHistory,{role:'user',content:question}];
+// ═══════════════════════════════════════════════════════════
+// MOTEUR DE RÉPONSE 100% INTERNE (hors-ligne, gratuit)
+// ═══════════════════════════════════════════════════════════
+function aiAnswer(q){
+  const t=(q||'').toLowerCase().trim();
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const n=norm(t);
+  const has=(...words)=>words.some(w=>n.includes(norm(w)));
 
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:aiGetContext(),messages})
-  })
-  .then(r=>r.json())
-  .then(data=>{
-    const raw=data.content?.[0]?.text||'Désolé, je n\'ai pas pu répondre.';
-    aiHistory.push({role:'user',content:question});
-    aiHistory.push({role:'assistant',content:raw});
-    if(aiHistory.length>20) aiHistory=aiHistory.slice(-20);
+  // Détecter un numéro de semaine mentionné (sert à plusieurs intentions)
+  const wkMatch=n.match(/semaine\s*(\d{1,2})|\bs\s?(\d{1,2})\b|\bsem\s?(\d{1,2})/);
+  const wkNumAsked=wkMatch?parseInt(wkMatch[1]||wkMatch[2]||wkMatch[3]):null;
 
-    document.getElementById(thinkId)?.remove();
+  // ── A0) AFFECTATION CHANTIER (mettre/affecter ... sur ... chantier) ──
+  if(has('affect','affecte','affecter','mets ','met ','mettre ','place ','placer ','assigne','assigner','positionne','envoie sur','envoyer sur')
+     && has('chantier','sur le','sur la','poste','55275','stru','part21','sto','3441','12142','5598','5796','50017','9388','50013')){
+    return aiAffectationGuide(q);
+  }
 
-    // Parse actions from response
-    const actions=[];
-    const actionRe=/<ACTION>([\s\S]*?)<\/ACTION>/g;
-    let am;
-    while((am=actionRe.exec(raw))!==null){
-      try{actions.push(JSON.parse(am[1].trim()));}catch(e){}
+  // ── A1) MISE EN FORMATION / CONGÉ / ABSENCE (action planning) ──
+  // Verbe d'action (tolère fautes : planifie/plannifie/plannifie...) OU tournure "en formation/en congé"
+  const actionVerb=/\b(mets?|mettre|place[rz]?|plac[ée]|assigne[rz]?|programme[rz]?|plann?if|planif|positionne)/.test(n)
+                || /\ben (formation|congé|conge|maladie|arret|arrêt|deplacement|déplacement|mission|absence|repos)\b/.test(n);
+  const planTarget=has('formation','congé','conge','vacance','maladie','malade','absence','absent','deplacement','déplacement','mission','repos','ccdcl','cdccl','ewis','caces','safety','moe','part 145','english','welcome','medical','visite medicale','recyclage','stockage','global refresh','dismantling');
+  if(actionVerb && planTarget){
+    return aiPlanningActionGuide(q);
+  }
+
+  // Indices de SIMULATION : verbe de faisabilité OU (nombre de techniciens + période)
+  const simIntent=has('simul','accepter','peut-on prendre','peut on prendre','nouveau chantier','accepter un chantier','faisabilit','puis-je prendre','puis je prendre','je peux prendre','je peux accepter','capacite pour','assez de ressource','assez de monde','assez de tech','ai-je assez','ai je assez','aurai-je','aurais-je','aurai je','aurais je','prendre un chantier','prendre ce chantier');
+  // Détecter "N techniciens" + une période (semaines ou dates)
+  const techCount=n.match(/(\d{1,2})\s*(?:tech|technicien|personne|gars|monde|ressource|operateur|operateurs|opérateur)/);
+  const hasPeriod = /semaines?\s*\d/.test(n) || /\d{1,2}[\/\-]\d{1,2}/.test(n);
+  // ── A) SIMULATION (priorité maximale) ──
+  if(simIntent || (techCount && hasPeriod)){
+    return aiSimulationGuide(q);
+  }
+
+  // ── B) Questions sur QUI est absent / en congé / maladie / formation ──
+  if(has('conge','congé','vacance','absent','absence','absente','pas la','pas là','repos')){
+    return aiWhoAbsent(n,wkNumAsked,['conge']);
+  }
+  if(has('malade','maladie','arret','arrêt')){
+    return aiWhoAbsent(n,wkNumAsked,['maladie']);
+  }
+  if(has('en formation','stage') && has('qui','nom','liste','semaine','present','présent')){
+    return aiWhoAbsent(n,wkNumAsked,['formation']);
+  }
+  if(has('deplacement','déplacement','mission','en mission')){
+    return aiWhoAbsent(n,wkNumAsked,['deplacement']);
+  }
+
+  // ── C) Questions sur QUI est présent (éventuellement par catégorie) ──
+  if(has('present','présent','presente','présente','qui travaille','qui est la','qui est là','qui bosse')
+     || (has('chef','responsable','technicien','interim','expert','equipe','équipe') && has('present','présent','semaine','liste','nom','qui') && !techCount)){
+    return aiWhoPresent(n,wkNumAsked);
+  }
+
+  // ── D) Liste d'une catégorie (sans notion de présence ni semaine) ──
+  if((has('liste des chef','les chefs','combien de chef','qui sont les chef','chefs d','combien de responsable','les responsables','qui sont les responsable','combien de technicien','combien d intérimaire','combien d interimaire'))
+     && !wkNumAsked && !has('present','présent')){
+    return aiListCategory(n);
+  }
+
+  // ── E) Effectif / combien dispo (chiffre) ──
+  if(has('combien','effectif','capacite','capacité') && has('dispo','disponible','tech','present','semaine')){
+    return aiAnswerDispo(n,wkNumAsked);
+  }
+
+  // ── F) FORMATIONS / AUTORISATIONS QUI EXPIRENT ──
+  if(has('expir','perim','périm','echeance','échéance','renouveler','renouvellement','bient','a jour','à jour','pas a jour','pas à jour','valid') ){
+    return aiAnswerExpirations(n);
+  }
+  // Mention d'une formation précise → expirations de cette formation
+  let citedForm=null;
+  TRAININGS.forEach(tr=>{ if(n.includes(norm(tr).slice(0,5))) citedForm=tr; });
+  if(citedForm) return aiAnswerExpirations(n);
+
+  // ── G) ÉTAT ET BESOINS DES CHANTIERS ──
+  if(has('chantier','besoin','charge','avancement','retard','encours','en cours','manque')){
+    return aiAnswerChantiers(n);
+  }
+
+  // ── H) Dispo générique si une semaine est citée ──
+  if(wkNumAsked && has('dispo','disponible','effectif','monde','besoin','ecart','écart')){
+    return aiAnswerDispo(n,wkNumAsked);
+  }
+
+  // ── I) RECHERCHE D'UNE PERSONNE ──
+  const person=aiFindPerson(q);
+  if(person) return aiAnswerPerson(person);
+
+  return aiHelpMessage();
+}
+
+// Résout le lundi d'une semaine donnée (numéro ISO) ou la semaine courante
+function _weekMon(wkNumAsked){
+  const today=new Date();
+  if(wkNumAsked){
+    let mon=getMon(new Date(today.getFullYear(),0,1));
+    let guard=0;
+    while(wkN(mon)!==wkNumAsked && guard<60){ mon=addD(mon,7); guard++; }
+    return mon;
+  }
+  return getMon(today);
+}
+
+// ── QUI est absent (congé/maladie/formation/déplacement) une semaine donnée ──
+function aiWhoAbsent(n,wkNumAsked,types){
+  const mon=_weekMon(wkNumAsked);
+  const wk=wkN(mon);
+  const typeLabels={conge:'congé',maladie:'maladie',formation:'formation',deplacement:'déplacement',absence:'absence'};
+  const wantSet=new Set(types);
+  const found=[];
+  (S.personnel||[]).filter(p=>p.actif!==false).forEach(p=>{
+    const jours=[];
+    for(let d=0;d<7;d++){
+      const ds=fmt(addD(mon,d));
+      const am=S.planning[`${p.id}_${ds}_AM`]||{}, pm=S.planning[`${p.id}_${ds}_PM`]||{};
+      if(wantSet.has(am.type)||wantSet.has(pm.type)){
+        jours.push(['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'][d]);
+      }
     }
-
-    // Clean text (remove ACTION blocks)
-    const cleanText=raw.replace(/<ACTION>[\s\S]*?<\/ACTION>/g,'').trim();
-    const formatted=cleanText.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:#c0e0ff">$1</strong>');
-
-    // Show response
-    aiAddMessage(`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:4px">
-      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2979ff,#00d2ff);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✦</div>
-      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:13px;color:var(--t1);line-height:1.7;max-width:85%">${formatted}</div>
-    </div>`);
-
-    // Show confirmation cards for each action
-    if(actions.length>0){
-      aiPendingActions=actions;
-      let cardsHtml=`<div style="margin:8px 0 8px 42px">
-        <div style="font-size:11px;color:#ffd060;font-weight:700;margin-bottom:8px;letter-spacing:.5px">⚡ ${actions.length} ACTION${actions.length>1?'S':''} PROPOSÉE${actions.length>1?'S':''} — Confirmez :</div>`;
-      actions.forEach((a,i)=>{
-        cardsHtml+=`<div style="background:rgba(41,121,255,0.08);border:1px solid rgba(41,121,255,0.25);border-radius:12px;padding:12px 14px;margin-bottom:8px">
-          <div style="font-size:12px;color:#c0d8ff;margin-bottom:10px">📋 ${a.description||a.type}</div>
-          <div style="display:flex;gap:8px">
-            <button onclick="aiExecuteAction(${i})" style="flex:1;padding:8px;background:linear-gradient(135deg,#2979ff,#00d2ff);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✓ Confirmer</button>
-            <button onclick="aiCancelAction(${i})" style="padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8090a8;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif">✕</button>
-          </div>
-        </div>`;
-      });
-      cardsHtml+=`</div>`;
-      aiAddMessage(cardsHtml);
-    }
-  })
-  .catch(()=>{
-    document.getElementById(thinkId)?.remove();
-    aiAddMessage(`<div style="display:flex;align-items:flex-start;gap:10px">
-      <div style="width:32px;height:32px;border-radius:50%;background:#ff4d6d;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">!</div>
-      <div style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:13px;color:#ff8090">Erreur de connexion. Vérifiez votre connexion internet.</div>
-    </div>`);
-  })
-  .finally(()=>{
-    if(btn){btn.disabled=false;btn.style.opacity='1';}
-    document.getElementById('ai-input')?.focus();
+    if(jours.length) found.push({emp:p,jours});
   });
+  const lbl=types.map(t=>typeLabels[t]||t).join('/');
+  if(!found.length) return `✅ Personne en <strong>${lbl}</strong> en semaine ${wk} (${disp(fmt(mon))}).`;
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">🏖 ${found.length} personne(s) en ${lbl} — semaine ${wk} (${disp(fmt(mon))})</div>`;
+  html+=found.map(f=>{
+    const cat=_catLabel(f.emp.categorie);
+    const full=f.jours.length>=5?'toute la semaine':f.jours.join(', ');
+    return `<div style="margin-bottom:3px">• <strong>${f.emp.nom} ${f.emp.prenom}</strong> <span style="color:#8090a8">(${cat})</span> — <span style="color:#6effc4">${full}</span></div>`;
+  }).join('');
+  return html;
+}
+
+// ── QUI est présent (par catégorie si demandé) une semaine donnée ──
+function aiWhoPresent(n,wkNumAsked){
+  const mon=_weekMon(wkNumAsked);
+  const wk=wkN(mon);
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  // Catégorie demandée ?
+  let catFilter=null, catName='';
+  if(/\bchef/.test(n)){catFilter='chef';catName='chefs d\'équipe';}
+  else if(/responsable/.test(n)){catFilter='responsable';catName='responsables';}
+  else if(/technicien/.test(n)){catFilter='technicien';catName='techniciens';}
+  else if(/interim|intérim/.test(n)){catFilter='interimaire';catName='intérimaires';}
+  else if(/expert/.test(n)){catFilter='expert';catName='experts';}
+  else if(/alternant|apprenti/.test(n)){catFilter='alternant';catName='alternants';}
+
+  let people=(S.personnel||[]).filter(p=>p.actif!==false);
+  if(catFilter) people=people.filter(p=>p.categorie===catFilter);
+
+  const present=[],absent=[];
+  people.forEach(p=>{
+    let presentDays=0,total=0;
+    for(let d=0;d<5;d++){
+      const ds=fmt(addD(mon,d)); if(isHol(ds))continue; total++;
+      const am=S.planning[`${p.id}_${ds}_AM`]||{}, pm=S.planning[`${p.id}_${ds}_PM`]||{};
+      const a=ABSENT.has(am.type||''),b=ABSENT.has(pm.type||'');
+      if(!a&&!b)presentDays+=1;else if(!a||!b)presentDays+=0.5;
+    }
+    const ratio=total>0?presentDays/total:1;
+    if(ratio>=0.5)present.push({emp:p,ratio});else absent.push({emp:p,ratio});
+  });
+
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">👥 ${catName?catName.charAt(0).toUpperCase()+catName.slice(1):'Personnel'} présent(s) — semaine ${wk} (${disp(fmt(mon))})</div>`;
+  if(!present.length){
+    html+=`<div style="color:#ff8090">Aucun${catFilter==='responsable'||catFilter==='technicien'?'':'e'} ${catName||'personne'} présent(e) cette semaine.</div>`;
+  }else{
+    html+=`<div style="color:#34c759;font-weight:700;margin-bottom:3px">${present.length} présent(s) :</div>`;
+    html+=present.map(x=>`<div style="margin-bottom:2px">• <strong>${x.emp.nom} ${x.emp.prenom}</strong>${catFilter?'':' <span style="color:#8090a8">('+_catLabel(x.emp.categorie)+')</span>'}${x.ratio<1?' <span style="color:#ffd060">(partiel)</span>':''}</div>`).join('');
+  }
+  if(absent.length){
+    html+=`<div style="margin-top:8px;font-size:11px;color:#8090a8">Absent(s) : ${absent.map(x=>x.emp.nom).join(', ')}</div>`;
+  }
+  return html;
+}
+
+// ── Liste d'une catégorie (sans présence) ──
+function aiListCategory(n){
+  let catFilter='chef',catName='chefs d\'équipe';
+  if(/responsable/.test(n)){catFilter='responsable';catName='responsables';}
+  else if(/technicien/.test(n)){catFilter='technicien';catName='techniciens';}
+  else if(/interim|intérim/.test(n)){catFilter='interimaire';catName='intérimaires';}
+  else if(/expert/.test(n)){catFilter='expert';catName='experts';}
+  else if(/alternant|apprenti/.test(n)){catFilter='alternant';catName='alternants';}
+  const list=(S.personnel||[]).filter(p=>p.categorie===catFilter&&p.actif!==false);
+  if(!list.length) return `Aucun(e) ${catName} enregistré(e).`;
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">${list.length} ${catName}</div>`;
+  html+=list.map(p=>`<div style="margin-bottom:2px">• <strong>${p.nom} ${p.prenom}</strong> <span style="color:#8090a8">(${p.trigramme||''})</span></div>`).join('');
+  return html;
+}
+
+function _catLabel(c){
+  return {responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant',expert:'Expert'}[c]||c;
+}
+
+// Recherche une personne par nom/prénom/trigramme dans la question
+function aiFindPerson(q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const words=norm(q).split(/[\s,]+/).filter(w=>w.length>=2);
+  let best=null,bestScore=0;
+  (S.personnel||[]).forEach(p=>{
+    const nom=norm(p.nom),prenom=norm(p.prenom),tri=norm(p.trigramme);
+    let score=0;
+    words.forEach(w=>{
+      if(tri===w) score+=5;
+      if(nom===w||prenom===w) score+=4;
+      else if(nom.includes(w)&&w.length>=3) score+=2;
+      else if(prenom.includes(w)&&w.length>=3) score+=2;
+    });
+    if(score>bestScore){bestScore=score;best=p;}
+  });
+  return bestScore>=2?best:null;
+}
+
+function aiHelpMessage(){
+  return `Je suis votre assistant <strong style="color:#c0e0ff">100% interne</strong> (gratuit, hors-ligne). Je réponds à partir de vos données. Quelques exemples :<br><br>
+  • <em>« Qui est en congé en semaine 30 ? »</em><br>
+  • <em>« Quels chefs d'équipe sont présents semaine 30 ? »</em><br>
+  • <em>« Qui est en maladie cette semaine ? »</em><br>
+  • <em>« Quelles formations expirent bientôt ? »</em> / <em>« Qui n'a pas le CACES nacelle à jour ? »</em><br>
+  • <em>« Combien de techniciens dispo en semaine 30 ? »</em><br>
+  • <em>« État des chantiers »</em> / <em>« Quels chantiers manquent de monde ? »</em><br>
+  • <em>« Infos sur Dupont »</em><br>
+  • <em>« Simulation : 5 techniciens du 01/09 au 30/09 »</em>`;
+}
+
+// ── Formations/autorisations qui expirent ──
+function aiAnswerExpirations(n){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const all=[];
+  (S.formations||[]).forEach(f=>{
+    if(!f.dateExpiration) return;
+    const emp=byId(f.empId); if(!emp) return;
+    const exp=parseLocal(f.dateExpiration);
+    const days=Math.round((exp-today)/86400000);
+    all.push({emp,type:f.type,exp:f.dateExpiration,days,kind:'Formation'});
+  });
+  (S.autorisations||[]).forEach(a=>{
+    if(!a.dateExpiration) return;
+    const emp=byId(a.empId); if(!emp) return;
+    const exp=parseLocal(a.dateExpiration);
+    const days=Math.round((exp-today)/86400000);
+    all.push({emp,type:a.type||a.nom||'Autorisation',exp:a.dateExpiration,days,kind:'Autorisation'});
+  });
+
+  // Filtre éventuel par type de formation cité
+  let filterType=null;
+  TRAININGS.forEach(tr=>{ if(n.includes(tr.toLowerCase().slice(0,5))) filterType=tr; });
+  let list=all;
+  if(filterType) list=all.filter(x=>x.type===filterType);
+
+  // Seuil : "expiré" seul, ou à venir (60j par défaut)
+  const expired=list.filter(x=>x.days<0).sort((a,b)=>a.days-b.days);
+  const soon=list.filter(x=>x.days>=0&&x.days<=60).sort((a,b)=>a.days-b.days);
+
+  if(!expired.length&&!soon.length){
+    return `✅ ${filterType?'Pour <strong>'+filterType+'</strong> : ':''}Aucune ${filterType?'':'formation/autorisation '}expirée ni à échéance dans les 60 prochains jours.`;
+  }
+  let html='';
+  if(expired.length){
+    html+=`<div style="color:#ff8090;font-weight:800;margin-bottom:6px">⚠ ${expired.length} EXPIRÉE${expired.length>1?'S':''}</div>`;
+    html+=expired.slice(0,15).map(x=>`<div style="margin-bottom:3px">• <strong>${x.emp.nom} ${x.emp.prenom}</strong> — ${x.type} <span style="color:#ff8090">(expiré depuis ${Math.abs(x.days)}j, ${disp(x.exp)})</span></div>`).join('');
+    if(expired.length>15) html+=`<div style="color:#8090a8;font-size:11px">…et ${expired.length-15} autres</div>`;
+  }
+  if(soon.length){
+    html+=`<div style="color:#ffd060;font-weight:800;margin:10px 0 6px">🔔 ${soon.length} À RENOUVELER (≤60j)</div>`;
+    html+=soon.slice(0,15).map(x=>`<div style="margin-bottom:3px">• <strong>${x.emp.nom} ${x.emp.prenom}</strong> — ${x.type} <span style="color:#ffd060">(dans ${x.days}j, ${disp(x.exp)})</span></div>`).join('');
+    if(soon.length>15) html+=`<div style="color:#8090a8;font-size:11px">…et ${soon.length-15} autres</div>`;
+  }
+  return html;
+}
+
+// ── Personnel disponible / manquant (chiffres) ──
+function aiAnswerDispo(n,wkNumAsked){
+  const mon=_weekMon(wkNumAsked);
+  const wEnd=addD(mon,6);
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  let dispo=0; const absents=[];
+  techs.forEach(p=>{
+    let present=0,total=0;
+    for(let d=0;d<5;d++){
+      const ds=fmt(addD(mon,d));
+      if(isHol(ds)) continue;
+      total++;
+      const am=S.planning[`${p.id}_${ds}_AM`]||{}, pm=S.planning[`${p.id}_${ds}_PM`]||{};
+      const amAbs=ABSENT.has(am.type||''), pmAbs=ABSENT.has(pm.type||'');
+      if(!amAbs&&!pmAbs) present+=1; else if(!amAbs||!pmAbs) present+=0.5;
+    }
+    const ratio=total>0?present/total:1;
+    dispo+=ratio;
+    if(ratio<1) absents.push({emp:p,ratio});
+  });
+  dispo=Math.round(dispo*10)/10;
+
+  // Calcul du besoin de la semaine
+  const ovWk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  let besoin=0;
+  (S.chantiers||[]).filter(c=>['encours','futur','termine'].includes(c.statut)).forEach(c=>{
+    const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;
+    const dansP=(!d||d<=wEnd)&&(!f||f>=mon);
+    const ov=S.besoinOverrides?.[`${c.id}_${ovWk}`];
+    const hasOv=ov!=null&&ov!=='';
+    if(dansP){ besoin+=hasOv?parseInt(ov):(c.ressources?.technicien||0); }
+    else if(hasOv){ besoin+=parseInt(ov); }
+  });
+  const ecart=Math.round((dispo-besoin)*10)/10;
+
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">📅 Semaine ${wkN(mon)} (${disp(fmt(mon))})</div>`;
+  html+=`<div style="display:flex;gap:14px;margin-bottom:8px">
+    <div><span style="font-size:20px;font-weight:900;color:#34c759">${dispo}</span><br><span style="font-size:10px;color:#8090a8">dispo</span></div>
+    <div><span style="font-size:20px;font-weight:900;color:#82b1ff">${besoin}</span><br><span style="font-size:10px;color:#8090a8">besoin</span></div>
+    <div><span style="font-size:20px;font-weight:900;color:${ecart>=0?'#34c759':'#ff4d6d'}">${ecart>=0?'+':''}${ecart}</span><br><span style="font-size:10px;color:#8090a8">écart</span></div>
+  </div>`;
+  html+=ecart>=0
+    ? `<div style="color:#34c759">✅ Effectif suffisant cette semaine (${ecart} en marge).</div>`
+    : `<div style="color:#ff8090">⚠ Manque de <strong>${Math.abs(ecart)}</strong> technicien(s) — mobiliser des intérimaires ou décaler de la charge.</div>`;
+  if(absents.length){
+    html+=`<div style="margin-top:8px;font-size:11px;color:#8090a8">Absences partielles/totales : ${absents.slice(0,8).map(a=>a.emp.nom).join(', ')}${absents.length>8?'…':''}</div>`;
+  }
+  return html;
+}
+
+// ── État et besoins des chantiers ──
+function aiAnswerChantiers(n){
+  const actifs=(S.chantiers||[]).filter(c=>['encours','futur'].includes(c.statut));
+  if(!actifs.length) return 'Aucun chantier en cours ou à venir.';
+  const today=new Date();
+  // Si on demande spécifiquement les manques
+  const onlyManque=n.includes('manque')||n.includes('retard');
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:8px">🔧 ${actifs.length} chantier(s) actif(s)</div>`;
+  actifs.forEach(c=>{
+    const statut=c.statut==='encours'?'<span style="color:#34c759">En cours</span>':'<span style="color:#82b1ff">À venir</span>';
+    const tech=c.ressources?.technicien||0;
+    const periode=(c.debut?disp(c.debut):'?')+' → '+(c.fin?disp(c.fin):'?');
+    let avct='';
+    if(c.statut==='encours'&&c.debut&&c.fin){
+      const d=parseLocal(c.debut),f=parseLocal(c.fin);
+      const pct=Math.min(100,Math.max(0,Math.round((today-d)/(f-d)*100)));
+      avct=` · ${pct}% du temps écoulé`;
+    }
+    if(onlyManque){
+      // n'afficher que si MH non renseigné ou retard
+      const mh=c.manHours||0;
+      if(c.statut==='encours'&&mh===0){
+        html+=`<div style="margin-bottom:5px">• <strong>${c.nom}</strong> ${c.client?'('+c.client+')':''} — ⚠ volume Man/Hours non renseigné</div>`;
+      }
+      return;
+    }
+    html+=`<div style="margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <strong>${c.nom}</strong> ${c.client?'<span style="color:#8090a8">('+c.client+')</span>':''} — ${statut}<br>
+      <span style="font-size:11px;color:#a0b0c8">${tech} tech. · ${periode}${avct}</span>
+    </div>`;
+  });
+  if(onlyManque&&!html.includes('•')) html+='<div style="color:#34c759">✅ Aucun chantier en manque signalé.</div>';
+  return html;
+}
+
+// ── Infos d'une personne ──
+function aiAnswerPerson(p){
+  const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert'}[p.categorie]||p.categorie;
+  let html=`<div style="font-weight:800;color:#c0e0ff;font-size:15px">${p.nom} ${p.prenom}</div>
+  <div style="font-size:11px;color:#8090a8;margin-bottom:8px">${p.trigramme||''} · ${cat} · ${p.contrat||''}</div>`;
+  const forms=(S.formations||[]).filter(f=>f.empId===p.id);
+  const autos=(S.autorisations||[]).filter(a=>a.empId===p.id);
+  const today=new Date();today.setHours(0,0,0,0);
+  const fmtItem=(type,exp)=>{
+    if(!exp) return `<div>• ${type} <span style="color:#8090a8">(pas de date)</span></div>`;
+    const days=Math.round((parseLocal(exp)-today)/86400000);
+    const col=days<0?'#ff8090':days<=60?'#ffd060':'#34c759';
+    const lbl=days<0?`expiré (${disp(exp)})`:`${disp(exp)}`;
+    return `<div>• ${type} <span style="color:${col}">${lbl}</span></div>`;
+  };
+  if(forms.length){
+    html+=`<div style="font-weight:700;color:#a0b8d8;margin:6px 0 3px">Formations (${forms.length})</div>`;
+    html+=forms.map(f=>fmtItem(f.type,f.dateExpiration)).join('');
+  }
+  if(autos.length){
+    html+=`<div style="font-weight:700;color:#a0b8d8;margin:8px 0 3px">Autorisations (${autos.length})</div>`;
+    html+=autos.map(a=>fmtItem(a.type||a.nom,a.dateExpiration)).join('');
+  }
+  if(!forms.length&&!autos.length) html+='<div style="color:#8090a8">Aucune formation ni autorisation enregistrée.</div>';
+  return html;
+}
+
+// ── Guide / lancement de simulation de chantier ──
+function aiSimulationGuide(q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const n=norm(q);
+
+  // Nombre de techniciens demandé
+  const techM=n.match(/(\d{1,2})\s*(?:tech|technicien|personne|gars|monde|ressource|operateur)/);
+  const nbTech=techM?parseInt(techM[1]):null;
+
+  // CAS 1 : période en numéros de semaine — "semaine 32 et 33", "semaines 32 a 35", "s32-s34"
+  const weekNums=[];
+  // "semaine 32 et 33" / "semaine 32, 33" / "semaines 32 33"
+  const wkListM=n.match(/semaines?\s*((?:\d{1,2}[\s,etàa\-]*)+)/);
+  if(wkListM){
+    const nums=(wkListM[1].match(/\d{1,2}/g)||[]).map(Number);
+    if(nums.length){
+      // plage "30 a 33" / "30 à 33" / "30-33" → toutes les semaines entre les deux
+      if(/\bà\b|\ba\b|\-/.test(wkListM[1]) && nums.length===2 && nums[1]>nums[0]){
+        for(let w=nums[0];w<=nums[1];w++) weekNums.push(w);
+      } else { nums.forEach(w=>weekNums.push(w)); }
+    }
+  }
+
+  // CAS 2 : dates "du 01/09 au 30/09"
+  const dateM=n.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?.*?(?:au|jusqu|→|a\s|-)\s*(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+
+  // Si on a des semaines → simuler dessus
+  if(weekNums.length){
+    return aiRunSimulationWeeks(nbTech,weekNums);
+  }
+  // Si on a des dates → simuler dessus
+  if(dateM){
+    const yr=new Date().getFullYear();
+    const d1=new Date(dateM[3]?(dateM[3].length===2?2000+ +dateM[3]:+dateM[3]):yr, +dateM[2]-1, +dateM[1]);
+    const d2=new Date(dateM[6]?(dateM[6].length===2?2000+ +dateM[6]:+dateM[6]):yr, +dateM[5]-1, +dateM[4]);
+    let mons=[]; let mon=getMon(d1);
+    while(mon<=d2){ mons.push(wkN(mon)); mon=addD(mon,7); }
+    return aiRunSimulationWeeks(nbTech,mons);
+  }
+
+  // Sinon : guider
+  let msg=`🔮 <strong style="color:#c0e0ff">Simulation de faisabilité</strong><br>
+  Je calcule si vous pouvez accepter un chantier selon votre capacité résiduelle réelle (techniciens disponibles − charge déjà validée), semaine par semaine.<br><br>`;
+  if(nbTech && !weekNums.length){
+    msg+=`Vous indiquez <strong>${nbTech} technicien(s)</strong> mais pas la période. Précisez les semaines, par exemple :<br>
+    <em style="color:#82b1ff">« ${nbTech} techniciens en semaine 32 et 33 »</em>`;
+  } else {
+    msg+=`Donnez-moi <strong>le nombre de techniciens</strong> et <strong>la période</strong> :<br>
+    <em style="color:#82b1ff">« 4 techniciens en semaine 32 et 33 »</em><br>
+    <em style="color:#82b1ff">« 5 techniciens du 01/09 au 30/09 »</em>`;
+  }
+  return msg;
+}
+
+// Simulation sur une liste de numéros de semaine
+function aiRunSimulationWeeks(nbTech,weekNums){
+  if(!weekNums||!weekNums.length) return '⚠ Précisez les semaines, par exemple « semaine 32 et 33 ».';
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  const rows=[];
+  weekNums.forEach(wk=>{
+    const mon=_weekMon(wk);
+    const wEnd=addD(mon,6);
+    let dispo=0;
+    techs.forEach(p=>{
+      let present=0,total=0;
+      for(let d=0;d<5;d++){
+        const ds=fmt(addD(mon,d)); if(isHol(ds))continue; total++;
+        const am=S.planning[`${p.id}_${ds}_AM`]||{},pm=S.planning[`${p.id}_${ds}_PM`]||{};
+        const a=ABSENT.has(am.type||''),b=ABSENT.has(pm.type||'');
+        if(!a&&!b)present+=1;else if(!a||!b)present+=0.5;
+      }
+      dispo+=total>0?present/total:1;
+    });
+    const ovWk=`${mon.getFullYear()}-S${wkN(mon)}`;
+    let besoin=0;
+    (S.chantiers||[]).filter(c=>['encours','futur','termine'].includes(c.statut)).forEach(c=>{
+      const cd=c.debut?parseLocal(c.debut):null,cf=c.fin?parseLocal(c.fin):null;
+      const dansP=(!cd||cd<=wEnd)&&(!cf||cf>=mon);
+      const ov=S.besoinOverrides?.[`${c.id}_${ovWk}`];const hasOv=ov!=null&&ov!=='';
+      if(dansP)besoin+=hasOv?parseInt(ov):(c.ressources?.technicien||0);
+      else if(hasOv)besoin+=parseInt(ov);
+    });
+    dispo=Math.round(dispo*10)/10;
+    const reste=Math.round((dispo-besoin)*10)/10;
+    rows.push({wk,date:fmt(mon),dispo,besoin,reste});
+  });
+
+  // Si pas de nombre demandé : afficher la capacité résiduelle (combien on PEUT prendre)
+  if(!nbTech){
+    let html=`🔮 <strong style="color:#c0e0ff">Capacité résiduelle — semaine${weekNums.length>1?'s':''} ${weekNums.join(', ')}</strong><br>
+    <div style="font-size:11px;color:#8090a8;margin:4px 0 8px">Techniciens encore disponibles après la charge déjà validée :</div>`;
+    rows.forEach(r=>{
+      const col=r.reste>0?'#34c759':r.reste===0?'#ffd060':'#ff4d6d';
+      html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <span><strong>S${r.wk}</strong> <span style="color:#8090a8">(${disp(r.date)})</span></span>
+        <span style="color:#8090a8;font-size:12px">${r.dispo} dispo − ${r.besoin} engagés =</span>
+        <span style="color:${col};font-weight:800">${r.reste>0?'+':''}${r.reste} libre${r.reste>1?'s':''}</span>
+      </div>`;
+    });
+    const minReste=Math.min(...rows.map(r=>r.reste));
+    html+=`<div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.08);border-radius:8px;font-size:13px">
+      💡 Vous pouvez engager jusqu'à <strong style="color:#00d2ff">${Math.max(0,minReste)} technicien(s)</strong> sur toute la période sans dépasser votre capacité.
+      ${minReste<0?'<br><span style="color:#ff8090">⚠ Attention : certaines semaines sont déjà en sous-effectif.</span>':''}
+    </div>`;
+    return html;
+  }
+
+  // Avec un nombre demandé : verdict clair
+  const koWeeks=rows.filter(r=>r.reste<nbTech);
+  const okCount=rows.length-koWeeks.length;
+  const verdict=okCount===rows.length
+    ? `<div style="padding:10px 14px;background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.4);border-radius:10px;color:#34c759;font-weight:800;font-size:15px;text-align:center">✅ OUI — vous avez les ressources pour ${nbTech} technicien(s)</div>`
+    : okCount===0
+      ? `<div style="padding:10px 14px;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.4);border-radius:10px;color:#ff4d6d;font-weight:800;font-size:15px;text-align:center">❌ NON — capacité insuffisante pour ${nbTech} technicien(s)</div>`
+      : `<div style="padding:10px 14px;background:rgba(255,208,96,0.12);border:1px solid rgba(255,208,96,0.4);border-radius:10px;color:#ffd060;font-weight:800;font-size:14px;text-align:center">⚠ PARTIELLEMENT — OK sur ${okCount}/${rows.length} semaine(s)</div>`;
+
+  let html=`🔮 <strong style="color:#c0e0ff">Simulation : ${nbTech} technicien(s) — semaine${weekNums.length>1?'s':''} ${weekNums.join(', ')}</strong><br><br>${verdict}<br>`;
+  html+=`<div style="margin-top:8px">`;
+  rows.forEach(r=>{
+    const ok=r.reste>=nbTech;
+    const col=ok?'#34c759':'#ff4d6d';
+    const manque=ok?'':` — manque ${Math.round((nbTech-r.reste)*10)/10}`;
+    html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px">
+      <span><strong>S${r.wk}</strong> <span style="color:#8090a8">(${disp(r.date)})</span></span>
+      <span style="color:#8090a8">${r.reste} libre / ${nbTech} requis</span>
+      <span style="color:${col};font-weight:700">${ok?'✓':'✗'+manque}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+  if(koWeeks.length){
+    html+=`<div style="margin-top:8px;font-size:11px;color:#ffd060">Semaine(s) insuffisante(s) : ${koWeeks.map(w=>'S'+w.wk).join(', ')}. → mobiliser des intérimaires ou décaler la charge.</div>`;
+  }
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// AFFECTATION AUTOMATIQUE AU PLANNING (avec aperçu + conflits)
+// ═══════════════════════════════════════════════════════════
+let _affectData=null;
+
+function aiAffectationGuide(q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const n=norm(q);
+
+  // 1) Identifier le chantier cité
+  let chantier=null;
+  (S.chantiers||[]).forEach(c=>{
+    if(n.includes(norm(c.nom))) chantier=c;
+  });
+  if(!chantier){
+    return `🔧 <strong style="color:#c0e0ff">Affectation</strong><br>Je n'ai pas identifié le chantier. Précisez son nom, par ex :<br><em style="color:#82b1ff">« Mets BAOU et CASTANON sur le chantier 5598 semaine 32 et 33 »</em>`;
+  }
+
+  // 2) Identifier la période (semaines ou dates)
+  let dates=[];
+  const wkListM=n.match(/semaines?\s*((?:\d{1,2}[\s,etàa\-]*)+)/);
+  if(wkListM){
+    const nums=(wkListM[1].match(/\d{1,2}/g)||[]).map(Number);
+    let weekNums=[];
+    if((/\bà\b|\ba\b|\-/.test(wkListM[1]))&&nums.length===2&&nums[1]>nums[0]){
+      for(let w=nums[0];w<=nums[1];w++) weekNums.push(w);
+    } else weekNums=nums;
+    weekNums.forEach(wk=>{
+      const mon=_weekMon(wk);
+      for(let d=0;d<5;d++) dates.push(fmt(addD(mon,d))); // lun→ven
+    });
+  }
+  const dateM=n.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?.*?(?:au|jusqu|→|a\s|-)\s*(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+  if(!dates.length && dateM){
+    const yr=new Date().getFullYear();
+    const d1=new Date(dateM[3]?(dateM[3].length===2?2000+ +dateM[3]:+dateM[3]):yr,+dateM[2]-1,+dateM[1]);
+    const d2=new Date(dateM[6]?(dateM[6].length===2?2000+ +dateM[6]:+dateM[6]):yr,+dateM[5]-1,+dateM[4]);
+    let d=new Date(d1);
+    while(d<=d2){ const wd=d.getDay(); if(wd>=1&&wd<=5) dates.push(fmt(d)); d=new Date(d.getTime()+86400000); }
+  }
+  if(!dates.length){
+    return `🔧 <strong style="color:#c0e0ff">Affectation sur ${chantier.nom}</strong><br>Précisez la période, par ex :<br><em style="color:#82b1ff">« ...semaine 32 et 33 »</em> ou <em style="color:#82b1ff">« ...du 04/08 au 15/08 »</em>`;
+  }
+
+  // 3) Identifier les personnes citées (par trigramme ou nom)
+  const people=aiFindPeople(q,chantier);
+  if(!people.length){
+    return `🔧 <strong style="color:#c0e0ff">Affectation sur ${chantier.nom}</strong><br>Je n'ai pas identifié de personne. Citez-les par nom ou trigramme, par ex :<br><em style="color:#82b1ff">« Mets BAOU et CASTANON sur ${chantier.nom} semaine 32 »</em>`;
+  }
+
+  // 4) Construire l'aperçu avec détection de conflits
+  const typeLabels={conge:'congé',maladie:'maladie',formation:'formation',deplacement:'déplacement',absence:'absence',travail:'déjà sur un chantier'};
+  const plan=[];
+  people.forEach(emp=>{
+    const slots=[];
+    dates.forEach(ds=>{
+      if(isHol(ds)) return; // jamais sur un férié
+      ['AM','PM'].forEach(h=>{
+        const key=`${emp.id}_${ds}_${h}`;
+        const existing=S.planning[key];
+        let conflict=null;
+        if(existing && existing.type){
+          if(existing.type==='travail'){
+            const ch=existing.chantierId?(S.chantiers||[]).find(c=>c.id===existing.chantierId):null;
+            conflict={kind:'travail',label:ch?('chantier '+ch.nom):'un chantier'};
+          } else {
+            conflict={kind:existing.type,label:typeLabels[existing.type]||existing.type};
+          }
+        }
+        slots.push({key,ds,h,conflict});
+      });
+    });
+    plan.push({emp,slots});
+  });
+
+  _affectData={chantier,plan,dates};
+  return aiRenderAffectPreview();
+}
+
+// Trouve toutes les personnes citées dans la question (hors mots du chantier)
+function aiFindPeople(q,chantier){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const stop=new Set(['mets','met','mettre','place','placer','affecte','affecter','assigne','assigner','sur','le','la','les','chantier','semaine','semaines','du','au','et',norm(chantier.nom),'poste','positionne']);
+  const tokens=norm(q).split(/[\s,]+/).filter(w=>w.length>=2 && !stop.has(w) && !/^\d+$/.test(w) && !/^\d{1,2}[\/\-]\d/.test(w));
+  const found=[];
+  const seen=new Set();
+  (S.personnel||[]).forEach(p=>{
+    if(p.actif===false) return;
+    const nom=norm(p.nom),prenom=norm(p.prenom),tri=norm(p.trigramme);
+    let match=false;
+    tokens.forEach(w=>{
+      if(tri===w) match=true;
+      else if(nom===w||prenom===w) match=true;
+      else if(w.length>=4 && (nom.includes(w)||prenom.includes(w))) match=true;
+    });
+    if(match && !seen.has(p.id)){ seen.add(p.id); found.push(p); }
+  });
+  return found;
+}
+
+function aiRenderAffectPreview(){
+  const {chantier,plan,dates}=_affectData;
+  const joursOuvres=dates.filter(d=>!isHol(d));
+  let totalConflicts=0;
+  plan.forEach(p=>p.slots.forEach(s=>{if(s.conflict)totalConflicts++;}));
+
+  let html=`🔧 <strong style="color:#c0e0ff">Affectation sur le chantier ${chantier.nom}</strong> ${chantier.client?'<span style="color:#8090a8">('+chantier.client+')</span>':''}<br>
+  <div style="font-size:11px;color:#8090a8;margin:4px 0 10px">${plan.length} personne(s) · ${joursOuvres.length} jour(s) ouvré(s) · ${disp(joursOuvres[0])} → ${disp(joursOuvres[joursOuvres.length-1])} · journée complète</div>`;
+
+  plan.forEach((p,pi)=>{
+    const conflicts=p.slots.filter(s=>s.conflict);
+    // Regrouper les conflits par jour
+    const conflictDays={};
+    conflicts.forEach(s=>{ if(!conflictDays[s.ds])conflictDays[s.ds]=s.conflict.label; });
+    html+=`<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="font-weight:700;color:#e0e8ff">• ${p.emp.nom} ${p.emp.prenom} <span style="color:#8090a8;font-weight:400">(${p.emp.trigramme})</span></div>`;
+    if(Object.keys(conflictDays).length){
+      html+=`<div style="margin-top:4px;font-size:11px;color:#ff8fa3">⚠ Conflits : ${Object.entries(conflictDays).map(([d,l])=>disp(d)+' ('+l+')').join(', ')}</div>
+      <div style="margin-top:5px;display:flex;gap:6px">
+        <button onclick="aiAffectSetMode(${pi},'skip')" id="affmode-${pi}-skip" style="flex:1;padding:5px;font-size:10px;border-radius:6px;background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#34c759;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700">Garder l'existant (sauter les jours en conflit)</button>
+        <button onclick="aiAffectSetMode(${pi},'overwrite')" id="affmode-${pi}-overwrite" style="flex:1;padding:5px;font-size:10px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#a0b0c8;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700">Écraser et affecter quand même</button>
+      </div>`;
+      p.mode=p.mode||'skip'; // défaut sécurisé
+    } else {
+      html+=`<div style="margin-top:3px;font-size:11px;color:#34c759">✓ Aucun conflit — sera affecté sur tous les jours ouvrés</div>`;
+      p.mode='clean';
+    }
+    html+=`</div>`;
+  });
+
+  if(totalConflicts){
+    html+=`<div style="margin-top:8px;font-size:11px;color:#ffd060">Pour chaque personne en conflit, choisissez "garder" (par défaut, sécurisé) ou "écraser".</div>`;
+  }
+  html+=`<div style="display:flex;gap:8px;margin-top:14px">
+    <button onclick="aiConfirmAffectation()" style="flex:1;padding:10px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.45);border-radius:10px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">✅ Confirmer l'affectation</button>
+    <button onclick="aiCancelAffectation()" style="padding:10px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">Annuler</button>
+  </div>`;
+  return html;
+}
+
+// Change le mode (skip/overwrite) d'une personne et rafraîchit l'aperçu
+function aiAffectSetMode(pi,mode){
+  if(!_affectData) return;
+  _affectData.plan[pi].mode=mode;
+  // Mettre à jour visuellement les boutons
+  const skipBtn=document.getElementById(`affmode-${pi}-skip`);
+  const owBtn=document.getElementById(`affmode-${pi}-overwrite`);
+  if(skipBtn&&owBtn){
+    const active='background:rgba(0,160,255,0.25);border:1px solid #00a0ff;color:#00d2ff;cursor:pointer;font-family:\'Outfit\',sans-serif;font-weight:700;flex:1;padding:5px;font-size:10px;border-radius:6px';
+    const inactive='background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#a0b0c8;cursor:pointer;font-family:\'Outfit\',sans-serif;font-weight:700;flex:1;padding:5px;font-size:10px;border-radius:6px';
+    skipBtn.style.cssText=mode==='skip'?active:inactive;
+    owBtn.style.cssText=mode==='overwrite'?active:inactive;
+  }
+}
+
+function aiConfirmAffectation(){
+  if(!_affectData) return;
+  const {chantier,plan}=_affectData;
+  let affected=0, skipped=0;
+  // Sauvegarder l'état pour annulation
+  _affectUndo={snapshot:JSON.stringify(S.planning),desc:`${plan.length} pers. sur ${chantier.nom}`};
+
+  plan.forEach(p=>{
+    const mode=p.mode||'skip';
+    p.slots.forEach(s=>{
+      if(s.conflict && mode==='skip'){ skipped++; return; } // garder l'existant
+      // clean (pas de conflit) OU overwrite → on affecte
+      S.planning[s.key]={type:'travail',note:'',chantierId:chantier.id,chantierColor:chantier.color||'#2979ff'};
+      affected++;
+    });
+  });
+
+  save();
+  if(typeof renderWeekly==='function') try{renderWeekly();}catch(e){}
+  if(typeof renderMaster==='function') try{renderMaster();}catch(e){}
+  if(typeof renderDash==='function') try{renderDash();}catch(e){}
+
+  const undoBtn=`<button onclick="aiUndoAffectation()" style="margin-top:8px;padding:6px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#a0b0c8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">↩ Annuler cette affectation</button>`;
+  aiAddMessage(`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:4px">
+    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2979ff,#00d2ff);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✦</div>
+    <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:13px;color:var(--t1);line-height:1.6;max-width:88%">
+      ✅ <strong style="color:#34c759">Affectation effectuée</strong> sur le chantier ${chantier.nom}.<br>
+      ${affected} demi-journée(s) affectée(s)${skipped?`, ${skipped} conservée(s) (conflits gardés)`:''}.<br>
+      Le planning hebdo et le master sont à jour.${undoBtn}
+    </div>
+  </div>`);
+  _affectData=null;
+  setTimeout(()=>{const m=document.getElementById('ai-messages');if(m)m.scrollTop=m.scrollHeight;},50);
+}
+
+let _affectUndo=null;
+function aiUndoAffectation(){
+  if(!_affectUndo){ toast('Rien à annuler'); return; }
+  S.planning=JSON.parse(_affectUndo.snapshot);
+  save();
+  if(typeof renderWeekly==='function') try{renderWeekly();}catch(e){}
+  if(typeof renderMaster==='function') try{renderMaster();}catch(e){}
+  if(typeof renderDash==='function') try{renderDash();}catch(e){}
+  toast('↩ Affectation annulée');
+  _affectUndo=null;
+  aiAddMessage(`<div style="padding:8px 8px 8px 42px;font-size:12px;color:#8090a8">↩ La dernière affectation a été annulée, le planning est revenu à son état précédent.</div>`);
+}
+
+function aiCancelAffectation(){
+  _affectData=null;
+  aiAddMessage(`<div style="padding:8px 8px 8px 42px;font-size:12px;color:#8090a8">Affectation annulée.</div>`);
+}
+
+// ── Mise en formation / congé / absence (action planning) ──
+let _planActData=null;
+function aiPlanningActionGuide(q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const n=norm(q);
+
+  // 1) Type d'activité
+  let type=null, formInt='', label='', isCaces=false, formIntName='';
+  // Formations internes (intitulés connus) — TOUTES internes chez Damien sauf CACES intérimaires
+  const formIntMap={
+    'global refresh':'Global Refresh','globalrefresh':'Global Refresh',
+    'ewis':'EWIS',
+    'cdccl':'CDCCL','ccdcl':'CDCCL','cdcl':'CDCCL',
+    'safety':'Safety Training','safety training':'Safety Training',
+    'moe':'MOE/PART 145','part 145':'MOE/PART 145','part145':'MOE/PART 145','moe/part':'MOE/PART 145',
+    'hf':'HF & SMS','sms':'HF & SMS','hf & sms':'HF & SMS','hf et sms':'HF & SMS',
+    'competenc':'Competencies','compétenc':'Competencies',
+    'english':'English','anglais':'English',
+    'dismantling':'Aircraft Dismantling','aircraft dismantling':'Aircraft Dismantling','demantelement':'Aircraft Dismantling',
+    'welcome':'Welcome HSE',
+    'travail en hauteur':'Travail en hauteur','hauteur':'Travail en hauteur',
+    'risque chimi':'Risque chimiques','chimi':'Risque chimiques',
+    'visite medicale':'Visite Médicale','visite médicale':'Visite Médicale','medical':'Visite Médicale',
+    'pushback':'Pushback','licence part 66':'Licence Part 66'
+  };
+  // Détection CACES (classement dépend de la catégorie de la personne)
+  const cacesMap={'nacelle':'CACES NACELLE','chariot':'CACES CHARIOT','tracma':'CACES TRACMA','telesco':'CACES TELESCO','télesco':'CACES TELESCO','gerbeur':'CACES GERBEUR'};
+  if(n.includes('caces')){
+    isCaces=true;
+    // Identifier le type précis de CACES
+    formIntName='CACES';
+    for(const k in cacesMap){ if(n.includes(k)){ formIntName=cacesMap[k]; break; } }
+    type='__caces__'; label='formation CACES'; // type réel déterminé par personne
+  }
+  if(!type){
+    for(const k in formIntMap){ if(n.includes(k)){ type='formation_int'; formInt=formIntMap[k]; label='formation interne '+formInt; break; } }
+  }
+  if(!type){
+    if(n.includes('formation')){ type='formation_int'; formInt=''; label='formation interne'; } // par défaut interne chez Damien
+    else if(n.includes('conge')||n.includes('congé')||n.includes('vacance')||n.includes('repos')){ type='conge'; label='congé'; }
+    else if(n.includes('malad')){ type='maladie'; label='maladie'; }
+    else if(n.includes('deplacement')||n.includes('déplacement')||n.includes('mission')){ type='deplacement'; label='déplacement'; }
+    else if(n.includes('absence')||n.includes('absent')){ type='absence'; label='absence'; }
+  }
+  if(!type) return `📋 Précisez le type : formation, congé, maladie, déplacement ou absence.`;
+
+  // 2) Personne(s)
+  const fakeChantier={nom:'__none__'};
+  const people=aiFindPeople(q,fakeChantier);
+  if(!people.length) return `📋 <strong style="color:#c0e0ff">${label.charAt(0).toUpperCase()+label.slice(1)}</strong><br>Je n'ai pas identifié de personne. Citez-la par nom ou trigramme.`;
+
+  // 3) Date(s) : une date unique "le 13 juillet 2026", "le 13/07", ou une période
+  let dates=[];
+  const moisMap={janvier:1,fevrier:2,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,aout:8,août:8,septembre:9,octobre:10,novembre:11,decembre:12,décembre:12};
+  // "13 juillet 2026" ou "13 juillet"
+  let dm=n.match(/(\d{1,2})\s+(janvier|fevrier|février|mars|avril|mai|juin|juillet|aout|août|septembre|octobre|novembre|decembre|décembre)\s*(\d{4})?/);
+  if(dm){
+    const jour=+dm[1], mois=moisMap[dm[2]], an=dm[3]?+dm[3]:new Date().getFullYear();
+    dates.push(fmt(new Date(an,mois-1,jour)));
+  }
+  // "le 13/07/2026" ou "13/07"
+  if(!dates.length){
+    const dd=n.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+    if(dd && !n.match(/(?:au|→|jusqu)/)){
+      const an=dd[3]?(dd[3].length===2?2000+ +dd[3]:+dd[3]):new Date().getFullYear();
+      dates.push(fmt(new Date(an,+dd[2]-1,+dd[1])));
+    }
+  }
+  // Période "du ... au ..."
+  if(!dates.length){
+    const dateM=n.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?.*?(?:au|jusqu|→|a\s|-)\s*(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+    if(dateM){
+      const yr=new Date().getFullYear();
+      const d1=new Date(dateM[3]?(dateM[3].length===2?2000+ +dateM[3]:+dateM[3]):yr,+dateM[2]-1,+dateM[1]);
+      const d2=new Date(dateM[6]?(dateM[6].length===2?2000+ +dateM[6]:+dateM[6]):yr,+dateM[5]-1,+dateM[4]);
+      let d=new Date(d1);
+      while(d<=d2){ const wd=d.getDay(); if(wd>=1&&wd<=5) dates.push(fmt(d)); d=new Date(d.getTime()+86400000); }
+    }
+  }
+  // Semaine
+  if(!dates.length){
+    const wkListM=n.match(/semaines?\s*((?:\d{1,2}[\s,etàa\-]*)+)/);
+    if(wkListM){
+      const nums=(wkListM[1].match(/\d{1,2}/g)||[]).map(Number);
+      let weekNums=nums;
+      if((/\bà\b|\ba\b|\-/.test(wkListM[1]))&&nums.length===2&&nums[1]>nums[0]){weekNums=[];for(let w=nums[0];w<=nums[1];w++)weekNums.push(w);}
+      weekNums.forEach(wk=>{const mon=_weekMon(wk);for(let d=0;d<5;d++)dates.push(fmt(addD(mon,d)));});
+    }
+  }
+  if(!dates.length) return `📋 <strong style="color:#c0e0ff">${label}</strong> pour ${people.map(p=>p.nom).join(', ')}<br>Précisez la date, par ex : <em style="color:#82b1ff">« le 13 juillet 2026 »</em> ou <em style="color:#82b1ff">« du 13/07 au 17/07 »</em>.`;
+
+  // 4) Aperçu + conflits
+  const typeLabels={conge:'congé',maladie:'maladie',formation:'formation ext.',formation_int:'formation interne',deplacement:'déplacement',absence:'absence',travail:'chantier'};
+  const plan=[];
+  people.forEach(emp=>{
+    // Pour un CACES : externe si intérimaire, interne sinon. Sinon, type global.
+    let pType=type, pFormInt=formInt, pLabel=label;
+    if(isCaces){
+      if(emp.categorie==='interimaire'){ pType='formation'; pFormInt=''; pLabel='formation externe '+formIntName; }
+      else { pType='formation_int'; pFormInt=formIntName; pLabel='formation interne '+formIntName; }
+    }
+    const slots=[];
+    dates.forEach(ds=>{
+      if(isHol(ds)) return;
+      ['AM','PM'].forEach(h=>{
+        const key=`${emp.id}_${ds}_${h}`;
+        const ex=S.planning[key];
+        let conflict=null;
+        if(ex&&ex.type){
+          if(ex.type==='travail'){const ch=ex.chantierId?(S.chantiers||[]).find(c=>c.id===ex.chantierId):null;conflict={label:ch?('chantier '+ch.nom):'un chantier'};}
+          else conflict={label:typeLabels[ex.type]||ex.type};
+        }
+        slots.push({key,ds,h,conflict});
+      });
+    });
+    plan.push({emp,slots,mode:slots.some(s=>s.conflict)?'skip':'clean',pType,pFormInt,pLabel});
+  });
+
+  // Label global pour l'en-tête : si CACES avec mix de catégories, on l'indique
+  let headerLabel=label;
+  if(isCaces){
+    const hasInterim=people.some(p=>p.categorie==='interimaire');
+    const hasOther=people.some(p=>p.categorie!=='interimaire');
+    if(hasInterim&&hasOther) headerLabel=formIntName+' (interne + externe selon catégorie)';
+    else if(hasInterim) headerLabel='formation externe '+formIntName;
+    else headerLabel='formation interne '+formIntName;
+  }
+
+  _planActData={type,formInt,label:headerLabel,plan,dates,isCaces};
+  return aiRenderPlanActPreview();
+}
+
+function aiRenderPlanActPreview(){
+  const {type,formInt,label,plan,dates}=_planActData;
+  const jo=dates.filter(d=>!isHol(d));
+  const icon={conge:'🏖',maladie:'🤒',formation:'📚',formation_int:'📖',deplacement:'✈️',absence:'🚫'}[type]||'📋';
+  let html=`${icon} <strong style="color:#c0e0ff">${label.charAt(0).toUpperCase()+label.slice(1)}</strong><br>
+  <div style="font-size:11px;color:#8090a8;margin:4px 0 10px">${plan.length} personne(s) · ${jo.length} jour(s) ouvré(s) · ${disp(jo[0])}${jo.length>1?' → '+disp(jo[jo.length-1]):''} · journée complète</div>`;
+  plan.forEach((p,pi)=>{
+    const conflictDays={};
+    p.slots.forEach(s=>{if(s.conflict&&!conflictDays[s.ds])conflictDays[s.ds]=s.conflict.label;});
+    // Badge interne/externe par personne (utile pour CACES)
+    let badge='';
+    if(p.pType==='formation_int') badge=' <span style="font-size:10px;color:#6effc4">📖 interne</span>';
+    else if(p.pType==='formation') badge=' <span style="font-size:10px;color:#ffd060">📚 externe</span>';
+    html+=`<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="font-weight:700;color:#e0e8ff">• ${p.emp.nom} ${p.emp.prenom} <span style="color:#8090a8;font-weight:400">(${p.emp.trigramme})</span>${badge}</div>`;
+    if(Object.keys(conflictDays).length){
+      html+=`<div style="margin-top:4px;font-size:11px;color:#ff8fa3">⚠ Conflits : ${Object.entries(conflictDays).map(([d,l])=>disp(d)+' ('+l+')').join(', ')}</div>
+      <div style="margin-top:5px;display:flex;gap:6px">
+        <button onclick="aiPlanActSetMode(${pi},'skip')" id="pamode-${pi}-skip" style="flex:1;padding:5px;font-size:10px;border-radius:6px;background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#34c759;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700">Garder l'existant</button>
+        <button onclick="aiPlanActSetMode(${pi},'overwrite')" id="pamode-${pi}-overwrite" style="flex:1;padding:5px;font-size:10px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#a0b0c8;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700">Écraser</button>
+      </div>`;
+    } else {
+      html+=`<div style="margin-top:3px;font-size:11px;color:#34c759">✓ Aucun conflit</div>`;
+    }
+    html+=`</div>`;
+  });
+  html+=`<div style="display:flex;gap:8px;margin-top:14px">
+    <button onclick="aiConfirmPlanAct()" style="flex:1;padding:10px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.45);border-radius:10px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">✅ Confirmer</button>
+    <button onclick="aiCancelPlanAct()" style="padding:10px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">Annuler</button>
+  </div>`;
+  return html;
+}
+
+function aiPlanActSetMode(pi,mode){
+  if(!_planActData)return;
+  _planActData.plan[pi].mode=mode;
+  const sk=document.getElementById(`pamode-${pi}-skip`),ow=document.getElementById(`pamode-${pi}-overwrite`);
+  if(sk&&ow){
+    const A='background:rgba(0,160,255,0.25);border:1px solid #00a0ff;color:#00d2ff;cursor:pointer;font-family:\'Outfit\',sans-serif;font-weight:700;flex:1;padding:5px;font-size:10px;border-radius:6px';
+    const I='background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#a0b0c8;cursor:pointer;font-family:\'Outfit\',sans-serif;font-weight:700;flex:1;padding:5px;font-size:10px;border-radius:6px';
+    sk.style.cssText=mode==='skip'?A:I; ow.style.cssText=mode==='overwrite'?A:I;
+  }
+}
+
+function aiConfirmPlanAct(){
+  if(!_planActData)return;
+  const {type,formInt,plan}=_planActData;
+  let done=0,skip=0;
+  _affectUndo={snapshot:JSON.stringify(S.planning),desc:'planning'};
+  plan.forEach(p=>{
+    // type par personne si défini (cas CACES), sinon type global
+    const pType=p.pType||type;
+    const pFormInt=p.pFormInt!==undefined?p.pFormInt:formInt;
+    p.slots.forEach(s=>{
+      if(s.conflict&&p.mode==='skip'){skip++;return;}
+      const entry={type:pType,note:''};
+      if(pType==='formation_int') entry.formInt=pFormInt;
+      else if(pType==='formation'&&pFormInt) entry.note=pFormInt; // formation externe : note le CACES
+      S.planning[s.key]=entry;
+      done++;
+    });
+  });
+  save();
+  if(typeof renderWeekly==='function')try{renderWeekly();}catch(e){}
+  if(typeof renderMaster==='function')try{renderMaster();}catch(e){}
+  if(typeof renderDash==='function')try{renderDash();}catch(e){}
+  const undoBtn=`<button onclick="aiUndoAffectation()" style="margin-top:8px;padding:6px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#a0b0c8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">↩ Annuler</button>`;
+  aiAddMessage(`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:4px">
+    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2979ff,#00d2ff);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✦</div>
+    <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:13px;color:var(--t1);line-height:1.6;max-width:88%">
+      ✅ <strong style="color:#34c759">Planning mis à jour</strong>.<br>${done} demi-journée(s) renseignée(s)${skip?`, ${skip} conservée(s)`:''}.${undoBtn}
+    </div></div>`);
+  _planActData=null;
+  setTimeout(()=>{const m=document.getElementById('ai-messages');if(m)m.scrollTop=m.scrollHeight;},50);
+}
+
+function aiCancelPlanAct(){
+  _planActData=null;
+  aiAddMessage(`<div style="padding:8px 8px 8px 42px;font-size:12px;color:#8090a8">Action annulée.</div>`);
 }
 
 function aiExecuteAction(idx){
