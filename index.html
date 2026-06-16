@@ -72,6 +72,16 @@ function _loadSheetJS(cb){
   document.head.appendChild(s);
 }
 
+// ExcelJS chargé à la demande (pour les exports colorés)
+function _loadExcelJS(cb){
+  if(window.ExcelJS){cb&&cb();return;}
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+  s.onload=function(){cb&&cb();};
+  s.onerror=function(){if(typeof toast==='function')toast('Export coloré indisponible (connexion requise)');};
+  document.head.appendChild(s);
+}
+
 // Copyright protection
 document.addEventListener('contextmenu',function(e){e.preventDefault();});
 document.addEventListener('keydown',function(e){if(e.ctrlKey&&(e.key==='u'||e.key==='U')){e.preventDefault();}});
@@ -3681,6 +3691,9 @@ async function pullFromDrive(silent){
       const keepGdrive=S.gdrive;
       S=remoteData;
       S.gdrive=Object.assign({},keepGdrive,{lastModified:remoteStamp,device:remoteDevice});
+      // weekStart redevient une string après JSON → le reconvertir en Date
+      if(S.weekStart && !(S.weekStart instanceof Date)) S.weekStart=new Date(S.weekStart);
+      if(!S.weekStart || isNaN(S.weekStart)) S.weekStart=getMon(new Date());
       try{_safeStorage.setItem('asp4',JSON.stringify(S));}catch(e){}
       // Rafraîchir l'écran courant
       const active=document.querySelector('.tab.active')?.dataset?.tab||'dashboard';
@@ -4747,7 +4760,7 @@ function renderAirbusPresence(){
     </div>`;
   }).join('');
 
-  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px">${monthHeader}${rows}
+  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px"><div style="max-height:60vh;overflow-y:auto;position:relative"><div style="position:sticky;top:0;z-index:10;background:#0d1628">${monthHeader}</div>${rows}</div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;font-size:10px;color:var(--t3)">
       <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(0,160,255,0.4);display:inline-block"></span>Présent</span>
       <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:#6effc4;display:inline-block"></span>Congé</span>
@@ -5368,10 +5381,10 @@ function renderDash(){
   const actCh=S.chantiers.filter(c=>c.statut==='encours').length;
   const late=S.todos.filter(t=>!t.done&&(T-new Date(t.createdAt))>7*86400000).length;
 
-  // Ratio techniciens / intérimaires uniquement
-  const nTech  = S.personnel.filter(p=>p.categorie==='technicien').length;
-  const nInt   = S.personnel.filter(p=>p.categorie==='interimaire').length;
-  const nPrest = S.personnel.filter(p=>p.categorie==='prestataire').length;
+  // Ratio techniciens / intérimaires — uniquement le personnel EN PRODUCTION
+  const nTech  = S.personnel.filter(p=>p.categorie==='technicien'&&p.actif!==false).length;
+  const nInt   = S.personnel.filter(p=>p.categorie==='interimaire'&&p.actif!==false).length;
+  const nPrest = S.personnel.filter(p=>p.categorie==='prestataire'&&p.actif!==false).length;
   const total  = nTech + nInt;
   const pctTech  = total > 0 ? Math.round(nTech / total * 100) : 0;
   const pctInt   = total > 0 ? 100 - pctTech : 0;
@@ -5409,12 +5422,53 @@ function renderDash(){
           <span>${pctTech >= 60 ? '✅' : pctTech >= 40 ? '⚠️' : '🚨'}</span>${ratioMsg}
         </div>
       </div>`;
+  // ── Calculs pour les indicateurs de la semaine en cours ──
+  const _mon=getMon(new Date());
+  const _wEnd=addD(_mon,6);
+  const _ABSENT=new Set(['conge','maladie','formation','formation_int','absence','deplacement','ferie','we']);
+  const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  // Dispo de la semaine
+  let _dispo=0;
+  _techs.forEach(p=>{
+    let pres=0,tot=0;
+    for(let d=0;d<5;d++){const ds=fmt(addD(_mon,d));if(isHol(ds))continue;tot++;
+      const am=S.planning[`${p.id}_${ds}_AM`]||{},pm=S.planning[`${p.id}_${ds}_PM`]||{};
+      const a=_ABSENT.has(am.type||''),b=_ABSENT.has(pm.type||'');
+      if(!a&&!b)pres+=1;else if(!a||!b)pres+=0.5;}
+    _dispo+=tot>0?pres/tot:1;
+  });
+  _dispo=Math.round(_dispo*10)/10;
+  // Besoin de la semaine (chantiers + overrides)
+  const _ovWk=`${_mon.getFullYear()}-S${wkN(_mon)}`;
+  let _besoin=0;
+  S.chantiers.filter(c=>['encours','futur','termine'].includes(c.statut)).forEach(c=>{
+    const cd=c.debut?parseLocal(c.debut):null,cf=c.fin?parseLocal(c.fin):null;
+    const dansP=(!cd||cd<=_wEnd)&&(!cf||cf>=_mon);
+    const ov=S.besoinOverrides?.[`${c.id}_${_ovWk}`];const hasOv=ov!=null&&ov!=='';
+    if(dansP)_besoin+=hasOv?parseInt(ov):(c.ressources?.technicien||0);
+    else if(hasOv)_besoin+=parseInt(ov);
+  });
+  const _ecart=Math.round((_dispo-_besoin)*10)/10;
+  // Personnes absentes cette semaine (congé ou maladie, au moins une demi-journée)
+  const _absentSet=new Set();
+  S.personnel.filter(p=>p.actif!==false).forEach(p=>{
+    for(let d=0;d<7;d++){const ds=fmt(addD(_mon,d));
+      const am=S.planning[`${p.id}_${ds}_AM`]||{},pm=S.planning[`${p.id}_${ds}_PM`]||{};
+      if(['conge','maladie'].includes(am.type)||['conge','maladie'].includes(pm.type)){_absentSet.add(p.id);break;}}
+  });
+  const _absents=_absentSet.size;
+  // Avions stockage + recyclage en cours (ces modules listent les avions actifs)
+  const _nStockage=(S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').length;
+  const _nRecyclage=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;
+  const _avions=_nStockage+_nRecyclage;
+
+  const ecartColor=_ecart>=0?'c-mint':'c-rose';
   document.getElementById('statsGrid').innerHTML=[
     {v:S.personnel.length,l:'Effectif total',c:'c-cyan'},
-    {v:S.personnel.filter(p=>p.categorie==='chef'||p.categorie==='responsable').length,l:"Chefs / Resp. Projet",c:'c-gold'},
-    {v:warn+autoWarn,l:'Expirent bientôt',c:'c-orange'},
+    {v:(_ecart>=0?'+':'')+_ecart,l:'Écart capacité/besoin (sem.)',c:ecartColor},
+    {v:_absents,l:'Absents cette semaine',c:'c-orange'},
     {v:exp+autoExp,l:'Formations/Auto. exp.',c:'c-rose'},
-    {v:actCh,l:'Chantiers actifs',c:'c-mint'},
+    {v:_avions,l:'Avions stockage + recyclage',c:'c-mint'},
     {v:late,l:'Tâches en retard',c:'c-purple'},
   ].map(s=>`<div class="st ${s.c}"><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
 
@@ -5939,10 +5993,23 @@ function buildGrid(emps,dates,containerId){
     </tr>`;
   }).join('');
 
-  el.innerHTML=`<table class="ptable">
-    <thead><tr><th style="min-width:145px;text-align:left;padding-left:12px;position:sticky;left:0;z-index:5;background:rgba(10,16,32,0.9)">Personnel</th>${thCells}</tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  el.innerHTML=`<div style="max-height:68vh;overflow:auto;position:relative">
+    <table class="ptable">
+      <thead><tr>
+        <th class="ncol-head" style="min-width:145px;text-align:left;padding-left:12px">Personnel</th>
+        ${thCells}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+  // En-tête figé en haut au scroll vertical (sticky), coin Personnel figé sur les 2 axes
+  el.querySelectorAll('thead th').forEach((th,i)=>{
+    th.style.position='sticky';
+    th.style.top='0';
+    if(i===0){ th.style.left='0'; th.style.zIndex='7'; }
+    else th.style.zIndex='5';
+    th.style.background='#0d1628';
+  });
 }
 
 /* ═══ MASTER ═══ */
@@ -6050,6 +6117,8 @@ function sortByChantier(personnel, weekDates){
 
 function renderWeekly(){
   if(!S.weekStart)S.weekStart=getMon(new Date());
+  if(!(S.weekStart instanceof Date)) S.weekStart=new Date(S.weekStart);
+  if(isNaN(S.weekStart)) S.weekStart=getMon(new Date());
   buildLeg('legWeekly');
   const dates=Array.from({length:7},(_,i)=>addD(S.weekStart,i));
   const end=dates[6];
@@ -6454,8 +6523,8 @@ function renderAvancement(){
         // Comparer par string de date — inclut le jour actuel
         if(ds>todayStr) return;
         const d=parseLocal(ds); if(!d||isNaN(d)) return;
-        const wd=d.getDay();
-        if(wd===0||wd===6||isHol(ds)) return;
+        // Toute affectation au chantier compte, y compris week-ends et fériés travaillés
+        // (si on affecte explicitement quelqu'un sur le chantier ce jour-là, il travaille)
         mhConsommees+=MH_PAR_TECH_JOUR/2;
       });
     }catch(e){}
@@ -6790,8 +6859,10 @@ function renderRespGantt(){
 
   el.innerHTML=`<div style="overflow-x:auto">
     <div style="min-width:600px">
-      ${monthHeader}
-      <div style="position:relative">${rows}</div>
+      <div style="max-height:60vh;overflow-y:auto;position:relative">
+        <div style="position:sticky;top:0;z-index:10;background:#0d1628">${monthHeader}</div>
+        <div style="position:relative">${rows}</div>
+      </div>
       ${_ganttLegendHtml()}
     </div>
   </div>`;
@@ -7011,7 +7082,7 @@ function renderRecyclingGantt(){
       </div>
     </div>`;
   }).join('');
-  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px">${monthHeader}${rows}${_ganttLegendHtml()}</div></div>`;
+  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px"><div style="max-height:60vh;overflow-y:auto;position:relative"><div style="position:sticky;top:0;z-index:10;background:#0d1628">${monthHeader}</div>${rows}</div>${_ganttLegendHtml()}</div></div>`;
 }
 
 /* ── Parc avions recyclage ── */
@@ -7766,7 +7837,7 @@ function renderStockageGantt(){
     </div>`;
   }).join('');
 
-  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px">${monthHeader}${rows}${_ganttLegendHtml()}</div></div>`;
+  el.innerHTML=`<div style="overflow-x:auto"><div style="min-width:500px"><div style="max-height:60vh;overflow-y:auto;position:relative"><div style="position:sticky;top:0;z-index:10;background:#0d1628">${monthHeader}</div>${rows}</div>${_ganttLegendHtml()}</div></div>`;
 }
 
 /* ── Parc avions ── */
@@ -8094,23 +8165,24 @@ function renderPersonnel(){
   });
   const grid=document.getElementById('staffGrid');
   if(!emps.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">👥</div><p>Aucun employé dans cette catégorie</p></div>';return;}
-  grid.innerHTML=emps.map(emp=>{
+
+  // Séparer : actifs (cartes) vs intérimaires hors production (liste compacte en bas)
+  const horsProd=emps.filter(p=>p.categorie==='interimaire'&&p.actif===false);
+  const actifs=emps.filter(p=>!(p.categorie==='interimaire'&&p.actif===false));
+
+  grid.innerHTML=actifs.map(emp=>{
     const cat=CATS[emp.categorie]||{};const ini=(emp.nom[0]||'')+(emp.prenom[0]||'');
     const mF=S.formations.filter(f=>f.empId===emp.id);
     const exC=mF.filter(f=>tSt(f.dateExpiration)==='expired').length;
     const wC=mF.filter(f=>tSt(f.dateExpiration)==='warning').length;
     const isInt=emp.categorie==='interimaire';
-    const actif=emp.actif!==false;
-    const inactifCls=isInt&&!actif?' inactif':'';
 
     const toggleBtn=isInt?`<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
       ${emp.activite?`<div style="font-size:10px;font-weight:700;color:${emp.activite==='recycling'?'#6effc4':emp.activite==='stockage'?'#ff9a3c':'#82b1ff'};background:${emp.activite==='recycling'?'rgba(110,255,196,0.08)':emp.activite==='stockage'?'rgba(255,154,60,0.08)':'rgba(130,177,255,0.08)'};border:1px solid ${emp.activite==='recycling'?'rgba(110,255,196,0.25)':emp.activite==='stockage'?'rgba(255,154,60,0.25)':'rgba(130,177,255,0.25)'};border-radius:6px;padding:3px 8px;display:inline-block">${emp.activite==='recycling'?'♻️ Recyclage':emp.activite==='stockage'?'✈️ Stockage':'🔧 Chantier'}</div>`:''}
-      <button class="toggle-actif ${actif?'on':'off'}" onclick="toggleInterimaire('${emp.id}')">
-        ${actif?'✅ En production':'⏸ Hors production'}
-      </button>
+      <button class="toggle-actif on" onclick="toggleInterimaire('${emp.id}')">✅ En production</button>
     </div>`:'';
 
-    return`<div class="sc ${emp.categorie}${inactifCls}" onclick="openPanel('${emp.id}')">
+    return`<div class="sc ${emp.categorie}" onclick="openPanel('${emp.id}')">
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
         <div class="sc-avatar" style="background:${cat.col||'#2979ff'}18;color:${cat.col||'#2979ff'}">${ini}</div>
         <div><div style="font-size:14px;font-weight:800;color:var(--t1)">${emp.nom} ${emp.prenom}</div>
@@ -8130,6 +8202,28 @@ function renderPersonnel(){
       ${toggleBtn}
     </div>`;
   }).join('');
+
+  // Section "Intérimaires hors production" en liste compacte tout en bas
+  if(horsProd.length){
+    const rows=horsProd.map(emp=>{
+      const ini=(emp.nom[0]||'')+(emp.prenom[0]||'');
+      return `<div onclick="openPanel('${emp.id}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;opacity:0.7">
+        <div style="width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,0.06);color:#8090a8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:13px;font-weight:700;color:#a0b0c8">${emp.nom} ${emp.prenom}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#607090;margin-left:8px">${emp.trigramme}</span>
+        </div>
+        <button class="toggle-actif off" onclick="event.stopPropagation();toggleInterimaire('${emp.id}')" style="flex-shrink:0">⏸ Hors prod.</button>
+      </div>`;
+    }).join('');
+    grid.innerHTML+=`<div style="grid-column:1/-1;margin-top:20px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 4px;border-top:2px solid rgba(255,255,255,0.1)">
+        <span style="font-size:13px;font-weight:800;color:#8090a8">⏸ Intérimaires hors production</span>
+        <span style="font-size:11px;color:#607090;background:rgba(255,255,255,0.06);border-radius:99px;padding:2px 9px">${horsProd.length}</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden">${rows}</div>
+    </div>`;
+  }
 }
 
 function toggleInterimaire(id){
@@ -8140,6 +8234,7 @@ function toggleInterimaire(id){
   renderPersonnel();
   renderMaster();
   renderWeekly();
+  if(typeof renderDash==='function') renderDash();
   popSelects();
   toast(`${emp.prenom} ${emp.nom} : ${emp.actif!==false?'En production ✅':'Hors production ⏸'}`);
 }
@@ -10678,23 +10773,97 @@ function exportDayHtml(){
 }
 
 function exportWeekXls(){
-  if(window._xlsxFailed||typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
   if(!S.weekStart) S.weekStart=getMon(new Date());
-  const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
-  const JOURS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  const header=['Personnel','Trigramme',...dates.map((d,i)=>{const wd=d.getDay();return`${JOURS[wd===0?6:wd-1]} ${d.getDate()}/${d.getMonth()+1} AM`;}),
-    ...dates.map((d,i)=>{const wd=d.getDay();return`${JOURS[wd===0?6:wd-1]} ${d.getDate()}/${d.getMonth()+1} PM`;})];
-  const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
-  const rows=emps.map(emp=>{
-    const amCells=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_AM`]||{};return e.type||'';});
-    const pmCells=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_PM`]||{};return e.type||'';});
-    return[emp.prenom+' '+emp.nom,emp.trigramme,...amCells,...pmCells];
+  if(!(S.weekStart instanceof Date)) S.weekStart=new Date(S.weekStart);
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(()=>{
+    if(!window.ExcelJS){toast('Export coloré indisponible (connexion requise)');return;}
+    try{ _buildColoredWeekXls(); }catch(e){ console.error(e); toast('Erreur export: '+e.message); }
   });
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-  XLSX.utils.book_append_sheet(wb,ws,`S${wkN(S.weekStart)}`);
-  XLSX.writeFile(wb,`Planning_S${wkN(S.weekStart)}.xlsx`);
-  toast('Export Excel Planning Hebdo ✓');
+}
+
+// Récupère le libellé + la couleur d'une demi-journée (comme dans le planning)
+function _cellInfo(entry){
+  if(!entry||!entry.type) return {txt:'',color:null};
+  const COLS={conge:'2e7d32',maladie:'c62828',formation:'6a1b9a',formation_int:'6a1b9a',absence:'e65100',deplacement:'0277bd',ferie:'f9a825',we:'90a4ae'};
+  if(entry.type==='travail'){
+    const id=entry.chantierId;
+    if(!id) return {txt:'Travail',color:'1565c0'};
+    if(id==='STO') return {txt:'STO',color:'ff9a3c'};
+    if(id==='AIRBUS') return {txt:'PART 21',color:'00e5b0'};
+    if(id==='REC') return {txt:'Recyclage',color:'00e5b0'};
+    if(id.startsWith('REC_')){const a=(S.recycling?.avions||[]).find(x=>x.id===id.slice(4));return {txt:a?`♻️ ${a.type||''} ${a.msn||''}`.trim():'Recyclage',color:'00e5b0'};}
+    const ch=S.chantiers.find(c=>c.id===id);
+    return {txt:ch?ch.nom:'Travail',color:ch&&ch.color?ch.color.replace('#',''):'1565c0'};
+  }
+  if(entry.type==='formation_int') return {txt:(entry.formInt||'Formation'),color:'6a1b9a'};
+  if(entry.type==='formation') return {txt:(entry.note||'Formation'),color:'6a1b9a'};
+  const lbl={conge:'Congé',maladie:'Maladie',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'}[entry.type]||entry.type;
+  return {txt:entry.note||lbl,color:COLS[entry.type]||null};
+}
+
+async function _buildColoredWeekXls(){
+  const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
+  const JOURS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  const MOIS=['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
+
+  // Couleurs catégories (résolues)
+  const cs=getComputedStyle(document.documentElement);
+  const catCol=c=>{
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    const v=cs.getPropertyValue(map[c]||'').trim();
+    return v?v.replace('#',''):'cccccc';
+  };
+
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet(`S${wkN(S.weekStart)}`,{views:[{state:'frozen',xSplit:1,ySplit:1}]});
+
+  // En-tête
+  const header=['Personnel',...dates.map(d=>{const wd=d.getDay();return `${JOURS[wd===0?6:wd-1]} ${d.getDate()} ${MOIS[d.getMonth()]}`;})];
+  const hRow=ws.addRow(header);
+  hRow.height=22;
+  hRow.eachCell(c=>{
+    c.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1a2440'}};
+    c.alignment={horizontal:'center',vertical:'middle'};
+    c.border={bottom:{style:'thin',color:{argb:'FF888888'}}};
+  });
+
+  emps.forEach(emp=>{
+    // Pour chaque jour : AM et PM. Si identiques → 1 valeur. Sinon → "AM / PM".
+    const cells=dates.map(d=>{
+      const am=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_AM`]||{});
+      const pm=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_PM`]||{});
+      if(am.txt===pm.txt) return {txt:am.txt,color:am.color,split:false};
+      // Différent matin/après-midi
+      return {txt:(am.txt||'—')+' / '+(pm.txt||'—'),color:am.color,color2:pm.color,split:true};
+    });
+    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})`,...cells.map(c=>c.txt)]);
+    row.height=18;
+    // Nom coloré par catégorie
+    const c0=row.getCell(1);
+    c0.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(emp.categorie)}};
+    c0.font={bold:true,size:9,color:{argb:'FF000000'}};
+    c0.alignment={vertical:'middle',indent:1};
+    // Cellules jours
+    cells.forEach((c,i)=>{
+      const cell=row.getCell(i+2);
+      if(c.color){ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+c.color}}; }
+      cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+      cell.font={size:8,color:{argb:'FF000000'}};
+      cell.border={right:{style:'hair',color:{argb:'FFcccccc'}},bottom:{style:'hair',color:{argb:'FFcccccc'}}};
+    });
+  });
+
+  ws.columns.forEach((col,i)=>{ col.width=i===0?26:15; });
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`Planning_S${wkN(S.weekStart)}.xlsx`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  toast('✅ Export Excel coloré Planning Hebdo');
 }
 
 function exportMasterXls(){
