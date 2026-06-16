@@ -10858,6 +10858,35 @@ async function _buildColoredWeekXls(){
 
   ws.columns.forEach((col,i)=>{ col.width=i===0?26:15; });
 
+  // ── Légende des couleurs de catégories (uniquement celles présentes) ──
+  const catLabels={responsable:'Responsable Projet',chef:"Chef d'équipe",technicien:'Technicien/Mécanicien',expert:'Expert',alternant:'Alternant',stagiaire:'Stagiaire',interimaire:'Intérimaire',prestataire:'Prestataire',recycling:'A/C Tech. Recycling',part21:'Tech Part 21',iq:'Insp. Qualité'};
+  const presentCats=[...new Set(emps.map(e=>e.categorie))].filter(c=>catLabels[c]);
+  ws.addRow([]); // ligne vide de séparation
+  const legTitleRow=ws.addRow(['LÉGENDE — Catégories de personnel']);
+  legTitleRow.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+  presentCats.forEach(cat=>{
+    const r=ws.addRow([catLabels[cat]]);
+    const c=r.getCell(1);
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(cat)}};
+    c.font={bold:true,size:9,color:{argb:'FF000000'}};
+    c.alignment={vertical:'middle',indent:1};
+    r.height=16;
+  });
+
+  // ── Légende des activités/statuts ──
+  ws.addRow([]);
+  const actTitleRow=ws.addRow(['LÉGENDE — Activités']);
+  actTitleRow.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+  const actLeg=[['Congé','2e7d32'],['Maladie','c62828'],['Formation','6a1b9a'],['Absence','e65100'],['Déplacement','0277bd']];
+  actLeg.forEach(([lbl,col])=>{
+    const r=ws.addRow([lbl]);
+    const c=r.getCell(1);
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+col}};
+    c.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    c.alignment={vertical:'middle',indent:1};
+    r.height=16;
+  });
+
   const buf=await wb.xlsx.writeBuffer();
   const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const url=URL.createObjectURL(blob);
