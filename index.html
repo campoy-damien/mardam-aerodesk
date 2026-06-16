@@ -1189,6 +1189,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="gc-head">
       <div class="gc-title">📊 Planning Responsables & Chefs d'équipe</div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="gantt-resp-person" onchange="renderRespGantt()" style="height:30px;border-radius:99px;padding:0 12px;font-size:12px;background:var(--glass-1);border:1px solid var(--glass-border);color:var(--t1);max-width:200px">
+          <option value="">👥 Tout le monde</option>
+        </select>
         <select id="gantt-resp-year" onchange="renderChantiers()" style="height:30px;border-radius:99px;padding:0 12px;font-size:12px;background:var(--glass-1);border:1px solid var(--glass-border);color:var(--t1)"></select>
         <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--t3)">
           <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#6effc4;display:inline-block"></span>Congé</span>
@@ -2090,7 +2093,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button onclick="scrollNotice('n-autorisations')" class="btn btn-ghost btn-sm">🛡 Autorisations</button>
     <button onclick="scrollNotice('n-programme')" class="btn btn-ghost btn-sm">📊 Programme</button>
     <button onclick="scrollNotice('n-calculs')" class="btn btn-ghost btn-sm" style="border-color:rgba(255,208,96,0.4);color:#ffd060">🧮 Méthodes de calcul</button>
-    <button onclick="scrollNotice('n-ai')" class="btn btn-ghost btn-sm">✦ Assistant IA</button>
+    <button onclick="scrollNotice('n-ai')" class="btn btn-ghost btn-sm">✦ Assistant interne</button>
+    <button onclick="scrollNotice('n-import-rh')" class="btn btn-ghost btn-sm">📥 Import RH</button>
+    <button onclick="scrollNotice('n-export')" class="btn btn-ghost btn-sm">📊 Export coloré</button>
     <button onclick="scrollNotice('n-sync')" class="btn btn-ghost btn-sm">💾 Sauvegarde</button>
   </div>
   <div id="notice-content" style="padding:0 16px 40px;display:flex;flex-direction:column;gap:14px">
@@ -2306,15 +2311,19 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
     <div class="notice-section" id="n-ai" style="background:linear-gradient(135deg,rgba(41,121,255,0.06),rgba(0,210,255,0.04));border:1px solid rgba(41,121,255,0.2);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
-        <span style="font-size:20px">✦</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--cyan)">Assistant IA</div><div style="font-size:11px;color:var(--t4)">Analyse intelligente et actions automatiques</div></div>
+        <span style="font-size:20px">✦</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--cyan)">Assistant interne</div><div style="font-size:11px;color:var(--t4)">100% interne, gratuit, hors-ligne</div></div>
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
-        L'IA connaît toutes tes données et peut analyser et agir directement.<br>
-        • <strong style="color:#ffd060">Analyser</strong> — "Qui est dispo semaine prochaine ?", "Quels chantiers sont en retard ?"<br>
-        • <strong style="color:#ffd060">Planifier</strong> — "Mets Dupont en congé du 2 au 6 juin"<br>
-        • <strong style="color:#ffd060">Confirmation obligatoire</strong> — chaque action nécessite ta validation
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 L'IA ne modifie rien sans ton bouton "✓ Confirmer".</div>
+        L'assistant fonctionne <strong style="color:#6effc4">entièrement en local</strong> (aucun service payant, aucune donnée envoyée à l'extérieur). Il calcule ses réponses à partir de tes données. Tape ta question dans le langage courant :<br>
+        • <strong style="color:#ffd060">Formations qui expirent</strong> — "Quelles formations expirent bientôt ?", "Qui n'a pas le CACES nacelle à jour ?"<br>
+        • <strong style="color:#ffd060">Présence / absence</strong> — "Qui est en congé semaine 30 ?", "Quels chefs sont présents semaine 30 ?"<br>
+        • <strong style="color:#ffd060">Personnel disponible</strong> — "Combien de techniciens dispo cette semaine ?"<br>
+        • <strong style="color:#ffd060">Chantiers</strong> — "État des chantiers", "Quels chantiers manquent de monde ?"<br>
+        • <strong style="color:#ffd060">Recherche</strong> — "Infos sur Baou"<br>
+        • <strong style="color:#ffd060">Simulation de faisabilité</strong> — "5 techniciens en semaine 32 et 33 ?" → verdict OUI/NON/PARTIEL selon la capacité résiduelle réelle<br>
+        • <strong style="color:#ffd060">Actions sur le planning</strong> — "Mets Baou et Castanon sur le chantier 5598 semaine 33", "Plannifie Gohe en formation CDCCL le 13 juillet", "Mets Dupont en congé du 2 au 6 juin"
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Toute action sur le planning passe par un aperçu avec gestion des conflits (garder/écraser) et un bouton ↩ Annuler. Rien n'est modifié sans ta confirmation. Les formations sont classées internes 📖 sauf les CACES des intérimaires 📚.</div>
       </div>
     </div>
     <div class="notice-section" id="n-sync" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2323,11 +2332,41 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
-        • <strong style="color:#ffd060">Automatique</strong> — modifications sauvegardées dans le localStorage du navigateur<br>
-        • <strong style="color:#ffd060">Export JSON 💾</strong> — télécharge une copie complète de toutes tes données<br>
-        • <strong style="color:#ffd060">Import JSON</strong> — recharge des données exportées ⚠️ écrase les données actuelles<br>
-        • <strong style="color:#ffd060">Google Drive ☁️</strong> — synchronisation multi-appareils (iPad, iPhone, PC)
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,77,109,0.05);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ Vider le cache supprime les données locales. Exporte régulièrement ou utilise Google Drive.</div>
+        • <strong style="color:#ffd060">Automatique en local</strong> — chaque modification est sauvegardée immédiatement dans le navigateur<br>
+        • <strong style="color:#ffd060">Synchro Google Drive bidirectionnelle ☁️</strong> — tes appareils (Windows, iPad, iPhone) se synchronisent tout seuls. Quand tu reviens sur l'app, elle récupère automatiquement la dernière version si un autre appareil a fait des modifications plus récentes (petit message "✓ Données mises à jour")<br>
+        • <strong style="color:#ffd060">Export / Import JSON 💾</strong> — sauvegarde ou recharge une copie complète des données
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(110,255,196,0.05);border-left:3px solid #6effc4;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 La synchro se déclenche au retour sur l'app et toutes les 2-3 min. Elle ne charge la version distante que si elle est plus récente que la tienne — ta version récente ne se fait jamais écraser.</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(255,77,109,0.05);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ Vider le cache du navigateur supprime les données locales. Garde Google Drive activé pour ne rien perdre.</div>
+      </div>
+    </div>
+
+    <div class="notice-section" id="n-import-rh" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">📥</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Import suivi RH</div><div style="font-size:11px;color:var(--t4)">Mise à jour des formations depuis les fichiers RH</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        Dans l'onglet Formations, le bouton <strong style="color:#ffd060">📥 Import suivi RH (2 fichiers)</strong> permet de charger les deux fichiers Excel envoyés chaque mois par le service RH (Qualité + SSE).<br>
+        • <strong style="color:#ffd060">Site filtré</strong> — seules les lignes du site LFBF sont prises en compte<br>
+        • <strong style="color:#ffd060">Correspondance</strong> — par trigramme, avec vérification du nom (anomalies signalées)<br>
+        • <strong style="color:#ffd060">Mapping automatique</strong> — les intitulés RH sont traduits vers les formations de l'app (EWIS, CDCCL, CACES…), les colonnes Forklift sont mutualisées<br>
+        • <strong style="color:#ffd060">Aperçu avant validation</strong> — la liste des ajouts/mises à jour s'affiche, rien n'est appliqué tant que tu n'as pas confirmé
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 L'import met à jour les dates d'expiration existantes ET ajoute les formations manquantes. Nécessite une connexion internet (lecture des fichiers Excel).</div>
+      </div>
+    </div>
+
+    <div class="notice-section" id="n-export" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">📊</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Export Excel coloré</div><div style="font-size:11px;color:var(--t4)">Planning hebdo en Excel avec couleurs</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        Le bouton <strong style="color:#ffd060">📊 Export Excel</strong> du planning hebdo génère un vrai fichier .xlsx <strong style="color:#6effc4">avec les couleurs identiques à l'app</strong>.<br>
+        • <strong style="color:#ffd060">Une colonne par jour</strong> — le nom du chantier/activité s'affiche dans chaque cellule, coloré selon le chantier<br>
+        • <strong style="color:#ffd060">Matin / après-midi</strong> — si la journée est coupée, la cellule affiche "Chantier A / Chantier B"<br>
+        • <strong style="color:#ffd060">Noms colorés par catégorie</strong> + deux légendes (catégories de personnel et activités)<br>
+        • <strong style="color:#ffd060">Volets figés</strong> — la colonne des noms et la ligne des jours restent visibles au défilement
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Nécessite une connexion internet au moment de l'export (chargement de la librairie Excel).</div>
       </div>
     </div>
     <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · © 2025 Damien Campoy · Tous droits réservés</div>
@@ -3946,13 +3985,12 @@ function renderSlotGrid(){
           <div style="font-size:7px;color:${pos.col}99;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${entry.avionNom||''}</div>
         </div>`;
         cellClick=`openSlotEdit('${entry.id}')`;
-      } else if(isW||isH){
-        cellStyle=`background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)`;
-        cellContent=isH?`<span style="font-size:9px;color:#ffd060">♦</span>`:'';
-        cellClick='';
       } else {
-        cellStyle=`background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);cursor:pointer`;
-        cellContent=`<div style="opacity:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:${pos.col}" class="slot-hover">+</div>`;
+        // Cellule vide cliquable, y compris week-ends et fériés (teinte distinctive conservée)
+        const bgVide=isH?'rgba(255,200,0,0.05)':isW?'rgba(255,255,255,0.035)':'rgba(255,255,255,0.02)';
+        cellStyle=`background:${bgVide};border:1px solid rgba(255,255,255,0.05);cursor:pointer`;
+        const mark=isH?`<span style="position:absolute;top:2px;right:3px;font-size:8px;color:#ffd060">♦</span>`:'';
+        cellContent=`<div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center">${mark}<span style="opacity:0;font-size:10px;color:${pos.col}" class="slot-hover">+</span></div>`;
         cellClick=`openSlotNew(${pos.id},'${ds}')`;
       }
 
@@ -6634,9 +6672,32 @@ function renderChantiers(){
   }
   renderRespGantt();
   checkConflicts();
-  const cols=[{k:'prevision',l:'🔮 Prévision'},{k:'encours',l:'🔄 En cours'},{k:'futur',l:'📅 À venir'},{k:'termine',l:'✅ Terminés'}];
+  const cols=[{k:'prevision',l:'🔮 Prévision'},{k:'futur',l:'📅 À venir'},{k:'encours',l:'🔄 En cours'},{k:'termine',l:'✅ Terminés'}];
   document.getElementById('kanban').innerHTML=cols.map(col=>{
     const cards=S.chantiers.filter(c=>c.statut===col.k);
+    // Colonnes "Prévision" et "Terminés" → liste compacte pour optimiser la place
+    if(col.k==='termine'||col.k==='prevision'){
+      const isPrev=col.k==='prevision';
+      const accent=isPrev?'#a78bfa':'#34c759';
+      return`<div class="kcol">
+        <div class="kcol-head">${col.l}<span class="kcol-count">${cards.length}</span></div>
+        ${cards.length===0?`<div style="text-align:center;padding:24px;color:var(--t4);font-size:12px">Aucun chantier</div>`:
+          `<div style="display:flex;flex-direction:column;gap:4px">`+cards.map(c=>{
+            const chef=byId(c.chef);
+            const tech=c.ressources?.technicien;
+            const sub=isPrev
+              ? `${c.client?c.client+' · ':''}${c.debut?'prévu '+disp(c.debut):''}${tech?(c.debut?' · ':'')+tech+' tech.':''}`
+              : `${c.client?c.client+' · ':''}${c.fin?'terminé '+disp(c.fin):''}`;
+            return`<div onclick="editChantier('${c.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-left:3px solid ${c.color||accent};border-radius:8px;cursor:pointer;opacity:${isPrev?'0.9':'0.75'}">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:700;color:${isPrev?'#c0c8e0':'#a0b0c8'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}</div>
+                <div style="font-size:10px;color:#607090">${sub}</div>
+              </div>
+              ${chef?`<span style="font-size:10px;color:#607090;flex-shrink:0">${chef.trigramme}</span>`:''}
+            </div>`;
+          }).join('')+`</div>`}
+      </div>`;
+    }
     return`<div class="kcol">
       <div class="kcol-head">${col.l}<span class="kcol-count">${cards.length}</span></div>
       ${cards.length===0?`<div style="text-align:center;padding:24px;color:var(--t4);font-size:12px">Aucun chantier</div>`:
@@ -6672,8 +6733,19 @@ function renderRespGantt(){
   const yearMs=yearEnd-yearStart;
   const today=new Date(); const todayStr=fmt(today);
 
-  const people=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie));
-  if(!people.length){
+  const allPeople=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie));
+  // Peupler le sélecteur de personne (une seule fois)
+  const pSel=document.getElementById('gantt-resp-person');
+  if(pSel && pSel.options.length<=1){
+    allPeople.slice().sort((a,b)=>(a.nom||'').localeCompare(b.nom||'')).forEach(p=>{
+      const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;pSel.appendChild(o);
+    });
+  }
+  // Filtrer selon la personne sélectionnée
+  const selId=pSel?pSel.value:'';
+  const people=selId?allPeople.filter(p=>p.id===selId):allPeople;
+
+  if(!allPeople.length){
     el.innerHTML='<div style="padding:20px;color:var(--t4);font-size:13px;text-align:center">Aucun responsable ou chef d\'équipe enregistré</div>';
     return;
   }
