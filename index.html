@@ -444,14 +444,16 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 }
 .ptable td{border:1px solid rgba(255,255,255,0.05);padding:0}
 .ncol{
-  padding:0 10px;min-width:130px;max-width:160px;
-  position:sticky;left:0;z-index:3;
-  background:#0d1628;
-  border-right:2px solid rgba(255,255,255,0.15)!important;
+  padding:0 8px;min-width:144px;max-width:152px;width:150px;
+  position:sticky;left:0;z-index:6;
+  background:#000000;
+  border-right:2px solid rgba(255,255,255,0.18)!important;
+  box-shadow:6px 0 10px -2px rgba(0,0,0,0.95);
+  overflow:hidden;
 }
-.ncol-inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:58px;gap:2px}
-.emp-tri{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px}
-.emp-name{font-size:10px;font-weight:600;line-height:1.25;color:rgba(255,255,255,0.9)}
+.ncol-inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:58px;gap:2px;width:100%;overflow:hidden;background:#000;border-radius:4px}
+.emp-tri{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:1px}
+.emp-name{font-size:10px;font-weight:700;line-height:1.2;color:#ffffff;white-space:normal;overflow-wrap:anywhere;max-width:100%}
 
 /* Half-day cells */
 .hw{display:flex;flex-direction:column;height:58px}
@@ -4327,27 +4329,33 @@ function exportSlotPDF(){
     <tbody>${rows||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#8898bb">Aucune occupation ce mois</td></tr>'}</tbody>
   </table>`;
 
-  const w=window.open('','_blank');
-  if(!w){alert('Autorisez les popups');return;}
-  w.document.write(pdfBase(`Slot Hangar — ${MO_FR[month-1]} ${year}`,`Occupation des 3 positions · Export facturation`,'portrait',content));
-  w.document.close();
+  openPrintView(pdfBase(`Slot Hangar — ${MO_FR[month-1]} ${year}`,`Occupation des 3 positions · Export facturation`,'portrait',content), `Slot Hangar — ${MO_FR[month-1]} ${year}`);
   toast('Export PDF Slot Hangar ✓');
 }
 
 function exportSlotXls(){
-  if(typeof XLSX==='undefined'){alert('Module Excel non disponible');return;}
-  const entries=[...S.slot?.entries||[]].sort((a,b)=>a.debut.localeCompare(b.debut));
-  const data=[['Position','MSN','Avion','Type','Date début','Date fin','Jours ouvrés','Notes']];
-  entries.forEach(e=>{
-    const pos=SLOT_POSITIONS.find(p=>p.id===e.pos)||SLOT_POSITIONS[0];
-    data.push([pos.lbl,e.msn||'',e.avionNom||'',e.type||'',e.debut,e.fin,e.nbJours,e.notes||'']);
+  if(window._xlsxFailed){toast('Export Excel non disponible hors ligne');return;}
+  toast('⏳ Génération de l\'export…');
+  _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
+    try{
+      const entries=[...S.slot?.entries||[]].sort((a,b)=>a.debut.localeCompare(b.debut));
+      const data=[['Position','MSN','Avion','Type','Date début','Date fin','Jours ouvrés','Notes']];
+      entries.forEach(e=>{
+        const pos=SLOT_POSITIONS.find(p=>p.id===e.pos)||SLOT_POSITIONS[0];
+        data.push([pos.lbl,e.msn||'',e.avionNom||'',e.type||'',e.debut,e.fin,e.nbJours,e.notes||'']);
+      });
+      const wb=XLSX.utils.book_new();
+      const ws=XLSX.utils.aoa_to_sheet(data);
+      ws['!cols']=[{wch:14},{wch:12},{wch:20},{wch:14},{wch:14},{wch:14},{wch:14},{wch:30}];
+      XLSX.utils.book_append_sheet(wb,ws,'Slot Hangar');
+      XLSX.writeFile(wb,'Slot_Hangar_'+fmt(new Date())+'.xlsx');
+      toast('Export Excel Slot Hangar ✓');
+    }catch(e){
+      console.error(e);
+      toast('❌ Erreur export: '+e.message);
+    }
   });
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet(data);
-  ws['!cols']=[{wch:14},{wch:12},{wch:20},{wch:14},{wch:14},{wch:14},{wch:14},{wch:30}];
-  XLSX.utils.book_append_sheet(wb,ws,'Slot Hangar');
-  XLSX.writeFile(wb,'Slot_Hangar_'+fmt(new Date())+'.xlsx');
-  toast('Export Excel Slot Hangar ✓');
 }
 
 /* ═══ AIRBUS ACTIVITÉ ═══ */
@@ -5703,10 +5711,22 @@ function delForm(id){
   });
 }
 function exportFormXls(){
-  const rows=[['Employé','Trigramme','Catégorie','Formation','Obtention','Expiration','Statut','Notes']];
-  S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',emp?.trigramme||'—',CATS[emp?.categorie||'']?.lbl||'—',f.type,f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
-  const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:26},{wch:14},{wch:14},{wch:14},{wch:30}];
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Formations');if(window._xlsxFailed||typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;} XLSX.writeFile(wb,'AeroStaff_Formations.xlsx');
+  if(window._xlsxFailed){toast('Export Excel non disponible hors ligne');return;}
+  toast('⏳ Génération de l\'export…');
+  _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
+    try{
+      const rows=[['Employé','Trigramme','Catégorie','Formation','Obtention','Expiration','Statut','Notes']];
+      S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',emp?.trigramme||'—',CATS[emp?.categorie||'']?.lbl||'—',f.type,f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
+      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:26},{wch:14},{wch:14},{wch:14},{wch:30}];
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Formations');
+      XLSX.writeFile(wb,'AeroStaff_Formations.xlsx');
+      toast('Export Excel Formations ✓');
+    }catch(e){
+      console.error(e);
+      toast('❌ Erreur export: '+e.message);
+    }
+  });
 }
 function handleXlsImport(e){
   const file=e.target.files[0];if(!file)return;
@@ -6022,7 +6042,7 @@ function buildGrid(emps,dates,containerId){
       </td>`;
     }).join('');
     return separator + `<tr>
-      <td class="ncol" style="background:linear-gradient(${cat.col||'#2979ff'}26,${cat.col||'#2979ff'}26),#0d1628;border-left:3px solid ${cat.col||'var(--glass-border)'}">
+      <td class="ncol" style="background:linear-gradient(${cat.col||'#2979ff'}14,${cat.col||'#2979ff'}14),#000000;border-left:3px solid ${cat.col||'var(--glass-border)'}">
         <div class="ncol-inner">
           <div class="emp-tri" style="color:${cat.col||'var(--t3)'}">${emp.trigramme}</div>
           <div class="emp-name">${emp.nom} ${emp.prenom}</div>
@@ -6045,9 +6065,8 @@ function buildGrid(emps,dates,containerId){
   el.querySelectorAll('thead th').forEach((th,i)=>{
     th.style.position='sticky';
     th.style.top='0';
-    if(i===0){ th.style.left='0'; th.style.zIndex='7'; }
-    else th.style.zIndex='5';
-    th.style.background='#0d1628';
+    if(i===0){ th.style.left='0'; th.style.zIndex='8'; th.style.background='#000000'; th.style.boxShadow='6px 0 10px -2px rgba(0,0,0,0.95)'; }
+    else { th.style.zIndex='5'; th.style.background='#0d1628'; }
   });
 }
 
@@ -6992,9 +7011,32 @@ function checkConflicts(){
         const sorted=days.sort();
         const lbl=ABSENCE_LABELS[type]||type;
         const role=c.resp===emp.id?'Resp.':'Chef d\'équipe';
-        conflicts.push({
-          type:'absence',
-          msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} du ${disp(sorted[0])} au ${disp(sorted[sorted.length-1])} (${days.length}j) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')})`
+        // Découper en blocs réellement continus : un week-end ou un jour férié
+        // entre deux jours d'absence ne coupe pas le bloc, mais un jour ouvré
+        // travaillé (ou non renseigné) le coupe.
+        const runs=[];
+        let run=[sorted[0]];
+        for(let k=1;k<sorted.length;k++){
+          const prev=parseLocal(sorted[k-1]);
+          const cur=parseLocal(sorted[k]);
+          let bridge=true;
+          const probe=new Date(prev);probe.setDate(probe.getDate()+1);
+          while(probe<cur){
+            const wd=probe.getDay();
+            const isWE=(wd===0||wd===6);
+            const isH=(typeof isHol==='function')?isHol(fmt(probe)):false;
+            if(!isWE&&!isH){bridge=false;break;}
+            probe.setDate(probe.getDate()+1);
+          }
+          if(bridge){run.push(sorted[k]);}
+          else{runs.push(run);run=[sorted[k]];}
+        }
+        runs.push(run);
+        runs.forEach(r=>{
+          conflicts.push({
+            type:'absence',
+            msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} du ${disp(r[0])} au ${disp(r[r.length-1])} (${r.length}j) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')})`
+          });
         });
       });
     });
@@ -8768,27 +8810,37 @@ function delAutorisation(id){
 
 function exportAutoXls(){
   if(!S.autorisations?.length){alert('Aucune autorisation à exporter');return;}
-  const rows=[['Employé','Trigramme','Catégorie','Autorisation','Obtention','Expiration','Statut','Notes']];
-  const sLbl={valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'};
-  S.autorisations.forEach(a=>{
-    const emp=byId(a.empId);
-    rows.push([
-      emp?`${emp.prenom} ${emp.nom}`:'—',
-      emp?.trigramme||'—',
-      CATS[emp?.categorie||'']?.lbl||'—',
-      a.type,
-      a.dateObtention?disp(a.dateObtention):'—',
-      a.dateExpiration?disp(a.dateExpiration):'—',
-      sLbl[tSt(a.dateExpiration)]||'—',
-      a.notes||''
-    ]);
+  if(window._xlsxFailed){toast('Export Excel non disponible hors ligne');return;}
+  toast('⏳ Génération de l\'export…');
+  _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
+    try{
+      const rows=[['Employé','Trigramme','Catégorie','Autorisation','Obtention','Expiration','Statut','Notes']];
+      const sLbl={valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'};
+      S.autorisations.forEach(a=>{
+        const emp=byId(a.empId);
+        rows.push([
+          emp?`${emp.prenom} ${emp.nom}`:'—',
+          emp?.trigramme||'—',
+          CATS[emp?.categorie||'']?.lbl||'—',
+          a.type,
+          a.dateObtention?disp(a.dateObtention):'—',
+          a.dateExpiration?disp(a.dateExpiration):'—',
+          sLbl[tSt(a.dateExpiration)]||'—',
+          a.notes||''
+        ]);
+      });
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:10},{wch:14},{wch:14},{wch:14},{wch:30}];
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Autorisations');
+      XLSX.writeFile(wb,'AeroStaff_Autorisations.xlsx');
+      toast('Export Autorisations téléchargé ✓');
+    }catch(e){
+      console.error(e);
+      toast('❌ Erreur export: '+e.message);
+    }
   });
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:10},{wch:14},{wch:14},{wch:14},{wch:30}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Autorisations');
-  if(window._xlsxFailed||typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;} XLSX.writeFile(wb,'AeroStaff_Autorisations.xlsx');
-  toast('Export Autorisations téléchargé ✓');
 }
 
 
@@ -10548,6 +10600,48 @@ function buildGantt(containerId, chantiers, year){
 
 /* ═══ PDF EXPORT BASE ═══ */
 
+// Affiche un document imprimable DANS l'application (overlay), au lieu de window.open
+// — évite le piège iOS/iPad où la nouvelle vue PDF n'a pas de bouton retour en mode PWA.
+function openPrintView(html, label){
+  // strip auto-print script éventuel (le bouton gère l'impression)
+  try{ html = html.replace(/window\.onload\s*=\s*\(\)\s*=>\s*setTimeout\(\(\)\s*=>\s*window\.print\(\)\s*,\s*\d+\)/g, '0'); }catch(e){}
+  var old=document.getElementById('print-overlay');
+  if(old) old.remove();
+  var ov=document.createElement('div');
+  ov.id='print-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:999999;background:#0b0f1a;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)';
+  var bar=document.createElement('div');
+  bar.style.cssText='flex:0 0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;background:#0d1e3d;color:#e0e8f0;font-family:-apple-system,system-ui,sans-serif';
+  var ttl=document.createElement('span');
+  ttl.textContent=label||'Aperçu — Export';
+  ttl.style.cssText='font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+  var btns=document.createElement('div');
+  btns.style.cssText='display:flex;gap:8px;flex:0 0 auto';
+  var printBtn=document.createElement('button');
+  printBtn.textContent='🖨️ Imprimer / PDF';
+  printBtn.style.cssText='border:0;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;background:#2979ff;color:#fff;cursor:pointer';
+  var closeBtn=document.createElement('button');
+  closeBtn.textContent='✕ Fermer';
+  closeBtn.style.cssText='border:0;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;background:#39507a;color:#fff;cursor:pointer';
+  btns.appendChild(printBtn);btns.appendChild(closeBtn);
+  bar.appendChild(ttl);bar.appendChild(btns);
+  var frame=document.createElement('iframe');
+  frame.setAttribute('title','Aperçu export');
+  frame.style.cssText='flex:1 1 auto;width:100%;border:0;background:#fff';
+  ov.appendChild(bar);ov.appendChild(frame);
+  document.body.appendChild(ov);
+  // écrit le contenu dans l'iframe (styles isolés)
+  try{
+    var doc=frame.contentWindow.document;
+    doc.open();doc.write(html);doc.close();
+  }catch(e){ toast('Erreur affichage aperçu'); ov.remove(); return; }
+  closeBtn.onclick=function(){ ov.remove(); };
+  printBtn.onclick=function(){
+    try{ frame.contentWindow.focus(); frame.contentWindow.print(); }
+    catch(e){ try{ window.print(); }catch(e2){ toast('Impression indisponible'); } }
+  };
+}
+
 function pdfBase(title,subtitle,orientation,content){
   const date=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
   return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title>
@@ -10630,9 +10724,8 @@ function exportGanttPDF(){
     <tbody>${renderRows(ch1)}</tbody></table></div>
   ${ch2.length?`<div class="section"><div class="section-title">🔮 Prévisionnels (${ch2.length})</div>
     <table><thead><tr><th style="text-align:left;width:180px">Chantier</th><th></th></tr></thead><tbody>${renderRows(ch2)}</tbody></table></div>`:''}`;
-  const w=window.open('','_blank');if(!w){alert('Autorisez les popups');return;}
-  w.document.write(pdfBase(`Programme Activité ${year}`,`${ch1.length+ch2.length} chantiers`,'landscape',content2));
-  w.document.close();toast('Export PDF ✓');
+  openPrintView(pdfBase(`Programme Activité ${year}`,`${ch1.length+ch2.length} chantiers`,'landscape',content2), `Programme Activité ${year}`);
+  toast('Export PDF ✓');
 }
 
 function exportMasterPDF(){
@@ -10665,9 +10758,8 @@ function exportMasterPDF(){
     return`<tr><td style="padding:3px 6px;font-size:8.5px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.2"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:8px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.</td>${cells}</tr>`;
   }).join('');
   const content2=`<div style="overflow-x:auto"><table style="table-layout:fixed"><thead><tr><th style="text-align:left;width:130px;background:#1e3a5f">Personnel</th>${thCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
-  const w=window.open('','_blank');if(!w){alert('Autorisez les popups');return;}
-  w.document.write(pdfBase(`Master Planning — ${MO[month]} ${year}`,`${emps.length} personnes`,'landscape',content2));
-  w.document.close();toast('PDF Master Planning ✓');
+  openPrintView(pdfBase(`Master Planning — ${MO[month]} ${year}`,`${emps.length} personnes`,'landscape',content2), `Master Planning — ${MO[month]} ${year}`);
+  toast('PDF Master Planning ✓');
 }
 
 function exportWeekHtml(){
@@ -10754,8 +10846,7 @@ function exportWeekHtml(){
   </div>
   <div class="footer">© 2025 Damien Campoy — MARDAM AeroDesk Pro · Généré le ${new Date().toLocaleDateString('fr-FR')}</div>
   <sc"+"ript>window.onload=()=>setTimeout(()=>window.print(),400)<\/script></body></html>`;
-  const w=window.open('','_blank');if(!w){alert('Autorisez les popups');return;}
-  w.document.write(html);w.document.close();
+  openPrintView(html, 'Planning Hebdomadaire');
 }
 
 function openDayExtract(){
@@ -10841,8 +10932,7 @@ function exportDayHtml(){
   </div>
   <div class="footer">© 2025 Damien Campoy — MARDAM AeroDesk Pro · Généré le ${new Date().toLocaleDateString('fr-FR')}</div>
   <sc"+"ript>window.onload=()=>setTimeout(()=>window.print(),400)<\/script></body></html>`;
-  const w=window.open('','_blank');if(!w){alert('Autorisez les popups');return;}
-  w.document.write(html);w.document.close();
+  openPrintView(html, `Extrait Jour — ${JOURS[d.getDay()]} ${disp(ds)}`);
 }
 
 function exportWeekXls(){
@@ -10969,22 +11059,31 @@ async function _buildColoredWeekXls(){
 }
 
 function exportMasterXls(){
-  if(window._xlsxFailed||typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
-  const year=S.masterYear;const month=S.masterMonth;
-  const n=new Date(year,month+1,0).getDate();
-  const dates=Array.from({length:n},(_,i)=>new Date(year,month,i+1));
-  const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
-  const header=['Personnel','Trigramme',...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} AM`),...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} PM`)];
-  const rows=emps.map(emp=>{
-    const am=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_AM`]||{};return e.type||'';});
-    const pm=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_PM`]||{};return e.type||'';});
-    return[emp.prenom+' '+emp.nom,emp.trigramme,...am,...pm];
+  if(window._xlsxFailed){toast('Export Excel non disponible hors ligne');return;}
+  toast('⏳ Génération de l\'export…');
+  _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
+    try{
+      const year=S.masterYear;const month=S.masterMonth;
+      const n=new Date(year,month+1,0).getDate();
+      const dates=Array.from({length:n},(_,i)=>new Date(year,month,i+1));
+      const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
+      const header=['Personnel','Trigramme',...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} AM`),...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} PM`)];
+      const rows=emps.map(emp=>{
+        const am=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_AM`]||{};return e.type||'';});
+        const pm=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_PM`]||{};return e.type||'';});
+        return[emp.prenom+' '+emp.nom,emp.trigramme,...am,...pm];
+      });
+      const wb=XLSX.utils.book_new();
+      const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
+      XLSX.utils.book_append_sheet(wb,ws,`${MO[month]} ${year}`);
+      XLSX.writeFile(wb,`MasterPlanning_${MO[month]}_${year}.xlsx`);
+      toast('Export Excel Master Planning ✓');
+    }catch(e){
+      console.error(e);
+      toast('❌ Erreur export: '+e.message);
+    }
   });
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-  XLSX.utils.book_append_sheet(wb,ws,`${MO[month]} ${year}`);
-  XLSX.writeFile(wb,`MasterPlanning_${MO[month]}_${year}.xlsx`);
-  toast('Export Excel Master Planning ✓');
 }
 
 function exportAll(){
