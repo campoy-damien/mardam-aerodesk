@@ -10733,31 +10733,80 @@ function exportMasterPDF(){
   const n=new Date(year,month+1,0).getDate();
   const dates=Array.from({length:n},(_,i)=>new Date(year,month,i+1));
   const empF=document.getElementById('mp-emp')?.value||'';
-  const emps=empF?S.personnel.filter(p=>p.id===empF):sortPersonnel(S.personnel.filter(p=>p.actif!==false));
-  const TYPE_BG={travail:'#dbeafe',conge:'#dcfce7',maladie:'#fee2e2',formation:'#fef9c3',absence:'#ffedd5',deplacement:'#f3e8ff',we:'#f1f5f9',ferie:'#fef3c7','':'#f8faff'};
-  const TYPE_FG={travail:'#1d4ed8',conge:'#15803d',maladie:'#b91c1c',formation:'#a16207',absence:'#c2410c',deplacement:'#7e22ce',we:'#94a3b8',ferie:'#d97706','':'#94a3b8'};
-  const TYPE_LBL={travail:'T',conge:'C',maladie:'M',formation:'F',absence:'A',deplacement:'D',we:'',ferie:'♦','':''};
+  const baseList=empF?S.personnel.filter(p=>p.id===empF):S.personnel.filter(p=>p.actif!==false);
+  const emps=sortPersonnel(baseList);
+  const D1=['L','M','M','J','V','S','D'];
+  const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',formation_int:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
+  const LBL={conge:'C',maladie:'M',formation:'F',formation_int:'Fi',absence:'A',deplacement:'D',ferie:'♦',we:''};
+  const LBL_FULL={conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'Week-end'};
+
+  // libellé complet + couleur d'une demi-journée
+  const cellLabel=(e,isW,isH)=>{
+    const t=e.type||(isH?'ferie':isW?'we':'');
+    if(t==='travail'&&e.chantierId){
+      if(e.chantierId==='STO') return{txt:'Stockage',col:'#e65100'};
+      if(e.chantierId==='AIRBUS') return{txt:'Airbus P21',col:'#0277bd'};
+      if(e.chantierId==='REC') return{txt:'Recyclage',col:'#2e7d32'};
+      if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?`MSN ${av.msn||'?'}`:'Recyclage',col:'#2e7d32'};}
+      const ch=S.chantiers.find(c=>c.id===e.chantierId);
+      return{txt:ch?ch.nom:'Travail',col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
+    }
+    if(t==='travail') return{txt:'Travail',col:'#1565c0'};
+    if(t) return{txt:LBL_FULL[t]||t,col:COLS[t]||'#666'};
+    return{txt:'',col:'#999'};
+  };
+  const mainCh=emp=>{const counts={};dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)counts[e.chantierId]=(counts[e.chantierId]||0)+1;}));const s=Object.entries(counts).sort((a,b)=>b[1]-a[1]);return s.length?s[0][0]:null;};
+  const groupInfo=cId=>{
+    if(cId==='STO') return{label:'Stockage',icon:'✈️',color:'#e65100'};
+    if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
+    if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
+    if(cId&&cId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'}`:'Recyclage',icon:'♻️',color:'#2e7d32'};}
+    const ch=cId?S.chantiers.find(c=>c.id===cId):null;
+    return{label:ch?ch.nom:'Sans chantier assigné',icon:ch?'🔧':'📋',color:ch?.color&&ch.color.startsWith('#')?ch.color:'#5a7090'};
+  };
+
+  // en-tête des jours
   const thCells=dates.map(d=>{
     const ds=fmt(d);const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);const di=wd===0?6:wd-1;
-    const bg=isH?'#fef3c7':isW?'#f1f5f9':'#1e3a5f';const col=isH?'#d97706':isW?'#94a3b8':'#e0e8f0';
-    return`<th style="background:${bg};color:${col};min-width:34px;width:34px;padding:4px 1px;text-align:center;font-size:8px;border:1px solid #dde6f0"><div>${D3[di]}</div><div style="font-size:11px;font-weight:800">${d.getDate()}</div></th>`;
+    const bg=isH?'#fef3c7':isW?'#eef2f7':'#1e3a5f';const col=isH?'#d97706':isW?'#94a3b8':'#e0e8f0';
+    return`<th style="background:${bg};color:${col};min-width:52px;width:52px;padding:3px 1px;text-align:center;font-size:7px;border:1px solid #dde6f0;text-transform:none"><div>${D1[di]}</div><div style="font-size:10px;font-weight:800">${d.getDate()}</div></th>`;
   }).join('');
-  const catColors={responsable:'#9333ea',chef:'#ea580c',technicien:'#2563eb',expert:'#0891b2',recycling:'#d97706',interimaire:'#7c3aed',prestataire:'#ca8a04',part21:'#1d4ed8',iq:'#0369a1'};
-  const bodyRows=emps.map(emp=>{
-    const catCol=catColors[emp.categorie]||'#64748b';
+
+  let lastGroup=undefined;let bodyRows='';
+  const numCols=dates.length+1;
+  const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
+  emps.forEach(emp=>{
+    const gKey=emp.categorie||'autre';
+    if(gKey!==lastGroup){
+      lastGroup=gKey;
+      const ci=CATS[gKey]||{lbl:gKey,col:'#5a7090'};
+      const gc=(ci.col&&ci.col.startsWith('#'))?ci.col:'#5a7090';
+      bodyRows+=`<tr><td colspan="${numCols}" style="padding:4px 8px;background:${gc}1f;border-top:2px solid ${gc};border-bottom:1px solid ${gc}55;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:${gc}">${catIcons[gKey]||'👤'} ${ci.lbl||gKey}</td></tr>`;
+    }
     const cells=dates.map(d=>{
       const ds=fmt(d);const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
       const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
-      const at=am.type||(isH?'ferie':isW?'we':'');const pt=pm.type||(isH?'ferie':isW?'we':'');
-      const amBg=TYPE_BG[at]||'#f8faff';const pmBg=TYPE_BG[pt]||'#f8faff';
-      const amFg=TYPE_FG[at]||'#94a3b8';const pmFg=TYPE_FG[pt]||'#94a3b8';
-      const amL=at==='travail'&&am.chantierId?(S.chantiers.find(c=>c.id===am.chantierId)?.nom||'T').slice(0,6):TYPE_LBL[at]||'';
-      const pmL=pt==='travail'&&pm.chantierId?(S.chantiers.find(c=>c.id===pm.chantierId)?.nom||'T').slice(0,6):TYPE_LBL[pt]||'';
-      return`<td style="padding:0;min-width:34px;width:34px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;height:34px"><div style="flex:1;background:${amBg};color:${amFg};display:flex;align-items:center;justify-content:center;font-size:6.5px;font-weight:700;border-bottom:1px solid #e2e8f0;line-height:1;overflow:hidden">${amL}</div><div style="flex:1;background:${pmBg};color:${pmFg};display:flex;align-items:center;justify-content:center;font-size:6.5px;font-weight:700;line-height:1;overflow:hidden">${pmL}</div></div></td>`;
+      const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
+      return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:6.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.02;overflow:hidden;padding:0 1px;word-break:break-word">${la.txt}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:6.5px;font-weight:800;line-height:1.02;overflow:hidden;padding:0 1px;word-break:break-word">${lp.txt}</div></div></td>`;
     }).join('');
-    return`<tr><td style="padding:3px 6px;font-size:8.5px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.2"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:8px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.</td>${cells}</tr>`;
-  }).join('');
-  const content2=`<div style="overflow-x:auto"><table style="table-layout:fixed"><thead><tr><th style="text-align:left;width:130px;background:#1e3a5f">Personnel</th>${thCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+    const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
+    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.</td>${cells}</tr>`;
+  });
+
+  // Légende : chantiers réellement utilisés ce mois + types d'absence
+  const usedChIds=new Set();
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);})));
+  const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
+  const typeLegend=[['conge'],['maladie'],['formation'],['absence'],['deplacement'],['ferie'],['we']].map(([k])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${LBL_FULL[k]}</span>`).join('');
+
+  const content2=`<div style="overflow-x:auto"><table style="table-layout:fixed"><thead><tr><th style="text-align:left;width:120px;background:#1e3a5f;color:#fff;font-size:9px">Personnel</th>${thCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>
+  <div style="margin-top:16px;padding:12px 14px;border:1px solid #e0e8f0;border-radius:8px;background:#fafbfc">
+    <div style="font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🔧 Chantiers</div>
+    <div style="margin-bottom:12px">${chLegend||'<span style="font-size:10px;color:#999">Aucun chantier affecté ce mois</span>'}</div>
+    <div style="font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">📋 Types d'activité</div>
+    <div>${typeLegend}</div>
+    <div style="margin-top:8px;font-size:9px;color:#8898bb">Chaque case = matin (haut) / après-midi (bas). La couleur identifie le chantier (voir légende ci-dessus).</div>
+  </div>`;
   openPrintView(pdfBase(`Master Planning — ${MO[month]} ${year}`,`${emps.length} personnes`,'landscape',content2), `Master Planning — ${MO[month]} ${year}`);
   toast('PDF Master Planning ✓');
 }
@@ -11059,31 +11108,135 @@ async function _buildColoredWeekXls(){
 }
 
 function exportMasterXls(){
-  if(window._xlsxFailed){toast('Export Excel non disponible hors ligne');return;}
-  toast('⏳ Génération de l\'export…');
-  _loadSheetJS(()=>{
-    if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
-    try{
-      const year=S.masterYear;const month=S.masterMonth;
-      const n=new Date(year,month+1,0).getDate();
-      const dates=Array.from({length:n},(_,i)=>new Date(year,month,i+1));
-      const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
-      const header=['Personnel','Trigramme',...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} AM`),...dates.map(d=>`${d.getDate()}/${d.getMonth()+1} PM`)];
-      const rows=emps.map(emp=>{
-        const am=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_AM`]||{};return e.type||'';});
-        const pm=dates.map(d=>{const e=S.planning[`${emp.id}_${fmt(d)}_PM`]||{};return e.type||'';});
-        return[emp.prenom+' '+emp.nom,emp.trigramme,...am,...pm];
-      });
-      const wb=XLSX.utils.book_new();
-      const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-      XLSX.utils.book_append_sheet(wb,ws,`${MO[month]} ${year}`);
-      XLSX.writeFile(wb,`MasterPlanning_${MO[month]}_${year}.xlsx`);
-      toast('Export Excel Master Planning ✓');
-    }catch(e){
-      console.error(e);
-      toast('❌ Erreur export: '+e.message);
-    }
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(()=>{
+    if(!window.ExcelJS){toast('Export coloré indisponible (connexion requise)');return;}
+    try{ _buildColoredMasterXls(); }catch(e){ console.error(e); toast('Erreur export: '+e.message); }
   });
+}
+
+async function _buildColoredMasterXls(){
+  const year=S.masterYear, month=S.masterMonth;
+  const n=new Date(year,month+1,0).getDate();
+  const dates=Array.from({length:n},(_,i)=>new Date(year,month,i+1));
+  const empF=document.getElementById('mp-emp')?.value||'';
+  const baseList=empF?S.personnel.filter(p=>p.id===empF):S.personnel.filter(p=>p.actif!==false);
+  const emps=sortPersonnel(baseList);
+  const D1=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+  const cs=getComputedStyle(document.documentElement);
+  const catCol=c=>{
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    let v=cs.getPropertyValue(map[c]||'').trim();
+    if(!v){const cc=CATS[c]?.col||'';if(cc.startsWith('#'))v=cc;else if(cc.startsWith('var(')){v=cs.getPropertyValue(cc.slice(4,-1).trim()).trim();}}
+    return v?v.replace('#',''):'cccccc';
+  };
+
+  const wb=new ExcelJS.Workbook();
+  const wsName=`${MO[month]} ${year}`.slice(0,31);
+  const ws=wb.addWorksheet(wsName,{views:[{state:'frozen',xSplit:1,ySplit:1}]});
+  const nCols=1+n;
+
+  // En-tête : jour + numéro, week-ends/fériés teintés
+  const header=['Personnel',...dates.map(d=>{const wd=d.getDay();return `${D1[wd===0?6:wd-1]} ${d.getDate()}`;})];
+  const hRow=ws.addRow(header);
+  hRow.height=24;
+  hRow.eachCell((c,col)=>{
+    let bg='FF1a2440';
+    if(col>1){const d=dates[col-2];const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));if(isH)bg='FF7a5b00';else if(isW)bg='FF3a4560';}
+    c.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    c.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+    c.border={bottom:{style:'thin',color:{argb:'FF888888'}}};
+  });
+
+  const catLabels={responsable:'Responsable Projet',chef:"Chef d'équipe",technicien:'Technicien/Mécanicien',expert:'Expert',alternant:'Alternant',stagiaire:'Stagiaire',interimaire:'Intérimaire',prestataire:'Prestataire',recycling:'A/C Tech. Recycling',part21:'Tech Part 21',iq:'Insp. Qualité'};
+
+  let lastCat=undefined;
+  emps.forEach(emp=>{
+    // bandeau de catégorie
+    if(emp.categorie!==lastCat){
+      lastCat=emp.categorie;
+      const sec=ws.addRow([catLabels[emp.categorie]||emp.categorie||'Autre']);
+      ws.mergeCells(sec.number,1,sec.number,nCols);
+      const sc=sec.getCell(1);
+      sc.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};
+      sc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(emp.categorie)}};
+      sc.alignment={vertical:'middle',indent:1};
+      sec.height=18;
+    }
+    // cellules jours (AM/PM combinés comme l'hebdo)
+    const cells=dates.map(d=>{
+      const am=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_AM`]||{});
+      const pm=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_PM`]||{});
+      if(am.txt===pm.txt) return {txt:am.txt,color:am.color};
+      return {txt:(am.txt||'—')+' / '+(pm.txt||'—'),color:am.color||pm.color};
+    });
+    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})`,...cells.map(c=>c.txt)]);
+    row.height=16;
+    const c0=row.getCell(1);
+    c0.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(emp.categorie)}};
+    c0.font={bold:true,size:9,color:{argb:'FF000000'}};
+    c0.alignment={vertical:'middle',indent:1};
+    cells.forEach((c,i)=>{
+      const d=dates[i];const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));
+      const cell=row.getCell(i+2);
+      if(c.color){ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+c.color}}; }
+      else if(isH){ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFfff3cd'}}; }
+      else if(isW){ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFf1f5f9'}}; }
+      cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+      cell.font={size:7,color:{argb:'FF000000'}};
+      cell.border={right:{style:'hair',color:{argb:'FFcccccc'}},bottom:{style:'hair',color:{argb:'FFcccccc'}}};
+    });
+  });
+
+  ws.columns.forEach((col,i)=>{ col.width=i===0?28:9; });
+
+  // ── Légende catégories présentes ──
+  const presentCats=[...new Set(emps.map(e=>e.categorie))].filter(c=>catLabels[c]);
+  ws.addRow([]);
+  const legTitleRow=ws.addRow(['LÉGENDE — Catégories de personnel']);
+  legTitleRow.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+  presentCats.forEach(cat=>{
+    const r=ws.addRow([catLabels[cat]]);const c=r.getCell(1);
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(cat)}};
+    c.font={bold:true,size:9,color:{argb:'FF000000'}};
+    c.alignment={vertical:'middle',indent:1};r.height=16;
+  });
+
+  // ── Légende chantiers utilisés ──
+  const usedCh=new Set();
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedCh.add(e.chantierId);})));
+  if(usedCh.size){
+    ws.addRow([]);
+    const chTitle=ws.addRow(['LÉGENDE — Chantiers']);
+    chTitle.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+    [...usedCh].forEach(id=>{
+      const info=_cellInfo({type:'travail',chantierId:id});
+      const r=ws.addRow([info.txt]);const c=r.getCell(1);
+      if(info.color) c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+info.color}};
+      c.font={bold:true,size:9,color:{argb:'FF000000'}};
+      c.alignment={vertical:'middle',indent:1};r.height=16;
+    });
+  }
+
+  // ── Légende activités ──
+  ws.addRow([]);
+  const actTitleRow=ws.addRow(['LÉGENDE — Activités']);
+  actTitleRow.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+  [['Congé','2e7d32'],['Maladie','c62828'],['Formation','6a1b9a'],['Absence','e65100'],['Déplacement','0277bd'],['Férié','f9a825'],['Week-end','90a4ae']].forEach(([lbl,col])=>{
+    const r=ws.addRow([lbl]);const c=r.getCell(1);
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+col}};
+    c.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    c.alignment={vertical:'middle',indent:1};r.height=16;
+  });
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`MasterPlanning_${MO[month]}_${year}.xlsx`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  toast('✅ Export Excel coloré Master Planning');
 }
 
 function exportAll(){
