@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-FIXSAVE -->
+<!-- AeroStaff Pro v7 — Build 20260621-XLSWEEK -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2380,7 +2380,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-FIXSAVE · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-XLSWEEK · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -11838,9 +11838,9 @@ async function _buildColoredWeekXls(){
     const cells=dates.map(d=>{
       const am=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_AM`]||{});
       const pm=_cellInfo(S.planning[`${emp.id}_${fmt(d)}_PM`]||{});
-      if(am.txt===pm.txt) return {txt:am.txt,color:am.color,split:false};
-      // Différent matin/après-midi
-      return {txt:(am.txt||'—')+' / '+(pm.txt||'—'),color:am.color,color2:pm.color,split:true};
+      if(am.txt===pm.txt) return {txt:am.txt,color:am.color};
+      // Différent matin/après-midi : remplir avec la couleur disponible (matin sinon après-midi)
+      return {txt:(am.txt||'—')+' / '+(pm.txt||'—'),color:am.color||pm.color};
     });
     const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})`,...cells.map(c=>c.txt)]);
     row.height=26;
@@ -11875,6 +11875,22 @@ async function _buildColoredWeekXls(){
     c.alignment={vertical:'middle',indent:1};
     r.height=16;
   });
+
+  // ── Légende des chantiers utilisés (comme le master) ──
+  const usedChW=new Set();
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChW.add(e.chantierId);})));
+  if(usedChW.size){
+    ws.addRow([]);
+    const chTitle=ws.addRow(['LÉGENDE — Chantiers']);
+    chTitle.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
+    [...usedChW].forEach(id=>{
+      const info=_cellInfo({type:'travail',chantierId:id});
+      const r=ws.addRow([info.txt]);const c=r.getCell(1);
+      if(info.color) c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+info.color}};
+      c.font={bold:true,size:9,color:{argb:'FF000000'}};
+      c.alignment={vertical:'middle',indent:1};r.height=16;
+    });
+  }
 
   // ── Légende des activités/statuts ──
   ws.addRow([]);
