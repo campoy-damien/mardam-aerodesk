@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-XLSDUP -->
+<!-- AeroStaff Pro v7 — Build 20260621-INTERIM3 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1052,10 +1052,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <button class="tab" id="tb-todo"      onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
   <button class="tab" id="tb-autorisations" onclick="goTab('autorisations')">🛡 Autorisations<span class="tab-notif" id="nt-auto"></span></button>
   <button class="tab" id="tb-programme" onclick="goTab('programme')">📊 Programme Activité</button>
+  <button class="tab" id="tb-kpi" onclick="goTab('kpi')">📈 Tableau KPI</button>
   <button class="tab" id="tb-airbus" onclick="goTab('airbus')">🛩 Airbus Activité</button>
-  <button class="tab" id="tb-ai" onclick="goTab('ai')" style="background:linear-gradient(135deg,rgba(41,121,255,0.15),rgba(0,210,255,0.15));border:1px solid rgba(0,210,255,0.25)">✦ Assistant IA</button>
-  <button class="tab" id="tb-simulation" onclick="goTab('simulation')" style="background:linear-gradient(135deg,rgba(110,255,196,0.1),rgba(0,210,255,0.08));border:1px solid rgba(110,255,196,0.25)">🧪 Simulation</button>
-  <button class="tab" id="tb-notice" onclick="goTab('notice')" style="background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,154,60,0.1));border:1px solid rgba(255,215,0,0.2)">📖 Notice</button>
+  <button class="tab" id="tb-ai" onclick="goTab('ai')">✦ Assistant IA</button>
+  <button class="tab" id="tb-simulation" onclick="goTab('simulation')">🧪 Simulation</button>
+  <button class="tab" id="tb-notice" onclick="goTab('notice')">📖 Notice</button>
+</div>
 </nav>
 
 <!-- ═══════════ PAGES ═══════════ -->
@@ -1807,11 +1809,22 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 <!-- Modal confirmation suppression -->
 
+<!-- TABLEAU DE BORD KPI -->
+<div class="page" id="pg-kpi">
+  <div class="sh" style="background:linear-gradient(135deg,rgba(0,210,255,0.1),rgba(52,199,89,0.06))">
+    <div>
+      <div class="sh-title" style="margin:0">📈 Tableau de bord KPI</div>
+      <span style="font-size:11px;color:#6090c0" id="kpiSubtitle">Indicateurs de pilotage</span>
+    </div>
+  </div>
+  <div id="kpiGrid" style="padding:4px 0"></div>
+</div>
+
 <!-- AIRBUS ACTIVITÉ -->
 <div class="page" id="pg-airbus">
   <div class="sh" style="background:linear-gradient(135deg,rgba(0,100,200,0.12),rgba(0,160,255,0.06))">
     <div style="display:flex;align-items:center;gap:14px">
-      <svg width="52" height="22" viewBox="0 0 100 40"><path d="M5 20 Q30 5 60 18 Q75 22 95 15 L95 25 Q75 32 60 28 Q30 35 5 20Z" fill="#0064c8"/><path d="M60 18 Q75 10 95 15 L95 20 Q80 16 65 20Z" fill="#00a0ff"/></svg>
+      <svg width="40" height="40" viewBox="-30 -32 60 64"><path d="M0 -28 C5 -28 7 -18 7 -8 L26 8 L26 14 L7 5 L7 18 L13 24 L13 27 L0 23 L-13 27 L-13 24 L-7 18 L-7 5 L-26 14 L-26 8 L-7 -8 C-7 -18 -5 -28 0 -28 Z" fill="#00a0ff"/><ellipse cx="0" cy="-4" rx="3.5" ry="18" fill="#0064c8" opacity="0.5"/></svg>
       <div>
         <div class="sh-title" style="margin:0">Airbus <em>Activité</em></div>
         <span style="font-size:11px;color:#6090c0">Suivi MSN · Charge hebdomadaire</span>
@@ -2159,8 +2172,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Grille AM/PM</strong> — chaque case = une demi-journée<br>
         • <strong style="color:#ffd060">Clic sur une case</strong> — Travail, Congé, Formation, Maladie, Déplacement…<br>
         • <strong style="color:#ffd060">Affectation chantier</strong> — Travail → choisir le chantier associé (y compris Stockage, Part 21, ou un avion en recyclage)<br>
+        • <strong style="color:#ffd060">2 chantiers par demi-journée</strong> — une demi-journée peut porter un 2ᵉ chantier optionnel (jusqu'à 4 chantiers/jour). Les 3,5 h sont alors divisées à parts égales (1,75 h chacun). La case s'affiche en 2 bandes de couleur avec le MSN de chaque avion.<br>
         • <strong style="color:#ffd060">Copier semaine</strong> — duplique le planning vers une autre semaine<br>
-        • <strong style="color:#ffd060">📊 Export Excel coloré & 📄 PDF</strong> — rendu identique à l'app, avec couleurs, noms de chantier + MSN et légendes<br>
+        • <strong style="color:#ffd060">📊 Export Excel coloré & 📄 PDF</strong> — rendu identique à l'app, avec couleurs, MSN des chantiers et légendes (cases scindées pour les demi-journées à 2 chantiers)<br>
         • <strong style="color:#ffd060">Navigation</strong> — ← Préc. / Aujourd'hui / Suiv. →
         <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les absences saisies ici sont déduites automatiquement de la capacité dans Programme Activité. Après chaque saisie, la vue <strong>reste à la même position</strong> pour enchaîner les cases sans rescroller.</div>
       </div>
@@ -2171,11 +2185,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
-        • <strong style="color:#ffd060">+ Chantier</strong> — nom, dates, Man Hours estimées, techniciens requis<br>
+        • <strong style="color:#ffd060">+ Chantier</strong> — client, avion, MSN, dates, volume Man Hours, techniciens requis. Le nom est composé automatiquement « Client — Avion — MSN ».<br>
         • <strong style="color:#ffd060">Statuts</strong> — En cours / Futur / Prévu / Terminé — impactent la charge<br>
-        • <strong style="color:#ffd060">Man Hours</strong> — calcul automatique de l'avancement<br>
-        • <strong style="color:#ffd060">Gantt</strong> — visualisation dans Programme Activité
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 "En cours" et "Futur" alimentent le tableau de charge dans Programme Activité.</div>
+        • <strong style="color:#ffd060">Suivi d'avancement</strong> (carte sur le dashboard) — avancement <strong>réel</strong> = MH consommées (techniciens/intérimaires affectés dans le planning × 7 h/jour) ÷ MH total, comparé à l'avancement <strong>théorique</strong> (jours ouvrés écoulés) → statut ✅ en avance / 🟡 dans les temps / 🚨 en retard<br>
+        • <strong style="color:#ffd060">Volume MH</strong> — saisissable directement sur la carte du dashboard (ou dans la fiche)<br>
+        • <strong style="color:#ffd060">🔧 Heures ajoutées</strong> — sur chaque chantier en cours, ajoutez des heures de rectification/défaut (motif + heures, autant que nécessaire). L'app affiche alors les <strong>deux avancements</strong> (périmètre initial vs révisé) et calcule l'<strong>impact</strong> : combien de techniciens ajouter pour tenir la date, ou la nouvelle date de livraison à effectif constant.
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 "En cours" et "Futur" alimentent le tableau de charge dans Programme Activité. Seuls les techniciens et intérimaires comptent dans les Man Hours consommées (pas les apprentis ni l'encadrement).</div>
       </div>
     </div>
     <div class="notice-section" id="n-stockage" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2313,7 +2328,36 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ff8fa3">Non comptés</strong> : Apprenti/Alternant (pas encore qualifié, n'apporte pas de main d'œuvre productive), Responsable, Chef d'équipe, Expert et autres fonctions support<br>
         Les responsables, chefs et apprentis apparaissent dans le planning et les Gantts de présence (Chantiers, Recyclage, Stockage, Part 21) mais pas dans le calcul de la capacité de production.
 
+        <div style="margin:14px 0 6px;font-size:13px;font-weight:800;color:#00d2ff">6 · Man Hours & avancement des chantiers</div>
+        • <strong style="color:#ffd060">Heures consommées</strong> — chaque demi-journée où un <strong>technicien ou intérimaire</strong> est affecté à un chantier compte pour <strong>3,5 h</strong> (base 7 h/jour). Seules les affectations jusqu'à aujourd'hui inclus sont comptées ; les week-ends/fériés comptent s'ils sont explicitement affectés.<br>
+        • <strong style="color:#ffd060">2 chantiers sur une même demi-journée</strong> — les 3,5 h sont <strong>divisées à parts égales</strong> : 1,75 h pour chacun des deux chantiers.<br>
+        • <strong style="color:#ffd060">Avancement réel</strong> = heures consommées ÷ volume Man Hours total (initial + heures ajoutées) × 100.<br>
+        • <strong style="color:#ffd060">Avancement théorique</strong> = jours ouvrés écoulés ÷ jours ouvrés totaux × 100. L'écart entre réel et théorique donne le statut ✅/🟡/🚨.<br>
+        • <strong style="color:#ffd060">Heures ajoutées</strong> — pour tenir la date : techniciens nécessaires = heures restantes ÷ (jours ouvrés restants × 7). Nouvelle date à effectif constant = heures restantes ÷ (nb techniciens prévus × 7), reportée en jours ouvrés.
+
+        <div style="margin:14px 0 6px;font-size:13px;font-weight:800;color:#34c759">7 · Base de calcul du Tableau de bord KPI</div>
+        Les KPI sont calculés sur la <strong>semaine en cours</strong> (et les 8 semaines à venir pour le sous-effectif) :<br>
+        • <strong style="color:#ffd060">Taux de disponibilité</strong> = DISPO ÷ effectif productif &nbsp;·&nbsp; <strong>Absentéisme</strong> = demi-journées congé+maladie ÷ total demi-journées productives<br>
+        • <strong style="color:#ffd060">Avancement moyen chantiers</strong> = moyenne pondérée par les Man Hours &nbsp;·&nbsp; <strong>Dérive de périmètre</strong> = heures ajoutées ÷ heures initiales<br>
+        • <strong style="color:#ffd060">Conformité habilitations</strong> = personnel sans aucune qualification expirée ÷ effectif actif &nbsp;·&nbsp; <strong>Compétences à risque</strong> = qualifications détenues (valides) par ≤ 1 personne<br>
+        • Code couleur 🟢 bon / 🟡 vigilance / 🔴 alerte selon des seuils adaptés à chaque indicateur.
+
         <div style="margin-top:12px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ En résumé : la capacité vient du <strong>planning réel</strong>, le besoin vient des <strong>chantiers + modules</strong> (ajustable à la semaine), et l'écart te dit s'il faut renforcer ou si tu as de la marge.</div>
+      </div>
+    </div>
+
+    <div class="notice-section" id="n-kpi" style="background:rgba(255,255,255,0.03);border:1px solid rgba(0,210,255,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">📈</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Tableau de bord KPI</div><div style="font-size:11px;color:var(--t4)">Indicateurs de pilotage</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        Vue de pilotage synthétique, calculée sur la <strong>semaine en cours</strong> et l'état actuel des données, avec code couleur 🟢/🟡/🔴 :<br>
+        • <strong style="color:#ffd060">👥 Capacité & RH</strong> — taux de disponibilité, écart capacité/besoin, absentéisme, recours intérim, charge formation, semaines en sous-effectif (8 prochaines)<br>
+        • <strong style="color:#ffd060">🔧 Chantiers</strong> — avancement réel moyen pondéré, écart réel/théorique, chantiers en retard, dérive de périmètre (heures ajoutées)<br>
+        • <strong style="color:#ffd060">🛡 Qualifications</strong> — conformité des habilitations, qualifications expirées, échéances &lt; 30 et &lt; 90 jours, compétences à risque (≤ 1 détenteur)<br>
+        • <strong style="color:#ffd060">♻️ Recyclage · Stockage · Airbus</strong> — avions en recyclage, charge stockage (avec tendance), charge Part 21
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Les indicateurs chantiers prennent toute leur valeur une fois les volumes Man/Hours renseignés. Le tableau se recalcule à chaque ouverture de l'onglet.</div>
       </div>
     </div>
 
@@ -2324,14 +2368,16 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         L'assistant fonctionne <strong style="color:#6effc4">entièrement en local</strong> (aucun service payant, aucune donnée envoyée à l'extérieur). Il calcule ses réponses à partir de tes données. Tape ta question dans le langage courant :<br>
-        • <strong style="color:#ffd060">Formations qui expirent</strong> — "Quelles formations expirent bientôt ?", "Qui n'a pas le CACES nacelle à jour ?"<br>
-        • <strong style="color:#ffd060">Présence / absence</strong> — "Qui est en congé semaine 30 ?", "Quels chefs sont présents semaine 30 ?"<br>
-        • <strong style="color:#ffd060">Personnel disponible</strong> — "Combien de techniciens dispo cette semaine ?"<br>
-        • <strong style="color:#ffd060">Chantiers</strong> — "État des chantiers", "Quels chantiers manquent de monde ?"<br>
-        • <strong style="color:#ffd060">Recherche</strong> — "Infos sur Baou"<br>
-        • <strong style="color:#ffd060">Simulation de faisabilité</strong> — "5 techniciens en semaine 32 et 33 ?" → verdict OUI/NON/PARTIEL selon la capacité résiduelle réelle<br>
-        • <strong style="color:#ffd060">Actions sur le planning</strong> — "Mets Baou et Castanon sur le chantier 5598 semaine 33", "Plannifie Gohe en formation CDCCL le 13 juillet", "Mets Dupont en congé du 2 au 6 juin"
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Toute action sur le planning passe par un aperçu avec gestion des conflits (garder/écraser) et un bouton ↩ Annuler. Rien n'est modifié sans ta confirmation. Les formations sont classées internes 📖 sauf les CACES des intérimaires 📚.</div>
+        • <strong style="color:#ffd060">Échéances</strong> — "Quelles formations expirent dans les 6 mois ?", "Autorisations à renouveler cette année" (l'horizon est compris : 3 mois, 6 mois, fin d'année…)<br>
+        • <strong style="color:#ffd060">Présence / absence</strong> — "Qui est en congé cette semaine ?", "Quels chefs sont présents la semaine prochaine ?"<br>
+        • <strong style="color:#ffd060">Disponibilité & charge</strong> — "Combien de techniciens dispo cette semaine ?", "Écart capacité/besoin", "Compare cette semaine et la semaine prochaine"<br>
+        • <strong style="color:#ffd060">Recherche croisée</strong> — "Qui a le CACES nacelle ET est dispo cette semaine ?", "Quels techniciens ont l'EWIS valide ?" (combine plusieurs qualifications + présence + catégorie)<br>
+        • <strong style="color:#ffd060">Chantiers / recyclage / stockage</strong> — "État des chantiers", "Quels chantiers manquent de monde ?"<br>
+        • <strong style="color:#ffd060">Simulation & actions</strong> — "5 techniciens du 01/09 au 30/09 ?", "Mets Baou sur le chantier 5598 la semaine prochaine", "Mets Dupont en congé du 2 au 6 juin"<br>
+        • <strong style="color:#ffd060">Suggestions par thème</strong> — des exemples classés (Charge, Présence, Activité, Formations, Recherche croisée, Effectif, Simulation) au-dessus de la zone de saisie<br>
+        • <strong style="color:#ffd060">Réponses cliquables</strong> — les noms ouvrent la fiche de la personne, et un bouton ouvre directement le planning de la semaine concernée<br>
+        • <strong style="color:#ffd060">Tolérance aux fautes & dictée vocale</strong> — comprend les fautes de frappe ; la dictée laisse le texte modifiable avant envoi
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Toute action sur le planning passe par un aperçu avec gestion des conflits (garder/écraser) et un bouton ↩ Annuler. Rien n'est modifié sans ta confirmation. Une question (« qui… », « combien… ») n'est jamais exécutée comme un ordre.</div>
       </div>
     </div>
     <div class="notice-section" id="n-sync" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2380,7 +2426,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-XLSDUP · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-INTERIM3 · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2426,6 +2472,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field">
       <label style="color:var(--cyan)">⚠ Chantier associé <span style="color:var(--rose);font-weight:700">*</span> <span style="font-size:9px;color:var(--t4);font-weight:400">(requis pour le suivi Man/Hours)</span></label>
       <select id="cellChantier" style="border-color:rgba(0,210,255,0.3);background:rgba(0,210,255,0.05)"><option value="">— Sélectionner le chantier —</option></select>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label style="color:var(--cyan)">2ᵉ chantier sur la demi-journée <span style="font-size:9px;color:var(--t4);font-weight:400">(optionnel — les 3,5 h sont divisées à parts égales)</span></label>
+      <select id="cellChantier2" style="border-color:rgba(0,210,255,0.2);background:rgba(0,210,255,0.03)"><option value="">— Aucun —</option></select>
     </div>
   </div>
   <div id="wrapNote" style="display:none;margin-bottom:11px">
@@ -2620,12 +2670,33 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     </div>
 <div class="field"><label>Téléphone</label><input type="tel" id="p-tel"></div>
     <div class="field" style="grid-column:1/-1"><label>Email</label><input type="email" id="p-email"></div>
+    <div class="field" id="wrap-agence" style="display:none"><label>Agence d'intérim</label><input type="text" id="p-agence" placeholder="Ex : Adecco, Manpower, Randstad…"></div>
+    <div class="field" id="wrap-debut" style="display:none"><label>Début de contrat</label><input type="date" id="p-debut"></div>
     <div class="field" id="wrap-emb"><label>Date embauche</label><input type="date" id="p-emb"></div>
     <div class="field" id="wrap-fin"><label>Fin de contrat</label><input type="date" id="p-fin"></div>
   </div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-pers')">Annuler</button>
     <button class="btn btn-cyan" onclick="savePersonnel()">Sauvegarder</button>
+  </div>
+</div>
+</div>
+
+<!-- Prolongation contrat intérimaire -->
+<div class="mbg" id="m-prolong">
+<div class="modal">
+  <div class="modal-title">📝 Prolongation de contrat</div>
+  <div id="prolong-info" style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6"></div>
+  <input type="hidden" id="prolong-id">
+  <div class="field"><label>Nouvelle date de début <span style="font-size:9px;color:var(--t4)">(pré-remplie en continuité — à décaler si retour plus tard)</span></label><input type="date" id="prolong-debut" onchange="_prolongGapHint();_prolongAbsHint()"></div>
+  <div id="prolong-gap" style="font-size:11px;margin:2px 0 8px"></div>
+  <div class="field"><label>Nouvelle date de fin de contrat <span style="color:var(--rose)">*</span></label><input type="date" id="prolong-fin" onchange="_prolongAbsHint()"></div>
+  <div id="prolong-absences" style="margin:8px 0"></div>
+  <div class="field" style="margin-top:8px"><label>Référence / motif <span style="font-size:9px;color:var(--t4)">(facultatif)</span></label><input type="text" id="prolong-ref" placeholder="Ex : avenant n°2, besoin chantier 55275"></div>
+  <div id="prolong-hist"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-prolong')">Annuler</button>
+    <button class="btn btn-cyan" onclick="saveProlongation()">Enregistrer la prolongation</button>
   </div>
 </div>
 </div>
@@ -3674,6 +3745,24 @@ function gasPull(){
   pullFromDrive(false);
 }
 
+// Bascule entre les onglets "Automatique" / "Manuel" de la config Drive
+function driveTab(which, btn){
+  const auto=document.getElementById('driveTabAuto');
+  const manual=document.getElementById('driveTabManual');
+  if(auto) auto.style.display=which==='auto'?'':'none';
+  if(manual) manual.style.display=which==='manual'?'':'none';
+  ['dtab-auto','dtab-manual'].forEach(id=>{const b=document.getElementById(id);if(b)b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+}
+// Copie le code Google Apps Script dans le presse-papier
+function copyGasCode(){
+  const el=document.getElementById('gasCode'); if(!el) return;
+  const txt=el.textContent||'';
+  const ok=()=>{ if(typeof toast==='function') toast('📋 Code copié'); };
+  const fb=()=>{ try{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok(); }catch(e){ if(typeof toast==='function') toast('⚠️ Copie impossible, sélectionnez le code manuellement'); } };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,fb); } else fb();
+}
+
 // Met à jour l'affichage du modal Drive (connecté / non connecté)
 function refreshGdriveUI(){
   const notConf=document.getElementById('gasNotConf');
@@ -3889,7 +3978,7 @@ function addHoliday(){
 function removeHol(i){S.holidays.splice(i,1);renderHolTags();save();}
 
 /* ═══ TABS ═══ */
-const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,autorisations:renderAutorisations,programme:renderProgramme,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
+const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,autorisations:renderAutorisations,programme:renderProgramme,kpi:renderKPI,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
 
 /* ═══ SLOT HANGAR ═══ */
 const SLOT_POSITIONS=[
@@ -5425,6 +5514,9 @@ function popSelects(){
       o.textContent='✈️ Airbus — Activité Part 21';
       cc.appendChild(o);
     }
+    // Recopier les mêmes options dans le 2ᵉ chantier
+    const cc2=document.getElementById('cellChantier2');
+    if(cc2){ cc2.innerHTML='<option value="">— Aucun —</option>'+cc.innerHTML.replace(/^<option value="">[^<]*<\/option>/,''); }
   }
 }
 
@@ -5908,6 +6000,26 @@ function xlsDate(v){
 }
 
 /* ═══ PLANNING GRID ═══ */
+// Couleur d'un chantier/activité spéciale (pour les bandes multi-chantiers)
+function _chColor(cid){
+  if(!cid) return '#2979ff';
+  if(cid==='STO') return '#ff9a3c';
+  if(cid==='AIRBUS') return '#00a0ff';
+  if(cid==='REC'||cid.startsWith('REC_')) return '#6effc4';
+  const ch=S.chantiers.find(c=>c.id===cid); return ch?.color||'#2979ff';
+}
+// Libellé compact = MSN avion uniquement (sans client), pour gagner de la place
+function _chMsnLabel(cid){
+  if(!cid) return '';
+  if(cid==='STO') return 'STO';
+  if(cid==='AIRBUS') return 'P21';
+  if(cid==='REC') return 'REC';
+  if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); return av?('MSN'+(av.msn||'?')):'REC'; }
+  const ch=S.chantiers.find(c=>c.id===cid);
+  if(!ch) return 'Trav.';
+  return ch.msn?('MSN'+ch.msn):((ch.avion||ch.nom||'Trav.').slice(0,8));
+}
+
 function buildGrid(emps,dates,containerId){
   const el=document.getElementById(containerId);
   const thCells=dates.map(d=>{
@@ -6062,12 +6174,29 @@ function buildGrid(emps,dates,containerId){
 
       const amClick = `onclick="openCell('${emp.id}','${ds}','AM')"`;
       const pmClick = `onclick="openCell('${emp.id}','${ds}','PM')"`;
-      const amText  = amLbl || (!at && isH ? 'Férié' : !at && isW ? 'W-E' : '');
-      const pmText  = pmLbl || (!pt && isH ? 'Férié' : !pt && isW ? 'W-E' : '');
+      // Titre (survol) : inclure le 2e chantier si présent
+      const amTitle2=`${at||'Vide'}${am.note?' · '+am.note:am.chantierId?' · '+getChNom(am.chantierId)+(am.chantierId2?' + '+getChNom(am.chantierId2):''):''}`;
+      const pmTitle2=`${pt||'Vide'}${pm.note?' · '+pm.note:pm.chantierId?' · '+getChNom(pm.chantierId)+(pm.chantierId2?' + '+getChNom(pm.chantierId2):''):''}`;
+
+      // Rendu d'une demi-journée à 2 chantiers : 2 bandes de couleur côte à côte (libellé = MSN)
+      const twoBands=(e)=>{
+        const c1=_chColor(e.chantierId),c2=_chColor(e.chantierId2);
+        const l1=_chMsnLabel(e.chantierId),l2=_chMsnLabel(e.chantierId2);
+        return `<div style="display:flex;height:100%;width:100%">
+          <div style="flex:1;min-width:0;background:${hexRgba(c1,0.22)};color:${c1};display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;overflow:hidden;line-height:1;padding:0 1px">${l1}</div>
+          <div style="flex:1;min-width:0;background:${hexRgba(c2,0.22)};color:${c2};display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;overflow:hidden;line-height:1;padding:0 1px;border-left:1px solid rgba(255,255,255,0.28)">${l2}</div>
+        </div>`;
+      };
+      const amTwo = at==='travail' && am.chantierId && am.chantierId2;
+      const pmTwo = pt==='travail' && pm.chantierId && pm.chantierId2;
+      const amInner = amTwo ? twoBands(am) : (amLbl || (!at && isH ? 'Férié' : !at && isW ? 'W-E' : ''));
+      const pmInner = pmTwo ? twoBands(pm) : (pmLbl || (!pt && isH ? 'Férié' : !pt && isW ? 'W-E' : ''));
+      const amDivStyle = amTwo ? 'padding:0;overflow:hidden' : amStyle;
+      const pmDivStyle = pmTwo ? 'padding:0;overflow:hidden' : pmStyle;
       return`<td>
         <div class="hw">
-          <div class="hd ${amCls}" style="${amStyle}" ${amClick} title="${amTitle}">${amText}</div>
-          <div class="hd ${pmCls}" style="${pmStyle}" ${pmClick} title="${pmTitle}">${pmText}</div>
+          <div class="hd ${amCls}" style="${amDivStyle}" ${amClick} title="${amTitle2}">${amInner}</div>
+          <div class="hd ${pmCls}" style="${pmDivStyle}" ${pmClick} title="${pmTitle2}">${pmInner}</div>
         </div>
       </td>`;
     }).join('');
@@ -6238,6 +6367,7 @@ function openCell(empId,dateStr,half){
   document.getElementById('wrapNote').style.display=(['formation','absence','deplacement'].includes(cellType))?'block':'none';
   document.getElementById('wrapFormInt').style.display=cellType==='formation_int'?'block':'none';
   if(ex.chantierId)document.getElementById('cellChantier').value=ex.chantierId;
+  const cc2=document.getElementById('cellChantier2'); if(cc2) cc2.value=ex.chantierId2||'';
   document.getElementById('cellNote').value=ex.note||'';
   document.getElementById('cellFormInt').value=ex.formInt||'';
   openM('m-cell');
@@ -6279,6 +6409,8 @@ function saveCellEdit(){
   const {empId,dateStr,half}=cellCtx;
   const apply=document.getElementById('cellApply').value;
   const chantierId=document.getElementById('cellChantier').value;
+  let chantierId2=document.getElementById('cellChantier2')?.value||'';
+  if(chantierId2 && chantierId2===chantierId) chantierId2=''; // pas deux fois le même
   const note=document.getElementById('cellNote').value;
   const formInt=document.getElementById('cellFormInt').value;
   if(cellType==='formation_int' && !formInt){toast('⚠️ Sélectionnez l\'intitulé de la formation');return;}
@@ -6289,6 +6421,7 @@ function saveCellEdit(){
       type:cellType,
       note:['formation','absence','deplacement'].includes(cellType)?note:'',
       chantierId:cellType==='travail'?chantierId:'',
+      chantierId2:cellType==='travail'?chantierId2:'',
       formInt:cellType==='formation_int'?formInt:''
     };
   };
@@ -6610,7 +6743,10 @@ function renderAvancement(){
     const todayStr=fmt(today); // comparaison par date uniquement, pas par heure
     try{
       Object.entries(S.planning||{}).forEach(([key,entry])=>{
-        if(!entry||entry.chantierId!==c.id) return;
+        if(!entry) return;
+        const isPrim = entry.chantierId===c.id;
+        const isSec = entry.chantierId2===c.id;
+        if(!isPrim && !isSec) return;
         const parts=key.split('_');
         if(parts.length<3) return;
         const empId=parts[0];
@@ -6622,9 +6758,9 @@ function renderAvancement(){
         // Comparer par string de date — inclut le jour actuel
         if(ds>todayStr) return;
         const d=parseLocal(ds); if(!d||isNaN(d)) return;
-        // Toute affectation au chantier compte, y compris week-ends et fériés travaillés
-        // (si on affecte explicitement quelqu'un sur le chantier ce jour-là, il travaille)
-        mhConsommees+=MH_PAR_TECH_JOUR/2;
+        // 2 chantiers sur la demi-journée → 3,5 h divisées (1,75 h chacun), sinon 3,5 h
+        const partage = entry.chantierId && entry.chantierId2;
+        mhConsommees += partage ? (MH_PAR_TECH_JOUR/2)/2 : (MH_PAR_TECH_JOUR/2);
       });
     }catch(e){}
 
@@ -8461,6 +8597,9 @@ function renderPersonnel(){
     </div>`;
   }).join('');
 
+  // Synthèse "Intérimaires en production" (au-dessus de "hors production")
+  grid.innerHTML+=renderInterimSynthese();
+
   // Section "Intérimaires hors production" en liste compacte tout en bas
   if(horsProd.length){
     const rows=horsProd.map(emp=>{
@@ -8496,6 +8635,213 @@ function toggleInterimaire(id){
   popSelects();
   toast(`${emp.prenom} ${emp.nom} : ${emp.actif!==false?'En production ✅':'Hors production ⏸'}`);
 }
+// ═══ INTÉRIMAIRES EN PRODUCTION — synthèse, prolongation, PDF ═══
+function _interimSeuil(){ return (S.params&&S.params.interimRappelJours)||14; }
+function setInterimSeuil(v){ S.params=S.params||{}; S.params.interimRappelJours=Math.max(1,parseInt(v)||14); save(); renderPersonnel(); }
+function _joursAvant(dateStr){ if(!dateStr) return null; const d=parseLocal(dateStr); const t=new Date(); t.setHours(0,0,0,0); return Math.round((d-t)/86400000); }
+function _interimsProd(){ return (S.personnel||[]).filter(p=>p.categorie==='interimaire'&&p.actif!==false).sort((a,b)=>{const da=a.dateFin?parseLocal(a.dateFin):new Date(8640000000000000);const db=b.dateFin?parseLocal(b.dateFin):new Date(8640000000000000);return da-db;}); }
+
+function renderInterimSynthese(){
+  const list=_interimsProd();
+  if(!list.length) return '';
+  const seuil=_interimSeuil();
+  const aProlonger=list.filter(p=>{const j=_joursAvant(p.dateFin); return j!==null && j<=seuil;});
+  const statutBadge=(j)=>{
+    if(j===null) return '<span style="font-size:10px;color:#8090a8">—</span>';
+    if(j<0) return `<span style="font-size:10px;font-weight:800;color:#ff4d6d">⚫ Expiré (${-j}j)</span>`;
+    if(j<=seuil) return `<span style="font-size:10px;font-weight:800;color:#ff4d6d">🔴 À prolonger (${j}j)</span>`;
+    if(j<=30) return `<span style="font-size:10px;font-weight:800;color:#ffd060">🟠 ${j}j</span>`;
+    return `<span style="font-size:10px;font-weight:700;color:#34c759">🟢 ${j}j</span>`;
+  };
+  const rows=list.map(p=>{
+    const j=_joursAvant(p.dateFin);
+    const rowBg=(j!==null&&j<=seuil)?'background:rgba(255,77,109,0.07)':((j!==null&&j<=30)?'background:rgba(255,208,96,0.05)':'');
+    const nbProl=Array.isArray(p.prolongations)?p.prolongations.length:0;
+    return `<tr style="${rowBg};border-bottom:1px solid rgba(255,255,255,0.05)">
+      <td style="padding:8px 10px;font-weight:700;color:var(--t1);font-size:12px">${p.nom} ${p.prenom}${nbProl?` <span style="font-size:9px;color:#82b1ff" title="${nbProl} prolongation(s)">↗${nbProl}</span>`:''}</td>
+      <td style="padding:8px 10px;color:#a0b0c8;font-size:12px">${p.agence||'—'}</td>
+      <td style="padding:8px 10px;color:#a0b0c8;font-size:11px">${p.debutContrat?disp(p.debutContrat):'—'}</td>
+      <td style="padding:8px 10px;color:var(--t1);font-size:11px;font-weight:600">${p.dateFin?disp(p.dateFin):'—'}</td>
+      <td style="padding:8px 10px">${statutBadge(j)}</td>
+      <td style="padding:8px 6px;text-align:right;white-space:nowrap">
+        <button onclick="openProlongation('${p.id}')" style="padding:4px 9px;border-radius:7px;background:rgba(0,210,255,0.14);border:1px solid rgba(0,210,255,0.35);color:#00d2ff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">+ Prolong.</button>
+        <button onclick="exportProlongationIndiv('${p.id}')" title="Demande PDF individuelle" style="padding:4px 8px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#9fb0c8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">📄</button>
+      </td>
+    </tr>`;
+  }).join('');
+  const banner=aProlonger.length?`<div style="margin:0 0 10px;padding:10px 14px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.35);border-radius:10px;color:#ff8090;font-size:12px;font-weight:700">🔔 Rappel : ${aProlonger.length} intérimaire(s) à prolonger sous ${seuil} jours — ${aProlonger.map(p=>p.nom+' '+p.prenom).join(', ')}</div>`:'';
+  return `<div style="grid-column:1/-1;margin-top:8px;margin-bottom:18px">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 4px;border-top:2px solid rgba(0,210,255,0.2)">
+      <span style="font-size:13px;font-weight:800;color:#00d2ff">👷 Intérimaires en production</span>
+      <span style="font-size:11px;color:#607090;background:rgba(255,255,255,0.06);border-radius:99px;padding:2px 9px">${list.length}</span>
+      ${aProlonger.length?`<span style="font-size:11px;color:#ff8090;background:rgba(255,77,109,0.12);border-radius:99px;padding:2px 9px;font-weight:700">${aProlonger.length} à prolonger</span>`:''}
+      <div style="flex:1"></div>
+      <label style="font-size:11px;color:#8090a8">Rappel : <input type="number" min="1" value="${seuil}" onchange="setInterimSeuil(this.value)" style="width:48px;padding:3px 6px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#e0e8ff;font-family:'Outfit',sans-serif;text-align:center"> j avant</label>
+      <button onclick="exportProlongationsPDF()" style="padding:6px 12px;border-radius:8px;background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#34c759;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📄 PDF récap RH</button>
+    </div>
+    ${banner}
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:560px">
+        <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Nom</th>
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Agence</th>
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Début</th>
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Fin contrat</th>
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Statut</th>
+          <th style="padding:8px 6px;text-align:right;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Action</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// Types d'indisponibilité à signaler lors d'une prolongation
+const ABS_LBL={conge:'🏖 Congé',maladie:'🤒 Maladie',absence:'🚫 Absence',deplacement:'✈️ Déplacement',formation:'📚 Formation',formation_int:'📚 Formation'};
+function _scanAbsences(empId,d1,d2){
+  const map={}; if(!empId||!d1||!d2) return map;
+  const start=parseLocal(d1), end=parseLocal(d2); if(end<start) return map;
+  Object.entries(S.planning||{}).forEach(([k,e])=>{
+    if(!e||!ABS_LBL[e.type]) return;
+    if(!k.startsWith(empId+'_')) return;
+    const pa=k.split('_'); const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM') return;
+    const ds=pa.slice(1,-1).join('_'); const d=parseLocal(ds);
+    if(!d||isNaN(d)||d<start||d>end) return;
+    const key=(e.type==='formation_int')?'formation':e.type;
+    (map[key]=map[key]||new Set()).add(ds);
+  });
+  return map;
+}
+function _compressDates(dates){
+  const arr=[...new Set(dates)].sort();
+  const ranges=[]; let s=null,p=null;
+  const allOff=(a,b)=>{ let d=addD(parseLocal(a),1); const end=parseLocal(b); while(d<end){ const wd=d.getDay(); if(wd!==0&&wd!==6&&!isHol(fmt(d))) return false; d=addD(d,1);} return true; };
+  arr.forEach(ds=>{
+    if(s===null){s=ds;p=ds;return;}
+    const gap=Math.round((parseLocal(ds)-parseLocal(p))/86400000);
+    if(gap===1 || (gap>1 && allOff(p,ds))){ p=ds; } else { ranges.push([s,p]); s=ds;p=ds; }
+  });
+  if(s!==null) ranges.push([s,p]);
+  return ranges;
+}
+function _absencesHtml(empId,d1,d2,compact){
+  const map=_scanAbsences(empId,d1,d2);
+  const keys=Object.keys(map);
+  if(!keys.length) return '';
+  return keys.map(t=>{
+    const dates=[...map[t]];
+    const parts=_compressDates(dates).map(([a,b])=>a===b?disp(a):`${disp(a)} → ${disp(b)}`).join(', ');
+    const jours=Math.round(dates.length/2*10)/10;
+    return `<div style="font-size:11px;color:${compact?'#555':'#ffd060'};padding:2px 0">${ABS_LBL[t]} : ${parts} <span style="color:${compact?'#888':'#8090a8'}">(${jours} j)</span></div>`;
+  }).join('');
+}
+function _prolongAbsHint(){
+  const wrap=document.getElementById('prolong-absences'); if(!wrap) return;
+  const id=document.getElementById('prolong-id').value;
+  const d1=document.getElementById('prolong-debut').value;
+  const d2=document.getElementById('prolong-fin').value;
+  if(!id||!d1||!d2){ wrap.innerHTML=''; return; }
+  const html=_absencesHtml(id,d1,d2);
+  wrap.innerHTML=html
+    ? `<div style="padding:9px 12px;background:rgba(255,208,96,0.08);border:1px solid rgba(255,208,96,0.3);border-radius:10px">
+        <div style="font-size:11px;font-weight:800;color:#ffd060;margin-bottom:4px">⚠ Indisponibilités déjà prévues sur la nouvelle période — adaptez la demande si besoin :</div>${html}
+      </div>`
+    : `<div style="font-size:11px;color:#34c759;padding:2px 0">✓ Aucune absence/formation prévue sur la période.</div>`;
+}
+
+function openProlongation(id){
+  const emp=byId(id); if(!emp) return;
+  document.getElementById('prolong-id').value=id;
+  document.getElementById('prolong-fin').value='';
+  document.getElementById('prolong-ref').value='';
+  // Nouvelle date de début pré-remplie en continuité (lendemain de la fin actuelle)
+  const debEl=document.getElementById('prolong-debut');
+  if(debEl) debEl.value=emp.dateFin?fmt(addD(parseLocal(emp.dateFin),1)):'';
+  const gap=document.getElementById('prolong-gap'); if(gap) gap.innerHTML='';
+  const info=document.getElementById('prolong-info');
+  if(info) info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>`;
+  const hist=document.getElementById('prolong-hist');
+  const ps=Array.isArray(emp.prolongations)?emp.prolongations:[];
+  if(hist) hist.innerHTML=ps.length?`<div style="font-size:11px;color:#8090a8;margin:8px 0 4px">Historique :</div>`+ps.map(p=>`<div style="font-size:11px;color:#a0b0c8;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${p.ancienneFin?disp(p.ancienneFin):'—'} → ${p.nouveauDebut&&p.gap>0?`<span style="color:#ffd060">⏸ ${p.gap}j puis </span>`:''}<strong style="color:var(--t1)">${disp(p.nouvelleFin)}</strong>${p.ref?` · ${p.ref}`:''} <span style="color:#607090">(${disp(p.date)})</span></div>`).join(''):'';
+  _prolongAbsHint();
+  openM('m-prolong');
+}
+// Affiche un indice si la nouvelle date de début crée une interruption
+function _prolongGapHint(){
+  const emp=byId(document.getElementById('prolong-id').value); if(!emp) return;
+  const gapEl=document.getElementById('prolong-gap'); if(!gapEl) return;
+  const nd=document.getElementById('prolong-debut').value;
+  if(!nd||!emp.dateFin){ gapEl.innerHTML=''; return; }
+  const cont=fmt(addD(parseLocal(emp.dateFin),1));
+  const diff=Math.round((parseLocal(nd)-parseLocal(cont))/86400000);
+  if(diff>0) gapEl.innerHTML=`<span style="color:#ffd060;font-weight:700">⏸ Interruption de ${diff} jour(s)</span> entre la fin actuelle et le retour.`;
+  else if(diff===0) gapEl.innerHTML=`<span style="color:#34c759">✓ Continuité (pas d'interruption).</span>`;
+  else gapEl.innerHTML=`<span style="color:#ff8090">⚠ Le début chevauche le contrat actuel.</span>`;
+}
+function saveProlongation(){
+  const id=document.getElementById('prolong-id').value;
+  const emp=byId(id); if(!emp) return;
+  const nf=document.getElementById('prolong-fin').value;
+  if(!nf){ toast('⚠️ Indiquez la nouvelle date de fin'); return; }
+  const nd=document.getElementById('prolong-debut').value||'';
+  if(nd && parseLocal(nf)<parseLocal(nd)){ toast('⚠️ La fin doit être après le début'); return; }
+  const ref=(document.getElementById('prolong-ref').value||'').trim();
+  // Calcul de l'interruption éventuelle
+  let gap=0;
+  if(nd && emp.dateFin){ const cont=fmt(addD(parseLocal(emp.dateFin),1)); gap=Math.max(0,Math.round((parseLocal(nd)-parseLocal(cont))/86400000)); }
+  if(!Array.isArray(emp.prolongations)) emp.prolongations=[];
+  emp.prolongations.push({id:uid(),ancienneFin:emp.dateFin||'',nouveauDebut:nd,gap,nouvelleFin:nf,ref,date:fmt(new Date())});
+  if(nd) emp.debutContrat=nd; // le début de la période active devient la nouvelle date
+  emp.dateFin=nf;
+  save(); closeM('m-prolong'); renderPersonnel(); if(typeof renderDash==='function')renderDash();
+  toast(`✅ ${emp.prenom} ${emp.nom} prolongé${nd?` du ${disp(nd)}`:''} au ${disp(nf)}${gap>0?` (interruption ${gap}j)`:''}`);
+}
+
+function _prolongPdfHead(title){
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:28px;font-size:13px}
+  h1{font-size:18px;margin:0 0 4px}.sub{color:#666;font-size:12px;margin-bottom:18px}
+  table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ccd;padding:7px 9px;text-align:left;font-size:12px;vertical-align:top}
+  th{background:#eef3fb;color:#1a2440}.foot{margin-top:24px;font-size:11px;color:#666}.urgent{color:#c0392b;font-weight:700}</style></head><body>`;
+}
+function exportProlongationsPDF(){
+  const seuil=_interimSeuil();
+  const list=_interimsProd().filter(p=>{const j=_joursAvant(p.dateFin); return j!==null&&j<=seuil;});
+  if(!list.length){ toast('Aucun intérimaire à prolonger sous '+seuil+' jours'); return; }
+  const rows=list.map(p=>{const j=_joursAvant(p.dateFin);const cont=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'—';return `<tr><td>${p.nom} ${p.prenom}</td><td>${p.agence||'—'}</td><td>${p.debutContrat?disp(p.debutContrat):'—'}</td><td class="${j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}</td><td>${j<0?'Expiré':j+' j'}</td><td>${cont}</td><td style="min-width:110px"></td></tr>`;}).join('');
+  const html=_prolongPdfHead('Prolongations intérimaires')+`
+    <h1>Demande de prolongation de contrats — Intérimaires</h1>
+    <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · Contrats se terminant sous ${seuil} jours</div>
+    <table><thead><tr><th>Nom</th><th>Agence</th><th>Début</th><th>Fin actuelle</th><th>Échéance</th><th>Début proposé (continuité)</th><th>Nouvelle fin proposée</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="foot">Début proposé = lendemain de la fin actuelle (à décaler en cas d'interruption / retour différé). Merci de procéder à la prolongation des contrats ci-dessus. — Document généré par MARDAM AeroDesk Pro.</div>
+  </body></html>`;
+  openPrintView(html,'PDF — Prolongations RH');
+}
+function exportProlongationIndiv(id){
+  const p=byId(id); if(!p) return;
+  const j=_joursAvant(p.dateFin);
+  const contDebut=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'';
+  const ps=Array.isArray(p.prolongations)?p.prolongations:[];
+  const histRows=ps.map(x=>`<tr><td>${x.ancienneFin?disp(x.ancienneFin):'—'}</td><td>${x.nouveauDebut?disp(x.nouveauDebut):'—'}${x.gap>0?` <span style="color:#c0392b">(⏸ ${x.gap}j)</span>`:''}</td><td>${disp(x.nouvelleFin)}</td><td>${x.ref||'—'}</td><td>${disp(x.date)}</td></tr>`).join('');
+  const html=_prolongPdfHead('Demande de prolongation')+`
+    <h1>Demande de prolongation de contrat</h1>
+    <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))}</div>
+    <table>
+      <tr><th style="width:42%">Intérimaire</th><td>${p.nom} ${p.prenom}</td></tr>
+      <tr><th>Agence d'intérim</th><td>${p.agence||'—'}</td></tr>
+      <tr><th>Début de contrat</th><td>${p.debutContrat?disp(p.debutContrat):'—'}</td></tr>
+      <tr><th>Fin de contrat actuelle</th><td class="${j!==null&&j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}${j!==null?` (${j<0?'expiré':j+' j restants'})`:''}</td></tr>
+      <tr><th>Nouvelle date de début souhaitée</th><td>${contDebut?`<span style="color:#666">proposé : ${contDebut} (continuité)</span>`:'&nbsp;'}</td></tr>
+      <tr><th>Nouvelle fin de contrat souhaitée</th><td>&nbsp;</td></tr>
+      <tr><th>Motif / référence</th><td>&nbsp;</td></tr>
+    </table>
+    ${ps.length?`<h1 style="font-size:14px;margin-top:20px">Historique des prolongations</h1><table><thead><tr><th>Ancienne fin</th><th>Nouveau début</th><th>Nouvelle fin</th><th>Référence</th><th>Date</th></tr></thead><tbody>${histRows}</tbody></table>`:''}
+    ${(()=>{const ab=_absencesHtml(p.id,p.debutContrat||p.dateFin,p.dateFin,true);return ab?`<h1 style="font-size:14px;margin-top:20px">Indisponibilités prévues sur le contrat en cours</h1><div>${ab}</div>`:'';})()}
+    <div class="foot">Merci de procéder à la prolongation de ce contrat. — Document généré par MARDAM AeroDesk Pro.</div>
+  </body></html>`;
+  openPrintView(html,'PDF — '+p.nom+' '+p.prenom);
+}
+
 function openPanel(id){
   const emp=byId(id);if(!emp)return;
   const cat=CATS[emp.categorie]||{};const ini=(emp.nom[0]||'')+(emp.prenom[0]||'');
@@ -8618,9 +8964,15 @@ function togglePrestFields(cat){
   const isPrest=cat==='prestataire';
   const isInt=cat==='interimaire';
 
-  // Date embauche — masquée pour prestataires
+  // Date embauche — masquée pour prestataires ET intérimaires (remplacée par "début de contrat")
   const embEl=document.getElementById('wrap-emb');
-  if(embEl) embEl.style.display=isPrest?'none':'';
+  if(embEl) embEl.style.display=(isPrest||isInt)?'none':'';
+
+  // Agence + début de contrat — uniquement pour intérimaires
+  const agEl=document.getElementById('wrap-agence');
+  if(agEl) agEl.style.display=isInt?'':'none';
+  const debEl=document.getElementById('wrap-debut');
+  if(debEl) debEl.style.display=isInt?'':'none';
 
   // Fin de contrat — masquée pour CDI et prestataires
   const finEl=document.getElementById('wrap-fin');
@@ -8643,7 +8995,7 @@ function selectActivite(val){
 
 function openPersNew(){
   document.getElementById('pi').value='';
-  ['p-pre','p-nom','p-tri','p-tel','p-email','p-emb','p-fin'].forEach(i=>document.getElementById(i).value='');
+  ['pi','p-pre','p-nom','p-tri','p-tel','p-email','p-emb','p-fin','p-agence','p-debut'].forEach(i=>{const el=document.getElementById(i); if(el)el.value='';});
   document.getElementById('p-cat').value='technicien';
   document.getElementById('p-activite').value='';
   selectActivite('');
@@ -8658,6 +9010,8 @@ function editPersonnel(id){
   document.getElementById('p-tel').value=emp.tel||'';
   document.getElementById('p-email').value=emp.email||'';document.getElementById('p-emb').value=emp.dateEmbauche||'';
   document.getElementById('p-fin').value=emp.dateFin||'';
+  const agI=document.getElementById('p-agence'); if(agI) agI.value=emp.agence||'';
+  const debI=document.getElementById('p-debut'); if(debI) debI.value=emp.debutContrat||'';
   // Restaurer activité si intérimaire
   document.getElementById('p-activite').value=emp.activite||'';
   selectActivite(emp.activite||'');
@@ -8671,7 +9025,7 @@ function savePersonnel(){
   const editId=document.getElementById('pi').value;
   const cat=document.getElementById('p-cat').value;
   const activite=cat==='interimaire'?(document.getElementById('p-activite')?.value||''):'';
-  const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite};
+  const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||''};
   if(editId){const i=S.personnel.findIndex(p=>p.id===editId);if(i>-1)S.personnel[i]={...S.personnel[i],...data};}
   else S.personnel.push({id:uid(),...data});
   save();closeM('m-pers');popSelects();renderPersonnel();renderDash();
@@ -9154,6 +9508,127 @@ function aiRenderSuggestions(idx){
       return `<button onclick="aiAsk(this.dataset.q)" data-q="${safe}" style="background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.25);color:#60b4ff;border-radius:99px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;text-align:left">${q}</button>`;
     }).join('');
   }
+}
+
+function renderKPI(){
+  const el=document.getElementById('kpiGrid'); if(!el) return;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const curMon=getMon(today);
+  const wkKey=`${curMon.getFullYear()}-S${wkN(curMon)}`;
+  const MHJ=7;
+  const sub=document.getElementById('kpiSubtitle');
+  if(sub) sub.textContent=`Semaine ${wkN(curMon)} · ${disp(fmt(curMon))} → ${disp(fmt(addD(curMon,6)))}`;
+
+  const card=(val,label,color,sub2)=>`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;min-width:0">
+    <div style="font-size:25px;font-weight:900;color:${color};line-height:1.05">${val}</div>
+    <div style="font-size:10.5px;color:#9fb0c8;margin-top:6px;text-transform:uppercase;letter-spacing:.4px;font-weight:700">${label}</div>
+    ${sub2?`<div style="font-size:11px;color:#7088a8;margin-top:4px">${sub2}</div>`:''}
+  </div>`;
+  const section=(title,inner)=>`<div class="gc" style="margin-bottom:14px"><div class="gc-head"><div class="gc-title">${title}</div></div><div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">${inner}</div></div>`;
+  const colHigh=(v,t1,t2)=>v>=t1?'#34c759':v>=t2?'#ffd060':'#ff4d6d';
+  const colLow=(v,t1,t2)=>v<=t1?'#34c759':v<=t2?'#ffd060':'#ff4d6d';
+
+  let html='';
+
+  // ── RH & Capacité ──
+  try{
+    const dd=_aiDispoSemaine(curMon); const bb=_aiBesoinSemaine(curMon);
+    const eff=dd.nbTechs;
+    const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
+    const ecart=Math.round((dd.dispo-bb.total)*10)/10;
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+    let absH=0,totH=0,formH=0;
+    prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
+    const tauxAbs=totH>0?Math.round(absH/totH*100):0;
+    const nbInterim=prod.filter(p=>p.categorie==='interimaire').length;
+    const tauxInt=eff>0?Math.round(nbInterim/eff*100):0;
+    let sousEff=0; for(let i=0;i<8;i++){ const m=addD(curMon,7*i); if(_aiDispoSemaine(m).dispo<_aiBesoinSemaine(m).total) sousEff++; }
+    html+=section('👥 Capacité &amp; RH (semaine en cours)',
+      card(tauxDispo+'%','Taux de disponibilité',colHigh(tauxDispo,85,70),`${dd.dispo} / ${eff} productifs`)+
+      card((ecart>=0?'+':'')+ecart,'Écart capacité / besoin',ecart>=0?'#34c759':'#ff4d6d',`dispo ${dd.dispo} · besoin ${bb.total}`)+
+      card(tauxAbs+'%','Absentéisme',colLow(tauxAbs,8,15),`${absH} demi-j. (congé+maladie)`)+
+      card(tauxInt+'%','Recours intérim',colLow(tauxInt,30,50),`${nbInterim} intérimaires / ${eff}`)+
+      card((formH/2)+' j','Charge formation',formH>0?'#ffd060':'#34c759','jours-homme cette semaine')+
+      card(sousEff,'Semaines en sous-effectif',colLow(sousEff,0,2),'sur les 8 prochaines')
+    );
+  }catch(e){ html+=section('👥 Capacité & RH',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
+
+  // ── Chantiers ──
+  try{
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
+    const todayStr=fmt(today);
+    const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
+    const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
+    let sumW=0,sumReel=0,sumTheo=0,sumInit=0,sumSupp=0,nbA=0,nbO=0,nbR=0,nbVol=0;
+    enc.forEach(c=>{
+      const mhInit=c.manHours||0; const mhSupp=Array.isArray(c.mhAjouts)?c.mhAjouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0):0;
+      const mhTot=mhInit+mhSupp; sumInit+=mhInit; sumSupp+=mhSupp;
+      if(mhTot<=0) return; nbVol++;
+      const mhC=consom(c.id);
+      const reel=Math.min(100,mhC/mhTot*100);
+      const jT=calcJoursOuvres(c.debut,c.fin); const finEff=(c.fin&&parseLocal(c.fin)<today)?c.fin:todayStr; const jE=calcJoursOuvres(c.debut,finEff);
+      const theo=jT>0?Math.min(100,jE/jT*100):0;
+      const delta=reel-theo;
+      sumW+=mhTot; sumReel+=reel*mhTot; sumTheo+=theo*mhTot;
+      if(delta>=5)nbA++; else if(delta<=-10)nbR++; else nbO++;
+    });
+    const avMoy=sumW>0?Math.round(sumReel/sumW):0;
+    const thMoy=sumW>0?Math.round(sumTheo/sumW):0;
+    const derive=sumInit>0?Math.round(sumSupp/sumInit*100):0;
+    if(nbVol===0){
+      html+=section('🔧 Chantiers en cours',
+        `<div style="grid-column:1/-1;color:#ffd060;font-size:12px;margin-bottom:8px">💡 Renseignez le volume Man/Hours des chantiers (dashboard ou fiche chantier) pour activer l'avancement, la dérive de périmètre et le statut avance/retard.</div>`+
+        card(enc.length,'Chantiers en cours','#82b1ff','volume MH non renseigné'));
+    } else {
+      const dlt=avMoy-thMoy;
+      html+=section('🔧 Chantiers en cours',
+        card(avMoy+'%','Avancement réel moyen','#82b1ff',`pondéré MH · ${nbVol} chantier(s)`)+
+        card((dlt>=0?'+':'')+dlt+'%','Écart réel / théorique',dlt>=0?'#34c759':dlt>=-10?'#ffd060':'#ff4d6d',`théorique ${thMoy}%`)+
+        card(nbR,'Chantiers en retard',colLow(nbR,0,1),`✅ ${nbA} avance · 🟡 ${nbO} dans les temps`)+
+        card('+'+derive+'%','Dérive de périmètre',colLow(derive,5,15),`+${sumSupp} h ajoutées / ${sumInit} h`)
+      );
+    }
+  }catch(e){ html+=section('🔧 Chantiers',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
+
+  // ── Qualifications ──
+  try{
+    const active=(S.personnel||[]).filter(p=>p.actif!==false);
+    const allQ=[]; (S.formations||[]).forEach(f=>{ if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
+    (S.autorisations||[]).forEach(a=>{ if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
+    const days=(d)=>Math.round((parseLocal(d)-today)/86400000);
+    let exp30=0,exp90=0,expired=0;
+    allQ.forEach(q=>{ const dn=days(q.exp); if(dn<0)expired++; else { if(dn<=30)exp30++; if(dn<=90)exp90++; } });
+    const expByEmp=new Set(); allQ.forEach(q=>{ if(days(q.exp)<0) expByEmp.add(q.empId); });
+    const conformes=active.filter(p=>!expByEmp.has(p.id)).length;
+    const tauxConf=active.length>0?Math.round(conformes/active.length*100):100;
+    const holders={}; allQ.forEach(q=>{ if(days(q.exp)>=0){ (holders[q.type]=holders[q.type]||new Set()).add(q.empId); } });
+    const risque=Object.keys(holders).filter(t=>holders[t].size<=1).length;
+    html+=section('🛡 Qualifications &amp; conformité',
+      card(tauxConf+'%','Conformité habilitations',colHigh(tauxConf,95,85),`${conformes}/${active.length} sans expiration`)+
+      card(expired,'Qualifications expirées',colLow(expired,0,3),'à régulariser')+
+      card(exp30,'Expirent &lt; 30 jours',colLow(exp30,0,5),'formations + autorisations')+
+      card(exp90,'Expirent &lt; 90 jours',colLow(exp90,3,10),'à anticiper')+
+      card(risque,'Compétences à risque',colLow(risque,0,3),'détenues par ≤ 1 personne')
+    );
+  }catch(e){ html+=section('🛡 Qualifications',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
+
+  // ── Activités spécifiques ──
+  try{
+    const bb=_aiBesoinSemaine(curMon);
+    const recActifs=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;
+    const stMH=S.stockage?.mhHebdo?.[wkKey]?.total||0;
+    const prevMon=addD(curMon,-7); const prevKey=`${prevMon.getFullYear()}-S${wkN(prevMon)}`;
+    const stPrev=S.stockage?.mhHebdo?.[prevKey]?.total||0;
+    const stTrend=stPrev>0?Math.round((stMH-stPrev)/stPrev*100):0;
+    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0)+(ac.iq||0);
+    html+=section('♻️ Recyclage · Stockage · Airbus',
+      card(recActifs,'Avions en recyclage','#6effc4',`besoin ${bb.recT} tech.`)+
+      card(stMH+' h','Charge stockage (sem.)',stMH>0?'#ff9a3c':'#8090a8',stPrev>0?`${stTrend>=0?'+':''}${stTrend}% vs S-1`:'pas de référence S-1')+
+      card(airb,'Charge Airbus Part 21',airb>0?'#00a0ff':'#8090a8','techniciens requis (sem.)')
+    );
+  }catch(e){}
+
+  el.innerHTML=html+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Indicateurs calculés sur la semaine en cours et l'état actuel des données · actualisés à chaque ouverture de l'onglet.</div>`;
 }
 
 function renderAI(){ try{ aiRenderSuggestions(); }catch(e){} }
@@ -11532,7 +12007,7 @@ function exportMasterPDF(){
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
-      if(e.chantierId==='STO') return{txt:'Stockage',col:'#e65100'};
+      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'Stockage',col:'#e65100'};
       if(e.chantierId==='AIRBUS') return{txt:'Airbus P21',col:'#0277bd'};
       if(e.chantierId==='REC') return{txt:'Recyclage',col:'#2e7d32'};
       if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?`MSN ${av.msn||'?'}`:'Recyclage',col:'#2e7d32'};}
@@ -11583,7 +12058,7 @@ function exportMasterPDF(){
 
   // Légende : chantiers réellement utilisés ce mois + types d'absence
   const usedChIds=new Set();
-  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);})));
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);if(e.chantierId2)usedChIds.add(e.chantierId2);})));
   const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
   const typeLegend=[['conge'],['maladie'],['formation'],['absence'],['deplacement'],['ferie'],['we']].map(([k])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${LBL_FULL[k]}</span>`).join('');
 
@@ -11611,7 +12086,7 @@ function exportWeekHtml(){
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
-      if(e.chantierId==='STO') return{txt:'STO',col:'#e65100'};
+      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'STO',col:'#e65100'};
       if(e.chantierId==='AIRBUS') return{txt:'P21',col:'#0277bd'};
       if(e.chantierId==='REC') return{txt:'REC',col:'#2e7d32'};
       if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?('MSN'+(av.msn||'?')):'REC',col:'#2e7d32'};}
@@ -11667,7 +12142,7 @@ function exportWeekHtml(){
   const usedChIds=new Set();
   emps.forEach(emp=>{const c=mainCh(emp);if(c)usedChIds.add(c);});
   // Aussi parcourir toutes les cellules pour capter les chantiers ponctuels
-  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);})));
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);if(e.chantierId2)usedChIds.add(e.chantierId2);})));
   const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
   const typeLegend=[['conge','Congé'],['maladie','Maladie'],['formation','Formation'],['absence','Absence'],['deplacement','Déplacement'],['ferie','Férié'],['we','Week-end']].map(([k,l])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${l}</span>`).join('');
 
@@ -11715,7 +12190,7 @@ function exportDayHtml(){
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
-      if(e.chantierId==='STO') return{txt:'Stockage (STO)',col:'#e65100'};
+      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'Stockage (STO)',col:'#e65100'};
       if(e.chantierId==='AIRBUS') return{txt:'Airbus Part 21',col:'#0277bd'};
       if(e.chantierId==='REC') return{txt:'Recyclage',col:'#2e7d32'};
       if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?`${av.type||'A/C'} MSN${av.msn||'?'}`:'Recyclage',col:'#2e7d32'};}
@@ -11752,7 +12227,7 @@ function exportDayHtml(){
 
   // Légende
   const usedChIds=new Set();
-  emps.forEach(emp=>{const c=mainCh(emp);if(c)usedChIds.add(c);['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${ds}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);});});
+  emps.forEach(emp=>{const c=mainCh(emp);if(c)usedChIds.add(c);['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${ds}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);if(e.chantierId2)usedChIds.add(e.chantierId2);});});
   const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
   const typeLegend=[['conge','Congé'],['maladie','Maladie'],['formation','Formation'],['absence','Absence'],['deplacement','Déplacement'],['ferie','Férié'],['we','Week-end']].map(([k,l])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${l}</span>`).join('');
 
@@ -11789,6 +12264,10 @@ function _cellInfo(entry){
   if(entry.type==='travail'){
     const id=entry.chantierId;
     if(!id) return {txt:'Travail',color:'1565c0'};
+    // 2 chantiers sur la demi-journée → détail des deux (MSN), couleur du 1er
+    if(entry.chantierId2){
+      return {txt:_chMsnLabel(id)+' + '+_chMsnLabel(entry.chantierId2), color:_chColor(id).replace('#','')};
+    }
     if(id==='STO') return {txt:'STO',color:'ff9a3c'};
     if(id==='AIRBUS') return {txt:'PART 21',color:'00e5b0'};
     if(id==='REC') return {txt:'Recyclage',color:'00e5b0'};
@@ -11882,7 +12361,7 @@ async function _buildColoredWeekXls(){
 
   // ── Légende des chantiers utilisés (comme le master) ──
   const usedChW=new Set();
-  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChW.add(e.chantierId);})));
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChW.add(e.chantierId);if(e.chantierId2)usedChW.add(e.chantierId2);})));
   if(usedChW.size){
     ws.addRow([]);
     const chTitle=ws.addRow(['LÉGENDE — Chantiers']);
@@ -12017,7 +12496,7 @@ async function _buildColoredMasterXls(){
 
   // ── Légende chantiers utilisés ──
   const usedCh=new Set();
-  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedCh.add(e.chantierId);})));
+  emps.forEach(emp=>dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedCh.add(e.chantierId);if(e.chantierId2)usedCh.add(e.chantierId2);})));
   if(usedCh.size){
     ws.addRow([]);
     const chTitle=ws.addRow(['LÉGENDE — Chantiers']);
