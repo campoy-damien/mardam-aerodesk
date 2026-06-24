@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-PROLONGSTAT -->
+<!-- AeroStaff Pro v7 — Build 20260621-PROGREC -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1723,9 +1723,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
       <div style="font-size:13px;font-weight:800;color:var(--t1)">📅 Planning occupation hangar</div>
       <div style="display:flex;gap:6px;align-items:center">
-        <button onclick="slotNavWeek(-1)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:4px 10px;cursor:pointer;font-size:14px">← Préc.</button>
+        <button onclick="slotNavWeek(-1)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">← Année</button>
         <button onclick="slotNavWeek(0)" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.25);border-radius:8px;color:var(--cyan);padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">Aujourd'hui</button>
-        <button onclick="slotNavWeek(1)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:4px 10px;cursor:pointer;font-size:14px">Suiv. →</button>
+        <button onclick="slotNavWeek(1)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">Année →</button>
+        <select id="slot-year" onchange="slotGoToYear(this.value)" title="Aller à l'année" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 8px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer"></select>
       </div>
     </div>
     <div id="slot-grid" style="overflow-x:auto"></div>
@@ -1736,7 +1737,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:13px;font-weight:800;color:var(--t1)">📋 Historique occupation</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <input type="month" id="slot-hist-month" onchange="renderSlotHistorique()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 10px;font-family:'Outfit',sans-serif;font-size:12px">
+        <select id="slot-hist-mois" onchange="renderSlotHistorique()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 10px;font-family:'Outfit',sans-serif;font-size:12px">
+          <option value="1">Janvier</option><option value="2">Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+        </select>
+        <select id="slot-hist-annee" onchange="renderSlotHistorique()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 10px;font-family:'Outfit',sans-serif;font-size:12px"></select>
         <select id="slot-hist-pos" onchange="renderSlotHistorique()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 10px;font-family:'Outfit',sans-serif;font-size:12px">
           <option value="all">Toutes positions</option>
           <option value="1">Position 1</option>
@@ -2426,7 +2430,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROLONGSTAT · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROGREC · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3988,6 +3992,8 @@ const SLOT_POSITIONS=[
   {id:3,lbl:'Position 3',col:'#ffb450',bg:'rgba(255,180,80,0.15)',border:'rgba(255,180,80,0.4)'},
 ];
 let slotWeekOffset=0;
+let slotYear=new Date().getFullYear();
+const SLOT_COLW=46;
 
 function getSlotAvions(){
   const today=fmt(new Date());
@@ -4016,22 +4022,47 @@ function getSlotAvions(){
 
 function renderSlot(){
   if(!S.slot) S.slot={entries:[]};
-  // Init mois historique
-  const mEl=document.getElementById('slot-hist-month');
-  if(mEl&&!mEl.value){
-    const now=new Date();
-    mEl.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const now=new Date();
+  // Peupler le sélecteur d'année du planning (année courante → 2060)
+  const yEl=document.getElementById('slot-year');
+  if(yEl&&!yEl.options.length){
+    let opt=''; for(let y=now.getFullYear();y<=2060;y++) opt+=`<option value="${y}">${y}</option>`;
+    yEl.innerHTML=opt; yEl.value=now.getFullYear();
+  }
+  // Peupler le sélecteur d'année de l'historique (2018 → 2060) + mois courant
+  const haEl=document.getElementById('slot-hist-annee');
+  if(haEl&&!haEl.options.length){
+    let opt=''; for(let y=2018;y<=2060;y++) opt+=`<option value="${y}">${y}</option>`;
+    haEl.innerHTML=opt; haEl.value=now.getFullYear();
+    const hmEl=document.getElementById('slot-hist-mois'); if(hmEl) hmEl.value=String(now.getMonth()+1);
   }
   renderSlotGrid();
   renderSlotHistorique();
   updateSlotPositionLabels();
+  if(slotYear===new Date().getFullYear()) setTimeout(_slotScrollToday,30);
+}
+
+// Aller directement à une année dans le planning
+function slotGoToYear(y){
+  y=parseInt(y); if(!y) return; slotYear=y;
+  renderSlotGrid(); updateSlotPositionLabels();
+  const el=document.getElementById('slot-grid');
+  if(y===new Date().getFullYear()) _slotScrollToday(); else if(el) el.scrollLeft=0;
 }
 
 function slotNavWeek(dir){
-  if(dir===0) slotWeekOffset=0;
-  else slotWeekOffset+=dir;
-  renderSlotGrid();
-  updateSlotPositionLabels();
+  const cur=new Date().getFullYear();
+  if(dir===0){ slotYear=cur; renderSlotGrid(); updateSlotPositionLabels(); _slotScrollToday(); return; }
+  slotYear=Math.min(2060,Math.max(2018,slotYear+dir));
+  renderSlotGrid(); updateSlotPositionLabels();
+  const el=document.getElementById('slot-grid'); if(el) el.scrollLeft=0;
+}
+function _slotScrollToday(){
+  const el=document.getElementById('slot-grid'); if(!el) return;
+  const start=getMon(new Date(slotYear,0,1));
+  const idx=Math.round((new Date().setHours(0,0,0,0)-start)/86400000);
+  if(idx<0){ el.scrollLeft=0; return; }
+  el.scrollLeft=Math.max(0, idx*SLOT_COLW - el.clientWidth/2 + SLOT_COLW);
 }
 
 function updateSlotPositionLabels(){
@@ -4054,93 +4085,82 @@ function updateSlotPositionLabels(){
 function renderSlotGrid(){
   const el=document.getElementById('slot-grid');
   if(!el) return;
-  const today=new Date();
-  const baseWeek=getMon(addD(today,slotWeekOffset*7));
-  // Afficher 4 semaines
-  const days=[];
-  for(let d=0;d<28;d++) days.push(addD(baseWeek,d));
+  const prevScroll=el.scrollLeft;
+  const today=new Date(); const todayStr=fmt(today);
+  const y=slotYear||today.getFullYear();
+  const yEl=document.getElementById('slot-year');
+  if(yEl&&yEl.options.length){ const yv=String(y); if([...yEl.options].some(o=>o.value===yv)) yEl.value=yv; }
+  // Année complète : du lundi de la semaine du 1er janvier au dimanche de la semaine du 31 déc.
+  const start=getMon(new Date(y,0,1));
+  const lastSun=addD(getMon(new Date(y,11,31)),6);
+  const totalDays=Math.round((lastSun-start)/86400000)+1;
+  const nbWeeks=Math.round(totalDays/7);
+  const days=[]; for(let d=0;d<totalDays;d++) days.push(addD(start,d));
   const entries=S.slot?.entries||[];
+  const CW=SLOT_COLW, POSW=120;
+  const stickyTh='position:sticky;left:0;z-index:3;';
+  const stickyTd='position:sticky;left:0;z-index:1;';
 
-  // Header jours
   const JCOURT=['L','M','M','J','V','S','D'];
   const thCells=days.map(d=>{
-    const ds=fmt(d);
-    const wd=d.getDay();
-    const isW=wd===0||wd===6;
-    const isH=isHol(ds);
-    const isTd=ds===fmt(today);
+    const ds=fmt(d); const wd=d.getDay();
+    const isW=wd===0||wd===6; const isH=isHol(ds); const isTd=ds===todayStr;
     const bg=isTd?'rgba(0,210,255,0.2)':isH?'rgba(255,200,0,0.08)':isW?'rgba(255,255,255,0.03)':'#0d1628';
     const col=isTd?'var(--cyan)':isH?'#ffd060':isW?'#4a5a7a':'#6080a0';
     const di=wd===0?6:wd-1;
-    return`<th style="background:${bg};color:${col};min-width:52px;width:52px;padding:5px 2px;text-align:center;font-size:9px;border:1px solid rgba(255,255,255,0.06)">
+    return`<th style="background:${bg};color:${col};min-width:${CW}px;width:${CW}px;padding:4px 1px;text-align:center;font-size:9px;border:1px solid rgba(255,255,255,0.06)">
       <div style="font-weight:600">${JCOURT[di]}</div>
-      <div style="font-size:11px;font-weight:800">${d.getDate()}</div>
-      ${isTd?`<div style="font-size:8px;color:var(--cyan)">auj.</div>`:''}
+      <div style="font-size:10px;font-weight:800">${d.getDate()}</div>
+      ${isTd?`<div style="font-size:7px;color:var(--cyan)">auj.</div>`:''}
     </th>`;
   }).join('');
 
-  // Lignes par position
+  let weekHead=''; for(let w=0;w<nbWeeks;w++){ const mon=addD(start,w*7); weekHead+=`<th colspan="7" style="background:#0d1628;color:var(--cyan);padding:4px;text-align:center;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;white-space:nowrap">S${wkN(mon)}</th>`; }
+
   const rows=SLOT_POSITIONS.map(pos=>{
     const cells=days.map(d=>{
-      const ds=fmt(d);
-      const wd=d.getDay();
-      const isW=wd===0||wd===6;
-      const isH=isHol(ds);
+      const ds=fmt(d); const wd=d.getDay();
+      const isW=wd===0||wd===6; const isH=isHol(ds);
       const entry=entries.find(e=>parseInt(e.pos)===pos.id&&e.debut<=ds&&e.fin>=ds);
       let cellStyle='',cellContent='',cellClick='';
-
       if(entry){
         cellStyle=`background:${pos.bg};border:2px solid ${pos.border};cursor:pointer`;
-        cellContent=`<div style="padding:2px;text-align:center">
-          <div style="font-size:9px;font-weight:900;color:${pos.col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${entry.msn||'?'}</div>
-          <div style="font-size:7px;color:${pos.col}99;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${entry.avionNom||''}</div>
-        </div>`;
+        cellContent=`<div style="padding:1px;text-align:center"><div style="font-size:9px;font-weight:900;color:${pos.col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${entry.msn||'?'}</div></div>`;
         cellClick=`openSlotEdit('${entry.id}')`;
       } else {
-        // Cellule vide cliquable, y compris week-ends et fériés (teinte distinctive conservée)
         const bgVide=isH?'rgba(255,200,0,0.05)':isW?'rgba(255,255,255,0.035)':'rgba(255,255,255,0.02)';
         cellStyle=`background:${bgVide};border:1px solid rgba(255,255,255,0.05);cursor:pointer`;
-        const mark=isH?`<span style="position:absolute;top:2px;right:3px;font-size:8px;color:#ffd060">♦</span>`:'';
+        const mark=isH?`<span style="position:absolute;top:1px;right:2px;font-size:7px;color:#ffd060">♦</span>`:'';
         cellContent=`<div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center">${mark}<span style="opacity:0;font-size:10px;color:${pos.col}" class="slot-hover">+</span></div>`;
         cellClick=`openSlotNew(${pos.id},'${ds}')`;
       }
-
-      return`<td style="padding:2px;${cellStyle};min-width:52px;width:52px;height:58px;vertical-align:middle;text-align:center" ${cellClick?`onclick="${cellClick}"`:''}>${cellContent}</td>`;
+      return`<td style="padding:1px;${cellStyle};min-width:${CW}px;width:${CW}px;height:52px;vertical-align:middle;text-align:center" ${cellClick?`onclick="${cellClick}"`:''}>${cellContent}</td>`;
     }).join('');
-
-    // Semaines en cours sur cette position
-    const activeEntries=entries.filter(e=>e.pos===pos.id&&e.fin>=fmt(baseWeek)&&e.debut<=fmt(addD(baseWeek,27)));
-
+    const nbOcc=entries.filter(e=>parseInt(e.pos)===pos.id&&e.fin>=fmt(start)&&e.debut<=fmt(lastSun)).length;
     return`<tr>
-      <td style="padding:8px 14px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);white-space:nowrap;min-width:110px;border-left:3px solid ${pos.col}">
+      <td style="${stickyTd}padding:8px 12px;border:1px solid rgba(255,255,255,0.06);background:#0e1830;white-space:nowrap;min-width:${POSW}px;width:${POSW}px;border-left:3px solid ${pos.col}">
         <div style="font-size:12px;font-weight:800;color:${pos.col}">${pos.lbl}</div>
-        <div style="font-size:9px;color:var(--t4);margin-top:2px">${activeEntries.length?activeEntries.map(e=>`MSN ${e.msn||'?'}`).join(', '):'Libre'}</div>
+        <div style="font-size:9px;color:var(--t4);margin-top:2px">${nbOcc?nbOcc+' occ.':'Libre'}</div>
       </td>
       ${cells}
     </tr>`;
   }).join('');
 
-  // Générer les labels de semaines
-  const weekLabels=[];
-  for(let w=0;w<4;w++){
-    const mon=addD(baseWeek,w*7);
-    weekLabels.push({mon,wNum:wkN(mon),span:7});
-  }
-
-  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:11px">
+  el.innerHTML=`<table style="border-collapse:collapse;font-size:11px">
     <thead>
       <tr>
-        <th style="background:#0d1628;border:1px solid rgba(255,255,255,0.08);min-width:110px;padding:6px 14px;text-align:left;color:#6080a0;font-size:10px">POSITION</th>
-        ${weekLabels.map(w=>`<th colspan="7" style="background:#0d1628;color:var(--cyan);padding:5px;text-align:center;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700">S${w.wNum} · ${disp(fmt(w.mon))}</th>`).join('')}
+        <th style="${stickyTh}background:#0d1628;border:1px solid rgba(255,255,255,0.08);min-width:${POSW}px;width:${POSW}px;padding:6px 12px;text-align:left;color:#6080a0;font-size:10px">POSITION · ${y}</th>
+        ${weekHead}
       </tr>
       <tr>
-        <th style="background:#0d1628;border:1px solid rgba(255,255,255,0.08)"></th>
+        <th style="${stickyTh}background:#0d1628;border:1px solid rgba(255,255,255,0.08)"></th>
         ${thCells}
       </tr>
     </thead>
     <tbody>${rows}</tbody>
   </table>
   <style>.slot-hover{opacity:0!important} td:hover .slot-hover{opacity:1!important}</style>`;
+  el.scrollLeft=prevScroll;
 }
 
 let _slotDurationMode='day';
@@ -4318,10 +4338,10 @@ function deleteSlotEntry(){
 function renderSlotHistorique(){
   const el=document.getElementById('slot-historique');
   if(!el||!S.slot) return;
-  const mEl=document.getElementById('slot-hist-month');
   const posFilter=document.getElementById('slot-hist-pos')?.value||'all';
-  const monthStr=mEl?.value||`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
-  const [year,month]=monthStr.split('-').map(Number);
+  const now=new Date();
+  const month=parseInt(document.getElementById('slot-hist-mois')?.value)||(now.getMonth()+1);
+  const year=parseInt(document.getElementById('slot-hist-annee')?.value)||now.getFullYear();
 
   let entries=[...S.slot.entries||[]].map(e=>({...e,pos:parseInt(e.pos)})).filter(e=>{
     // Comparaison par string YYYY-MM pour éviter les problèmes de fuseau
@@ -4385,9 +4405,9 @@ function renderSlotHistorique(){
 }
 
 function exportSlotPDF(){
-  const mEl=document.getElementById('slot-hist-month');
-  const monthStr=mEl?.value||`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
-  const [year,month]=monthStr.split('-').map(Number);
+  const now=new Date();
+  const month=parseInt(document.getElementById('slot-hist-mois')?.value)||(now.getMonth()+1);
+  const year=parseInt(document.getElementById('slot-hist-annee')?.value)||now.getFullYear();
   const MO_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   const entries=[...S.slot?.entries||[]].filter(e=>{
     const d=new Date(e.debut);const f=new Date(e.fin);
@@ -8917,14 +8937,15 @@ function _prolongPdfHead(title){
 }
 function exportProlongationsPDF(){
   const seuil=_interimSeuil();
-  const list=_interimsProd().filter(p=>{const j=_joursAvant(p.dateFin); const a=Array.isArray(p.prolongations)?p.prolongations:[]; const pend=a.length&&a[a.length-1].statut==='demandee'; return j!==null&&j<=seuil&&!pend;});
-  if(!list.length){ toast('Aucun intérimaire à prolonger sous '+seuil+' jours (hors demandes déjà en attente)'); return; }
-  const rows=list.map(p=>{const j=_joursAvant(p.dateFin);const cont=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'—';return `<tr><td>${p.nom} ${p.prenom}</td><td>${p.agence||'—'}</td><td>${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €':'—'}</td><td>${p.debutContrat?disp(p.debutContrat):'—'}</td><td class="${j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}</td><td>${j<0?'Expiré':j+' j'}</td><td>${cont}</td><td style="min-width:110px"></td></tr>`;}).join('');
+  const list=_interimsProd().filter(p=>{const j=_joursAvant(p.dateFin); return j!==null&&j<=seuil;});
+  if(!list.length){ toast('Aucun intérimaire dont le contrat se termine sous '+seuil+' jours'); return; }
+  const stLbl=(p)=>{const a=Array.isArray(p.prolongations)?p.prolongations:[];const l=a.length?a[a.length-1]:null;return l&&l.statut==='demandee'?'🟡 Demande en cours':l&&l.statut==='refusee'?'🔴 Refusée':'';};
+  const rows=list.map(p=>{const j=_joursAvant(p.dateFin);const cont=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'—';return `<tr><td>${p.nom} ${p.prenom}</td><td>${p.agence||'—'}</td><td>${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €':'—'}</td><td>${p.debutContrat?disp(p.debutContrat):'—'}</td><td class="${j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}</td><td>${j<0?'Expiré':j+' j'}</td><td>${stLbl(p)}</td><td>${cont}</td><td style="min-width:110px"></td></tr>`;}).join('');
   const html=_prolongPdfHead('Prolongations intérimaires')+`
     <h1>Demande de prolongation de contrats — Intérimaires</h1>
-    <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · Contrats se terminant sous ${seuil} jours</div>
-    <table><thead><tr><th>Nom</th><th>Agence</th><th>Taux €/h</th><th>Début</th><th>Fin actuelle</th><th>Échéance</th><th>Début proposé (continuité)</th><th>Nouvelle fin proposée</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="foot">Début proposé = lendemain de la fin actuelle (à décaler en cas d'interruption / retour différé). Merci de procéder à la prolongation des contrats ci-dessus. — Document généré par MARDAM AeroDesk Pro.</div>
+    <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${list.length} intérimaire(s) dont le contrat se termine sous ${seuil} jours</div>
+    <table><thead><tr><th>Nom</th><th>Agence</th><th>Taux €/h</th><th>Début</th><th>Fin actuelle</th><th>Échéance</th><th>Statut</th><th>Début proposé (continuité)</th><th>Nouvelle fin proposée</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="foot">Début proposé = lendemain de la fin actuelle (à décaler en cas d'interruption / retour différé). Astuce : augmentez le seuil de rappel pour inclure davantage d'intérimaires dans une seule demande. — Document généré par MARDAM AeroDesk Pro.</div>
   </body></html>`;
   openPrintView(html,'PDF — Prolongations RH');
 }
@@ -11502,19 +11523,14 @@ function renderChargeCapaTable(year){
       const debut=av.debutChantier||av.entree;
       const fin=av.finChantier||av.finPrev;
       const actif=(!debut||parseLocal(debut)<=wEnd2)&&(!fin||parseLocal(fin)>=mon);
-      if(!actif) return;
+      const ovKey=`REC_${av.id}_${stockWkey}`;
+      const ovr=S.besoinOverrides?.[ovKey];
+      const hasOvr=ovr!==undefined&&ovr!==null&&ovr!=='';
       let nb=0;
-      const affectes=techsAffectesAvion(av.id);
-      if(affectes>0){ nb=affectes; }                      // P1 : affectations planning
-      else{
-        const fixed=parseInt(av.techsRequis)||0;
-        if(fixed>0){ nb=fixed; }                          // P2 : besoin fixe
-        else{
-          const wData=S.recycling?.piecesHebdo?.[stockWkey]||{}; // P3 : calcul par pièces
-          const pieces=wData[av.id]||0;
-          const pph=parseFloat(av.piecesParHeure)||1;
-          if(pieces>0) nb=Math.ceil(pieces/(pph*5));
-        }
+      if(actif){
+        nb=hasOvr?(parseInt(ovr)||0):_recBesoinAvionSemaine(av,mon);
+      } else if(hasOvr){
+        nb=parseInt(ovr)||0; // hors période mais ajustement saisi (avance/prolongation)
       }
       if(nb>0){
         recTechs+=nb;
@@ -11698,13 +11714,75 @@ function setBesoinEditYear(y){
 }
 
 /* ═══ TABLEAU ÉDITABLE DES BESOINS PAR CHANTIER × SEMAINE ═══ */
+// Besoin calculé (hors override) d'un avion recyclage pour une semaine (mêmes priorités que Programme)
+function _recBesoinAvionSemaine(av,mon){
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const recPers=S.personnel.filter(p=>p.categorie==='recycling'&&p.actif!==false);
+  let affectes=0;
+  recPers.forEach(emp=>{
+    let present=false,affecte=false;
+    for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds))continue;
+      const am=S.planning[`${emp.id}_${ds}_AM`]||{}; const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
+      if(!ABSENT.has(am.type||'')||!ABSENT.has(pm.type||'')) present=true;
+      if(am.chantierId===`REC_${av.id}`||pm.chantierId===`REC_${av.id}`||am.chantierId==='REC'||pm.chantierId==='REC') affecte=true;
+    }
+    if(present&&affecte) affectes++;
+  });
+  if(affectes>0) return affectes;
+  const fixed=parseInt(av.techsRequis)||0;
+  if(fixed>0) return fixed;
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  const wData=S.recycling?.piecesHebdo?.[wk]||{};
+  const pieces=wData[av.id]||0;
+  const pph=parseFloat(av.piecesParHeure)||1;
+  if(pieces>0) return Math.ceil(pieces/(pph*5));
+  return 0;
+}
+// Cellule éditable du tableau des besoins (commune chantiers + recyclage)
+function _besoinEditCell(ovKey,theo,d,f,mon,isCur){
+  const wEnd=addD(mon,6);
+  const dansPeriode=(!d||d<=wEnd)&&(!f||f>=mon);
+  const ov=S.besoinOverrides?.[ovKey];
+  const hasOv=ov!==undefined&&ov!==null&&ov!=='';
+  const cellCurStyle=isCur?'border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d;background:rgba(255,77,109,0.06)':'';
+  if(!dansPeriode){
+    const avant=d&&wEnd<d;
+    if(hasOv){
+      const accent=avant?'110,200,255':'255,77,109';
+      const txt=avant?'#8fd0ff':'#ff8fa3';
+      return`<td style="padding:2px;text-align:center;${cellCurStyle}">
+        <input type="number" min="0" max="99" value="${parseInt(ov)}" placeholder="${avant?'⏪':'⏩'}"
+          onchange="setBesoinOverride('${ovKey}',this.value,-1)"
+          title="${avant?'Démarrage anticipé — besoin saisi (vider pour retirer)':'Prolongation / retard — besoin saisi (vider pour retirer)'}"
+          style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:rgba(${accent},0.12);border:1px solid rgba(${accent},0.5);color:${txt}">
+      </td>`;
+    }
+    return`<td style="padding:2px;text-align:center;${cellCurStyle}">
+      <button type="button" onclick="activateBesoinCell(this,'${ovKey}',${avant?1:0})"
+        title="Ajouter un besoin pour cette semaine (démarrage anticipé ou prolongation)"
+        style="width:30px;height:26px;border-radius:6px;border:1px dashed rgba(255,255,255,0.16);background:transparent;color:#52617a;font-size:13px;font-weight:700;cursor:pointer">+</button>
+    </td>`;
+  }
+  const val=hasOv?parseInt(ov):theo;
+  const bgColor=hasOv?'rgba(255,208,96,0.15)':'rgba(255,255,255,0.04)';
+  const brdColor=hasOv?'rgba(255,208,96,0.5)':'rgba(255,255,255,0.1)';
+  const txtColor=hasOv?'#ffd060':'#c0d0e8';
+  return`<td style="padding:2px;text-align:center;${cellCurStyle}">
+    <input type="number" min="0" max="99" value="${val}"
+      data-ck="${ovKey}" data-theo="${theo}"
+      onchange="setBesoinOverride('${ovKey}',this.value,${theo})"
+      title="${hasOv?'Ajusté (théorique: '+theo+')':'Théorique'}"
+      style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:${bgColor};border:1px solid ${brdColor};color:${txtColor}">
+  </td>`;
+}
 function buildBesoinEditTable(year,weeks){
   const today=new Date(); today.setHours(12,0,0,0);
   const todayMon=getMon(today);
   const isCurrentWeek=mon=>fmt(getMon(mon))===fmt(todayMon);
   // Chantiers actifs avec un besoin (ou potentiellement ajustable)
   const chantiers=S.chantiers.filter(c=>['encours','futur'].includes(c.statut));
-  if(!chantiers.length) return '';
+  const hasRec=(S.recycling?.avions||[]).some(a=>a.statut!=='termine'&&a.msn);
+  if(!chantiers.length && !hasRec) return '';
 
   // Année propre à ce tableau (sélecteur dédié), indépendante du Gantt
   const besoinYear=window._besoinEditYear||year;
@@ -11738,51 +11816,11 @@ function buildBesoinEditTable(year,weeks){
   // Lignes : un chantier par ligne
   const rows=chantiers.map(c=>{
     const theo=c.ressources?.technicien||0;
+    const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;
     const cells=relevantWeeks.map(mon=>{
-      const wEnd=addD(mon,6);
-      const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;
-      const dansPeriode=(!d||d<=wEnd)&&(!f||f>=mon);
       const isCur=isCurrentWeek(mon);
-      const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
-      const ovKey=`${c.id}_${wk}`;
-      const ov=S.besoinOverrides?.[ovKey];
-      const hasOv=ov!==undefined&&ov!==null&&ov!=='';
-      const cellCurStyle=isCur?'border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d;background:rgba(255,77,109,0.06)':'';
-
-      // ── Hors période théorique (avant le début OU après la fin) ──
-      if(!dansPeriode){
-        const avant=d&&wEnd<d;   // semaine entièrement avant le début → démarrage anticipé
-        if(hasOv){
-          // Case activée → éditable. Bleu = avance, Rouge = prolongation/retard
-          const accent=avant?'110,200,255':'255,77,109';
-          const txt=avant?'#8fd0ff':'#ff8fa3';
-          return`<td style="padding:2px;text-align:center;${cellCurStyle}">
-            <input type="number" min="0" max="99" value="${parseInt(ov)}" placeholder="${avant?'⏪':'⏩'}"
-              onchange="setBesoinOverride('${ovKey}',this.value,-1)"
-              title="${avant?'Démarrage anticipé — besoin saisi (vider pour retirer)':'Prolongation / retard — besoin saisi (vider pour retirer)'}"
-              style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:rgba(${accent},0.12);border:1px solid rgba(${accent},0.5);color:${txt}">
-          </td>`;
-        }
-        // Pas encore activée → bouton + cliquable
-        return`<td style="padding:2px;text-align:center;${cellCurStyle}">
-          <button type="button" onclick="activateBesoinCell(this,'${ovKey}',${avant?1:0})"
-            title="Ajouter un besoin pour cette semaine (démarrage anticipé ou prolongation)"
-            style="width:30px;height:26px;border-radius:6px;border:1px dashed rgba(255,255,255,0.16);background:transparent;color:#52617a;font-size:13px;font-weight:700;cursor:pointer">+</button>
-        </td>`;
-      }
-
-      // ── Dans la période théorique → éditable ──
-      const val=hasOv?parseInt(ov):theo;
-      const bgColor=hasOv?'rgba(255,208,96,0.15)':'rgba(255,255,255,0.04)';
-      const brdColor=hasOv?'rgba(255,208,96,0.5)':'rgba(255,255,255,0.1)';
-      const txtColor=hasOv?'#ffd060':'#c0d0e8';
-      return`<td style="padding:2px;text-align:center;${cellCurStyle}">
-        <input type="number" min="0" max="99" value="${val}"
-          data-ck="${ovKey}" data-theo="${theo}"
-          onchange="setBesoinOverride('${ovKey}',this.value,${theo})"
-          title="${hasOv?'Ajusté (théorique: '+theo+')':'Théorique'}"
-          style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:${bgColor};border:1px solid ${brdColor};color:${txtColor}">
-      </td>`;
+      const ovKey=`${c.id}_${mon.getFullYear()}-S${wkN(mon)}`;
+      return _besoinEditCell(ovKey,theo,d,f,mon,isCur);
     }).join('');
     return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
@@ -11797,6 +11835,32 @@ function buildBesoinEditTable(year,weeks){
       ${cells}
     </tr>`;
   }).join('');
+
+  // Lignes : un avion en recyclage par ligne (en cours / à venir)
+  const recAv=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn);
+  const recRows=recAv.map(av=>{
+    const d=(av.debutChantier||av.entree)?parseLocal(av.debutChantier||av.entree):null;
+    const f=(av.finChantier||av.finPrev)?parseLocal(av.finChantier||av.finPrev):null;
+    const cells=relevantWeeks.map(mon=>{
+      const isCur=isCurrentWeek(mon);
+      const ovKey=`REC_${av.id}_${mon.getFullYear()}-S${wkN(mon)}`;
+      const theo=_recBesoinAvionSemaine(av,mon);
+      return _besoinEditCell(ovKey,theo,d,f,mon,isCur);
+    }).join('');
+    return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,154,60,0.04)">
+      <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="width:3px;height:24px;border-radius:2px;background:${av.color||'#ff9a3c'};display:inline-block"></span>
+          <div>
+            <div style="font-size:12px;font-weight:800;color:#ffd0a0">♻️ ${av.type||'A/C'} — MSN ${av.msn||'?'}</div>
+            <div style="font-size:9px;color:#8090a8">Recyclage${parseInt(av.techsRequis)?` · ${parseInt(av.techsRequis)}T fixe`:''}</div>
+          </div>
+        </div>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+  const recSep=recAv.length?`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(255,154,60,0.25);font-size:10px;font-weight:800;color:#ff9a3c;letter-spacing:.5px">♻️ RECYCLAGE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(255,154,60,0.25)"></td>').join('')}</tr>`:'';
 
   return`
   <div style="margin-top:8px;border-top:2px solid rgba(255,208,96,0.2)">
@@ -11816,7 +11880,7 @@ function buildBesoinEditTable(year,weeks){
             <th style="${thS};text-align:left;position:sticky;left:0;background:#141d33;z-index:3">Chantier</th>
             ${headWeeks}
           </tr></thead>
-          <tbody>${rows}</tbody>
+          <tbody>${rows}${recSep}${recRows}</tbody>
         </table>
       </div>
       <div style="padding:4px 14px 12px">
