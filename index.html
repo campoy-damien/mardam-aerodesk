@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-PROLDEL -->
+<!-- AeroStaff Pro v7 — Build 20260621-CDIPART21 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2431,7 +2431,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROLDEL · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-CDIPART21 · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2674,6 +2674,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <input type="hidden" id="p-activite" value="">
     </div>
 <div class="field"><label>Téléphone</label><input type="tel" id="p-tel"></div>
+    <div class="field" id="wrap-niveau" style="display:none"><label>Niveau</label><select id="p-niveau"><option value="">— Non défini —</option><option>Meca Niveau 1</option><option>Meca Niveau 2</option><option>Meca Niveau 3</option><option>Tech Niveau 1</option><option>Tech Niveau 2</option><option>Tech Niveau 3</option><option>Tech Niveau 4</option></select></div>
     <div class="field" style="grid-column:1/-1"><label>Email</label><input type="email" id="p-email"></div>
     <div class="field" id="wrap-agence" style="display:none"><label>Agence d'intérim</label><input type="text" id="p-agence" placeholder="Ex : Adecco, Manpower, Randstad…"></div>
     <div class="field" id="wrap-debut" style="display:none"><label>Début de contrat</label><input type="date" id="p-debut"></div>
@@ -8685,6 +8686,7 @@ function renderInterimSynthese(){
     return `<tr style="${rowBg};border-bottom:1px solid rgba(255,255,255,0.05)">
       <td style="padding:8px 10px;font-weight:700;color:var(--t1);font-size:12px">${p.nom} ${p.prenom}${nbProl?` <span style="font-size:9px;color:#82b1ff" title="${nbProl} prolongation(s)">↗${nbProl}</span>`:''}${pend?`<div style="font-size:9px;color:#ffd060;font-weight:700;margin-top:2px">🟡 Demande en attente → ${disp(pend.nouvelleFin)}</div>`:''}</td>
       <td style="padding:8px 10px;color:#a0b0c8;font-size:12px">${p.agence||'—'}</td>
+      <td style="padding:8px 10px;font-size:11px">${p.niveau?`<span style="color:#c9a8ff;font-weight:700">${p.niveau}</span>`:'<span style="color:#52617a">—</span>'}</td>
       <td style="padding:8px 10px;color:#a0b0c8;font-size:11px">${p.debutContrat?disp(p.debutContrat):'—'}</td>
       <td style="padding:8px 10px;color:#a0b0c8;font-size:11px">${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €':'—'}</td>
       <td style="padding:8px 10px;color:var(--t1);font-size:11px;font-weight:600">${p.dateFin?disp(p.dateFin):'—'}</td>
@@ -8710,10 +8712,11 @@ function renderInterimSynthese(){
     </div>
     ${banner}
     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;min-width:640px">
+      <table style="width:100%;border-collapse:collapse;min-width:720px">
         <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
           <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Nom</th>
           <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Agence</th>
+          <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Niveau</th>
           <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Début</th>
           <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Taux €/h</th>
           <th style="padding:8px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;letter-spacing:.4px">Fin contrat</th>
@@ -8903,24 +8906,24 @@ function exportInterimXls(){
       const titre=ws.addRow(['Suivi des intérimaires en production — '+disp(fmt(new Date()))]);
       titre.getCell(1).font={bold:true,size:13,color:{argb:'FF1a2440'}};
       try{ ws.mergeCells(1,1,1,10); }catch(e){}
-      const hr=ws.addRow(['Nom','Prénom','Trigramme','Agence','Taux €/h','Début contrat','Fin contrat','Jours restants','Statut','Prolong.']);
+      const hr=ws.addRow(['Nom','Prénom','Trigramme','Agence','Niveau','Taux €/h','Début contrat','Fin contrat','Jours restants','Statut','Prolong.']);
       hr.height=20;
       hr.eachCell(c=>{ c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1a2440'}}; c.font={bold:true,size:10,color:{argb:'FFFFFFFF'}}; c.alignment={horizontal:'center',vertical:'middle'}; });
       list.forEach(p=>{
         const j=_joursAvant(p.dateFin);
-        const r=ws.addRow([ p.nom||'', p.prenom||'', p.trigramme||'', p.agence||'', (p.tauxHoraire!=null?p.tauxHoraire:''), p.debutContrat?disp(p.debutContrat):'', p.dateFin?disp(p.dateFin):'', (j===null?'':j), statutTxt(j), (Array.isArray(p.prolongations)?p.prolongations.length:0) ]);
+        const r=ws.addRow([ p.nom||'', p.prenom||'', p.trigramme||'', p.agence||'', p.niveau||'', (p.tauxHoraire!=null?p.tauxHoraire:''), p.debutContrat?disp(p.debutContrat):'', p.dateFin?disp(p.dateFin):'', (j===null?'':j), statutTxt(j), (Array.isArray(p.prolongations)?p.prolongations.length:0) ]);
         r.height=18;
         const col=statutCol(j);
         r.eachCell((cell,ci)=>{
           cell.font={size:9,color:{argb:'FF1a2440'}};
-          cell.alignment={vertical:'middle',horizontal:(ci>=5?'center':'left'),indent:ci<5?1:0};
+          cell.alignment={vertical:'middle',horizontal:(ci>=6?'center':'left'),indent:ci<6?1:0};
           cell.border={bottom:{style:'hair',color:{argb:'FFcccccc'}}};
           if(col) cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+col}};
         });
-        if(p.tauxHoraire!=null) r.getCell(5).numFmt='0.00 "€"';
-        r.getCell(9).font={size:9,bold:true,color:{argb:'FF1a2440'}};
+        if(p.tauxHoraire!=null) r.getCell(6).numFmt='0.00 "€"';
+        r.getCell(10).font={size:9,bold:true,color:{argb:'FF1a2440'}};
       });
-      ws.columns=[{width:16},{width:14},{width:10},{width:18},{width:10},{width:14},{width:14},{width:13},{width:13},{width:10}];
+      ws.columns=[{width:16},{width:14},{width:10},{width:18},{width:13},{width:10},{width:14},{width:14},{width:13},{width:13},{width:10}];
       ws.addRow([]);
       const lg=ws.addRow(['LÉGENDE — Statut']); lg.getCell(1).font={bold:true,size:10,color:{argb:'FF1a2440'}};
       [['Expiré','e06070'],['À prolonger (≤'+seuil+'j)','f4a3ad'],['Bientôt (≤30j)','ffe0a0'],['OK','c8eccb']].forEach(([t,c])=>{
@@ -9003,6 +9006,7 @@ function openPanel(id){
       <div class="sc-avatar" style="width:54px;height:54px;font-size:18px;border-radius:16px;background:${cat.col||'#2979ff'}18;color:${cat.col||'#2979ff'}">${ini}</div>
       <div>${catBadge(emp.categorie)}
         <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:${cat.col||'var(--cyan)'};letter-spacing:2px;margin-top:6px">${emp.trigramme}</div>
+        ${emp.niveau?`<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#c9a8ff;background:rgba(201,168,255,0.12);border:1px solid rgba(201,168,255,0.3);border-radius:6px;padding:2px 9px">🎖 ${emp.niveau}</div>`:''}
       </div>
     </div>
     <div class="sdiv">Coordonnées</div>
@@ -9110,7 +9114,7 @@ function toggleMoteurAutre(val){
 }
 
 function togglePrestFields(cat){
-  const CDI_CATS=['technicien','chef','expert','responsable','recycling'];
+  const CDI_CATS=['technicien','chef','expert','responsable','recycling','part21','iq'];
   const isPrest=cat==='prestataire';
   const isInt=cat==='interimaire';
 
@@ -9125,6 +9129,9 @@ function togglePrestFields(cat){
   if(debEl) debEl.style.display=isInt?'':'none';
   const txEl=document.getElementById('wrap-taux');
   if(txEl) txEl.style.display=isInt?'':'none';
+  // Niveau — uniquement techniciens et intérimaires
+  const nivEl=document.getElementById('wrap-niveau');
+  if(nivEl) nivEl.style.display=(cat==='technicien'||isInt)?'':'none';
 
   // Fin de contrat — masquée pour CDI et prestataires
   const finEl=document.getElementById('wrap-fin');
@@ -9147,7 +9154,7 @@ function selectActivite(val){
 
 function openPersNew(){
   document.getElementById('pi').value='';
-  ['pi','p-pre','p-nom','p-tri','p-tel','p-email','p-emb','p-fin','p-agence','p-debut','p-taux'].forEach(i=>{const el=document.getElementById(i); if(el)el.value='';});
+  ['pi','p-pre','p-nom','p-tri','p-tel','p-email','p-emb','p-fin','p-agence','p-debut','p-taux','p-niveau'].forEach(i=>{const el=document.getElementById(i); if(el)el.value='';});
   document.getElementById('p-cat').value='technicien';
   document.getElementById('p-activite').value='';
   selectActivite('');
@@ -9165,6 +9172,7 @@ function editPersonnel(id){
   const agI=document.getElementById('p-agence'); if(agI) agI.value=emp.agence||'';
   const debI=document.getElementById('p-debut'); if(debI) debI.value=emp.debutContrat||'';
   const txI=document.getElementById('p-taux'); if(txI) txI.value=(emp.tauxHoraire!=null?emp.tauxHoraire:'');
+  const nivI=document.getElementById('p-niveau'); if(nivI) nivI.value=emp.niveau||'';
   // Restaurer activité si intérimaire
   document.getElementById('p-activite').value=emp.activite||'';
   selectActivite(emp.activite||'');
@@ -9178,7 +9186,7 @@ function savePersonnel(){
   const editId=document.getElementById('pi').value;
   const cat=document.getElementById('p-cat').value;
   const activite=cat==='interimaire'?(document.getElementById('p-activite')?.value||''):'';
-  const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null};
+  const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||''};
   if(editId){const i=S.personnel.findIndex(p=>p.id===editId);if(i>-1)S.personnel[i]={...S.personnel[i],...data};}
   else S.personnel.push({id:uid(),...data});
   save();closeM('m-pers');popSelects();renderPersonnel();renderDash();
