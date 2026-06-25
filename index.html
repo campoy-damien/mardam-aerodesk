@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-PROGREC -->
+<!-- AeroStaff Pro v7 — Build 20260621-PROLDEL -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2223,7 +2223,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Pcs réelles</strong> — saisie manuelle instantanée<br>
         • <strong style="color:#ffd060">Statut</strong> — En avance / Dans les temps / En retard (auto)<br><br>
         <strong style="color:#ff9a3c">Charge / Capacité :</strong> tableau BESOIN vs DISPO vs ÉCART par semaine.<br>
-        <div style="margin-top:8px;padding:8px 12px;background:rgba(255,154,60,0.06);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">♻️ Le besoin recyclage remonte dans <strong>Programme Activité</strong> selon 3 priorités, dans cet ordre : <strong>1.</strong> les techniciens « recyclage » réellement affectés à l'avion dans le planning → <strong>2.</strong> sinon le nombre fixe saisi → <strong>3.</strong> sinon le calcul par pièces/semaine. Chaque avion en cours ou à venir apparaît en ligne séparée dans le détail d'une semaine.</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(255,154,60,0.06);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">♻️ Le besoin recyclage remonte dans <strong>Programme Activité</strong> selon 3 priorités, dans cet ordre : <strong>1.</strong> les techniciens « recyclage » réellement affectés à l'avion dans le planning → <strong>2.</strong> sinon le nombre fixe saisi → <strong>3.</strong> sinon le calcul par pièces/semaine. Chaque avion en cours ou à venir apparaît en ligne séparée dans le détail d'une semaine, et dispose de sa propre ligne éditable dans le <strong>tableau d'ajustement des besoins</strong> (section ♻️ RECYCLAGE) pour fixer le besoin semaine par semaine.</div>
       </div>
     </div>
     <div class="notice-section" id="n-personnel" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2277,7 +2277,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">ÉCART</strong> — vert = suffisant, rouge = manque d'effectif<br>
         • <strong style="color:#ffd060">Gantt + sélecteur d'année</strong> — tous les chantiers visualisés sur l'année choisie (jusqu'à 2060)<br>
         • <strong style="color:#ffd060">Colonne 📍 rouge</strong> — repère la semaine en cours
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique. Les <strong style="color:#ff9a3c">avions en recyclage</strong> en cours / à venir y figurent aussi, dans une section <strong style="color:#ff9a3c">♻️ RECYCLAGE</strong> : chaque avion (Type — MSN) est une ligne éditable comme un chantier, avec son besoin théorique par défaut (techniciens recyclage affectés → nombre fixe → calcul par pièces). Le tableau intègre également une ligne <strong style="color:#82b1ff">📦 Stockage</strong> (MH ÷ 35) et une ligne <strong style="color:#00a0ff">✈️ Airbus Part 21</strong> (Part 21 + IQ), éditables sur toutes les semaines. Toute valeur saisie prime sur le calcul automatique dans le besoin total de la semaine. <strong>Tu pilotes ainsi 100 % des activités depuis ce seul tableau.</strong></div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les semaines en rouge permettent d'anticiper les renforts avant qu'elles arrivent. Détail du calcul → section 🧮 Méthodes de calcul.</div>
       </div>
     </div>
@@ -2377,6 +2377,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Disponibilité & charge</strong> — "Combien de techniciens dispo cette semaine ?", "Écart capacité/besoin", "Compare cette semaine et la semaine prochaine"<br>
         • <strong style="color:#ffd060">Recherche croisée</strong> — "Qui a le CACES nacelle ET est dispo cette semaine ?", "Quels techniciens ont l'EWIS valide ?" (combine plusieurs qualifications + présence + catégorie)<br>
         • <strong style="color:#ffd060">Chantiers / recyclage / stockage</strong> — "État des chantiers", "Quels chantiers manquent de monde ?"<br>
+        • <strong style="color:#ffd060">Activité par mois</strong> — "Chantiers actifs au mois d'août", "Avions en recyclage en septembre", ou le point global "Que se passe-t-il ce mois-ci ?" (combine chantiers + recyclage actifs sur le mois ; l'année est prise en compte si précisée)<br>
         • <strong style="color:#ffd060">Simulation & actions</strong> — "5 techniciens du 01/09 au 30/09 ?", "Mets Baou sur le chantier 5598 la semaine prochaine", "Mets Dupont en congé du 2 au 6 juin"<br>
         • <strong style="color:#ffd060">Suggestions par thème</strong> — des exemples classés (Charge, Présence, Activité, Formations, Recherche croisée, Effectif, Simulation) au-dessus de la zone de saisie<br>
         • <strong style="color:#ffd060">Réponses cliquables</strong> — les noms ouvrent la fiche de la personne, et un bouton ouvre directement le planning de la semaine concernée<br>
@@ -2430,7 +2431,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROGREC · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROLDEL · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -4771,7 +4772,7 @@ function renderAirbusGantt(){
   const ySel=document.getElementById('airbus-gantt-year');
   if(ySel&&!ySel.options.length){
     const curY=new Date().getFullYear();
-    for(let y=curY-1;y<=curY+2;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===curY)o.selected=true;ySel.appendChild(o);}
+    for(let y=curY-1;y<=2060;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===curY)o.selected=true;ySel.appendChild(o);}
   }
   const year=parseInt(ySel?.value)||new Date().getFullYear();
   const yearStart=new Date(year,0,1);
@@ -6988,7 +6989,7 @@ function renderChantiers(){
   const yrSel=document.getElementById('gantt-resp-year');
   if(yrSel && !yrSel.options.length){
     const cy=new Date().getFullYear();
-    for(let y=cy-1;y<=cy+5;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;yrSel.appendChild(o);}
+    for(let y=cy-1;y<=2060;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;yrSel.appendChild(o);}
   }
   renderRespGantt();
   checkConflicts();
@@ -8689,6 +8690,7 @@ function renderInterimSynthese(){
       <td style="padding:8px 10px;color:var(--t1);font-size:11px;font-weight:600">${p.dateFin?disp(p.dateFin):'—'}</td>
       <td style="padding:8px 10px">${statutBadge(j)}</td>
       <td style="padding:8px 6px;text-align:right;white-space:nowrap">
+        ${pend?`<button onclick="acceptProlong('${p.id}','${pend.id}')" title="Valider la prolongation au ${disp(pend.nouvelleFin)}" style="padding:4px 9px;border-radius:7px;background:rgba(52,199,89,0.18);border:1px solid rgba(52,199,89,0.45);color:#34c759;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✓ Valider</button> `:''}
         <button onclick="openProlongation('${p.id}')" style="padding:4px 9px;border-radius:7px;background:rgba(0,210,255,0.14);border:1px solid rgba(0,210,255,0.35);color:#00d2ff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">+ Prolong.</button>
         <button onclick="exportProlongationIndiv('${p.id}')" title="Demande PDF individuelle" style="padding:4px 8px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#9fb0c8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">📄</button>
       </td>
@@ -8834,10 +8836,25 @@ function _refreshProlongHist(empId){
         <button onclick="acceptProlong('${emp.id}','${p.id}')" style="padding:3px 10px;border-radius:6px;background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#34c759;font-size:10px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✓ Accepter</button>
         <button onclick="refuseProlong('${emp.id}','${p.id}')" style="padding:3px 10px;border-radius:6px;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.4);color:#ff6b81;font-size:10px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✗ Refuser</button>
       </div>`:'';
-    return `<div style="font-size:11px;color:#a0b0c8;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      ${p.ancienneFin?disp(p.ancienneFin):'—'} → ${p.nouveauDebut&&p.gap>0?`<span style="color:#ffd060">⏸${p.gap}j puis </span>`:''}<strong style="color:var(--t1)">${disp(p.nouvelleFin)}</strong> · ${badge(p.statut)}${p.ref?` <span style="color:#607090">· ${p.ref}</span>`:''}${actions}
+    return `<div style="font-size:11px;color:#a0b0c8;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:8px">
+      <div style="flex:1">${p.ancienneFin?disp(p.ancienneFin):'—'} → ${p.nouveauDebut&&p.gap>0?`<span style="color:#ffd060">⏸${p.gap}j puis </span>`:''}<strong style="color:var(--t1)">${disp(p.nouvelleFin)}</strong> · ${badge(p.statut)}${p.ref?` <span style="color:#607090">· ${p.ref}</span>`:''}${actions}</div>
+      <button onclick="deleteProlong('${emp.id}','${p.id}')" title="Supprimer cette ligne d'historique" style="flex:none;width:22px;height:22px;border-radius:6px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:#ff6b81;font-size:12px;font-weight:800;cursor:pointer;line-height:1">✕</button>
     </div>`;
   }).join(''):'')+`<div id="prolong-postaction"></div>`;
+}
+function deleteProlong(empId,pid){
+  const emp=byId(empId); if(!emp||!Array.isArray(emp.prolongations)) return;
+  const original=emp.prolongations.length?(emp.prolongations[0].ancienneFin||emp.dateFin):emp.dateFin;
+  emp.prolongations=emp.prolongations.filter(x=>x.id!==pid);
+  // Recalculer la fin de contrat effective d'après les prolongations acceptées restantes
+  let lastAcc=null;
+  emp.prolongations.forEach(p=>{ if(p.statut==='acceptee'||!p.statut) lastAcc=p; });
+  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut) emp.debutContrat=lastAcc.nouveauDebut; }
+  else if(original){ emp.dateFin=original; }
+  save(); renderPersonnel(); if(typeof renderDash==='function')renderDash();
+  _refreshProlongHist(empId);
+  const info=document.getElementById('prolong-info'); if(info) info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>`;
+  toast('🗑️ Ligne d\'historique supprimée');
 }
 function acceptProlong(empId,pid){
   const emp=byId(empId); if(!emp) return;
@@ -9578,6 +9595,9 @@ const AI_SUGGESTIONS={
   ],
   '🔧 Activité':[
     'État des chantiers',
+    'Que se passe-t-il ce mois-ci ?',
+    'Chantiers actifs ce mois-ci',
+    'Avions en recyclage ce mois-ci',
     'Quels chantiers manquent de monde ?',
     'Quels chantiers sont en retard ?',
     'État du recyclage',
@@ -9941,6 +9961,12 @@ function aiAnswer(q){
   else if(/cette\s+semaine|semaine\s+en\s+cours|cette\s+semaine ci|actuelle/.test(n)) phraseWeek=_curWk;
   const effWeek = (wkNumAsked!=null) ? wkNumAsked : (relWeek!=null ? relWeek : phraseWeek);
 
+  // Détection d'un mois dans la requête (pour le point mensuel global)
+  const _MOIS_KW=[['janvier',0],['fevrier',1],['mars',2],['avril',3],['mai',4],['juin',5],['juillet',6],['aout',7],['septembre',8],['octobre',9],['novembre',10],['decembre',11]];
+  let moisAsked=-1;
+  for(const [m,idx] of _MOIS_KW){ if(new RegExp('\\b'+m).test(n)){ moisAsked=idx; break; } }
+  if(moisAsked<0 && /\bce mois|du mois\b/.test(n)) moisAsked=new Date().getMonth();
+
   // ── Salutations / remerciements / aide ──
   if(/^(bonjour|bonsoir|salut|coucou|hello|hey|yo|hi|cc|wesh|bjr|slt|hola|hallo|good morning|bonne journee|bonne journée)\b/.test(n) && n.length<28){
     return `Bonjour 👋 Je suis votre assistant interne. Je peux vous renseigner sur le personnel, les chantiers, les absences, les formations, la charge et faire des simulations. Tapez <em>« aide »</em> pour des exemples, ou utilisez les suggestions en haut.`;
@@ -10010,6 +10036,11 @@ function aiAnswer(q){
     if(hasQualCue){ const cross=aiCrossQuery(n, effWeek); if(cross) return cross; }
   }
 
+  // ── Chantiers mentionnés explicitement → priorité (évite que "chantiers actifs" parte en "présents") ──
+  if(/\bchantiers?\b/.test(n) && !actionVerb && !fhas('recyclage') && !/\bstockage\b/.test(n)){
+    return _aiDispatch('chantiers', effWeek, n);
+  }
+
   // ── B) absences ──
   if(fhas(...AI_LEX.conge) || has('pas la','pas là')){
     return _aiDispatch('conge', effWeek, n);
@@ -10070,6 +10101,11 @@ function aiAnswer(q){
     return _aiDispatch('dispo', effWeek, n);
   }
 
+  // ── Point mensuel global (chantiers + recyclage actifs sur le mois) ──
+  if(moisAsked>=0 && !techCount){
+    return aiAnswerMois(moisAsked, n);
+  }
+
   // ── I) RECHERCHE D'UNE PERSONNE ──
   const person=aiFindPerson(q);
   if(person) return aiAnswerPerson(person);
@@ -10108,7 +10144,7 @@ function _aiDispatch(tag, wk, n){
     case 'deplacement': return aiWhoAbsent(n||'', wk, ['deplacement']);
     case 'present':     return aiWhoPresent(n||'', wk);
     case 'chantiers':   return aiAnswerChantiers(n||'');
-    case 'recyclage':   return aiAnswerRecyclage();
+    case 'recyclage':   return aiAnswerRecyclage(n||'');
     case 'stockage':    return aiAnswerStockage(wk);
   }
   return aiHelpMessage();
@@ -10369,7 +10405,8 @@ function aiHelpMessage(){
   • <em>« Quels chefs d'équipe sont présents semaine 30 ? »</em><br><br>
   <strong style="color:#82b1ff">🔧 Activité</strong><br>
   • <em>« État des chantiers »</em> · <em>« Quels chantiers manquent de monde ? »</em><br>
-  • <em>« État du recyclage »</em> · <em>« Stockage cette semaine »</em><br><br>
+  • <em>« État du recyclage »</em> · <em>« Stockage cette semaine »</em><br>
+  • <em>« Chantiers actifs au mois d'août »</em> · <em>« Que se passe-t-il ce mois-ci ? »</em><br><br>
   <strong style="color:#82b1ff">🛡 Formations & personnel</strong><br>
   • <em>« Quelles formations expirent dans les 6 mois ? »</em> · <em>« Autorisations à renouveler cette année »</em><br>
   • <em>« Infos sur Dupont »</em> · <em>« Répartition de l'effectif »</em><br><br>
@@ -10596,11 +10633,31 @@ function aiWeekSummary(wkNumAsked){
 }
 
 // ── État du recyclage (avions actifs + avancement) ──
-function aiAnswerRecyclage(){
-  const avions=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine');
-  if(!avions.length) return '♻️ Aucun avion en recyclage actuellement.';
+function aiAnswerRecyclage(n){
   const today=new Date();
-  let html=`<div style="font-weight:800;color:#ff9a3c;margin-bottom:8px">♻️ ${avions.length} avion(s) en recyclage</div>`;
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const nn=norm(n||'');
+  const MOIS=[['janvier',0],['fevrier',1],['mars',2],['avril',3],['mai',4],['juin',5],['juillet',6],['aout',7],['septembre',8],['octobre',9],['novembre',10],['decembre',11]];
+  const MOIS_LBL=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  let moisIdx=-1;
+  for(const [m,idx] of MOIS){ if(new RegExp('\\b'+m).test(nn)){ moisIdx=idx; break; } }
+  if(moisIdx<0 && /\bce mois|du mois\b/.test(nn)) moisIdx=new Date().getMonth();
+
+  let avions=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine');
+  let periodeLabel='';
+  if(moisIdx>=0){
+    const yMatch=nn.match(/(20\d{2})/);
+    const year=yMatch?parseInt(yMatch[1]):today.getFullYear();
+    const mStart=new Date(year,moisIdx,1), mEnd=new Date(year,moisIdx+1,0);
+    avions=(S.recycling?.avions||[]).filter(a=>{
+      const d=(a.debutChantier||a.entree)?parseLocal(a.debutChantier||a.entree):null;
+      const f=(a.finChantier||a.finPrev)?parseLocal(a.finChantier||a.finPrev):null;
+      return (!d||d<=mEnd)&&(!f||f>=mStart);
+    });
+    periodeLabel=` en ${MOIS_LBL[moisIdx]} ${year}`;
+  }
+  if(!avions.length) return moisIdx>=0?`♻️ Aucun avion en recyclage${periodeLabel}.`:'♻️ Aucun avion en recyclage actuellement.';
+  let html=`<div style="font-weight:800;color:#ff9a3c;margin-bottom:8px">♻️ ${avions.length} avion(s) en recyclage${periodeLabel}</div>`;
   avions.forEach(av=>{
     const d=av.debutChantier||av.entree, f=av.finChantier||av.finPrev;
     const enCours=d?parseLocal(d)<=today:true;
@@ -10648,14 +10705,35 @@ function aiEffectif(){
 
 // ── État et besoins des chantiers ──
 function aiAnswerChantiers(n){
-  const actifs=(S.chantiers||[]).filter(c=>['encours','futur'].includes(c.statut));
-  if(!actifs.length) return 'Aucun chantier en cours ou à venir.';
   const today=new Date();
-  // Si on demande spécifiquement les manques
-  const onlyManque=n.includes('manque')||n.includes('retard');
-  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:8px">🔧 ${actifs.length} chantier(s) actif(s)</div>`;
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const nn=norm(n);
+  // Détection d'un mois éventuel (« au mois d'août », « en mars »…)
+  const MOIS=[['janvier',0],['fevrier',1],['mars',2],['avril',3],['mai',4],['juin',5],['juillet',6],['aout',7],['septembre',8],['octobre',9],['novembre',10],['decembre',11]];
+  const MOIS_LBL=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  let moisIdx=-1;
+  for(const [m,idx] of MOIS){ if(new RegExp('\\b'+m).test(nn)){ moisIdx=idx; break; } }
+  if(moisIdx<0 && /\bce mois|du mois\b/.test(nn)) moisIdx=new Date().getMonth();
+
+  let base=(S.chantiers||[]).filter(c=>['encours','futur'].includes(c.statut));
+  let periodeLabel='';
+  if(moisIdx>=0){
+    const yMatch=nn.match(/(20\d{2})/);
+    let year=yMatch?parseInt(yMatch[1]):today.getFullYear();
+    const mStart=new Date(year,moisIdx,1), mEnd=new Date(year,moisIdx+1,0);
+    // Inclure aussi les terminés pour un mois passé
+    base=(S.chantiers||[]).filter(c=>['encours','futur','termine'].includes(c.statut)).filter(c=>{
+      const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
+      return (!d||d<=mEnd)&&(!f||f>=mStart);
+    });
+    periodeLabel=` en ${MOIS_LBL[moisIdx]} ${year}`;
+  }
+  if(!base.length) return moisIdx>=0?`Aucun chantier actif${periodeLabel}.`:'Aucun chantier en cours ou à venir.';
+  const actifs=base;
+  const onlyManque=nn.includes('manque')||nn.includes('retard');
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:8px">🔧 ${actifs.length} chantier(s) actif(s)${periodeLabel}</div>`;
   actifs.forEach(c=>{
-    const statut=c.statut==='encours'?'<span style="color:#34c759">En cours</span>':'<span style="color:#82b1ff">À venir</span>';
+    const statut=c.statut==='encours'?'<span style="color:#34c759">En cours</span>':c.statut==='termine'?'<span style="color:#8090a8">Terminé</span>':'<span style="color:#82b1ff">À venir</span>';
     const tech=c.ressources?.technicien||0;
     const periode=(c.debut?disp(c.debut):'?')+' → '+(c.fin?disp(c.fin):'?');
     let avct='';
@@ -10665,7 +10743,6 @@ function aiAnswerChantiers(n){
       avct=` · ${pct}% du temps écoulé`;
     }
     if(onlyManque){
-      // n'afficher que si MH non renseigné ou retard
       const mh=c.manHours||0;
       if(c.statut==='encours'&&mh===0){
         html+=`<div style="margin-bottom:5px">• <strong>${c.nom}</strong> ${c.client?'('+c.client+')':''} — ⚠ volume Man/Hours non renseigné</div>`;
@@ -10678,6 +10755,30 @@ function aiAnswerChantiers(n){
     </div>`;
   });
   if(onlyManque&&!html.includes('•')) html+='<div style="color:#34c759">✅ Aucun chantier en manque signalé.</div>';
+  return html;
+}
+
+// ── Point mensuel global : chantiers + recyclage actifs sur un mois ──
+function aiAnswerMois(moisIdx,n){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const nn=norm(n||'');
+  const MOIS_LBL=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const yMatch=nn.match(/(20\d{2})/);
+  const year=yMatch?parseInt(yMatch[1]):new Date().getFullYear();
+  const mStart=new Date(year,moisIdx,1), mEnd=new Date(year,moisIdx+1,0);
+  const overlaps=(d,f)=>{const dd=d?parseLocal(d):null,ff=f?parseLocal(f):null;return (!dd||dd<=mEnd)&&(!ff||ff>=mStart);};
+  const chantiers=(S.chantiers||[]).filter(c=>['encours','futur','termine'].includes(c.statut)&&overlaps(c.debut,c.fin));
+  const recAv=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&overlaps(a.debutChantier||a.entree,a.finChantier||a.finPrev));
+  let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:8px">🗓️ Activité en ${MOIS_LBL[moisIdx]} ${year}</div>`;
+  html+=`<div style="font-weight:700;color:#82b1ff;margin:6px 0 3px">🔧 Chantiers (${chantiers.length})</div>`;
+  if(chantiers.length){
+    chantiers.forEach(c=>{ const st=c.statut==='encours'?'En cours':c.statut==='termine'?'Terminé':'À venir'; html+=`<div style="font-size:11px;color:#a0b0c8;margin-bottom:2px">• <strong style="color:#e0e8ff">${c.nom}</strong> — ${st} · ${c.ressources?.technicien||0} tech.</div>`; });
+  } else html+=`<div style="font-size:11px;color:#8090a8">Aucun chantier ce mois.</div>`;
+  html+=`<div style="font-weight:700;color:#ff9a3c;margin:8px 0 3px">♻️ Recyclage (${recAv.length})</div>`;
+  if(recAv.length){
+    recAv.forEach(a=>{ const enCours=(a.debutChantier||a.entree)?parseLocal(a.debutChantier||a.entree)<=new Date():true; html+=`<div style="font-size:11px;color:#a0b0c8;margin-bottom:2px">• <strong style="color:#ffd0a0">${a.type||'A/C'} — MSN ${a.msn||'?'}</strong> — ${enCours?'En cours':'À venir'}</div>`; });
+  } else html+=`<div style="font-size:11px;color:#8090a8">Aucun avion en recyclage ce mois.</div>`;
+  html+=`<div style="margin-top:8px;font-size:10px;color:#607090">💬 Demandez « chantiers actifs en ${MOIS_LBL[moisIdx]} » ou « recyclage en ${MOIS_LBL[moisIdx]} » pour le détail d'une activité.</div>`;
   return html;
 }
 
@@ -11487,16 +11588,20 @@ function renderChargeCapaTable(year){
       }
     });
 
-    // Ajouter le besoin stockage (MH → techs) pour cette semaine
+    // Ajouter le besoin stockage (MH → techs) pour cette semaine — override prioritaire
     const stockWkey=`${mon.getFullYear()}-S${wNum}`;
+    const stockOv=S.besoinOverrides?.[`STO_${stockWkey}`];
+    const hasStockOv=stockOv!==undefined&&stockOv!==null&&stockOv!=='';
     const stockMH=S.stockage?.mhHebdo?.[stockWkey]?.total||0;
-    const stockTechs=stockMH>0?Math.ceil(stockMH/35):0;
+    const stockTechs=hasStockOv?(parseInt(stockOv)||0):(stockMH>0?Math.ceil(stockMH/35):0);
     besoinActifs+=stockTechs;
 
-    // Ajouter le besoin Airbus Part21+IQ pour cette semaine
+    // Ajouter le besoin Airbus Part21+IQ pour cette semaine — override prioritaire
     const airbusWk=`${mon.getFullYear()}-S${wNum}`;
+    const airbusOv=S.besoinOverrides?.[`AIR_${airbusWk}`];
+    const hasAirbusOv=airbusOv!==undefined&&airbusOv!==null&&airbusOv!=='';
     const airbusCharge=S.airbus?.charge?.[airbusWk]||{};
-    const airbusTechs=(airbusCharge.part21||0)+(airbusCharge.iq||0);
+    const airbusTechs=hasAirbusOv?(parseInt(airbusOv)||0):((airbusCharge.part21||0)+(airbusCharge.iq||0));
     besoinActifs+=airbusTechs;
     const recAvions=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine');
     let recTechs=0;
@@ -11739,6 +11844,16 @@ function _recBesoinAvionSemaine(av,mon){
   return 0;
 }
 // Cellule éditable du tableau des besoins (commune chantiers + recyclage)
+function _stockBesoinSemaine(mon){
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  const mh=S.stockage?.mhHebdo?.[wk]?.total||0;
+  return mh>0?Math.ceil(mh/35):0;
+}
+function _airbusBesoinSemaine(mon){
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  const c=S.airbus?.charge?.[wk]||{};
+  return (parseInt(c.part21)||0)+(parseInt(c.iq)||0);
+}
 function _besoinEditCell(ovKey,theo,d,f,mon,isCur){
   const wEnd=addD(mon,6);
   const dansPeriode=(!d||d<=wEnd)&&(!f||f>=mon);
@@ -11782,7 +11897,9 @@ function buildBesoinEditTable(year,weeks){
   // Chantiers actifs avec un besoin (ou potentiellement ajustable)
   const chantiers=S.chantiers.filter(c=>['encours','futur'].includes(c.statut));
   const hasRec=(S.recycling?.avions||[]).some(a=>a.statut!=='termine'&&a.msn);
-  if(!chantiers.length && !hasRec) return '';
+  const hasStock=!!(S.stockage?.mhHebdo && Object.keys(S.stockage.mhHebdo).length);
+  const hasAirbus=!!(S.airbus?.charge && Object.keys(S.airbus.charge).length);
+  if(!chantiers.length && !hasRec && !hasStock && !hasAirbus) return '';
 
   // Année propre à ce tableau (sélecteur dédié), indépendante du Gantt
   const besoinYear=window._besoinEditYear||year;
@@ -11862,6 +11979,44 @@ function buildBesoinEditTable(year,weeks){
   }).join('');
   const recSep=recAv.length?`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(255,154,60,0.25);font-size:10px;font-weight:800;color:#ff9a3c;letter-spacing:.5px">♻️ RECYCLAGE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(255,154,60,0.25)"></td>').join('')}</tr>`:'';
 
+  // Ligne : activité Stockage (agrégée, MH → techniciens), éditable sur toutes les semaines
+  const stockCells=relevantWeeks.map(mon=>{
+    const isCur=isCurrentWeek(mon);
+    const ovKey=`STO_${mon.getFullYear()}-S${wkN(mon)}`;
+    return _besoinEditCell(ovKey,_stockBesoinSemaine(mon),null,null,mon,isCur);
+  }).join('');
+  const stockSep=`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(130,177,255,0.25);font-size:10px;font-weight:800;color:#82b1ff;letter-spacing:.5px">📦 STOCKAGE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(130,177,255,0.25)"></td>').join('')}</tr>`;
+  const stockRow=`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(130,177,255,0.04)">
+    <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="width:3px;height:24px;border-radius:2px;background:#82b1ff;display:inline-block"></span>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#bcd4ff">📦 Stockage</div>
+          <div style="font-size:9px;color:#8090a8">Activité stockage · MH → tech.</div>
+        </div>
+      </div>
+    </td>${stockCells}
+  </tr>`;
+
+  // Ligne : activité Airbus Part 21 / IQ (agrégée), éditable sur toutes les semaines
+  const airbusCells=relevantWeeks.map(mon=>{
+    const isCur=isCurrentWeek(mon);
+    const ovKey=`AIR_${mon.getFullYear()}-S${wkN(mon)}`;
+    return _besoinEditCell(ovKey,_airbusBesoinSemaine(mon),null,null,mon,isCur);
+  }).join('');
+  const airbusSep=`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(0,160,255,0.25);font-size:10px;font-weight:800;color:#00a0ff;letter-spacing:.5px">✈️ AIRBUS PART 21</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(0,160,255,0.25)"></td>').join('')}</tr>`;
+  const airbusRow=`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(0,160,255,0.04)">
+    <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="width:3px;height:24px;border-radius:2px;background:#00a0ff;display:inline-block"></span>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#a0d8ff">✈️ Airbus Part 21</div>
+          <div style="font-size:9px;color:#8090a8">Part 21 + IQ · techniciens</div>
+        </div>
+      </div>
+    </td>${airbusCells}
+  </tr>`;
+
   return`
   <div style="margin-top:8px;border-top:2px solid rgba(255,208,96,0.2)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;cursor:pointer" onclick="document.getElementById('besoinEditBody').style.display=document.getElementById('besoinEditBody').style.display==='none'?'block':'none';this.querySelector('.chev').textContent=document.getElementById('besoinEditBody').style.display==='none'?'▸':'▾'">
@@ -11880,7 +12035,7 @@ function buildBesoinEditTable(year,weeks){
             <th style="${thS};text-align:left;position:sticky;left:0;background:#141d33;z-index:3">Chantier</th>
             ${headWeeks}
           </tr></thead>
-          <tbody>${rows}${recSep}${recRows}</tbody>
+          <tbody>${rows}${recSep}${recRows}${stockSep}${stockRow}${airbusSep}${airbusRow}</tbody>
         </table>
       </div>
       <div style="padding:4px 14px 12px">
