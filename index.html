@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-INTSEARCH -->
+<!-- AeroStaff Pro v7 — Build 20260621-COLORS20 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1831,11 +1831,14 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 <!-- TABLEAU DE BORD KPI -->
 <div class="page" id="pg-kpi">
-  <div class="sh" style="background:linear-gradient(135deg,rgba(0,210,255,0.1),rgba(52,199,89,0.06))">
+  <div class="sh" style="background:linear-gradient(135deg,rgba(0,210,255,0.1),rgba(52,199,89,0.06));display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <div>
       <div class="sh-title" style="margin:0">📈 Tableau de bord KPI</div>
       <span style="font-size:11px;color:#6090c0" id="kpiSubtitle">Indicateurs de pilotage</span>
     </div>
+    <div style="flex:1"></div>
+    <button onclick="exportKPIxls()" style="padding:8px 14px;border-radius:9px;background:rgba(0,210,255,0.14);border:1px solid rgba(0,210,255,0.4);color:#00d2ff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📊 Excel</button>
+    <button onclick="exportKPIpdf()" style="padding:8px 14px;border-radius:9px;background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#34c759;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📄 PDF</button>
   </div>
   <div id="kpiGrid" style="padding:4px 0"></div>
 </div>
@@ -2210,6 +2213,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Suivi d'avancement</strong> (carte sur le dashboard) — avancement <strong>réel</strong> = MH consommées (techniciens/intérimaires affectés dans le planning × 7 h/jour) ÷ MH total, comparé à l'avancement <strong>théorique</strong> (jours ouvrés écoulés) → statut ✅ en avance / 🟡 dans les temps / 🚨 en retard<br>
         • <strong style="color:#ffd060">Volume MH</strong> — saisissable directement sur la carte du dashboard (ou dans la fiche)<br>
         • <strong style="color:#ffd060">🔧 Heures ajoutées</strong> — sur chaque chantier en cours, ajoutez des heures de rectification/défaut (motif + heures, autant que nécessaire). L'app affiche alors les <strong>deux avancements</strong> (périmètre initial vs révisé) et calcule l'<strong>impact</strong> : combien de techniciens ajouter pour tenir la date, ou la nouvelle date de livraison à effectif constant.
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">👥 <strong>Équipe assignée</strong> — sélection par <strong>cases à cocher</strong> (avec recherche par nom et récap des personnes choisies). À l'enregistrement, l'équipe est <strong>automatiquement affectée au planning hebdo et master</strong> sur les jours ouvrés du chantier (matin + après-midi). Les absences déjà posées et les autres chantiers ne sont pas écrasés ; retirer une personne la désaffecte de ce chantier. Un <strong>encart d'alerte</strong> signale, avant validation, les membres <strong>en absence</strong> sur la période (congé, maladie, formation…).</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 "En cours" et "Futur" alimentent le tableau de charge dans Programme Activité. Seuls les techniciens et intérimaires comptent dans les Man Hours consommées (pas les apprentis ni l'encadrement).</div>
       </div>
     </div>
@@ -2250,10 +2254,13 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">Fiche</strong> — prénom, nom, trigramme, catégorie, poste, contrat, coordonnées<br>
         • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager<br>
+        • <strong style="color:#ffd060">Niveau</strong> — pour Technicien et Intérimaire, un menu (Meca Niveau 1/2/3, Tech Niveau 1/2/3/4) à côté du téléphone ; affiché sur la fiche profil<br>
         • <strong style="color:#ffd060">Actif/Inactif</strong> — les inactifs n'apparaissent pas dans les plannings<br>
         • <strong style="color:#ffd060">Trigramme</strong> — identifiant court dans les plannings (ex: DCA)<br>
         • <strong style="color:#ffd060">Import Excel</strong> — importer une liste depuis un .xlsx
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Commence toujours par créer ton équipe ici avant d'utiliser les plannings.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">👷 <strong>Suivi des intérimaires en production</strong> (tableau en bas de l'onglet Personnel) — colonnes Nom, Agence, Niveau, Début, Taux, Fin de contrat, Statut. <strong>Barre de recherche</strong>, <strong>filtre « 🟡 En attente »</strong> (uniquement les demandes de prolongation non validées) et <strong>tri</strong> (Nom A→Z ou Statut urgent d'abord). Seuil de rappel paramétrable, exports <strong>Excel</strong> et <strong>PDF récap RH</strong> (ce dernier ne liste que les demandes en attente, sans le taux, avec logo MARDAM).</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📝 <strong>Prolongations de contrat</strong> — bouton « + Prolong. » : saisis une nouvelle date de début et de fin (+ motif). La fin de contrat ne change qu'une fois la demande <strong>validée</strong> (bouton ✓ Valider sur la ligne ou dans la fenêtre). Plusieurs périodes <strong>s'enchaînent</strong> (la suivante part de la fin de la précédente, interruption/congé calculé automatiquement). Chaque ligne d'historique est <strong>modifiable (✎)</strong> ou <strong>supprimable (✕)</strong> en cas d'erreur ou de changement de dernière minute.</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Commence toujours par créer ton équipe ici avant d'utiliser les plannings.</div>
       </div>
     </div>
     <div class="notice-section" id="n-todo" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2376,8 +2383,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">👥 Capacité & RH</strong> — taux de disponibilité, écart capacité/besoin, absentéisme, recours intérim, charge formation, semaines en sous-effectif (8 prochaines)<br>
         • <strong style="color:#ffd060">🔧 Chantiers</strong> — avancement réel moyen pondéré, écart réel/théorique, chantiers en retard, dérive de périmètre (heures ajoutées)<br>
         • <strong style="color:#ffd060">🛡 Qualifications</strong> — conformité des habilitations, qualifications expirées, échéances &lt; 30 et &lt; 90 jours, compétences à risque (≤ 1 détenteur)<br>
-        • <strong style="color:#ffd060">♻️ Recyclage · Stockage · Airbus</strong> — avions en recyclage, charge stockage (avec tendance), charge Part 21
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Les indicateurs chantiers prennent toute leur valeur une fois les volumes Man/Hours renseignés. Le tableau se recalcule à chaque ouverture de l'onglet.</div>
+        • <strong style="color:#ffd060">♻️ Recyclage · Stockage · Airbus</strong> — avions en recyclage, charge stockage (avec tendance), charge Part 21<br>
+        • <strong style="color:#ffd060">⏱ Heures de production réalisées (semaine)</strong> — heures par catégorie productive (Technicien, Intérimaire, Sous-traitant, Tech. Recyclage, Tech Part 21) + total. Calcul : 7 h par jour ouvré (demi-journée « Travail » du planning = 3,5 h), avec le nombre de personnes et l'équivalent jours-homme. Une légende rappelle la méthode.
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📄 <strong>Exports PDF & Excel</strong> (boutons en haut de l'onglet) — documents propres et datés, avec logo MARDAM, prêts à présenter en réunion partenaire. Valeurs codées couleur (vert/orange/rouge) et identiques à l'écran.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Les indicateurs chantiers et les heures de production prennent toute leur valeur une fois les volumes Man/Hours et le planning hebdo renseignés. Le tableau se recalcule à chaque ouverture de l'onglet.</div>
       </div>
     </div>
 
@@ -2447,7 +2456,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-INTSEARCH · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-COLORS20 · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3136,7 +3145,7 @@ const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO
 const AUTORISATIONS_LIST = ['AMEC','ASTO','IMEC','ISTO','AELE','IELE','ASTR','ISTR','ACOM','ICOM','AENB','IENB','ABAT','IBAT','RUN','PART21','IPNT'];
 const MO = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const D3 = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-const CCOLORS = ['#2979ff','#00e5b0','#ff9a3c','#ff4d6d','#c084fc','#ffd060','#84fab0','#5ac8fa','#ff6b9d','#00d2ff','#a78bfa','#fb923c'];
+const CCOLORS = ['#2979ff','#00e5b0','#ff9a3c','#ff4d6d','#c084fc','#ffd060','#84fab0','#5ac8fa','#ff6b9d','#00d2ff','#a78bfa','#fb923c','#ff1744','#00e676','#ffea00','#d500f9','#651fff','#76ff03','#ff6d00','#f50057'];
 const CATS = {
   responsable:{ lbl:'Responsable Projet',  col:'var(--responsable)', b:'b-resp'},
   chef:       { lbl:"Chef d'équipe",        col:'var(--chef)',        b:'b-chef'},
@@ -9910,6 +9919,135 @@ function aiRenderSuggestions(idx){
   }
 }
 
+// Heures de production réalisées par catégorie (semaine) — 7h/jour, 3,5h/demi-journée 'travail'
+function _kpiHeuresData(curMon){
+  const CATS_PROD=[
+    {key:'technicien',lbl:'Technicien / Mécanicien',col:'#2979ff'},
+    {key:'interimaire',lbl:'Intérimaire',col:'#a78bfa'},
+    {key:'prestataire',lbl:'Sous-traitant',col:'#00e5b0'},
+    {key:'recycling',lbl:'Tech. Recyclage',col:'#ff9a3c'},
+    {key:'part21',lbl:'Tech Part 21',col:'#0064c8'}
+  ];
+  let total=0;
+  const cards=CATS_PROD.map(c=>{
+    const people=(S.personnel||[]).filter(p=>p.categorie===c.key&&p.actif!==false);
+    let h=0;
+    people.forEach(p=>{ let demi=0; for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(half=>{ const e=S.planning[`${p.id}_${ds}_${half}`]; if(e&&e.type==='travail') demi++; }); } h+=demi*3.5; });
+    total+=h;
+    return {val:(h%1===0?h:h.toFixed(1))+' h',label:c.lbl,sub:`${people.length} pers. · ${(h/7).toFixed(1)} j-homme`,col:c.col};
+  });
+  cards.push({val:(total%1===0?total:total.toFixed(1))+' h',label:'Total production',sub:`${(total/7).toFixed(1)} jours-homme`,col:'#34c759'});
+  const legend="⏱ Calcul : 7 h par jour ouvré (demi-journée = 3,5 h), d'après les demi-journées « Travail » affectées au planning de la semaine en cours. Catégories productives : Technicien, Intérimaire, Sous-traitant, Tech. Recyclage, Tech Part 21.";
+  return {cards,legend};
+}
+// Calcule les KPI de la semaine en cours sous forme structurée (pour affichage et exports)
+function _computeKPI(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const curMon=getMon(today);
+  const wkKey=`${curMon.getFullYear()}-S${wkN(curMon)}`;
+  const MHJ=7;
+  const sections=[];
+  const colHigh=(v,t1,t2)=>v>=t1?'good':v>=t2?'warn':'bad';
+  const colLow=(v,t1,t2)=>v<=t1?'good':v<=t2?'warn':'bad';
+  // RH & Capacité
+  try{
+    const dd=_aiDispoSemaine(curMon); const bb=_aiBesoinSemaine(curMon);
+    const eff=dd.nbTechs;
+    const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
+    const ecart=Math.round((dd.dispo-bb.total)*10)/10;
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+    let absH=0,totH=0,formH=0;
+    prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
+    const tauxAbs=totH>0?Math.round(absH/totH*100):0;
+    const nbInterim=prod.filter(p=>p.categorie==='interimaire').length;
+    const tauxInt=eff>0?Math.round(nbInterim/eff*100):0;
+    let sousEff=0; for(let i=0;i<8;i++){ const m=addD(curMon,7*i); if(_aiDispoSemaine(m).dispo<_aiBesoinSemaine(m).total) sousEff++; }
+    sections.push({title:'Capacité & RH',cards:[
+      {val:tauxDispo+' %',label:'Taux de disponibilité',sub:`${dd.dispo} / ${eff} productifs`,status:colHigh(tauxDispo,85,70)},
+      {val:(ecart>=0?'+':'')+ecart,label:'Écart capacité / besoin',sub:`dispo ${dd.dispo} · besoin ${bb.total}`,status:ecart>=0?'good':'bad'},
+      {val:tauxAbs+' %',label:'Absentéisme',sub:`${absH} demi-j. (congé+maladie)`,status:colLow(tauxAbs,8,15)},
+      {val:tauxInt+' %',label:'Recours intérim',sub:`${nbInterim} intérimaires / ${eff}`,status:colLow(tauxInt,30,50)},
+      {val:(formH/2)+' j',label:'Charge formation',sub:'jours-homme cette semaine',status:formH>0?'warn':'good'},
+      {val:String(sousEff),label:'Semaines en sous-effectif',sub:'sur les 8 prochaines',status:colLow(sousEff,0,2)}
+    ]});
+  }catch(e){}
+  // Chantiers en cours
+  try{
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
+    const todayStr=fmt(today);
+    const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
+    const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
+    let sumW=0,sumReel=0,sumTheo=0,sumInit=0,sumSupp=0,nbA=0,nbO=0,nbR=0,nbVol=0;
+    enc.forEach(c=>{
+      const mhInit=c.manHours||0; const mhSupp=Array.isArray(c.mhAjouts)?c.mhAjouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0):0;
+      const mhTot=mhInit+mhSupp; sumInit+=mhInit; sumSupp+=mhSupp;
+      if(mhTot<=0) return; nbVol++;
+      const mhC=consom(c.id);
+      const reel=Math.min(100,mhC/mhTot*100);
+      const jT=calcJoursOuvres(c.debut,c.fin); const finEff=(c.fin&&parseLocal(c.fin)<today)?c.fin:todayStr; const jE=calcJoursOuvres(c.debut,finEff);
+      const theo=jT>0?Math.min(100,jE/jT*100):0;
+      const delta=reel-theo;
+      sumW+=mhTot; sumReel+=reel*mhTot; sumTheo+=theo*mhTot;
+      if(delta>=5)nbA++; else if(delta<=-10)nbR++; else nbO++;
+    });
+    const avMoy=sumW>0?Math.round(sumReel/sumW):0;
+    const thMoy=sumW>0?Math.round(sumTheo/sumW):0;
+    const derive=sumInit>0?Math.round(sumSupp/sumInit*100):0;
+    if(nbVol===0){
+      sections.push({title:'Chantiers en cours',cards:[{val:String(enc.length),label:'Chantiers en cours',sub:'volume MH non renseigné',status:'neutral'}]});
+    } else {
+      const dlt=avMoy-thMoy;
+      sections.push({title:'Chantiers en cours',cards:[
+        {val:avMoy+' %',label:'Avancement réel moyen',sub:`pondéré MH · ${nbVol} chantier(s)`,status:'neutral'},
+        {val:(dlt>=0?'+':'')+dlt+' %',label:'Écart réel / théorique',sub:`théorique ${thMoy}%`,status:dlt>=0?'good':dlt>=-10?'warn':'bad'},
+        {val:String(nbR),label:'Chantiers en retard',sub:`${nbA} en avance · ${nbO} dans les temps`,status:colLow(nbR,0,1)},
+        {val:'+'+derive+' %',label:'Dérive de périmètre',sub:`+${sumSupp} h ajoutées / ${sumInit} h`,status:colLow(derive,5,15)}
+      ]});
+    }
+  }catch(e){}
+  // Qualifications
+  try{
+    const active=(S.personnel||[]).filter(p=>p.actif!==false);
+    const allQ=[]; (S.formations||[]).forEach(f=>{ if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
+    (S.autorisations||[]).forEach(a=>{ if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
+    const days=(d)=>Math.round((parseLocal(d)-today)/86400000);
+    let exp30=0,exp90=0,expired=0;
+    allQ.forEach(q=>{ const dn=days(q.exp); if(dn<0)expired++; else { if(dn<=30)exp30++; if(dn<=90)exp90++; } });
+    const expByEmp=new Set(); allQ.forEach(q=>{ if(days(q.exp)<0) expByEmp.add(q.empId); });
+    const conformes=active.filter(p=>!expByEmp.has(p.id)).length;
+    const tauxConf=active.length>0?Math.round(conformes/active.length*100):100;
+    const holders={}; allQ.forEach(q=>{ if(days(q.exp)>=0){ (holders[q.type]=holders[q.type]||new Set()).add(q.empId); } });
+    const risque=Object.keys(holders).filter(t=>holders[t].size<=1).length;
+    sections.push({title:'Qualifications & conformité',cards:[
+      {val:tauxConf+' %',label:'Conformité habilitations',sub:`${conformes}/${active.length} sans expiration`,status:colHigh(tauxConf,95,85)},
+      {val:String(expired),label:'Qualifications expirées',sub:'à régulariser',status:colLow(expired,0,3)},
+      {val:String(exp30),label:'Expirent < 30 jours',sub:'formations + autorisations',status:colLow(exp30,0,5)},
+      {val:String(exp90),label:'Expirent < 90 jours',sub:'à anticiper',status:colLow(exp90,3,10)},
+      {val:String(risque),label:'Compétences à risque',sub:'détenues par ≤ 1 personne',status:colLow(risque,0,3)}
+    ]});
+  }catch(e){}
+  // Recyclage · Stockage · Airbus
+  try{
+    const bb=_aiBesoinSemaine(curMon);
+    const recActifs=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;
+    const stMH=S.stockage?.mhHebdo?.[wkKey]?.total||0;
+    const prevMon=addD(curMon,-7); const prevKey=`${prevMon.getFullYear()}-S${wkN(prevMon)}`;
+    const stPrev=S.stockage?.mhHebdo?.[prevKey]?.total||0;
+    const stTrend=stPrev>0?Math.round((stMH-stPrev)/stPrev*100):0;
+    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0)+(ac.iq||0);
+    sections.push({title:'Recyclage · Stockage · Airbus',cards:[
+      {val:String(recActifs),label:'Avions en recyclage',sub:`besoin ${bb.recT} tech.`,status:'neutral'},
+      {val:stMH+' h',label:'Charge stockage (sem.)',sub:stPrev>0?`${stTrend>=0?'+':''}${stTrend}% vs S-1`:'pas de référence S-1',status:'neutral'},
+      {val:String(airb),label:'Charge Airbus Part 21',sub:'techniciens requis (sem.)',status:'neutral'}
+    ]});
+  }catch(e){}
+  // Heures de production réalisées par catégorie
+  try{
+    const hd=_kpiHeuresData(curMon);
+    sections.push({title:'Heures de production réalisées (semaine)',note:hd.legend,cards:hd.cards.map(c=>({val:c.val,label:c.label,sub:c.sub,status:'neutral'}))});
+  }catch(e){}
+  return {weekLabel:`Semaine ${wkN(curMon)} · ${disp(fmt(curMon))} → ${disp(fmt(addD(curMon,6)))}`, sections};
+}
 function renderKPI(){
   const el=document.getElementById('kpiGrid'); if(!el) return;
   const today=new Date(); today.setHours(0,0,0,0);
@@ -10028,10 +10166,89 @@ function renderKPI(){
     );
   }catch(e){}
 
+  // ── Heures de production réalisées par catégorie ──
+  try{
+    const hd=_kpiHeuresData(curMon);
+    const cards=hd.cards.map(c=>card(c.val,c.label,c.col,c.sub)).join('');
+    const legend=`<div style="grid-column:1/-1;font-size:11px;color:#7088a8;margin-top:6px;line-height:1.5;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;border-left:3px solid rgba(0,210,255,0.3)">${hd.legend}</div>`;
+    html+=section('⏱ Heures de production réalisées (semaine)', cards+legend);
+  }catch(e){}
+
   el.innerHTML=html+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Indicateurs calculés sur la semaine en cours et l'état actuel des données · actualisés à chaque ouverture de l'onglet.</div>`;
 }
 
 function renderAI(){ try{ aiRenderSuggestions(); }catch(e){} }
+
+// ── Export PDF des KPI (présentation partenaires) ──
+function exportKPIpdf(){
+  const k=_computeKPI();
+  const COL={good:'#16a34a',warn:'#d97706',bad:'#dc2626',neutral:'#1d4ed8'};
+  const sectionsHtml=k.sections.map(s=>{
+    const cards=s.cards.map(c=>`<div class="kpi"><div class="kv" style="color:${COL[c.status]||COL.neutral}">${c.val}</div><div class="kl">${c.label}</div><div class="ks">${c.sub||''}</div></div>`).join('');
+    const note=s.note?`<div style="font-size:9.5px;color:#7a8aa3;margin:6px 0 2px;font-style:italic">${s.note}</div>`:'';
+    return `<div class="sect"><div class="sect-t">${s.title}</div><div class="kgrid">${cards}</div>${note}</div>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>KPI LFBF</title>
+  <style>*{box-sizing:border-box}
+    body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f1e3d;margin:0;padding:30px;background:#fff}
+    .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #00a0d6;padding-bottom:13px}
+    .hd img{width:32px;height:32px;object-fit:contain}.brand{font-size:15px;font-weight:800}.brand em{font-style:normal;color:#00a0d6}
+    h1{font-size:19px;margin:16px 0 2px}.wk{color:#5a6b85;font-size:12px;margin-bottom:18px}
+    .sect{margin-bottom:15px;break-inside:avoid}
+    .sect-t{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;background:#eef4fb;border-left:4px solid #00a0d6;padding:7px 12px;border-radius:4px;margin-bottom:9px}
+    .kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .kpi{border:1px solid #dde6f0;border-radius:10px;padding:11px 13px;background:#fafcff}
+    .kv{font-size:22px;font-weight:800;line-height:1.05}
+    .kl{font-size:10px;color:#5a6b85;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:6px}
+    .ks{font-size:10px;color:#8094ad;margin-top:3px}
+    .ft{margin-top:22px;display:flex;align-items:center;gap:8px;border-top:1px solid #dde6f0;padding-top:12px}
+    .ft img{width:20px;height:20px;object-fit:contain}.ft b{font-size:12px}
+    @media print{.sect{break-inside:avoid}}
+  </style></head><body>
+    <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div></div>
+    <h1>Tableau de bord — Indicateurs clés (KPI)</h1>
+    <div class="wk">Site LFBF · ${k.weekLabel} · Édité le ${disp(fmt(new Date()))}</div>
+    ${sectionsHtml}
+    <div class="ft"><img src="${PDF_LOGO_B64}"><b>MARDAM AeroDesk Pro</b><span style="color:#8094ad;font-size:10px;margin-left:auto">Indicateurs calculés sur la semaine en cours</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — KPI');
+}
+
+// ── Export Excel des KPI (coloré) ──
+function exportKPIxls(){
+  _loadExcelJS(async()=>{
+    try{
+      const k=_computeKPI();
+      const FILL={good:'FFd7f5e0',warn:'FFfff0cc',bad:'FFfddede',neutral:'FFe6eefb'};
+      const FONT={good:'FF1a7a3a',warn:'FF9a6700',bad:'FFb02a2a',neutral:'FF1d4ed8'};
+      const wb=new ExcelJS.Workbook();
+      const ws=wb.addWorksheet('KPI',{views:[{state:'frozen',ySplit:3}]});
+      ws.mergeCells('A1:C1'); const t=ws.getCell('A1'); t.value='Tableau de bord — Indicateurs clés (KPI) · Site LFBF'; t.font={bold:true,size:14,color:{argb:'FF0f1e3d'}}; t.alignment={vertical:'middle'}; ws.getRow(1).height=24;
+      ws.mergeCells('A2:C2'); const s2=ws.getCell('A2'); s2.value=`${k.weekLabel} · Édité le ${disp(fmt(new Date()))}`; s2.font={size:10,color:{argb:'FF5a6b85'}};
+      const hr=ws.addRow(['Indicateur','Valeur','Détail']); hr.height=18; hr.eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF12233f'}};c.font={bold:true,color:{argb:'FFFFFFFF'},size:10};c.alignment={vertical:'middle'};});
+      k.sections.forEach(sec=>{
+        const sr=ws.addRow([sec.title]); ws.mergeCells(`A${sr.number}:C${sr.number}`); const sc=ws.getCell(`A${sr.number}`); sc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFeef4fb'}}; sc.font={bold:true,size:11,color:{argb:'FF0f1e3d'}}; sr.height=18;
+        if(sec.note){ const nr=ws.addRow([sec.note]); ws.mergeCells(`A${nr.number}:C${nr.number}`); const nc=ws.getCell(`A${nr.number}`); nc.font={size:8.5,italic:true,color:{argb:'FF7a8aa3'}}; nc.alignment={wrapText:true,vertical:'middle'}; nr.height=26; }
+        sec.cards.forEach(c=>{
+          const r=ws.addRow([c.label,c.val,c.sub||'']);
+          r.getCell(1).font={size:10,color:{argb:'FF24344f'}};
+          r.getCell(2).font={bold:true,size:11,color:{argb:FONT[c.status]||FONT.neutral}};
+          r.getCell(2).fill={type:'pattern',pattern:'solid',fgColor:{argb:FILL[c.status]||FILL.neutral}};
+          r.getCell(2).alignment={horizontal:'center'};
+          r.getCell(3).font={size:9,color:{argb:'FF8094ad'}};
+          r.eachCell(cell=>{cell.border={bottom:{style:'hair',color:{argb:'FFdde6f0'}}};});
+        });
+      });
+      ws.columns=[{width:36},{width:16},{width:36}];
+      const buf=await wb.xlsx.writeBuffer();
+      const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='KPI_LFBF_'+fmt(new Date())+'.xlsx';a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      toast('📊 Export KPI Excel (coloré)');
+    }catch(e){ console.error(e); toast('❌ Erreur export KPI: '+e.message); }
+  });
+}
 
 function aiGetContext(){
   const today=new Date();
@@ -12177,16 +12394,17 @@ function buildBesoinEditTable(year,weeks){
   // Lignes : un chantier par ligne
   const rows=chantiers.map(c=>{
     const theo=c.ressources?.technicien||0;
+    const col=c.color||'#82b1ff';
     const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;
     const cells=relevantWeeks.map(mon=>{
       const isCur=isCurrentWeek(mon);
       const ovKey=`${c.id}_${mon.getFullYear()}-S${wkN(mon)}`;
       return _besoinEditCell(ovKey,theo,d,f,mon,isCur);
     }).join('');
-    return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-      <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+    return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:${col}14">
+      <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:linear-gradient(0deg,${col}26,${col}26),#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-left:3px solid ${col}">
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="width:3px;height:24px;border-radius:2px;background:${c.color||'#82b1ff'};display:inline-block"></span>
+          <span style="width:3px;height:24px;border-radius:2px;background:${col};display:inline-block"></span>
           <div>
             <div style="font-size:12px;font-weight:800;color:#e0e8ff">${c.nom}</div>
             <div style="font-size:9px;color:#8090a8">${c.client||''} · théo. ${theo}T</div>
@@ -12200,6 +12418,7 @@ function buildBesoinEditTable(year,weeks){
   // Lignes : un avion en recyclage par ligne (en cours / à venir)
   const recAv=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn);
   const recRows=recAv.map(av=>{
+    const rcol=av.color||'#ff9a3c';
     const d=(av.debutChantier||av.entree)?parseLocal(av.debutChantier||av.entree):null;
     const f=(av.finChantier||av.finPrev)?parseLocal(av.finChantier||av.finPrev):null;
     const cells=relevantWeeks.map(mon=>{
@@ -12208,10 +12427,10 @@ function buildBesoinEditTable(year,weeks){
       const theo=_recBesoinAvionSemaine(av,mon);
       return _besoinEditCell(ovKey,theo,d,f,mon,isCur);
     }).join('');
-    return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,154,60,0.04)">
-      <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+    return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:${rcol}14">
+      <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:linear-gradient(0deg,${rcol}26,${rcol}26),#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-left:3px solid ${rcol}">
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="width:3px;height:24px;border-radius:2px;background:${av.color||'#ff9a3c'};display:inline-block"></span>
+          <span style="width:3px;height:24px;border-radius:2px;background:${rcol};display:inline-block"></span>
           <div>
             <div style="font-size:12px;font-weight:800;color:#ffd0a0">♻️ ${av.type||'A/C'} — MSN ${av.msn||'?'}</div>
             <div style="font-size:9px;color:#8090a8">Recyclage${parseInt(av.techsRequis)?` · ${parseInt(av.techsRequis)}T fixe`:''}</div>
