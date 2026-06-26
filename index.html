@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-CDIPART21 -->
+<!-- AeroStaff Pro v7 — Build 20260621-PROLEDIT -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2431,7 +2431,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-CDIPART21 · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PROLEDIT · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2695,6 +2695,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="modal-title">📝 Prolongation de contrat</div>
   <div id="prolong-info" style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6"></div>
   <input type="hidden" id="prolong-id">
+  <input type="hidden" id="prolong-editing" value="">
+  <div id="prolong-editmode" style="display:none;margin-bottom:10px;padding:8px 12px;background:rgba(255,208,96,0.1);border:1px solid rgba(255,208,96,0.35);border-radius:10px;font-size:12px;color:#ffd060;font-weight:700"></div>
   <div class="field"><label>Nouvelle date de début <span style="font-size:9px;color:var(--t4)">(pré-remplie en continuité — à décaler si retour plus tard)</span></label><input type="date" id="prolong-debut" onchange="_prolongGapHint();_prolongAbsHint()"></div>
   <div id="prolong-gap" style="font-size:11px;margin:2px 0 8px"></div>
   <div class="field"><label>Nouvelle date de fin de contrat <span style="color:var(--rose)">*</span></label><input type="date" id="prolong-fin" onchange="_prolongAbsHint()"></div>
@@ -2703,7 +2705,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div id="prolong-hist"></div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-prolong')">Annuler</button>
-    <button class="btn btn-cyan" onclick="saveProlongation()">Enregistrer la prolongation</button>
+    <button class="btn btn-cyan" id="prolong-savebtn" onclick="saveProlongation()">Enregistrer la prolongation</button>
   </div>
 </div>
 </div>
@@ -8782,17 +8784,62 @@ function _prolongAbsHint(){
     : `<div style="font-size:11px;color:#34c759;padding:2px 0">✓ Aucune absence/formation prévue sur la période.</div>`;
 }
 
+// Fin de référence pour enchaîner une nouvelle prolongation : dernière prolongation non refusée, sinon fin de contrat
+function _interimAnchorEnd(emp){
+  const ps=Array.isArray(emp.prolongations)?emp.prolongations:[];
+  for(let i=ps.length-1;i>=0;i--){ if(ps[i].statut!=='refusee' && ps[i].nouvelleFin) return ps[i].nouvelleFin; }
+  return emp.dateFin||'';
+}
+// Fin de référence pour une prolongation donnée (celle qui la précède dans la chaîne)
+function _anchorBefore(emp,pid){
+  const ps=Array.isArray(emp.prolongations)?emp.prolongations:[];
+  const idx=ps.findIndex(x=>x.id===pid);
+  for(let i=idx-1;i>=0;i--){ if(ps[i].statut!=='refusee' && ps[i].nouvelleFin) return ps[i].nouvelleFin; }
+  return emp.dateFin||'';
+}
+// Recalcule la fin de contrat effective d'après la dernière prolongation acceptée
+function _recomputeInterimFin(emp){
+  const ps=Array.isArray(emp.prolongations)?emp.prolongations:[];
+  let lastAcc=null;
+  ps.forEach(p=>{ if(p.statut==='acceptee'||!p.statut) lastAcc=p; });
+  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut) emp.debutContrat=lastAcc.nouveauDebut; }
+}
+// Charger une prolongation existante dans le formulaire pour la modifier
+function editProlong(empId,pid){
+  const emp=byId(empId); if(!emp) return;
+  const p=(emp.prolongations||[]).find(x=>x.id===pid); if(!p) return;
+  document.getElementById('prolong-editing').value=pid;
+  document.getElementById('prolong-debut').value=p.nouveauDebut||'';
+  document.getElementById('prolong-fin').value=p.nouvelleFin||'';
+  document.getElementById('prolong-ref').value=p.ref||'';
+  const bn=document.getElementById('prolong-editmode');
+  if(bn){ bn.style.display='block'; bn.innerHTML=`✎ Modification de la prolongation (fin ${disp(p.nouvelleFin)}) — <span onclick="cancelProlongEdit('${empId}')" style="cursor:pointer;text-decoration:underline;color:#ffb0c0">annuler la modification</span>`; }
+  const sb=document.getElementById('prolong-savebtn'); if(sb) sb.textContent='Mettre à jour la prolongation';
+  _prolongGapHint(); _prolongAbsHint();
+  try{ document.querySelector('#m-prolong .modal').scrollTop=0; }catch(e){}
+}
+function cancelProlongEdit(empId){
+  document.getElementById('prolong-editing').value='';
+  const bn=document.getElementById('prolong-editmode'); if(bn) bn.style.display='none';
+  const sb=document.getElementById('prolong-savebtn'); if(sb) sb.textContent='Enregistrer la prolongation';
+  if(empId) openProlongation(empId); else { document.getElementById('prolong-fin').value=''; document.getElementById('prolong-ref').value=''; }
+}
 function openProlongation(id){
   const emp=byId(id); if(!emp) return;
   document.getElementById('prolong-id').value=id;
+  document.getElementById('prolong-editing').value='';
+  const _bn=document.getElementById('prolong-editmode'); if(_bn) _bn.style.display='none';
+  const _sb=document.getElementById('prolong-savebtn'); if(_sb) _sb.textContent='Enregistrer la prolongation';
   document.getElementById('prolong-fin').value='';
   document.getElementById('prolong-ref').value='';
-  // Nouvelle date de début pré-remplie en continuité (lendemain de la fin actuelle)
+  // Nouvelle date de début pré-remplie en continuité de la DERNIÈRE période (chaînage)
+  const anchor=_interimAnchorEnd(emp);
   const debEl=document.getElementById('prolong-debut');
-  if(debEl) debEl.value=emp.dateFin?fmt(addD(parseLocal(emp.dateFin),1)):'';
+  if(debEl) debEl.value=anchor?fmt(addD(parseLocal(anchor),1)):'';
   const gap=document.getElementById('prolong-gap'); if(gap) gap.innerHTML='';
   const info=document.getElementById('prolong-info');
-  if(info) info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>`;
+  const chainNote=(anchor&&emp.dateFin&&anchor!==emp.dateFin)?`<br><span style="color:#ffd060;font-size:11px">⛓ Demande(s) en attente jusqu'au ${disp(anchor)} — la nouvelle période s'enchaîne à partir de là.</span>`:'';
+  if(info) info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>${chainNote}`;
   _refreshProlongHist(id);
   _prolongAbsHint();
   openM('m-prolong');
@@ -8802,12 +8849,14 @@ function _prolongGapHint(){
   const emp=byId(document.getElementById('prolong-id').value); if(!emp) return;
   const gapEl=document.getElementById('prolong-gap'); if(!gapEl) return;
   const nd=document.getElementById('prolong-debut').value;
-  if(!nd||!emp.dateFin){ gapEl.innerHTML=''; return; }
-  const cont=fmt(addD(parseLocal(emp.dateFin),1));
+  const editId=document.getElementById('prolong-editing').value;
+  const anchor=editId?_anchorBefore(emp,editId):_interimAnchorEnd(emp);
+  if(!nd||!anchor){ gapEl.innerHTML=''; return; }
+  const cont=fmt(addD(parseLocal(anchor),1));
   const diff=Math.round((parseLocal(nd)-parseLocal(cont))/86400000);
-  if(diff>0) gapEl.innerHTML=`<span style="color:#ffd060;font-weight:700">⏸ Interruption de ${diff} jour(s)</span> entre la fin actuelle et le retour.`;
+  if(diff>0) gapEl.innerHTML=`<span style="color:#ffd060;font-weight:700">⏸ Interruption de ${diff} jour(s)</span> entre la période précédente (fin ${disp(anchor)}) et le retour.`;
   else if(diff===0) gapEl.innerHTML=`<span style="color:#34c759">✓ Continuité (pas d'interruption).</span>`;
-  else gapEl.innerHTML=`<span style="color:#ff8090">⚠ Le début chevauche le contrat actuel.</span>`;
+  else gapEl.innerHTML=`<span style="color:#ff8090">⚠ Le début chevauche la période précédente.</span>`;
 }
 function saveProlongation(){
   const id=document.getElementById('prolong-id').value;
@@ -8817,15 +8866,40 @@ function saveProlongation(){
   const nd=document.getElementById('prolong-debut').value||'';
   if(nd && parseLocal(nf)<parseLocal(nd)){ toast('⚠️ La fin doit être après le début'); return; }
   const ref=(document.getElementById('prolong-ref').value||'').trim();
+  const editId=document.getElementById('prolong-editing').value;
+
+  // ── Mode MODIFICATION d'une prolongation existante ──
+  if(editId){
+    const p=(emp.prolongations||[]).find(x=>x.id===editId);
+    if(p){
+      const anchor=_anchorBefore(emp,editId);
+      let gap=0;
+      if(nd && anchor){ const cont=fmt(addD(parseLocal(anchor),1)); gap=Math.max(0,Math.round((parseLocal(nd)-parseLocal(cont))/86400000)); }
+      p.ancienneFin=anchor||''; p.nouveauDebut=nd; p.gap=gap; p.nouvelleFin=nf; p.ref=ref;
+      // Si la prolongation modifiée était acceptée, recalculer la fin de contrat
+      _recomputeInterimFin(emp);
+      save(); renderPersonnel(); if(typeof renderDash==='function')renderDash();
+      cancelProlongEdit(); // sort du mode édition
+      document.getElementById('prolong-id').value=id;
+      const info=document.getElementById('prolong-info'); if(info){ const a2=_interimAnchorEnd(emp); const cn=(a2&&emp.dateFin&&a2!==emp.dateFin)?`<br><span style="color:#ffd060;font-size:11px">⛓ Demande(s) en attente jusqu'au ${disp(a2)}.</span>`:''; info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>${cn}`; }
+      document.getElementById('prolong-debut').value=_interimAnchorEnd(emp)?fmt(addD(parseLocal(_interimAnchorEnd(emp)),1)):'';
+      const gEl=document.getElementById('prolong-gap'); if(gEl) gEl.innerHTML='';
+      _prolongAbsHint(); _refreshProlongHist(id);
+      toast(`✏️ Prolongation mise à jour — fin au ${disp(nf)}`);
+    }
+    return;
+  }
+
+  const anchor=_interimAnchorEnd(emp);
   let gap=0;
-  if(nd && emp.dateFin){ const cont=fmt(addD(parseLocal(emp.dateFin),1)); gap=Math.max(0,Math.round((parseLocal(nd)-parseLocal(cont))/86400000)); }
+  if(nd && anchor){ const cont=fmt(addD(parseLocal(anchor),1)); gap=Math.max(0,Math.round((parseLocal(nd)-parseLocal(cont))/86400000)); }
   if(!Array.isArray(emp.prolongations)) emp.prolongations=[];
-  emp.prolongations.push({id:uid(),ancienneFin:emp.dateFin||'',nouveauDebut:nd,gap,nouvelleFin:nf,ref,date:fmt(new Date()),statut:'demandee'});
+  emp.prolongations.push({id:uid(),ancienneFin:anchor||'',nouveauDebut:nd,gap,nouvelleFin:nf,ref,date:fmt(new Date()),statut:'demandee'});
   // La date de fin ne change PAS tant que la prolongation n'est pas ACCEPTÉE
   save(); renderPersonnel(); if(typeof renderDash==='function')renderDash();
-  // Réinitialiser le formulaire et afficher la demande "en attente"
+  // Réinitialiser le formulaire ; la période suivante s'enchaîne sur la fin qu'on vient de saisir
   document.getElementById('prolong-fin').value=''; document.getElementById('prolong-ref').value='';
-  document.getElementById('prolong-debut').value=emp.dateFin?fmt(addD(parseLocal(emp.dateFin),1)):'';
+  document.getElementById('prolong-debut').value=nf?fmt(addD(parseLocal(nf),1)):'';
   const gapEl=document.getElementById('prolong-gap'); if(gapEl) gapEl.innerHTML='';
   _prolongAbsHint(); _refreshProlongHist(id);
   toast(`🟡 Prolongation demandée (en attente) — fin proposée au ${disp(nf)}`);
@@ -8841,6 +8915,7 @@ function _refreshProlongHist(empId){
       </div>`:'';
     return `<div style="font-size:11px;color:#a0b0c8;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:8px">
       <div style="flex:1">${p.ancienneFin?disp(p.ancienneFin):'—'} → ${p.nouveauDebut&&p.gap>0?`<span style="color:#ffd060">⏸${p.gap}j puis </span>`:''}<strong style="color:var(--t1)">${disp(p.nouvelleFin)}</strong> · ${badge(p.statut)}${p.ref?` <span style="color:#607090">· ${p.ref}</span>`:''}${actions}</div>
+      <button onclick="editProlong('${emp.id}','${p.id}')" title="Modifier cette prolongation" style="flex:none;width:22px;height:22px;border-radius:6px;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.3);color:#00d2ff;font-size:11px;font-weight:800;cursor:pointer;line-height:1">✎</button>
       <button onclick="deleteProlong('${emp.id}','${p.id}')" title="Supprimer cette ligne d'historique" style="flex:none;width:22px;height:22px;border-radius:6px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:#ff6b81;font-size:12px;font-weight:800;cursor:pointer;line-height:1">✕</button>
     </div>`;
   }).join(''):'')+`<div id="prolong-postaction"></div>`;
@@ -8959,13 +9034,21 @@ function exportProlongationsPDF(){
   const seuil=_interimSeuil();
   const list=_interimsProd().filter(p=>{const j=_joursAvant(p.dateFin); return j!==null&&j<=seuil;});
   if(!list.length){ toast('Aucun intérimaire dont le contrat se termine sous '+seuil+' jours'); return; }
-  const stLbl=(p)=>{const a=Array.isArray(p.prolongations)?p.prolongations:[];const l=a.length?a[a.length-1]:null;return l&&l.statut==='demandee'?'🟡 Demande en cours':l&&l.statut==='refusee'?'🔴 Refusée':'';};
-  const rows=list.map(p=>{const j=_joursAvant(p.dateFin);const cont=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'—';return `<tr><td>${p.nom} ${p.prenom}</td><td>${p.agence||'—'}</td><td>${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €':'—'}</td><td>${p.debutContrat?disp(p.debutContrat):'—'}</td><td class="${j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}</td><td>${j<0?'Expiré':j+' j'}</td><td>${stLbl(p)}</td><td>${cont}</td><td style="min-width:110px"></td></tr>`;}).join('');
+  const lastPend=(p)=>{const a=Array.isArray(p.prolongations)?p.prolongations:[];const l=a.length?a[a.length-1]:null;return l&&l.statut==='demandee'?l:null;};
+  const rows=list.map(p=>{
+    const j=_joursAvant(p.dateFin);
+    const cont=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'—';
+    const pend=lastPend(p);
+    const debProp=pend&&pend.nouveauDebut?disp(pend.nouveauDebut):cont;
+    const finProp=pend&&pend.nouvelleFin?disp(pend.nouvelleFin):'';
+    const motif=pend&&pend.ref?pend.ref:'';
+    return `<tr><td>${p.nom} ${p.prenom}</td><td>${p.agence||'—'}</td><td>${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €':'—'}</td><td>${p.debutContrat?disp(p.debutContrat):'—'}</td><td class="${j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}</td><td>${j<0?'Expiré':j+' j'}</td><td>${debProp}</td><td style="min-width:90px">${finProp}</td><td>${motif||'&nbsp;'}</td></tr>`;
+  }).join('');
   const html=_prolongPdfHead('Prolongations intérimaires')+`
     <h1>Demande de prolongation de contrats — Intérimaires</h1>
     <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${list.length} intérimaire(s) dont le contrat se termine sous ${seuil} jours</div>
-    <table><thead><tr><th>Nom</th><th>Agence</th><th>Taux €/h</th><th>Début</th><th>Fin actuelle</th><th>Échéance</th><th>Statut</th><th>Début proposé (continuité)</th><th>Nouvelle fin proposée</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="foot">Début proposé = lendemain de la fin actuelle (à décaler en cas d'interruption / retour différé). Astuce : augmentez le seuil de rappel pour inclure davantage d'intérimaires dans une seule demande. — Document généré par MARDAM AeroDesk Pro.</div>
+    <table><thead><tr><th>Nom</th><th>Agence</th><th>Taux €/h</th><th>Début</th><th>Fin actuelle</th><th>Échéance</th><th>Début proposé</th><th>Nouvelle fin proposée</th><th>Motif</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="foot">Début proposé = date saisie dans la demande, ou à défaut le lendemain de la fin actuelle (à décaler en cas d'interruption / retour différé). Astuce : augmentez le seuil de rappel pour inclure davantage d'intérimaires dans une seule demande. — Document généré par MARDAM AeroDesk Pro.</div>
   </body></html>`;
   openPrintView(html,'PDF — Prolongations RH');
 }
@@ -8974,6 +9057,10 @@ function exportProlongationIndiv(id){
   const j=_joursAvant(p.dateFin);
   const contDebut=p.dateFin?disp(fmt(addD(parseLocal(p.dateFin),1))):'';
   const ps=Array.isArray(p.prolongations)?p.prolongations:[];
+  const pend=ps.length&&ps[ps.length-1].statut==='demandee'?ps[ps.length-1]:null;
+  const debSouhait=pend&&pend.nouveauDebut?`<strong>${disp(pend.nouveauDebut)}</strong>${pend.gap>0?` <span style="color:#c0392b">(interruption ${pend.gap}j)</span>`:''}`:(contDebut?`<span style="color:#666">proposé : ${contDebut} (continuité)</span>`:'&nbsp;');
+  const finSouhait=pend&&pend.nouvelleFin?`<strong>${disp(pend.nouvelleFin)}</strong>`:'&nbsp;';
+  const motifSouhait=pend&&pend.ref?pend.ref:'&nbsp;';
   const histRows=ps.map(x=>`<tr><td>${x.ancienneFin?disp(x.ancienneFin):'—'}</td><td>${x.nouveauDebut?disp(x.nouveauDebut):'—'}${x.gap>0?` <span style="color:#c0392b">(⏸ ${x.gap}j)</span>`:''}</td><td>${disp(x.nouvelleFin)}</td><td>${x.statut==='refusee'?'Refusée':x.statut==='demandee'?'Demandée':'Acceptée'}</td><td>${x.ref||'—'}</td><td>${disp(x.date)}</td></tr>`).join('');
   const html=_prolongPdfHead('Demande de prolongation')+`
     <h1>Demande de prolongation de contrat</h1>
@@ -8984,9 +9071,9 @@ function exportProlongationIndiv(id){
       <tr><th>Taux horaire</th><td>${p.tauxHoraire!=null?p.tauxHoraire.toFixed(2)+' €/h':'—'}</td></tr>
       <tr><th>Début de contrat</th><td>${p.debutContrat?disp(p.debutContrat):'—'}</td></tr>
       <tr><th>Fin de contrat actuelle</th><td class="${j!==null&&j<=0?'urgent':''}">${p.dateFin?disp(p.dateFin):'—'}${j!==null?` (${j<0?'expiré':j+' j restants'})`:''}</td></tr>
-      <tr><th>Nouvelle date de début souhaitée</th><td>${contDebut?`<span style="color:#666">proposé : ${contDebut} (continuité)</span>`:'&nbsp;'}</td></tr>
-      <tr><th>Nouvelle fin de contrat souhaitée</th><td>&nbsp;</td></tr>
-      <tr><th>Motif / référence</th><td>&nbsp;</td></tr>
+      <tr><th>Nouvelle date de début souhaitée</th><td>${debSouhait}</td></tr>
+      <tr><th>Nouvelle fin de contrat souhaitée</th><td>${finSouhait}</td></tr>
+      <tr><th>Motif / référence</th><td>${motifSouhait}</td></tr>
     </table>
     ${ps.length?`<h1 style="font-size:14px;margin-top:20px">Historique des prolongations</h1><table><thead><tr><th>Ancienne fin</th><th>Nouveau début</th><th>Nouvelle fin</th><th>Statut</th><th>Référence</th><th>Date</th></tr></thead><tbody>${histRows}</tbody></table>`:''}
     ${(()=>{const ab=_absencesHtml(p.id,p.debutContrat||p.dateFin,p.dateFin,true);return ab?`<h1 style="font-size:14px;margin-top:20px">Indisponibilités prévues sur le contrat en cours</h1><div>${ab}</div>`:'';})()}
