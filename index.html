@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-COLORS20 -->
+<!-- AeroStaff Pro v7 — Build 20260621-RECTERMINE -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2456,7 +2456,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-COLORS20 · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-RECTERMINE · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -7646,7 +7646,9 @@ function renderRecyclingAvions(){
     encours: {lbl:'En démantèlement',col:'#ff9a3c', bg:'rgba(255,154,60,0.1)'},
     termine: {lbl:'Terminé',         col:'#34c759', bg:'rgba(52,199,89,0.1)'},
   };
-  const rows=avions.map(av=>{
+  const actifs=avions.filter(a=>a.statut!=='termine');
+  const finis=avions.filter(a=>a.statut==='termine');
+  let rows=actifs.map(av=>{
     const st=STATUT[av.statut]||STATUT.attente;
     const avColor=av.color||'#ff9a3c';
     return`<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);border-left:3px solid ${avColor}">
@@ -7691,10 +7693,26 @@ function renderRecyclingAvions(){
       </div>
     </div>`;
   }).join('');
+  if(!actifs.length) rows='<div style="padding:18px;text-align:center;color:var(--t4);font-size:12px">Aucun avion actif en recyclage.</div>';
+  if(finis.length){
+    rows+=`<div style="padding:7px 16px;background:rgba(52,199,89,0.06);border-top:1px solid rgba(255,255,255,0.06);font-size:11px;font-weight:800;color:#34c759;letter-spacing:.5px">✅ TERMINÉS (${finis.length})</div>`;
+    rows+=finis.map(av=>{
+      const avColor=av.color||'#ff9a3c';
+      return`<div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.04);border-left:3px solid ${avColor};display:flex;align-items:center;gap:10px;flex-wrap:wrap;opacity:.78">
+        <div style="flex:1;min-width:150px">
+          <span style="font-size:12px;font-weight:700;color:${avColor}">${av.type||'—'}</span>
+          <span style="font-size:11px;color:var(--t2)"> · MSN ${av.msn||'—'}</span>
+          ${av.client?`<span style="font-size:10px;color:#8090b8"> · ${av.client}</span>`:''}
+          <div style="font-size:10px;color:#8090b8;margin-top:1px">${av.entree?disp(av.entree):'?'} → ${(av.finPrev||av.finChantier)?disp(av.finPrev||av.finChantier):'?'}</div>
+        </div>
+        <span style="background:rgba(52,199,89,0.1);border:1px solid #34c75955;color:#34c759;border-radius:99px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap">Terminé</span>
+        <button onclick="openAvionRecycEdit('${av.id}')" title="Modifier" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.25);border-radius:7px;color:var(--cyan);padding:4px 9px;cursor:pointer;font-size:11px;font-weight:700">✏️</button>
+        <button onclick="delAvionRec('${av.id}')" title="Supprimer" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:7px;color:#ff4d6d;padding:4px 8px;cursor:pointer;font-size:11px">🗑</button>
+      </div>`;
+    }).join('');
+  }
   el.innerHTML=rows;
 }
-
-/* ── Suivi avancement recyclage ── */
 function renderRecyclingAvancement(){
   const el=document.getElementById('recycling-avancement');
   if(!el) return;
