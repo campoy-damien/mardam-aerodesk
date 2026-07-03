@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-AUTOSEARCH -->
+<!-- AeroStaff Pro v7 — Build 20260621-SLOTMONTHS2 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1255,7 +1255,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div id="gantt-resp" style="overflow-x:auto"></div>
   </div>
 
-  <div id="kanban-yearlbl" style="margin:6px 2px 2px;font-size:12px;color:#8090a8;font-weight:700"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 2px 2px">
+    <div id="kanban-yearlbl" style="font-size:12px;color:#8090a8;font-weight:700"></div>
+    <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="chantier-search" placeholder="MSN ou client…" oninput="renderChantiers()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:220px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
+  </div>
   <div class="kanban" id="kanban"></div>
 </div>
 
@@ -2488,7 +2491,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AUTOSEARCH · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-SLOTMONTHS2 · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -4182,6 +4185,9 @@ function renderSlotGrid(){
 
   let weekHead=''; for(let w=0;w<nbWeeks;w++){ const mon=addD(start,w*7); weekHead+=`<th colspan="7" style="background:#0d1628;color:var(--cyan);padding:4px;text-align:center;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;white-space:nowrap">S${wkN(mon)}</th>`; }
 
+  const MO_ABR=['Janv','Févr','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+  let monthHead=''; { let i=0; while(i<days.length){ const m=days[i].getMonth(), yr=days[i].getFullYear(); let span=0; while(i<days.length && days[i].getMonth()===m && days[i].getFullYear()===yr){ span++; i++; } const bg=(m%2===0)?'#0a111f':'#121d34'; const lbl=MO_ABR[m]+(yr!==y?` '${String(yr).slice(2)}`:''); monthHead+=`<th colspan="${span}" style="background:${bg};color:#90a8d0;padding:0;border:1px solid rgba(255,255,255,0.10);font-size:10px;font-weight:800;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px"><div style="position:sticky;left:${POSW}px;display:inline-block;padding:4px 10px">${lbl}</div></th>`; } }
+
   const rows=SLOT_POSITIONS.map(pos=>{
     const cells=days.map(d=>{
       const ds=fmt(d); const wd=d.getDay();
@@ -4213,6 +4219,10 @@ function renderSlotGrid(){
 
   el.innerHTML=`<table style="border-collapse:collapse;font-size:11px">
     <thead>
+      <tr>
+        <th style="${stickyTh}background:#0a111f;border:1px solid rgba(255,255,255,0.08);min-width:${POSW}px;width:${POSW}px;padding:4px 12px;text-align:left;color:#8098c0;font-size:9px;font-weight:800">MOIS</th>
+        ${monthHead}
+      </tr>
       <tr>
         <th style="${stickyTh}background:#0d1628;border:1px solid rgba(255,255,255,0.08);min-width:${POSW}px;width:${POSW}px;padding:6px 12px;text-align:left;color:#6080a0;font-size:10px">POSITION · ${y}</th>
         ${weekHead}
@@ -7298,6 +7308,13 @@ function _chantierInYear(c,year){
   const start=d||f, end=f||d;
   return start<=new Date(year,11,31) && end>=new Date(year,0,1);
 }
+function _matchChantier(c,q){
+  if(!q) return true;
+  return (c.nom||'').toLowerCase().includes(q)
+    || (c.msn||'').toString().toLowerCase().includes(q)
+    || (c.client||'').toLowerCase().includes(q)
+    || (c.avion||'').toLowerCase().includes(q);
+}
 function renderChantiers(){
   // Populate year selector
   const yrSel=document.getElementById('gantt-resp-year');
@@ -7306,14 +7323,15 @@ function renderChantiers(){
     for(let y=cy-1;y<=2060;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;yrSel.appendChild(o);}
   }
   const selYear=parseInt(yrSel?.value)||new Date().getFullYear();
+  const _cq=(document.getElementById('chantier-search')?.value||'').toLowerCase().trim();
   renderRespGantt();
   checkConflicts();
   const cols=[{k:'prevision',l:'🔮 Prévision'},{k:'futur',l:'📅 À venir'},{k:'encours',l:'🔄 En cours'},{k:'termine',l:'✅ Terminés'}];
-  const totalYear=S.chantiers.filter(c=>_chantierInYear(c,selYear)).length;
+  const totalYear=S.chantiers.filter(c=>_chantierInYear(c,selYear)&&_matchChantier(c,_cq)).length;
   const ylbl=document.getElementById('kanban-yearlbl');
-  if(ylbl) ylbl.textContent=`📋 ${totalYear} chantier(s) sur l'année ${selYear}`;
+  if(ylbl) ylbl.textContent=`📋 ${totalYear} chantier(s) sur l'année ${selYear}${_cq?` · recherche « ${_cq} »`:''}`;
   document.getElementById('kanban').innerHTML=cols.map(col=>{
-    const cards=S.chantiers.filter(c=>c.statut===col.k && _chantierInYear(c,selYear));
+    const cards=S.chantiers.filter(c=>c.statut===col.k && _chantierInYear(c,selYear) && _matchChantier(c,_cq));
     // Colonnes "Prévision" et "Terminés" → liste compacte pour optimiser la place
     if(col.k==='termine'||col.k==='prevision'){
       const isPrev=col.k==='prevision';
