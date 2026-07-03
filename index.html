@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-AIRBUSMSNFIX -->
+<!-- AeroStaff Pro v7 — Build 20260621-AUTOSEARCH -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1605,6 +1605,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="sh">
     <div class="sh-title"><em>Autorisations</em></div>
     <div class="btn-row">
+      <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="auto-search" placeholder="Nom, prénom ou trigramme…" oninput="renderAutorisations()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openAutoModal()">+ Ajouter</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsInAuto').click()">📥 Import Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="exportAutoXls()">📤 Export Excel</button>
@@ -2487,7 +2488,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AIRBUSMSNFIX · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AUTOSEARCH · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -9810,11 +9811,13 @@ function renderAutorisations(){
   const eF=document.getElementById('auto-flt-emp')?.value||'';
   const tF=document.getElementById('auto-flt-type')?.value||'';
   const sF=document.getElementById('auto-flt-status')?.value||'';
+  const _aq=(document.getElementById('auto-search')?.value||'').toLowerCase().trim();
 
   const data=(S.autorisations||[]).filter(a=>{
     if(eF&&a.empId!==eF)return false;
     if(tF&&a.type!==tF)return false;
     if(sF&&tSt(a.dateExpiration)!==sF)return false;
+    if(_aq){ const e=byId(a.empId); if(!e||!_matchStaff(e,_aq)) return false; }
     return true;
   }).sort((a,b)=>({expired:0,warning:1,valid:2,na:3}[tSt(a.dateExpiration)]||3)-({expired:0,warning:1,valid:2,na:3}[tSt(b.dateExpiration)]||3));
 
