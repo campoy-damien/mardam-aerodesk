@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-TODOPURGEFIX -->
+<!-- AeroStaff Pro v7 — Build 20260621-AIRBUSMSNFIX -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1132,6 +1132,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="sh">
     <div class="sh-title">Suivi des <em>Formations</em></div>
     <div class="btn-row">
+      <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="form-search" placeholder="Nom, prénom ou trigramme…" oninput="renderForms()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()">📥 Import suivi RH (2 fichiers)</button>
       <button class="btn btn-mint btn-sm" onclick="exportFormXls()">📤 Export Excel</button>
@@ -1177,6 +1178,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="sh">
     <div class="sh-title">Master <em>Planning</em></div>
     <div class="btn-row">
+      <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="master-search" placeholder="Nom, prénom ou trigramme…" oninput="renderMaster()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <select id="mp-emp" onchange="renderMaster()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select>
       <select id="mp-year" onchange="renderMaster()" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select>
       <button class="btn btn-gold btn-sm" onclick="openM('m-hol')">🎉 Jours fériés</button>
@@ -1202,6 +1204,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 <div class="page" id="pg-weekly">
   <div class="sh">
     <div class="sh-title">Planning <em>Hebdomadaire</em></div>
+    <div class="btn-row"><select id="wk-emp" onchange="renderWeekly()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select><select id="wk-year" onchange="chWeekYear(this.value)" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select><div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="week-search" placeholder="Nom, prénom ou trigramme…" oninput="renderWeekly()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div></div>
   </div>
   <div class="navrow">
     <button class="btn btn-ghost btn-sm" onclick="chWeek(-1)">← Préc.</button>
@@ -2484,7 +2487,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-TODOPURGEFIX · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AIRBUSMSNFIX · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -4057,23 +4060,24 @@ const SLOT_COLW=46;
 
 function getSlotAvions(){
   const today=fmt(new Date());
-  const list=[];
-  // Chantiers avec MSN uniquement
+  const list=[]; const seen=new Set();
+  const add=o=>{ if(!o.msn||seen.has(o.msn)) return; seen.add(o.msn); list.push(o); };
+  // Priorité : chantier > recyclage > Airbus Part 21 > stockage
+  // (le stockage/parking, souvent auto-créé, n'apparaît que si le MSN n'est pas déjà listé)
   S.chantiers.filter(c=>['encours','futur','prevision'].includes(c.statut)&&c.msn).forEach(c=>{
-    list.push({id:'ch_'+c.id,lbl:`🔧 MSN ${c.msn} — ${c.avion||c.nom}`,msn:c.msn,type:'chantier',nom:c.avion||c.nom,color:c.color||'#82b1ff'});
-  });
-  // Stockage
-  (S.stockage?.avions||[]).forEach(a=>{
-    if(!a.msn) return;
-    list.push({id:'sto_'+a.id,lbl:`✈️ MSN ${a.msn} ${a.type||''}`,msn:a.msn,type:'stockage',nom:a.type||'Avion',color:'#ff9a3c'});
+    add({id:'ch_'+c.id,lbl:`🔧 MSN ${c.msn} — ${c.avion||c.nom}`,msn:c.msn,type:'chantier',nom:c.avion||c.nom,color:c.color||'#82b1ff'});
   });
   // Recyclage
   (S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn).forEach(a=>{
-    list.push({id:'rec_'+a.id,lbl:`♻️ MSN ${a.msn} ${a.type||''}`,msn:a.msn,type:'recycling',nom:a.type||'Avion',color:'#6effc4'});
+    add({id:'rec_'+a.id,lbl:`♻️ MSN ${a.msn} ${a.type||''}`,msn:a.msn,type:'recycling',nom:a.type||'Avion',color:'#6effc4'});
   });
   // Airbus Part 21
   (S.airbus?.msns||[]).filter(m=>(!m.sortie||m.sortie>=today)&&m.msn).forEach(m=>{
-    list.push({id:'airbus_'+m.id,lbl:`✈️ MSN ${m.msn} ${m.type||''} (Part 21)`,msn:m.msn,type:'airbus',nom:m.type||'Airbus',color:'#00a0ff'});
+    add({id:'airbus_'+m.id,lbl:`✈️ MSN ${m.msn} ${m.type||''} (Part 21)`,msn:m.msn,type:'airbus',nom:m.type||'Airbus',color:'#00a0ff'});
+  });
+  // Stockage
+  (S.stockage?.avions||[]).forEach(a=>{
+    add({id:'sto_'+a.id,lbl:`✈️ MSN ${a.msn} ${a.type||''}`,msn:a.msn,type:'stockage',nom:a.type||'Avion',color:'#ff9a3c'});
   });
   // Trier par MSN
   list.sort((a,b)=>a.msn.localeCompare(b.msn,'fr',{numeric:true}));
@@ -4395,6 +4399,43 @@ function deleteSlotEntry(){
   });
 }
 
+function _slotMergedGroups(entries){
+  const noWorkBetween=(finStr,debStr)=>{ let d=addD(parseLocal(finStr),1); const end=parseLocal(debStr); while(d<end){ const w=d.getDay(); if(w!==0&&w!==6&&!isHol(fmt(d))) return false; d=addD(d,1);} return true; };
+  const groups={};
+  entries.forEach(e=>{ const k=e.msn||'—'; (groups[k]=groups[k]||[]).push(e); });
+  const msnKeys=Object.keys(groups).sort((a,b)=>String(a).localeCompare(String(b),'fr',{numeric:true}));
+  return msnKeys.map(msn=>{
+    const list=groups[msn].slice().sort((a,b)=>a.debut.localeCompare(b.debut));
+    const avion=(list.find(e=>e.avionNom)||{}).avionNom||'—';
+    const periods=[]; let cur=null;
+    list.forEach(e=>{
+      if(cur && e.pos===cur.pos && (e.debut<=cur.fin || noWorkBetween(cur.fin,e.debut))){
+        if(e.fin>cur.fin) cur.fin=e.fin; cur.nbJours+=e.nbJours; cur.entries.push(e);
+        if(e.notes) cur.notes=(cur.notes?cur.notes+' · ':'')+e.notes;
+      } else { cur={pos:e.pos,debut:e.debut,fin:e.fin,nbJours:e.nbJours,notes:e.notes||'',entries:[e]}; periods.push(cur); }
+    });
+    const totalJ=periods.reduce((s,p)=>s+p.nbJours,0);
+    const byPos={}; periods.forEach(p=>byPos[p.pos]=(byPos[p.pos]||0)+p.nbJours);
+    return {msn,avion,periods,totalJ,byPos};
+  });
+}
+function _slotXlsSheet(entries){
+  const groupData=_slotMergedGroups(entries);
+  const data=[['MSN','Avion','Position','Date début','Date fin','Jours ouvrés','Notes']];
+  groupData.forEach(g=>{
+    g.periods.forEach(p=>{
+      const pos=SLOT_POSITIONS.find(x=>x.id===p.pos)||SLOT_POSITIONS[0];
+      data.push([g.msn,g.avion,pos.lbl,p.debut,p.fin,p.nbJours,p.notes||'']);
+    });
+    data.push(['','','Total MSN '+g.msn,'','',g.totalJ,'']);
+  });
+  const tx={1:0,2:0,3:0};
+  entries.forEach(e=>tx[e.pos]=(tx[e.pos]||0)+e.nbJours);
+  data.push([]);
+  SLOT_POSITIONS.forEach(pp=>data.push(['','','Total '+pp.lbl,'','',tx[pp.id]||0,'']));
+  data.push(['','','TOTAL GÉNÉRAL','','',Object.values(tx).reduce((a,b)=>a+b,0),'']);
+  return data;
+}
 function renderSlotHistorique(){
   const el=document.getElementById('slot-historique');
   if(!el||!S.slot) return;
@@ -4404,7 +4445,6 @@ function renderSlotHistorique(){
   const year=parseInt(document.getElementById('slot-hist-annee')?.value)||now.getFullYear();
 
   let entries=[...S.slot.entries||[]].map(e=>({...e,pos:parseInt(e.pos)})).filter(e=>{
-    // Comparaison par string YYYY-MM pour éviter les problèmes de fuseau
     const mStartStr=`${year}-${String(month).padStart(2,'0')}-01`;
     const mEndStr=`${year}-${String(month).padStart(2,'0')}-${String(new Date(year,month,0).getDate()).padStart(2,'0')}`;
     return !(e.fin<mStartStr||e.debut>mEndStr);
@@ -4414,110 +4454,115 @@ function renderSlotHistorique(){
 
   if(!entries.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--t4);font-size:12px">Aucune occupation sur cette période</div>';return;}
 
-  // Calculer totaux par position
+  // Totaux par position (global)
   const totals={1:0,2:0,3:0};
   entries.forEach(e=>totals[e.pos]=(totals[e.pos]||0)+e.nbJours);
+
+  const groupData=_slotMergedGroups(entries);
+
+  const posOf=p=>SLOT_POSITIONS.find(x=>x.id===p)||SLOT_POSITIONS[0];
+  const TD='padding:8px 12px;border:1px solid rgba(255,255,255,0.06)';
+  let rows='';
+  groupData.forEach((g,gi)=>{
+    const brk='';
+    rows+=`<tr><td colspan="6" style="padding:9px 12px;background:rgba(0,210,255,0.06);border:1px solid rgba(255,255,255,0.08);border-left:3px solid var(--cyan)">
+      <span style="font-weight:900;color:var(--t1)">MSN ${g.msn}</span><span style="color:var(--t3)"> · ${g.avion}</span>
+      <span style="float:right;font-weight:800;color:var(--cyan)">${g.totalJ} j ouvrés</span>
+    </td></tr>`;
+    g.periods.forEach((p,pi)=>{
+      const pc=posOf(p.pos); const multi=p.entries.length>1; const key=gi+'_'+pi;
+      rows+=`<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+        <td style="${TD};border-left:3px solid ${pc.col}"><span style="font-size:11px;font-weight:800;color:${pc.col}">${pc.lbl}</span></td>
+        <td style="${TD};color:var(--t2)">${disp(p.debut)}</td>
+        <td style="${TD};color:var(--t2)">${disp(p.fin)}</td>
+        <td style="${TD};text-align:center"><span style="font-size:17px;font-weight:900;color:${pc.col}">${p.nbJours}</span></td>
+        <td style="${TD};font-size:11px;color:var(--t4)">${p.notes||'—'}</td>
+        <td style="padding:4px;border:1px solid rgba(255,255,255,0.06);text-align:center">${
+          multi
+          ? `<button id="subtog-${key}" onclick="_slotToggleSub('${key}')" title="${p.entries.length} occupations fusionnées" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--t2);padding:3px 8px;cursor:pointer;font-size:11px">▸ ${p.entries.length}</button>`
+          : `<button onclick="openSlotEdit('${p.entries[0].id}')" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;color:var(--cyan);padding:3px 8px;cursor:pointer;font-size:10px">✏️</button>`
+        }</td>
+      </tr>`;
+      if(multi) p.entries.forEach(e=>{
+        rows+=`<tr data-sub="${key}" style="display:none;background:rgba(255,255,255,0.02)">
+          <td style="${TD};border-left:3px solid ${pc.col};padding-left:24px;font-size:11px;color:var(--t4)">↳ ${pc.lbl}</td>
+          <td style="${TD};color:var(--t3);font-size:11px">${disp(e.debut)}</td>
+          <td style="${TD};color:var(--t3);font-size:11px">${disp(e.fin)}</td>
+          <td style="${TD};text-align:center;font-size:12px;color:var(--t3)">${e.nbJours}</td>
+          <td style="${TD};font-size:10px;color:var(--t4)">${e.notes||'—'}</td>
+          <td style="padding:4px;border:1px solid rgba(255,255,255,0.06);text-align:center"><button onclick="openSlotEdit('${e.id}')" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;color:var(--cyan);padding:3px 8px;cursor:pointer;font-size:10px">✏️</button></td>
+        </tr>`;
+      });
+    });
+  });
 
   el.innerHTML=`
   <div style="display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap">
     ${SLOT_POSITIONS.map(p=>`<div style="background:${p.bg};border:1px solid ${p.border};border-radius:10px;padding:6px 14px;text-align:center">
       <div style="font-size:15px;font-weight:900;color:${p.col}">${totals[p.id]||0}j</div>
-      <div style="font-size:9px;color:var(--t4)">${p.lbl}</div>
-    </div>`).join('')}
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px 14px;text-align:center">
-      <div style="font-size:15px;font-weight:900;color:var(--t1)">${Object.values(totals).reduce((a,b)=>a+b,0)}j</div>
-      <div style="font-size:9px;color:var(--t4)">Total</div>
-    </div>
+      <div style="font-size:9px;color:var(--t4)">${p.lbl}</div></div>`).join('')}
   </div>
   <table style="width:100%;border-collapse:collapse;font-size:12px">
     <thead><tr>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase;text-align:left">Position</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase">MSN</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase">Avion</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase">Entrée</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase">Sortie</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase;text-align:center">Jours ouvrés</th>
-      <th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase">Notes</th>
-      <th style="background:#0d1628;border:1px solid rgba(255,255,255,0.08);width:40px"></th>
+      ${['Position','Entrée','Sortie','Jours ouvrés','Notes',''].map((h,i)=>`<th style="background:#0d1628;color:#6080a0;padding:7px 12px;border:1px solid rgba(255,255,255,0.08);font-size:10px;font-weight:700;text-transform:uppercase;text-align:${i===3?'center':'left'}${i===5?';width:60px':''}">${h}</th>`).join('')}
     </tr></thead>
-    <tbody>
-    ${entries.map((e,i)=>{
-      const pos=SLOT_POSITIONS.find(p=>p.id===e.pos)||SLOT_POSITIONS[0];
-      return`<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);border-left:3px solid ${pos.col}">
-          <span style="font-size:11px;font-weight:800;color:${pos.col}">${pos.lbl}</span>
-        </td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);font-weight:800;color:var(--t1)">${e.msn||'—'}</td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);color:var(--t2)">${e.avionNom||'—'}</td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);color:var(--t2)">${disp(e.debut)}</td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);color:var(--t2)">${disp(e.fin)}</td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);text-align:center">
-          <span style="font-size:18px;font-weight:900;color:${pos.col}">${e.nbJours}</span>
-        </td>
-        <td style="padding:8px 12px;border:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--t4)">${e.notes||'—'}</td>
-        <td style="padding:4px;border:1px solid rgba(255,255,255,0.06);text-align:center">
-          <button onclick="openSlotEdit('${e.id}')" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;color:var(--cyan);padding:3px 8px;cursor:pointer;font-size:10px">✏️</button>
-        </td>
-      </tr>`;
-    }).join('')}
-    </tbody>
+    <tbody>${rows}</tbody>
   </table>`;
+}
+function _slotToggleSub(key){
+  let anyShown=false;
+  document.querySelectorAll('tr[data-sub="'+key+'"]').forEach(r=>{ const show=r.style.display==='none'; r.style.display=show?'table-row':'none'; if(show)anyShown=true; });
+  const b=document.getElementById('subtog-'+key);
+  if(b) b.textContent=(anyShown?'▾':'▸')+b.textContent.slice(1);
 }
 
 function exportSlotPDF(){
   const now=new Date();
   const month=parseInt(document.getElementById('slot-hist-mois')?.value)||(now.getMonth()+1);
   const year=parseInt(document.getElementById('slot-hist-annee')?.value)||now.getFullYear();
+  const posFilter=document.getElementById('slot-hist-pos')?.value||'all';
   const MO_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-  const entries=[...S.slot?.entries||[]].filter(e=>{
-    const d=new Date(e.debut);const f=new Date(e.fin);
-    return!(f<new Date(year,month-1,1)||d>new Date(year,month,0));
-  }).sort((a,b)=>a.debut.localeCompare(b.debut));
+  const mStartStr=`${year}-${String(month).padStart(2,'0')}-01`;
+  const mEndStr=`${year}-${String(month).padStart(2,'0')}-${String(new Date(year,month,0).getDate()).padStart(2,'0')}`;
+  let entries=[...S.slot?.entries||[]].map(e=>({...e,pos:parseInt(e.pos)})).filter(e=>!(e.fin<mStartStr||e.debut>mEndStr));
+  if(posFilter!=='all') entries=entries.filter(e=>e.pos===parseInt(posFilter));
   const totals={1:0,2:0,3:0};
   entries.forEach(e=>totals[e.pos]=(totals[e.pos]||0)+e.nbJours);
-
-  const rows=entries.map(e=>{
-    const pos=SLOT_POSITIONS.find(p=>p.id===e.pos)||SLOT_POSITIONS[0];
-    return`<tr>
-      <td style="border-left:4px solid ${pos.col};padding-left:10px;font-weight:700;color:#0d1e3d">${pos.lbl}</td>
-      <td style="font-weight:900;font-size:14px;color:#0d1e3d">${e.msn||'—'}</td>
-      <td>${e.avionNom||'—'}</td>
-      <td>${disp(e.debut)}</td>
-      <td>${disp(e.fin)}</td>
-      <td style="text-align:center;font-size:18px;font-weight:900;color:${pos.col}">${e.nbJours}</td>
-      <td style="font-size:11px;color:#8898bb">${e.notes||'—'}</td>
-    </tr>`;
-  }).join('');
-
+  const groupData=_slotMergedGroups(entries);
+  let rows='';
+  groupData.forEach(g=>{
+    rows+=`<tr style="background:#eaf2ff"><td colspan="5" style="padding:7px 10px;font-weight:900;color:#0d1e3d;border-left:4px solid #2a6df0">MSN ${g.msn} · ${g.avion}<span style="float:right;color:#2a6df0">${g.totalJ} j ouvrés</span></td></tr>`;
+    g.periods.forEach(p=>{
+      const pos=SLOT_POSITIONS.find(x=>x.id===p.pos)||SLOT_POSITIONS[0];
+      const occ=p.entries.length>1?` <span style="color:#8898bb;font-size:9px">(${p.entries.length} occ.)</span>`:'';
+      rows+=`<tr>
+        <td style="border-left:4px solid ${pos.col};padding-left:10px;font-weight:700;color:#0d1e3d">${pos.lbl}</td>
+        <td>${disp(p.debut)}</td>
+        <td>${disp(p.fin)}${occ}</td>
+        <td style="text-align:center;font-size:16px;font-weight:900;color:${pos.col}">${p.nbJours}</td>
+        <td style="font-size:11px;color:#8898bb">${p.notes||'—'}</td>
+      </tr>`;
+    });
+  });
   const summaryHTML=SLOT_POSITIONS.map(p=>`
     <div style="background:${p.bg.replace('0.15','0.12')};border:1px solid ${p.border};border-radius:12px;padding:12px 20px;text-align:center">
       <div style="font-size:28px;font-weight:900;color:${p.col}">${totals[p.id]||0}</div>
       <div style="font-size:11px;color:#5a7090;font-weight:700">${p.lbl}</div>
       <div style="font-size:10px;color:#8898bb">jours ouvrés</div>
     </div>`).join('');
-
   const content=`
-  <div style="display:flex;gap:12px;margin-bottom:20px">${summaryHTML}
-    <div style="background:#f0f4ff;border:1px solid #c0d0e8;border-radius:12px;padding:12px 20px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:#0d1e3d">${Object.values(totals).reduce((a,b)=>a+b,0)}</div>
-      <div style="font-size:11px;color:#5a7090;font-weight:700">Total</div>
-      <div style="font-size:10px;color:#8898bb">jours ouvrés</div>
-    </div>
-  </div>
+  <div style="display:flex;gap:12px;margin-bottom:20px">${summaryHTML}</div>
   <table style="width:100%;border-collapse:collapse;font-size:12px">
     <thead><tr style="background:#0d1e3d;color:#e0e8f0">
       <th style="padding:8px 12px;text-align:left">Position</th>
-      <th style="padding:8px 12px">MSN</th>
-      <th style="padding:8px 12px">Avion</th>
       <th style="padding:8px 12px">Entrée</th>
       <th style="padding:8px 12px">Sortie</th>
       <th style="padding:8px 12px;text-align:center">Jours ouvrés</th>
       <th style="padding:8px 12px">Notes</th>
     </tr></thead>
-    <tbody>${rows||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#8898bb">Aucune occupation ce mois</td></tr>'}</tbody>
+    <tbody>${rows||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#8898bb">Aucune occupation ce mois</td></tr>'}</tbody>
   </table>`;
-
-  openPrintView(pdfBase(`Slot Hangar — ${MO_FR[month-1]} ${year}`,`Occupation des 3 positions · Export facturation`,'portrait',content), `Slot Hangar — ${MO_FR[month-1]} ${year}`);
+  openPrintView(pdfBase(`Slot Hangar — ${MO_FR[month-1]} ${year}`,`Occupation des 3 positions · Regroupé par MSN · Export facturation`,'portrait',content), `Slot Hangar — ${MO_FR[month-1]} ${year}`);
   toast('Export PDF Slot Hangar ✓');
 }
 
@@ -4527,18 +4572,41 @@ function exportSlotXls(){
   _loadSheetJS(()=>{
     if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
     try{
-      const entries=[...S.slot?.entries||[]].sort((a,b)=>a.debut.localeCompare(b.debut));
-      const data=[['Position','MSN','Avion','Type','Date début','Date fin','Jours ouvrés','Notes']];
-      entries.forEach(e=>{
-        const pos=SLOT_POSITIONS.find(p=>p.id===e.pos)||SLOT_POSITIONS[0];
-        data.push([pos.lbl,e.msn||'',e.avionNom||'',e.type||'',e.debut,e.fin,e.nbJours,e.notes||'']);
-      });
+      const MO_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const now=new Date();
+      const month=parseInt(document.getElementById('slot-hist-mois')?.value)||(now.getMonth()+1);
+      const year=parseInt(document.getElementById('slot-hist-annee')?.value)||now.getFullYear();
+      const posFilter=document.getElementById('slot-hist-pos')?.value||'all';
+      const buildAOA=(entries)=>{
+        const groupData=_slotMergedGroups(entries);
+        const data=[['MSN','Avion','Position','Date début','Date fin','Jours ouvrés','Notes']];
+        groupData.forEach(g=>{
+          g.periods.forEach(p=>{
+            const pos=SLOT_POSITIONS.find(x=>x.id===p.pos)||SLOT_POSITIONS[0];
+            data.push([g.msn,g.avion,pos.lbl,p.debut,p.fin,p.nbJours,p.notes||'']);
+          });
+          data.push(['','','Total MSN '+g.msn,'','',g.totalJ,'']);
+        });
+        const totalsX={1:0,2:0,3:0};
+        entries.forEach(e=>totalsX[e.pos]=(totalsX[e.pos]||0)+e.nbJours);
+        data.push([]);
+        SLOT_POSITIONS.forEach(pp=>data.push(['','','Total '+pp.lbl,'','',totalsX[pp.id]||0,'']));
+        data.push(['','','TOTAL GÉNÉRAL','','',Object.values(totalsX).reduce((a,b)=>a+b,0),'']);
+        return data;
+      };
+      const COLS=[{wch:12},{wch:20},{wch:14},{wch:14},{wch:14},{wch:14},{wch:30}];
+      const mStartStr=`${year}-${String(month).padStart(2,'0')}-01`;
+      const mEndStr=`${year}-${String(month).padStart(2,'0')}-${String(new Date(year,month,0).getDate()).padStart(2,'0')}`;
+      let moisEntries=[...S.slot?.entries||[]].map(e=>({...e,pos:parseInt(e.pos)})).filter(e=>!(e.fin<mStartStr||e.debut>mEndStr));
+      if(posFilter!=='all') moisEntries=moisEntries.filter(e=>e.pos===parseInt(posFilter));
+      const allEntries=[...S.slot?.entries||[]].map(e=>({...e,pos:parseInt(e.pos)}));
       const wb=XLSX.utils.book_new();
-      const ws=XLSX.utils.aoa_to_sheet(data);
-      ws['!cols']=[{wch:14},{wch:12},{wch:20},{wch:14},{wch:14},{wch:14},{wch:14},{wch:30}];
-      XLSX.utils.book_append_sheet(wb,ws,'Slot Hangar');
+      const wsMois=XLSX.utils.aoa_to_sheet(buildAOA(moisEntries)); wsMois['!cols']=COLS;
+      XLSX.utils.book_append_sheet(wb,wsMois,(MO_FR[month-1]+' '+year).slice(0,31));
+      const wsAll=XLSX.utils.aoa_to_sheet(buildAOA(allEntries)); wsAll['!cols']=COLS;
+      XLSX.utils.book_append_sheet(wb,wsAll,'Historique complet');
       XLSX.writeFile(wb,'Slot_Hangar_'+fmt(new Date())+'.xlsx');
-      toast('Export Excel Slot Hangar ✓');
+      toast('Export Excel Slot Hangar ✓ (2 feuilles)');
     }catch(e){
       console.error(e);
       toast('❌ Erreur export: '+e.message);
@@ -5040,6 +5108,7 @@ function saveAirbusSettings(){
 }
 
 function openAirbusNewMSN(){
+  document.getElementById('airbus-msn-id').value='';
   ['airbus-msn-num','airbus-msn-client','airbus-msn-notes'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   document.getElementById('airbus-msn-type').value='';
   document.getElementById('airbus-msn-entree').value='';
@@ -5574,7 +5643,7 @@ function _sortByNom(list){
 }
 
 function popSelects(){
-  ['flt-emp','f-emp','mp-emp','t-assign','a-emp','auto-flt-emp'].forEach(id=>{
+  ['flt-emp','f-emp','mp-emp','wk-emp','t-assign','a-emp','auto-flt-emp'].forEach(id=>{
     const sel=document.getElementById(id); if(!sel)return;
     const f=sel.options[0];
     sel.innerHTML=''; if(f)sel.appendChild(f);
@@ -5886,14 +5955,21 @@ function renderDash(){
 }
 
 /* ═══ FORMATIONS ═══ */
+function _matchStaff(emp,q){
+  if(!q) return true;
+  const p=(emp.prenom||'').toLowerCase(), n=(emp.nom||'').toLowerCase(), t=(emp.trigramme||'').toLowerCase();
+  return (p+' '+n).includes(q)||(n+' '+p).includes(q)||n.includes(q)||p.includes(q)||t.includes(q);
+}
 function renderForms(){
   const eF=document.getElementById('flt-emp')?.value||'';
   const tF=document.getElementById('flt-type')?.value||'';
   const sF=document.getElementById('flt-status')?.value||'';
+  const _fq=(document.getElementById('form-search')?.value||'').toLowerCase().trim();
   const data=S.formations.filter(f=>{
     if(eF&&f.empId!==eF)return false;
     if(tF&&f.type!==tF)return false;
     if(sF&&tSt(f.dateExpiration)!==sF)return false;
+    if(_fq){ const e=byId(f.empId); if(!e||!_matchStaff(e,_fq)) return false; }
     return true;
   }).sort((a,b)=>({expired:0,warning:1,valid:2,na:3}[tSt(a.dateExpiration)]||3)-({expired:0,warning:1,valid:2,na:3}[tSt(b.dateExpiration)]||3));
   const tb=document.getElementById('formTbody');
@@ -6402,12 +6478,15 @@ function renderMaster(){
     emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
     emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
   }
+  const _mq=(document.getElementById('master-search')?.value||'').toLowerCase().trim();
+  if(_mq) emps=emps.filter(p=>_matchStaff(p,_mq));
   buildGrid(emps,dates,'masterGrid');
 }
 
 /* ═══ WEEKLY ═══ */
 function chWeek(dir){S.weekStart=addD(S.weekStart,dir*7);renderWeekly();}
 function thisWeek(){S.weekStart=getMon(new Date());renderWeekly();}
+function chWeekYear(y){ y=parseInt(y); if(!y)return; const d=new Date(S.weekStart); S.weekStart=getMon(new Date(y,d.getMonth(),Math.min(d.getDate(),28))); renderWeekly(); }
 
 function sortByChantier(personnel, weekDates){
   // Trouve le chantier principal d'un employé sur la semaine
@@ -6489,7 +6568,16 @@ function renderWeekly(){
   document.getElementById('weekLbl').textContent=`Semaine ${wkN(S.weekStart)} · ${S.weekStart.getDate()} ${MO[S.weekStart.getMonth()].slice(0,3)} – ${end.getDate()} ${MO[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
   const sorted = sortByChantier(S.personnel.filter(p=>p.actif!==false), dates);
   const sortis = sortPersonnel(_inactifsAvecPlanning(dates));
-  buildGrid(sorted.concat(sortis), dates, 'weeklyGrid');
+  const _we=document.getElementById('wk-emp');
+  if(_we && _we.options.length<=1){ try{popSelects();}catch(e){} }
+  let _wlist=sorted.concat(sortis);
+  const _wemp=document.getElementById('wk-emp')?.value||'';
+  if(_wemp) _wlist=S.personnel.filter(p=>p.id===_wemp);
+  const _wq=(document.getElementById('week-search')?.value||'').toLowerCase().trim();
+  if(_wq) _wlist=_wlist.filter(p=>_matchStaff(p,_wq));
+  const _wy=document.getElementById('wk-year');
+  if(_wy){ if(!_wy.options.length){ const cy=new Date().getFullYear(); let o=''; for(let y=cy-1;y<=2060;y++) o+=`<option value="${y}">${y}</option>`; _wy.innerHTML=o; } _wy.value=S.weekStart.getFullYear(); }
+  buildGrid(_wlist, dates, 'weeklyGrid');
 }
 
 /* ═══ CELL EDIT ═══ */
@@ -9556,8 +9644,15 @@ function savePersonnel(){
   const activite=cat==='interimaire'?(document.getElementById('p-activite')?.value||''):'';
   const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||''};
   if(editId){const i=S.personnel.findIndex(p=>p.id===editId);if(i>-1)S.personnel[i]={...S.personnel[i],...data};}
-  else S.personnel.push({id:uid(),...data});
-  save();closeM('m-pers');popSelects();renderPersonnel();renderDash();
+  else S.personnel.push({id:uid(),...data,actif:true});
+  save();closeM('m-pers');popSelects();
+  // Réinitialise les filtres des plannings pour que la personne ajoutée/modifiée soit toujours visible
+  ['week-search','master-search','form-search'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['wk-emp','mp-emp','flt-emp'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderPersonnel();renderDash();
+  if(typeof renderWeekly==='function')renderWeekly();
+  if(typeof renderMaster==='function')renderMaster();
+  if(typeof renderForms==='function')renderForms();
 }
 function delPersonnel(id){
   if(!id) return;
