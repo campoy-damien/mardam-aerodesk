@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-FORMMATRIX -->
+<!-- AeroStaff Pro v7 — Build 20260621-CONDUITEAUTOS -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2491,7 +2491,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-FORMMATRIX · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-CONDUITEAUTOS · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3360,12 +3360,22 @@ function handleRhImport(ev){
   if(files.length>2){ toast('⚠️ Sélectionnez au maximum 2 fichiers (Qualité + SSE)'); ev.target.value=''; return; }
   toast('⏳ Lecture des fichiers…');
   _loadSheetJS(()=>{
+    // Formations : flux existant (avec aperçu)
     Promise.all(files.map(readRhFile))
       .then(results=>{
         const merged=mergeRhResults(results);
         prepareRhPreview(merged);
       })
       .catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
+    // Autorisations : matrice OPS -> mise à jour directe (sans doublon)
+    Promise.all(files.map(_readWbCellDates))
+      .then(wbs=>{
+        let aUpd=0,aCre=0,dUpd=0,dCre=0;
+        wbs.forEach(wb=>{ try{ const r=_importAutoFromWb(wb); aUpd+=r.upd; aCre+=r.cre; const d=_importDrivingFromWb(wb); dUpd+=d.upd; dCre+=d.cre; }catch(err){console.error('wb direct',err);} });
+        if(aUpd||aCre||dUpd||dCre){ save(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderForms==='function')renderForms(); if(typeof renderDash==='function')renderDash();
+          const t=[]; if(aUpd||aCre) t.push(`🛡 Autos : ${aUpd} maj · ${aCre} créées`); if(dUpd||dCre) t.push(`🚜 Conduite (autorisations) : ${dUpd} maj · ${dCre} créées`); toast(t.join('   |   ')); }
+      })
+      .catch(e=>console.error('auth import',e));
   });
   ev.target.value='';
 }
@@ -6114,6 +6124,107 @@ function handleXlsImport(e){
   };
   reader.readAsArrayBuffer(file);
   e.target.value='';
+}
+function _readWbCellDates(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{ try{ res(XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true})); }catch(err){rej(err);} };
+    r.onerror=()=>rej(new Error('lecture impossible'));
+    r.readAsArrayBuffer(file);
+  });
+}
+function _importDrivingFromWb(wb){
+  // Autorisations de conduite (feuille SSE) -> onglet AUTORISATIONS, détail conservé.
+  // MEDICAL VISIT est exclu (reste "Visite Médicale" en Formations via Qualifications SSE).
+  const SKIP=new Set(['MEDICAL VISIT']);
+  const EXCLUDE_CLEAN=new Set(['PUSHBACK']); // Pushback reste aussi une qualification en Formations
+  const _d=v=>{
+    if(v==null||v==='') return '';
+    if(v instanceof Date && !isNaN(v)) return fmt(v);
+    if(typeof v==='number'){ const dt=new Date(Math.round((v-25569)*86400*1000)); return isNaN(dt)?'':fmt(dt); }
+    const s=v.toString().trim(); if(!s||/^n\/?a$/i.test(s)) return '';
+    let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+    m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+    return '';
+  };
+  const norm=s=>(s==null?'':s).toString().trim().replace(/\s+/g,' ').toUpperCase();
+  const nm=wb.SheetNames.find(n=>n.trim().toLowerCase().includes('sse authorizations follow-up'));
+  if(!nm) return {upd:0,cre:0,cleaned:0};
+  const arr=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,raw:true});
+  const hr=arr.findIndex(r=>Array.isArray(r)&&r.some(c=>/trigram/i.test((c==null?'':c).toString())));
+  if(hr<0) return {upd:0,cre:0,cleaned:0};
+  const field=arr[hr].map(c=>(c==null?'':c).toString().trim());
+  const nameRow=(arr[hr-1]||[]).map(c=>(c==null?'':c).toString().trim());
+  const triCol=field.findIndex(h=>/trigram/i.test(h));
+  const fnCol=field.findIndex(h=>/first/i.test(h));
+  const lnCol=field.findIndex(h=>/last/i.test(h));
+  const dateCols=[]; let carry='';
+  field.forEach((h,i)=>{ if(nameRow[i]) carry=nameRow[i]; if(h.toLowerCase()==='date'){ const raw=((nameRow[i]||carry)||'').split('\n')[0].trim(); if(!raw||SKIP.has(norm(raw))) return; dateCols.push({i,type:raw}); } });
+  if(!dateCols.length||triCol<0) return {upd:0,cre:0,cleaned:0};
+  // Migration : retirer les entrées de conduite mal placées dans Formations (ancien import)
+  const cleanSet=new Set();
+  dateCols.forEach(({type})=>{ if(EXCLUDE_CLEAN.has(norm(type))) return; cleanSet.add(norm(type)); cleanSet.add(norm('Conduite — '+type)); });
+  let cleaned=0;
+  if(S.formations&&S.formations.length){ const before=S.formations.length; S.formations=S.formations.filter(f=>!cleanSet.has(norm(f.type))); cleaned=before-S.formations.length; }
+  if(!S.autorisations) S.autorisations=[];
+  let upd=0,cre=0;
+  for(let r=hr+1;r<arr.length;r++){
+    const row=arr[r]; if(!row) continue;
+    const tri=(row[triCol]==null?'':row[triCol]).toString().trim().toUpperCase();
+    if(!tri) continue;
+    let emp=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri);
+    if(!emp && fnCol>=0 && lnCol>=0){ const fn=(row[fnCol]||'').toString().trim().toLowerCase(), ln=(row[lnCol]||'').toString().trim().toLowerCase(); if(fn&&ln) emp=S.personnel.find(p=>(p.prenom||'').toLowerCase()===fn&&(p.nom||'').toLowerCase()===ln); }
+    if(!emp) continue;
+    dateCols.forEach(({i,type})=>{
+      const dexp=_d(row[i]); if(!dexp) return;
+      const ex=S.autorisations.find(a=>a.empId===emp.id&&norm(a.type)===norm(type));
+      if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
+      else { S.autorisations.push({id:uid(),empId:emp.id,type,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
+    });
+  }
+  return {upd,cre,cleaned};
+}
+function _importAutoFromWb(wb){
+  const KNOWN=['ASTO','AMEC','AELE','ASTR','ACOM','ABAT','AENB','ISTO','IMEC','IELE','ISTR','ICOM','IBAT','IENB','BORO','RUN','TAXI','WEIG','IPNT','ADEM','AINV','AVER','ADEC','EDEM','EINV','PART21'];
+  const KS=new Set(KNOWN);
+  const _d=v=>{
+    if(v==null||v==='') return '';
+    if(v instanceof Date && !isNaN(v)) return fmt(v);
+    if(typeof v==='number'){ const dt=new Date(Math.round((v-25569)*86400*1000)); return isNaN(dt)?'':fmt(dt); }
+    const s=v.toString().trim(); if(!s||/^n\/?a$/i.test(s)) return '';
+    let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+    m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+    return '';
+  };
+  let arr=null,hr=-1;
+  for(const nm of wb.SheetNames){
+    const a=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,raw:true});
+    const idx=a.findIndex(r=>Array.isArray(r)&&r.filter(c=>KS.has((c==null?'':c).toString().trim().toUpperCase())).length>=3);
+    if(idx>=0){ arr=a; hr=idx; break; }
+  }
+  if(!arr) return {upd:0,cre:0,notFound:[]};
+  const header=arr[hr].map(c=>(c==null?'':c).toString().trim());
+  const low=header.map(h=>h.toLowerCase());
+  let triCol=low.findIndex(h=>h.includes('trigram')); if(triCol<0) triCol=0;
+  const fnCol=low.findIndex(h=>h.includes('first'));
+  const lnCol=low.findIndex(h=>h.includes('last'));
+  const authCols=[]; header.forEach((h,i)=>{ const u=h.toUpperCase(); if(KS.has(u)) authCols.push({i,code:u}); });
+  let upd=0,cre=0; const notFound=new Set();
+  for(let r=hr+1;r<arr.length;r++){
+    const row=arr[r]; if(!row) continue;
+    const tri=(row[triCol]==null?'':row[triCol]).toString().trim().toUpperCase();
+    if(!tri) continue;
+    let emp=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri);
+    if(!emp && fnCol>=0 && lnCol>=0){ const fn=(row[fnCol]||'').toString().trim().toLowerCase(), ln=(row[lnCol]||'').toString().trim().toLowerCase(); if(fn&&ln) emp=S.personnel.find(p=>(p.prenom||'').toLowerCase()===fn&&(p.nom||'').toLowerCase()===ln); }
+    if(!emp){ if(authCols.some(({i})=>_d(row[i]))) notFound.add(tri); continue; }
+    authCols.forEach(({i,code})=>{
+      const dexp=_d(row[i]); if(!dexp) return;
+      const ex=S.autorisations.find(a=>a.empId===emp.id&&(a.type||'').toUpperCase()===code);
+      if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
+      else { S.autorisations.push({id:uid(),empId:emp.id,type:code,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
+    });
+  }
+  return {upd,cre,notFound:[...notFound]};
 }
 function handleAutoXlsImport(e){
   const file=e.target.files[0];if(!file)return;
