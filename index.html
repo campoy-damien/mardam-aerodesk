@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-SLOTMONTHS2 -->
+<!-- AeroStaff Pro v7 — Build 20260621-FORMMATRIX -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1614,7 +1614,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <button class="btn btn-ghost btn-sm" onclick="exportAutoXls()">📤 Export Excel</button>
     </div>
   </div>
-  <input type="file" id="xlsInAuto" accept=".xlsx,.xls" style="display:none" onchange="handleAutoXlsImport(event)">
+  <input type="file" id="xlsInAuto" accept=".xlsx,.xls,.xlsm" style="display:none" onchange="handleAutoXlsImport(event)">
 
   <!-- Filters -->
   <div class="gc" style="margin-bottom:12px">
@@ -2491,7 +2491,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-SLOTMONTHS2 · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-FORMMATRIX · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3169,7 +3169,7 @@ function saveToFile(data) {
 <div class="toast" id="toastEl">🔄 <span id="toastMsg"></span></div>
 
 <!-- Hidden inputs -->
-<input type="file" id="xlsIn"  accept=".xlsx,.xls" style="display:none" onchange="handleXlsImport(event)">
+<input type="file" id="xlsIn"  accept=".xlsx,.xls,.xlsm" style="display:none" onchange="handleXlsImport(event)">
 <input type="file" id="xlsRhIn" accept=".xlsx,.xls,.xlsm" multiple style="display:none" onchange="handleRhImport(event)">
 <input type="file" id="jsonIn" accept=".json"       style="display:none" onchange="handleJsonImport(event)">
 <script>
@@ -6054,83 +6054,63 @@ function handleXlsImport(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const data=new Uint8Array(ev.target.result);
-    const wb=XLSX.read(data,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const rows=XLSX.utils.sheet_to_json(ws,{header:1});
-
-    // Correspondances flexibles des types de formation
-    const TYPE_MAP={
-      'caces nacelle':'CACES NACELLE','nacelle':'CACES NACELLE',
-      'caces chariot':'CACES CHARIOT','chariot':'CACES CHARIOT',
-      'caces tracma':'CACES TRACMA','tracma':'CACES TRACMA',
-      'caces telesco':'CACES TELESCO','telesco':'CACES TELESCO','telescopique':'CACES TELESCO',
-      'caces gerbeur':'CACES GERBEUR','gerbeur':'CACES GERBEUR',
-      'ewis':'EWIS',
-      'cdccl':'CDCCL',
-      'safety training':'SAFETY TRAINING','safety':'SAFETY TRAINING','sst':'SAFETY TRAINING',
-      'english test':'English Test','english':'English Test','anglais':'English Test',
-      'moe':'MOE / PART 145','part 145':'MOE / PART 145','moe/part 145':'MOE / PART 145','part145':'MOE / PART 145',
-      'welcome hse':'Welcome HSE','hse':'Welcome HSE',
-      'travail en hauteur':'Travail en hauteur','hauteur':'Travail en hauteur',
-      'risque chimique':'Risque chimiques','risques chimiques':'Risque chimiques','chimique':'Risque chimiques',
-      'competences':'Compétences','compétences':'Compétences','competence':'Compétences',
-      'licence part 66':'Licence Part 66','part 66':'Licence Part 66','part66':'Licence Part 66',
-      'pushback':'Pushback',
-    };
-
-    const normalizeType=raw=>{
-      const k=(raw||'').toString().trim().toLowerCase();
-      return TYPE_MAP[k]||raw.toString().trim();
-    };
-
-    const findEmp=row=>{
-      // Essai 1 : trigramme (colonne C = index 2)
-      const tri=(row[2]||'').toString().trim().toUpperCase();
-      if(tri) { const e=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri); if(e) return e; }
-      // Essai 2 : Prénom Nom (colonne A = index 0)
-      const full=(row[0]||'').toString().trim();
-      if(full){
-        const pts=full.split(/\s+/);
-        const e=S.personnel.find(p=>
-          p.prenom.toLowerCase()===pts[0].toLowerCase()&&
-          p.nom.toLowerCase()===pts.slice(1).join(' ').toLowerCase()
-        );
-        if(e) return e;
-        // Essai 3 : Nom Prénom inversé
-        const e2=S.personnel.find(p=>
-          p.nom.toLowerCase()===pts[0].toLowerCase()&&
-          p.prenom.toLowerCase()===pts.slice(1).join(' ').toLowerCase()
-        );
-        if(e2) return e2;
-      }
-      // Essai 4 : Nom (col A) + Prénom (col B)
-      const nom=(row[0]||'').toString().trim().toLowerCase();
-      const prenom=(row[1]||'').toString().trim().toLowerCase();
-      if(nom&&prenom){
-        const e=S.personnel.find(p=>p.nom.toLowerCase()===nom&&p.prenom.toLowerCase()===prenom);
-        if(e) return e;
-        const e2=S.personnel.find(p=>p.prenom.toLowerCase()===nom&&p.nom.toLowerCase()===prenom);
-        if(e2) return e2;
-      }
-      return null;
-    };
-
-    let n=0, skip=0, notFound=[];
-    rows.slice(1).forEach((row,i)=>{
-      if(!row||row.every(c=>!c)) return; // ligne vide
-      const emp=findEmp(row);
-      if(!emp){ notFound.push(`Ligne ${i+2}: "${row[0]||''} ${row[1]||''} ${row[2]||''}"`); skip++; return; }
-      const type=normalizeType(row[3]);
-      if(!type) return;
-      S.formations.push({id:uid(),empId:emp.id,type,dateObtention:xlsDate(row[4]),dateExpiration:xlsDate(row[5]),notes:row[6]||''});
-      n++;
+    _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){alert('Import Excel non disponible hors ligne');return;}
+    try{
+      const data=new Uint8Array(ev.target.result);
+      const wb=XLSX.read(data,{type:'array',cellDates:true});
+      const WANT=['trainings follow-up','qualifications sse follow-up','sse authorizations follow-up'];
+      const MAP={'PART 145 & MOE':'MOE / PART 145','SAFETY TRAINING':'SAFETY TRAINING','CDCCL':'CDCCL','EWIS':'EWIS','COMPETENCIES':'Comp\u00e9tences','ENGLISH':'English Test','RISQUES CHIMIQUES':'Risque chimiques','TRAVAIL EN HAUTEUR':'Travail en hauteur','WELCOME':'Welcome HSE'};
+      const _d=v=>{
+        if(v==null||v==='') return '';
+        if(v instanceof Date && !isNaN(v)) return fmt(v);
+        if(typeof v==='number'){ const dt=new Date(Math.round((v-25569)*86400*1000)); return isNaN(dt)?'':fmt(dt); }
+        const s=v.toString().trim(); if(!s||/^n\/?a$/i.test(s)) return '';
+        let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+        m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+        return '';
+      };
+      const norm=s=>(s==null?'':s).toString().trim().replace(/\s+/g,' ').toUpperCase();
+      let upd=0,cre=0,sheetsDone=[],notFound=new Set();
+      wb.SheetNames.forEach(nm=>{
+        if(!WANT.some(w=>nm.trim().toLowerCase().includes(w))) return;
+        const arr=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,raw:true});
+        const hr=arr.findIndex(r=>Array.isArray(r)&&r.some(c=>/trigram/i.test((c==null?'':c).toString())));
+        if(hr<0) return;
+        const field=arr[hr].map(c=>(c==null?'':c).toString().trim());
+        const nameRow=(arr[hr-1]||[]).map(c=>(c==null?'':c).toString().trim());
+        const triCol=field.findIndex(h=>/trigram/i.test(h));
+        const fnCol=field.findIndex(h=>/first/i.test(h));
+        const lnCol=field.findIndex(h=>/last/i.test(h));
+        const dateCols=[]; let carry='';
+        field.forEach((h,i)=>{
+          if(nameRow[i]) carry=nameRow[i];
+          if(h.toLowerCase()==='date'){ const raw=((nameRow[i]||carry)||'').split('\n')[0].trim(); if(raw) dateCols.push({i,type:MAP[norm(raw)]||raw}); }
+        });
+        if(!dateCols.length||triCol<0) return;
+        for(let r=hr+1;r<arr.length;r++){
+          const row=arr[r]; if(!row) continue;
+          const tri=(row[triCol]==null?'':row[triCol]).toString().trim().toUpperCase();
+          if(!tri) continue;
+          let emp=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri);
+          if(!emp && fnCol>=0 && lnCol>=0){ const fn=(row[fnCol]||'').toString().trim().toLowerCase(), ln=(row[lnCol]||'').toString().trim().toLowerCase(); if(fn&&ln) emp=S.personnel.find(p=>(p.prenom||'').toLowerCase()===fn&&(p.nom||'').toLowerCase()===ln); }
+          if(!emp){ if(dateCols.some(({i})=>_d(row[i]))) notFound.add(tri); continue; }
+          dateCols.forEach(({i,type})=>{
+            const dexp=_d(row[i]); if(!dexp) return;
+            const ex=S.formations.find(a=>a.empId===emp.id&&norm(a.type)===norm(type));
+            if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
+            else { S.formations.push({id:uid(),empId:emp.id,type,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
+          });
+        }
+        sheetsDone.push(nm);
+      });
+      if(!sheetsDone.length){ alert('\u274c Aucune feuille de formations reconnue.\nAttendu : \u00ab Trainings follow-up \u00bb, \u00ab Qualifications SSE follow-up \u00bb ou \u00ab SSE Authorizations follow-up \u00bb.'); return; }
+      save();renderForms();renderDash();
+      let msg=`\u2705 Formations import\u00e9es !\n\nFeuilles : ${sheetsDone.join(', ')}\n\ud83d\udd04 ${upd} mise(s) \u00e0 jour\n\u2795 ${cre} cr\u00e9\u00e9e(s)`;
+      if(notFound.size){ const u=[...notFound]; msg+=`\n\n\u26a0\ufe0f ${u.length} trigramme(s) du fichier absent(s) de ton personnel${u.length<=15?` :\n${u.join(', ')}`:` (15 premiers) :\n${u.slice(0,15).join(', ')}\u2026`}`; }
+      alert(msg);
+    }catch(err){ console.error(err); alert('\u274c Erreur import: '+err.message); }
     });
-
-    save();renderForms();renderDash();
-    let msg=`✅ ${n} formation(s) importée(s) !`;
-    if(skip>0) msg+=`\n⚠️ ${skip} ligne(s) ignorée(s) — personnel introuvable :\n${notFound.slice(0,5).join('\n')}${notFound.length>5?'\n...':'' }`;
-    alert(msg);
   };
   reader.readAsArrayBuffer(file);
   e.target.value='';
@@ -6139,56 +6119,60 @@ function handleAutoXlsImport(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const data=new Uint8Array(ev.target.result);
-    const wb=XLSX.read(data,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const rows=XLSX.utils.sheet_to_json(ws,{header:1});
-
-    // Correspondances flexibles types autorisations
-    const TYPE_MAP={
-      'amec':'AMEC','asto':'ASTO','imec':'IMEC','isto':'ISTO',
-      'aele':'AELE','iele':'IELE','astr':'ASTR','istr':'ISTR',
-      'acom':'ACOM','icom':'ICOM','aenb':'AENB','ienb':'IENB',
-      'abat':'ABAT','ibat':'IBAT','run':'RUN','part21':'PART21',
-      'ipnt':'IPNT','part 21':'PART21'
-    };
-    const normalizeType=raw=>{
-      const k=(raw||'').toString().trim().toLowerCase();
-      return TYPE_MAP[k]||raw.toString().trim().toUpperCase();
-    };
-
-    const findEmp=row=>{
-      const tri=(row[2]||'').toString().trim().toUpperCase();
-      if(tri){const e=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri);if(e)return e;}
-      const nom=(row[0]||'').toString().trim().toLowerCase();
-      const prenom=(row[1]||'').toString().trim().toLowerCase();
-      if(nom&&prenom){
-        const e=S.personnel.find(p=>p.nom.toLowerCase()===nom&&p.prenom.toLowerCase()===prenom);if(e)return e;
-        const e2=S.personnel.find(p=>p.prenom.toLowerCase()===nom&&p.nom.toLowerCase()===prenom);if(e2)return e2;
+    _loadSheetJS(()=>{
+    if(typeof XLSX==='undefined'){alert('Export/Import Excel non disponible hors ligne');return;}
+    try{
+      const data=new Uint8Array(ev.target.result);
+      const wb=XLSX.read(data,{type:'array',cellDates:true});
+      const KNOWN=['ASTO','AMEC','AELE','ASTR','ACOM','ABAT','AENB','ISTO','IMEC','IELE','ISTR','ICOM','IBAT','IENB','BORO','RUN','TAXI','WEIG','IPNT','ADEM','AINV','AVER','ADEC','EDEM','EINV','PART21'];
+      const KS=new Set(KNOWN);
+      const _d=v=>{
+        if(v==null||v==='') return '';
+        if(v instanceof Date && !isNaN(v)) return fmt(v);
+        if(typeof v==='number'){ const dt=new Date(Math.round((v-25569)*86400*1000)); return isNaN(dt)?'':fmt(dt); }
+        const s=v.toString().trim(); if(!s||/^n\/?a$/i.test(s)) return '';
+        let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+        m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+        return '';
+      };
+      let arr=null, hr=-1;
+      for(const nm of wb.SheetNames){
+        const a=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,raw:true});
+        const idx=a.findIndex(r=>Array.isArray(r)&&r.filter(c=>KS.has((c==null?'':c).toString().trim().toUpperCase())).length>=3);
+        if(idx>=0){ arr=a; hr=idx; break; }
       }
-      if(nom){
-        const pts=nom.split(/\s+/);
-        const e=S.personnel.find(p=>p.nom.toLowerCase()===pts[0]&&p.prenom.toLowerCase()===pts.slice(1).join(' '));
-        if(e)return e;
+      if(!arr){ alert('\u274c Aucune matrice d\'autorisations trouv\u00e9e.\nUne feuille doit contenir une ligne avec les codes (ASTO, AMEC, ISTO\u2026).'); return; }
+      const header=arr[hr].map(c=>(c==null?'':c).toString().trim());
+      const low=header.map(h=>h.toLowerCase());
+      let triCol=low.findIndex(h=>h.includes('trigram')); if(triCol<0) triCol=0;
+      const fnCol=low.findIndex(h=>h.includes('first'));
+      const lnCol=low.findIndex(h=>h.includes('last'));
+      const authCols=[]; header.forEach((h,i)=>{ const u=h.toUpperCase(); if(KS.has(u)) authCols.push({i,code:u}); });
+      let upd=0,cre=0,ppl=0,notFound=[];
+      for(let r=hr+1;r<arr.length;r++){
+        const row=arr[r]; if(!row) continue;
+        const tri=(row[triCol]==null?'':row[triCol]).toString().trim().toUpperCase();
+        if(!tri) continue;
+        let emp=S.personnel.find(p=>(p.trigramme||'').toUpperCase()===tri);
+        if(!emp && fnCol>=0 && lnCol>=0){
+          const fn=(row[fnCol]||'').toString().trim().toLowerCase(), ln=(row[lnCol]||'').toString().trim().toLowerCase();
+          if(fn&&ln) emp=S.personnel.find(p=>(p.prenom||'').toLowerCase()===fn&&(p.nom||'').toLowerCase()===ln);
+        }
+        if(!emp){ if(authCols.some(({i})=>_d(row[i]))) notFound.push(tri); continue; }
+        ppl++;
+        authCols.forEach(({i,code})=>{
+          const dexp=_d(row[i]); if(!dexp) return;
+          const ex=S.autorisations.find(a=>a.empId===emp.id&&(a.type||'').toUpperCase()===code);
+          if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
+          else { S.autorisations.push({id:uid(),empId:emp.id,type:code,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
+        });
       }
-      return null;
-    };
-
-    let n=0,skip=0,notFound=[];
-    rows.slice(1).forEach((row,i)=>{
-      if(!row||row.every(c=>!c))return;
-      const emp=findEmp(row);
-      if(!emp){notFound.push(`Ligne ${i+2}: "${row[0]||''} ${row[1]||''} ${row[2]||''}"`);skip++;return;}
-      const type=normalizeType(row[3]);
-      if(!type)return;
-      S.autorisations.push({id:uid(),empId:emp.id,type,dateObtention:xlsDate(row[4]),dateExpiration:xlsDate(row[5]),notes:row[6]||''});
-      n++;
+      save();renderAutorisations();renderDash();
+      let msg=`\u2705 Autorisations import\u00e9es !\n\n\ud83d\udd04 ${upd} mise(s) \u00e0 jour\n\u2795 ${cre} cr\u00e9\u00e9e(s)\n\ud83d\udc64 ${ppl} personne(s) trait\u00e9e(s)`;
+      if(notFound.length){ const u=[...new Set(notFound)]; msg+=`\n\n\u26a0\ufe0f ${u.length} trigramme(s) du fichier absent(s) de ton personnel${u.length<=15?` :\n${u.join(', ')}`:` (15 premiers) :\n${u.slice(0,15).join(', ')}\u2026`}`; }
+      alert(msg);
+    }catch(err){ console.error(err); alert('\u274c Erreur import: '+err.message); }
     });
-
-    save();renderAutorisations();renderDash();
-    let msg=`✅ ${n} autorisation(s) importée(s) !`;
-    if(skip>0)msg+=`\n⚠️ ${skip} ligne(s) ignorée(s) :\n${notFound.slice(0,5).join('\n')}${notFound.length>5?'\n...':''}`;
-    alert(msg);
   };
   reader.readAsArrayBuffer(file);
   e.target.value='';
