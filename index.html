@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-CONDUITEAUTOS -->
+<!-- AeroStaff Pro v7 — Build 20260621-NOTICEUPD -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -444,6 +444,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5) brightnes
 
 /* ═══ TABLE ═══ */
 .tscroll{overflow-x:auto}
+.tscroll-v{max-height:65vh;overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{
   background:#0f1828;color:var(--t3);
@@ -1164,7 +1165,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     </div>
   </div>
   <div class="gc" style="overflow:hidden;padding:0">
-    <div class="tscroll">
+    <div class="tscroll tscroll-v">
       <table><thead><tr>
         <th>Employé</th><th>TRI</th><th>Catégorie</th><th>Formation</th>
         <th>Obtention</th><th>Expiration</th><th>Statut</th><th>Notes</th><th></th>
@@ -2186,7 +2187,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Compteurs clés</strong> — effectif, techniciens actifs, intérimaires, apprentis<br>
         • <strong style="color:#ffd060">Alertes formations</strong> — habilitations expirant dans les 30 jours<br>
         • <strong style="color:#ffd060">Ratio charge/capacité</strong> — aperçu de la semaine en cours<br>
-        • <strong style="color:#ffd060">Chantiers en cours</strong> — statut rapide
+        • <strong style="color:#ffd060">Chantiers en cours</strong> — statut rapide<br>
+        • <strong style="color:#ffd060">🎨 Fond d'écran</strong> — bouton en haut de l'app pour choisir l'ambiance (couleurs, nébuleuse, blueprint, réacteur, turbine, ATR, 737… ou aucun)
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Se met à jour automatiquement à chaque ouverture.</div>
       </div>
     </div>
@@ -2197,9 +2199,14 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">+ Formation</strong> — type, date d'obtention et date d'expiration<br>
-        • <strong style="color:#ffd060">Alertes auto</strong> — orange si expiration dans 30j, rouge si expirée<br>
-        • <strong style="color:#ffd060">Filtre par personne</strong> — liste déroulante pour cibler un technicien<br>
+        • <strong style="color:#ffd060">Affichage par personne (accordéon)</strong> — une ligne par employé avec un résumé (nombre de formations + pastilles ❌ expirées / ⚠️ bientôt / ✅ valides / ∞ sans limite). Clique sur une personne pour <strong>déplier</strong> ses formations, re-clique pour replier.<br>
+        • <strong style="color:#ffd060">Tri par urgence</strong> — les personnes ayant une formation expirée ou bientôt expirée remontent en haut, puis classement alphabétique<br>
+        • <strong style="color:#ffd060">Zone défilante</strong> — la liste défile dans un cadre à hauteur fixe, en-tête de colonnes figé<br>
+        • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 par nom, prénom ou trigramme (déplie automatiquement les résultats)<br>
+        • <strong style="color:#ffd060">Alertes auto</strong> — orange si expiration proche (moins de 60j), rouge si expirée<br>
+        • <strong style="color:#ffd060">Filtres</strong> — par personne, type ou statut<br>
         • <strong style="color:#ffd060">Badge onglet</strong> — compteur rouge si formations à renouveler
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Import suivi RH (2 fichiers)</strong> — met à jour les formations depuis les fichiers Excel Qualité + SSE (Trainings + Qualifications SSE), avec aperçu avant application. Les <strong>CACES passés en centre</strong> restent ici ; les autorisations de conduite partent dans l'onglet Autorisations.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(255,154,60,0.05);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ Renseigne toujours les dates d'expiration pour activer les alertes.</div>
       </div>
     </div>
@@ -2213,7 +2220,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Code couleur</strong> — chaque chantier a sa couleur ; congés, formations, absences, fériés et week-ends ont la leur<br>
         • <strong style="color:#ffd060">Colonne des noms en noir</strong> — figée à gauche au défilement, regroupée par catégorie de personnel<br>
         • <strong style="color:#ffd060">Clic sur une case</strong> — saisir/modifier l'activité (mêmes données que le Planning Hebdo)<br>
-        • <strong style="color:#ffd060">Filtres</strong> — par personne et par année<br>
+        • <strong style="color:#ffd060">Filtres &amp; recherche</strong> — par personne, par année, et barre 🔍 (nom, prénom ou trigramme)<br>
         • <strong style="color:#ffd060">📊 Export Excel coloré</strong> — fichier .xlsx avec les couleurs des chantiers, personnel regroupé par catégorie, nom de chantier + MSN dans chaque case, volets figés et légendes<br>
         • <strong style="color:#ffd060">📄 Export PDF</strong> — rendu coloré regroupé par catégorie, nom de chantier complet dans les cases + légende, idéal à envoyer aux collaborateurs
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Après avoir saisi une case, le planning <strong>reste à la position où tu étais</strong> — plus besoin de rescroller. Mêmes données que le Planning Hebdo.</div>
@@ -2232,6 +2239,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">2 chantiers par demi-journée</strong> — une demi-journée peut porter un 2ᵉ chantier optionnel (jusqu'à 4 chantiers/jour). Les 3,5 h sont alors divisées à parts égales (1,75 h chacun). La case s'affiche en 2 bandes de couleur avec le MSN de chaque avion.<br>
         • <strong style="color:#ffd060">Copier semaine</strong> — duplique le planning vers une autre semaine<br>
         • <strong style="color:#ffd060">📊 Export Excel coloré & 📄 PDF</strong> — rendu identique à l'app, avec couleurs, MSN des chantiers et légendes (cases scindées pour les demi-journées à 2 chantiers)<br>
+        • <strong style="color:#ffd060">Sélecteurs employé + année</strong> — cibler une personne précise et sauter directement à une autre année<br>
+        • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 par nom, prénom ou trigramme<br>
         • <strong style="color:#ffd060">Navigation</strong> — ← Préc. / Aujourd'hui / Suiv. →
         <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les absences saisies ici sont déduites automatiquement de la capacité dans Programme Activité. Après chaque saisie, la vue <strong>reste à la même position</strong> pour enchaîner les cases sans rescroller.</div>
       </div>
@@ -2244,6 +2253,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">+ Chantier</strong> — client, avion, MSN, dates, volume Man Hours, techniciens requis. Le nom est composé automatiquement « Client — Avion — MSN ».<br>
         • <strong style="color:#ffd060">Statuts</strong> — En cours / Futur / Prévu / Terminé — impactent la charge<br>
+        • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 (sur la ligne « N chantier(s) sur l'année ») par MSN ou client<br>
         • <strong style="color:#ffd060">Suivi d'avancement</strong> (carte sur le dashboard) — avancement <strong>réel</strong> = MH consommées (techniciens/intérimaires affectés dans le planning × 7 h/jour) ÷ MH total, comparé à l'avancement <strong>théorique</strong> (jours ouvrés écoulés) → statut ✅ en avance / 🟡 dans les temps / 🚨 en retard<br>
         • <strong style="color:#ffd060">Volume MH</strong> — saisissable directement sur la carte du dashboard (ou dans la fiche)<br>
         • <strong style="color:#ffd060">🔧 Heures ajoutées</strong> — sur chaque chantier en cours, ajoutez des heures de rectification/défaut (motif + heures, autant que nécessaire). L'app affiche alors les <strong>deux avancements</strong> (périmètre initial vs révisé) et calcule l'<strong>impact</strong> : combien de techniciens ajouter pour tenir la date, ou la nouvelle date de livraison à effectif constant.
@@ -2261,6 +2271,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Calcul auto</strong> — MH → nombre de techniciens (base 35h/semaine)<br>
         • <strong style="color:#ffd060">Charge hebdo</strong> — tableau navigation ← →<br>
         • <strong style="color:#ffd060">Intégration</strong> — besoins remontent dans Programme Activité (✈️)
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🏗 <strong>Occupation Slot Hangar</strong> — la grille annuelle affiche une <strong>bande « Mois »</strong> en haut, qui reste visible au défilement. L'<strong>historique d'occupation</strong> est regroupé par MSN (périodes contiguës fusionnées) ; les exports PDF/Excel suivent ce regroupement — Excel sur 2 feuilles : mois courant + historique complet.</div>
       </div>
     </div>
     <div class="notice-section" id="n-recycling" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,154,60,0.12);border-radius:14px;overflow:hidden">
@@ -2315,10 +2326,14 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
-        • <strong style="color:#ffd060">+ Autorisation</strong> — type (Part-66, EWIS, CDCCL…), technicien, dates<br>
+        • <strong style="color:#ffd060">+ Autorisation</strong> — type (AMEC, ASTO, IMEC, ISTO, IPNT, RUN…), technicien, dates<br>
+        • <strong style="color:#ffd060">Autorisations de conduite</strong> — les engins (chariot élévateur par tonnage, plateforme verticale/multidirectionnelle, tracteur de piste, gerbeur, pont roulant, portiques…) apparaissent ici, préfixés « <strong>Conduite —</strong> » pour les distinguer des CACES passés en centre (qui restent en Formations)<br>
+        • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 par nom, prénom ou trigramme<br>
         • <strong style="color:#ffd060">Alertes auto</strong> — expirations proches ou passées signalées<br>
         • <strong style="color:#ffd060">Filtres</strong> — par personne ou par type<br>
+        • <strong style="color:#ffd060">Matrice des autorisations</strong> — tableau récapitulatif en bas de page (une colonne par code, ✓ / — par personne)<br>
         • <strong style="color:#ffd060">Badge</strong> — compteur sur l'onglet si expirations imminentes
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « Import suivi RH (2 fichiers) » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code) et les <strong>autorisations de conduite</strong> du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
       </div>
     </div>
     <div class="notice-section" id="n-programme" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2491,7 +2506,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-CONDUITEAUTOS · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-NOTICEUPD · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -5995,23 +6010,56 @@ function renderForms(){
   }).sort((a,b)=>({expired:0,warning:1,valid:2,na:3}[tSt(a.dateExpiration)]||3)-({expired:0,warning:1,valid:2,na:3}[tSt(b.dateExpiration)]||3));
   const tb=document.getElementById('formTbody');
   if(!data.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--t3)">Aucune formation trouvée</td></tr>';return;}
-  tb.innerHTML=data.map(f=>{
-    const emp=byId(f.empId);const cat=CATS[emp?.categorie||'']||{};
-    return`<tr>
-      <td style="font-weight:700">${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
+  const groups={};
+  data.forEach(f=>{ (groups[f.empId]=groups[f.empId]||[]).push(f); });
+  const rank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
+  const empIds=Object.keys(groups).sort((a,b)=>{
+    const ra=Math.min(...groups[a].map(f=>rank(tSt(f.dateExpiration))));
+    const rb=Math.min(...groups[b].map(f=>rank(tSt(f.dateExpiration))));
+    if(ra!==rb) return ra-rb;
+    const ea=byId(a),eb=byId(b);
+    return `${ea?ea.nom+' '+ea.prenom:''}`.localeCompare(`${eb?eb.nom+' '+eb.prenom:''}`,'fr');
+  });
+  const expandAll=!!(_fq||tF||sF||eF);
+  tb.innerHTML=empIds.map(empId=>{
+    const emp=byId(empId);
+    const list=groups[empId].slice().sort((a,b)=>rank(tSt(a.dateExpiration))-rank(tSt(b.dateExpiration)));
+    const cnt={expired:0,warning:0,valid:0,na:0};
+    list.forEach(f=>{ const s=tSt(f.dateExpiration); cnt[s]=(cnt[s]||0)+1; });
+    const sum=[];
+    if(cnt.expired) sum.push(`<span style="color:var(--rose);font-weight:700">❌ ${cnt.expired}</span>`);
+    if(cnt.warning) sum.push(`<span style="color:#ffb454;font-weight:700">⚠️ ${cnt.warning}</span>`);
+    if(cnt.valid) sum.push(`<span style="color:#6effc4">✅ ${cnt.valid}</span>`);
+    if(cnt.na) sum.push(`<span style="color:var(--t3)">∞ ${cnt.na}</span>`);
+    const open=expandAll;
+    const hdr=`<tr onclick="_formToggleEmp('${empId}')" style="cursor:pointer;background:rgba(0,210,255,0.05);border-top:1px solid rgba(255,255,255,0.07)">
+      <td style="font-weight:800"><span id="femptog-${empId}" style="display:inline-block;width:16px;color:var(--cyan)">${open?'▾':'▸'}</span>${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
       <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${emp?.trigramme||'—'}</span></td>
       <td>${catBadge(emp?.categorie||'')}</td>
+      <td colspan="5" style="color:var(--t3);font-size:12px">${list.length} formation(s)&nbsp;&nbsp;·&nbsp;&nbsp;${sum.join('&nbsp;&nbsp;')}</td>
+      <td></td>
+    </tr>`;
+    const rows=list.map(f=>`<tr data-femp="${empId}" style="display:${open?'table-row':'none'}">
+      <td></td><td></td>
+      <td style="text-align:right;color:var(--t4);font-size:11px">↳</td>
       <td style="font-weight:600">${f.type}</td>
       <td style="color:var(--t3)">${disp(f.dateObtention)}</td>
       <td style="font-weight:${tSt(f.dateExpiration)==='expired'?'700':'400'};color:${tSt(f.dateExpiration)==='expired'?'var(--rose)':'var(--t1)'}">${disp(f.dateExpiration)}</td>
       <td>${SBADGE[tSt(f.dateExpiration)]||''}</td>
       <td style="font-size:11px;color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.notes||'—'}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-xs" onclick="editForm('${f.id}')">✏</button>
-        <button class="btn btn-rose btn-xs" onclick="delForm('${f.id}')">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();editForm('${f.id}')">✏</button>
+        <button class="btn btn-rose btn-xs" onclick="event.stopPropagation();delForm('${f.id}')">🗑</button>
       </td>
-    </tr>`;
+    </tr>`).join('');
+    return hdr+rows;
   }).join('');
+}
+function _formToggleEmp(key){
+  const rows=document.querySelectorAll('tr[data-femp="'+key+'"]');
+  let show=false;
+  rows.forEach(r=>{ const s=r.style.display==='none'; r.style.display=s?'table-row':'none'; if(s)show=true; });
+  const t=document.getElementById('femptog-'+key); if(t) t.textContent=show?'▾':'▸';
 }
 function openFormModal(id){
   document.getElementById('fi').value=id||'';
