@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-NOTICEUPD -->
+<!-- AeroStaff Pro v7 — Build 20260621-AUTOACCORD -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1647,7 +1647,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
   <!-- Table -->
   <div class="gc" style="overflow:hidden;padding:0;margin-bottom:14px">
-    <div class="tscroll">
+    <div class="tscroll tscroll-v">
       <table><thead><tr>
         <th>Employé</th><th>TRI</th><th>Catégorie</th><th>Autorisation</th>
         <th>Obtention</th><th>Expiration</th><th>Statut</th><th>Notes</th><th></th>
@@ -2506,7 +2506,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-NOTICEUPD · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AUTOACCORD · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -9987,28 +9987,63 @@ function renderAutorisations(){
   if(!data.length){
     tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--t3)">Aucune autorisation trouvée</td></tr>';
   } else {
-    tb.innerHTML=data.map(a=>{
-      const emp=byId(a.empId);const cat=CATS[emp?.categorie||'']||{};
-      const s=tSt(a.dateExpiration);
-      return`<tr>
-        <td style="font-weight:700">${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
+    const groups={};
+    data.forEach(a=>{ (groups[a.empId]=groups[a.empId]||[]).push(a); });
+    const rank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
+    const empIds=Object.keys(groups).sort((x,y)=>{
+      const rx=Math.min(...groups[x].map(a=>rank(tSt(a.dateExpiration))));
+      const ry=Math.min(...groups[y].map(a=>rank(tSt(a.dateExpiration))));
+      if(rx!==ry) return rx-ry;
+      const ex=byId(x),ey=byId(y);
+      return `${ex?ex.nom+' '+ex.prenom:''}`.localeCompare(`${ey?ey.nom+' '+ey.prenom:''}`,'fr');
+    });
+    const expandAll=!!(_aq||tF||sF||eF);
+    tb.innerHTML=empIds.map(empId=>{
+      const emp=byId(empId);
+      const list=groups[empId].slice().sort((a,b)=>rank(tSt(a.dateExpiration))-rank(tSt(b.dateExpiration)));
+      const cnt={expired:0,warning:0,valid:0,na:0};
+      list.forEach(a=>{ const s=tSt(a.dateExpiration); cnt[s]=(cnt[s]||0)+1; });
+      const sum=[];
+      if(cnt.expired) sum.push(`<span style="color:var(--rose);font-weight:700">❌ ${cnt.expired}</span>`);
+      if(cnt.warning) sum.push(`<span style="color:#ffb454;font-weight:700">⚠️ ${cnt.warning}</span>`);
+      if(cnt.valid) sum.push(`<span style="color:#6effc4">✅ ${cnt.valid}</span>`);
+      if(cnt.na) sum.push(`<span style="color:var(--t3)">∞ ${cnt.na}</span>`);
+      const open=expandAll;
+      const hdr=`<tr onclick="_autoToggleEmp('${empId}')" style="cursor:pointer;background:rgba(0,210,255,0.05);border-top:1px solid rgba(255,255,255,0.07)">
+        <td style="font-weight:800"><span id="autoemptog-${empId}" style="display:inline-block;width:16px;color:var(--cyan)">${open?'▾':'▸'}</span>${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
         <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${emp?.trigramme||'—'}</span></td>
         <td>${catBadge(emp?.categorie||'')}</td>
+        <td colspan="5" style="color:var(--t3);font-size:12px">${list.length} autorisation(s)&nbsp;&nbsp;·&nbsp;&nbsp;${sum.join('&nbsp;&nbsp;')}</td>
+        <td></td>
+      </tr>`;
+      const rows=list.map(a=>{
+        const s=tSt(a.dateExpiration);
+        return `<tr data-aemp="${empId}" style="display:${open?'table-row':'none'}">
+        <td></td><td></td>
+        <td style="text-align:right;color:var(--t4);font-size:11px">↳</td>
         <td><span class="badge" style="background:rgba(0,210,255,0.1);color:var(--cyan);border:1px solid rgba(0,210,255,0.25);font-family:'JetBrains Mono',monospace;font-size:11px">${a.type}</span></td>
         <td style="color:var(--t3)">${disp(a.dateObtention)}</td>
         <td style="font-weight:${s==='expired'?'700':'400'};color:${s==='expired'?'var(--rose)':'var(--t1)'}">${disp(a.dateExpiration)}</td>
         <td>${SBADGE[s]||''}</td>
         <td style="font-size:11px;color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.notes||'—'}</td>
         <td style="white-space:nowrap">
-          <button class="btn btn-ghost btn-xs" onclick="editAutorisation('${a.id}')">✏</button>
-          <button class="btn btn-rose btn-xs" onclick="delAutorisation('${a.id}')">🗑</button>
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();editAutorisation('${a.id}')">✏</button>
+          <button class="btn btn-rose btn-xs" onclick="event.stopPropagation();delAutorisation('${a.id}')">🗑</button>
         </td>
       </tr>`;
+      }).join('');
+      return hdr+rows;
     }).join('');
   }
 
   // Matrix
   renderAutoMatrix();
+}
+function _autoToggleEmp(key){
+  const rows=document.querySelectorAll('tr[data-aemp="'+key+'"]');
+  let show=false;
+  rows.forEach(r=>{ const s=r.style.display==='none'; r.style.display=s?'table-row':'none'; if(s)show=true; });
+  const t=document.getElementById('autoemptog-'+key); if(t) t.textContent=show?'▾':'▸';
 }
 
 function renderAutoMatrix(){
