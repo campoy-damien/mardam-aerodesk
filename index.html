@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-PDFFULLNAME -->
+<!-- AeroStaff Pro v7 — Build 20260621-PART21NEO -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -489,7 +489,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   border:none;background:transparent;color:var(--t4);
   font-family:'Outfit',sans-serif;letter-spacing:0.3px;
   transition:filter .12s,opacity .12s;padding:1px 3px;
-  text-align:center;line-height:1.2;user-select:none;
+  text-align:center;line-height:1.2;user-select:none;white-space:nowrap;
 }
 .hd:first-child{border-bottom:1px solid rgba(255,255,255,0.05)}
 .hd:hover{filter:brightness(1.3) saturate(1.2)}
@@ -1982,8 +1982,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field" style="grid-column:1/-1"><label>Type avion</label>
       <select id="airbus-msn-type">
         <option value="">— Sélectionner —</option>
-        <option>A220</option><option>A319</option><option>A320 CEO</option><option>A320 NEO</option>
-        <option>A321 CEO</option><option>A321 NEO</option><option>A330</option><option>A350</option><option>A380</option>
+        <option>A319 NEO</option><option>A320 NEO</option><option>A321 NEO</option>
       </select></div>
     <div class="field" style="grid-column:1/-1"><label>Activité *</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
@@ -2506,7 +2505,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PDFFULLNAME · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-PART21NEO · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2803,8 +2802,13 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="Boeing 737 NG">Boeing 737 NG</option>
         <option value="Boeing 737 MAX">Boeing 737 MAX</option>
         <option value="A220">A220</option>
+        <option value="A318 CEO">A318 CEO</option>
+        <option value="A319 CEO">A319 CEO</option>
         <option value="A320 CEO">A320 CEO</option>
+        <option value="A321 CEO">A321 CEO</option>
+        <option value="A319 NEO">A319 NEO</option>
         <option value="A320 NEO">A320 NEO</option>
+        <option value="A321 NEO">A321 NEO</option>
         <option value="Autre">Autre...</option>
       </select>
     </div>
@@ -2877,7 +2881,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field" style="grid-column:1/-1">
       <label>Couleur du chantier</label>
       <div class="swatches" id="cSwatches"></div>
-      <input type="hidden" id="c-color" value="#2979ff">
+      <div id="c-color-warn" style="display:none;margin-top:8px;padding:7px 10px;background:rgba(255,154,60,0.12);border:1px solid rgba(255,154,60,0.35);border-radius:8px;font-size:12px;color:#ffb454"></div>
+      <input type="hidden" id="c-color" value="#2962FF">
     </div>
   </div>
   <div class="mfooter">
@@ -3195,7 +3200,7 @@ const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO
 const AUTORISATIONS_LIST = ['AMEC','ASTO','IMEC','ISTO','AELE','IELE','ASTR','ISTR','ACOM','ICOM','AENB','IENB','ABAT','IBAT','RUN','PART21','IPNT'];
 const MO = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const D3 = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-const CCOLORS = ['#2979ff','#00e5b0','#ff9a3c','#ff4d6d','#c084fc','#ffd060','#84fab0','#5ac8fa','#ff6b9d','#00d2ff','#a78bfa','#fb923c','#ff1744','#00e676','#ffea00','#d500f9','#651fff','#76ff03','#ff6d00','#f50057'];
+const CCOLORS = ['#2962FF','#00ACC1','#00897B','#43A047','#9E9D24','#F57F17','#E64A19','#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#6D4C41','#546E7A','#0288D1','#7CB342','#FF7043','#EC407A','#6A1B9A','#283593','#1B5E20','#AD1457','#827717','#00838F'];
 const CATS = {
   responsable:{ lbl:'Responsable Projet',  col:'var(--responsable)', b:'b-resp'},
   chef:       { lbl:"Chef d'équipe",        col:'var(--chef)',        b:'b-chef'},
@@ -6353,16 +6358,19 @@ function _chColor(cid){
   const ch=S.chantiers.find(c=>c.id===cid); return ch?.color||'#2979ff';
 }
 // Libellé compact = MSN avion uniquement (sans client), pour gagner de la place
+function _avShort(t){ return (t||'').replace('Boeing 737 ','B737').replace('Boeing ','B').replace('Airbus ','').replace('ATR 72','ATR72').replace('ATR 42','ATR42').replace(' CEO','').replace(' NEO','').replace(' CL','').replace(' NG','').replace(' MAX','').trim(); }
 function _chMsnLabel(cid){
   if(!cid) return '';
-  if(cid==='STO') return 'STO';
-  if(cid==='AIRBUS') return 'P21';
-  if(cid==='REC') return 'REC';
-  if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); return av?('MSN'+(av.msn||'?')):'REC'; }
+  if(cid==='STO') return '\u2708\ufe0f STO';
+  if(cid==='AIRBUS') return '\u2708\ufe0f P21';
+  if(cid==='REC') return '\u267b\ufe0f REC';
+  if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(t?t+' - ':'')+(av.msn||'?'); }
   const ch=S.chantiers.find(c=>c.id===cid);
-  if(!ch) return 'Trav.';
-  return ch.msn?('MSN'+ch.msn):((ch.avion||ch.nom||'Trav.').slice(0,8));
+  if(!ch) return '\ud83d\udd27 Trav.';
+  const t=_avShort(ch.avion);
+  return '\ud83d\udd27 '+(t?t+' - ':'')+(ch.msn||(ch.nom||'Trav.').slice(0,8));
 }
+function _chIncomplete(cid){ const ch=S.chantiers.find(c=>c.id===cid); if(!ch) return false; return !((ch.avion||'').trim()) || !((ch.msn||'').trim()); }
 
 // Personnes hors production (actif=false) ayant au moins un jour de planning sur la période (traçabilité)
 function _inactifsAvecPlanning(dates){
@@ -6506,20 +6514,12 @@ function buildGrid(emps,dates,containerId){
         return '♻️'+t+' '+(av.msn||'');
       };
       const amLbl=at==='travail'&&am.chantierId
-        ?(am.chantierId==='STO'?'✈️ STO'
-          :amRecAv?getRecLbl(amRecAv)
-          :am.chantierId==='REC'?'♻️'
-          :am.chantierId==='AIRBUS'?'✈️ P21'
-          :(S.chantiers.find(c=>c.id===am.chantierId)?.nom||'Travail').slice(0,7))
+        ?_chMsnLabel(am.chantierId)
         :at==='formation'?(am.note||'Form.').slice(0,7)
         :at==='formation_int'?('📖'+(am.formInt||'').slice(0,8))
         :(HD_LBL[at]||'');
       const pmLbl=pt==='travail'&&pm.chantierId
-        ?(pm.chantierId==='STO'?'✈️ STO'
-          :pmRecAv?getRecLbl(pmRecAv)
-          :pm.chantierId==='REC'?'♻️'
-          :pm.chantierId==='AIRBUS'?'✈️ P21'
-          :(S.chantiers.find(c=>c.id===pm.chantierId)?.nom||'Travail').slice(0,7))
+        ?_chMsnLabel(pm.chantierId)
         :pt==='formation'?(pm.note||'Form.').slice(0,7)
         :pt==='formation_int'?('📖'+(pm.formInt||'').slice(0,8))
         :(HD_LBL[pt]||'');
@@ -6934,7 +6934,7 @@ function openChantierNew(){
   _equipeSetSelection([]);
   const _es=document.getElementById('c-equipe-search'); if(_es){_es.value='';_filterEquipe('');}
   const _ab=document.getElementById('c-equipe-abs'); if(_ab) _ab.innerHTML='';
-  renderSwatches('#2979ff');openM('m-chantier');
+  renderSwatches(_nextFreeColor());openM('m-chantier');
 }
 
 function editChantier(id){
@@ -6943,7 +6943,7 @@ function editChantier(id){
   document.getElementById('c-nom').value=c.nom||'';document.getElementById('c-client').value=c.client||'';
   document.getElementById('c-msn').value=c.msn||'';
   // Charger type avion
-  const avionOpts=['ATR 42','ATR 72','Boeing 737 CL','Boeing 737 NG','Boeing 737 MAX','A220','A320 CEO','A320 NEO'];
+  const avionOpts=['ATR 42','ATR 72','Boeing 737 CL','Boeing 737 NG','Boeing 737 MAX','A220','A318 CEO','A319 CEO','A320 CEO','A321 CEO','A319 NEO','A320 NEO','A321 NEO'];
   const avionVal=c.avion||'';
   if(avionOpts.includes(avionVal)){
     document.getElementById('c-avion').value=avionVal;
@@ -6986,10 +6986,26 @@ function editChantier(id){
   _checkEquipeAbsences();
 }
 
+function _activeChantiers(){ return (S.chantiers||[]).filter(c=>c.statut!=='termine'); }
+function _colorUsers(hex,excludeId){ hex=(hex||'').toLowerCase(); return _activeChantiers().filter(c=>c.id!==excludeId && (c.color||'').toLowerCase()===hex); }
+function _nextFreeColor(){ const used=new Set(_activeChantiers().map(c=>(c.color||'').toLowerCase())); return CCOLORS.find(c=>!used.has(c.toLowerCase()))||CCOLORS[0]; }
+function _updateColorWarn(hex){
+  const w=document.getElementById('c-color-warn'); if(!w) return;
+  const cur=document.getElementById('ci')?.value||'';
+  const users=_colorUsers(hex,cur);
+  if(users.length){
+    const list=users.map(c=>c.msn?('MSN '+c.msn):(c.nom||c.client||'chantier')).join(', ');
+    w.innerHTML=`\u26a0\ufe0f Couleur déjà utilisée par : <strong>${list}</strong>`;
+    w.style.display='block';
+  } else { w.style.display='none'; w.innerHTML=''; }
+}
 function renderSwatches(sel){
   const wrap=document.getElementById('cSwatches');if(!wrap)return;
-  wrap.innerHTML=CCOLORS.map(col=>`<div class="sw${col===sel?' on':''}" style="background:${col}" onclick="pickColor('${col}')" title="${col}"></div>`).join('');
+  let pal=CCOLORS.slice();
+  if(sel && !pal.some(c=>c.toLowerCase()===sel.toLowerCase())) pal=[sel,...pal];
+  wrap.innerHTML=pal.map(col=>`<div class="sw${col.toLowerCase()===(sel||'').toLowerCase()?' on':''}" style="background:${col}" onclick="pickColor('${col}')" title="${col}"></div>`).join('');
   document.getElementById('c-color').value=sel;
+  _updateColorWarn(sel);
 }
 function pickColor(col){renderSwatches(col);}
 
@@ -7507,6 +7523,7 @@ function renderChantiers(){
           const eq=(c.equipe||[]).map(id=>{const p=byId(id);return p?p.trigramme:null}).filter(Boolean);
           return`<div class="kcard" style="border-left-color:${c.color||'var(--glass-border)'}" onclick="editChantier('${c.id}')">
             <div class="kcard-name">${c.nom}</div>
+            ${_chIncomplete(c.id)?`<div style="display:inline-block;margin-top:3px;margin-bottom:4px;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.4);border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800;color:#ff9a3c">\u26a0 \u00c0 COMPL\u00c9TER (type/MSN)</div>`:''}
             ${c.client?`<div style="font-size:11px;color:var(--t3);margin-bottom:5px">🏢 ${c.client}</div>`:''}
             ${c.desc?`<div style="font-size:11px;color:var(--t2);margin-bottom:6px;line-height:1.4">${c.desc.slice(0,80)}${c.desc.length>80?'…':''}</div>`:''}
             ${c.ressources&&Object.keys(c.ressources).length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${Object.entries(c.ressources).map(([k,v])=>`<span style="background:${CATS[k]?.col||'rgba(255,255,255,0.1)'}22;border:1px solid ${CATS[k]?.col||'rgba(255,255,255,0.1)'}44;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:${CATS[k]?.col||'var(--t3)'};">${v} ${CATS[k]?.lbl||k}</span>`).join('')}</div>`:''}
@@ -7713,8 +7730,8 @@ function renderRespGantt(){
       html+=`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.04);min-height:38px">
         <!-- Label chantier -->
         <div style="width:180px;flex-shrink:0;padding:8px 14px 8px 22px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center;background:rgba(0,0,0,0.15)">
-          <div style="font-size:12px;font-weight:800;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}</div>
-          <div style="font-size:10px;color:#a0b0c8;margin-top:2px">${c.client||''}</div>
+          <div ${c.special?'':`onclick="editChantier('${c.id}')" `}style="font-size:12px;font-weight:800;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${c.special?'':'cursor:pointer'}">${c.special?c.nom:_chMsnLabel(c.id)}</div>
+          ${(!c.special && _chIncomplete(c.id))?`<div style="font-size:9px;font-weight:700;color:#ff9a3c;margin-top:2px">\u26a0 \u00e0 compl\u00e9ter</div>`:''}
         </div>
         <!-- Barre Gantt -->
         <div style="flex:1;position:relative;background:rgba(0,0,0,0.1)">
@@ -7727,7 +7744,6 @@ function renderRespGantt(){
           <div ${c.special?'':`onclick="editChantier('${c.id}')"`} title="${barTitle}"
             style="position:absolute;top:6px;bottom:6px;left:${l}%;width:${w}%;background:${col};border-radius:6px;${c.special?'':'cursor:pointer;'}z-index:3;box-shadow:0 2px 10px ${col}55;transition:opacity .15s;display:flex;align-items:center;padding:0 8px"
             onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
-            ${c.special?`<span style="font-size:9px;font-weight:800;color:#fff;white-space:nowrap">${role}</span>`:''}
           </div>
         </div>
       </div>`;
@@ -8990,7 +9006,7 @@ function openAvionToChantier(id){
   document.getElementById('c-msn').value=av.msn||'';
   document.getElementById('c-desc').value=av.notes||'';
   // Type avion
-  const avionOpts=['ATR 42','ATR 72','Boeing 737 CL','Boeing 737 NG','Boeing 737 MAX','A220','A320 CEO','A320 NEO'];
+  const avionOpts=['ATR 42','ATR 72','Boeing 737 CL','Boeing 737 NG','Boeing 737 MAX','A220','A318 CEO','A319 CEO','A320 CEO','A321 CEO','A319 NEO','A320 NEO','A321 NEO'];
   if(avionOpts.includes(av.type)){
     document.getElementById('c-avion').value=av.type;
     toggleAvionAutre(av.type);
@@ -9662,7 +9678,7 @@ function openPanel(id){
       </div>${SBADGE[tSt(f.dateExpiration)]||''}
     </div>`).join('')||'<div style="font-size:12px;color:var(--t4);padding:8px 0">Aucune formation</div>'}
     ${mC.length?`<div class="sdiv" style="margin-top:14px">Chantiers (${mC.length})</div>
-    ${mC.map(c=>`<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04)"><div style="display:flex;align-items:center;gap:7px"><div style="width:8px;height:8px;border-radius:50%;background:${c.color||'var(--t4)'}"></div><div style="font-size:12px;font-weight:700;color:var(--t1)">${c.nom}</div></div><div style="font-size:10px;color:var(--t3);margin-top:2px;padding-left:15px">${c.client||''} ${c.debut?'· '+disp(c.debut):''}</div></div>`).join('')}`:''}
+    ${mC.map(c=>`<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04)"><div style="display:flex;align-items:center;gap:7px"><div style="width:8px;height:8px;border-radius:50%;background:${c.color||'var(--t4)'}"></div><div style="font-size:12px;font-weight:700;color:var(--t1)">${_chMsnLabel(c.id)}</div></div><div style="font-size:10px;color:var(--t3);margin-top:2px;padding-left:15px">${c.debut?disp(c.debut)+(c.fin?' → '+disp(c.fin):''):''}</div></div>`).join('')}`:''}
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--glass-border)">
       <button class="btn btn-cyan btn-sm" onclick="editPersonnel('${id}')">✏ Modifier</button>
       <button class="btn btn-ghost btn-sm" onclick="closePanel();openFormModal();document.getElementById('f-emp').value='${id}'">+ Formation</button>
@@ -9682,8 +9698,13 @@ function updateAvrMoteur(val){
   const MOTEURS={
     'ATR 42':['PW120','PW124','PW127'],
     'ATR 72':['PW120','PW124','PW127'],
+    'A318 CEO':['CFM56','V2500'],
+    'A319 CEO':['CFM56','V2500'],
     'A320 CEO':['CFM56','V2500'],
+    'A321 CEO':['CFM56','V2500'],
+    'A319 NEO':['PW1100G','LEAP-1A'],
     'A320 NEO':['PW1100G','LEAP-1A'],
+    'A321 NEO':['PW1100G','LEAP-1A'],
     'Boeing 737 CL':['CFM56-3'],
     'Boeing 737 NG':['CFM56-7'],
     'Boeing 737 MAX':['LEAP-1B'],
@@ -9722,8 +9743,13 @@ function toggleAvionAutre(val){
   const MOTEURS={
     'ATR 42':['PW120','PW124','PW127'],
     'ATR 72':['PW120','PW124','PW127'],
+    'A318 CEO':['CFM56','V2500'],
+    'A319 CEO':['CFM56','V2500'],
     'A320 CEO':['CFM56','V2500'],
+    'A321 CEO':['CFM56','V2500'],
+    'A319 NEO':['PW1100G','LEAP-1A'],
     'A320 NEO':['PW1100G','LEAP-1A'],
+    'A321 NEO':['PW1100G','LEAP-1A'],
     'Boeing 737 CL':['CFM56-3'],
     'Boeing 737 NG':['CFM56-7'],
     'Boeing 737 MAX':['LEAP-1B'],
@@ -13454,12 +13480,11 @@ function exportMasterPDF(){
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
-      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'Stockage',col:'#e65100'};
-      if(e.chantierId==='AIRBUS') return{txt:'Airbus P21',col:'#0277bd'};
-      if(e.chantierId==='REC') return{txt:'Recyclage',col:'#2e7d32'};
-      if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?`MSN ${av.msn||'?'}`:'Recyclage',col:'#2e7d32'};}
+      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:_chMsnLabel(e.chantierId),col:'#e65100'};
+      if(e.chantierId==='AIRBUS') return{txt:_chMsnLabel(e.chantierId),col:'#0277bd'};
+      if(e.chantierId==='REC'||e.chantierId.startsWith('REC_')) return{txt:_chMsnLabel(e.chantierId),col:'#2e7d32'};
       const ch=S.chantiers.find(c=>c.id===e.chantierId);
-      return{txt:ch?ch.nom:'Travail',col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
+      return{txt:_chMsnLabel(e.chantierId),col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
     }
     if(t==='travail') return{txt:'Travail',col:'#1565c0'};
     if(t) return{txt:LBL_FULL[t]||t,col:COLS[t]||'#666'};
@@ -13497,7 +13522,7 @@ function exportMasterPDF(){
       const ds=fmt(d);const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
       const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
       const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
-      return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:6.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.02;overflow:hidden;padding:0 1px;word-break:break-word">${la.txt}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:6.5px;font-weight:800;line-height:1.02;overflow:hidden;padding:0 1px;word-break:break-word">${lp.txt}</div></div></td>`;
+      return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.02;overflow:hidden;padding:0 1px;white-space:nowrap">${la.txt}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.02;overflow:hidden;padding:0 1px;white-space:nowrap">${lp.txt}</div></div></td>`;
     }).join('');
     const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
     bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
@@ -13533,12 +13558,11 @@ function exportWeekHtml(){
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
-      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'STO',col:'#e65100'};
-      if(e.chantierId==='AIRBUS') return{txt:'P21',col:'#0277bd'};
-      if(e.chantierId==='REC') return{txt:'REC',col:'#2e7d32'};
-      if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?('MSN'+(av.msn||'?')):'REC',col:'#2e7d32'};}
+      if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:_chMsnLabel(e.chantierId),col:'#e65100'};
+      if(e.chantierId==='AIRBUS') return{txt:_chMsnLabel(e.chantierId),col:'#0277bd'};
+      if(e.chantierId==='REC'||e.chantierId.startsWith('REC_')) return{txt:_chMsnLabel(e.chantierId),col:'#2e7d32'};
       const ch=S.chantiers.find(c=>c.id===e.chantierId);
-      return{txt:ch?ch.nom:'Travail',col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
+      return{txt:_chMsnLabel(e.chantierId),col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
     }
     if(t==='travail') return{txt:'Travail',col:'#1565c0'};
     if(t) return{txt:LBL[t]||t,col:COLS[t]||'#666'};
@@ -13576,8 +13600,8 @@ function exportWeekHtml(){
       const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
       const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
       return`<td style="padding:0;border:1px solid #ddd;min-width:78px"><div style="display:flex;flex-direction:column">
-        <div style="padding:3px 5px;background:${la.col}15;border-bottom:1px solid #eee;font-size:9px;font-weight:600;color:${la.col};white-space:normal;word-break:break-word;line-height:1.2">${la.txt}</div>
-        <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2">${lp.txt}</div>
+        <div style="padding:3px 5px;background:${la.col}15;border-bottom:1px solid #eee;font-size:9px;font-weight:600;color:${la.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${la.txt}</div>
+        <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${lp.txt}</div>
       </div></td>`;
     }).join('');
     rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>${cells}</tr>`;
