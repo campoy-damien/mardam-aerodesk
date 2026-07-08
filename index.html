@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-AUTOACCORD -->
+<!-- AeroStaff Pro v7 — Build 20260621-ARCHMATRIX -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2506,7 +2506,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-AUTOACCORD · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-ARCHMATRIX · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -5944,7 +5944,7 @@ function renderDash(){
   }
 
   // Matrix — noms triés alphabétiquement (NOM Prénom)
-  const rows=_sortByNom(S.personnel).map(p=>{
+  const rows=_sortByNom(S.personnel.filter(p=>!p.archived)).map(p=>{
     const mF={}; S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
     const cat=CATS[p.categorie]||{};
     const cells=TRAININGS.map(t=>{
@@ -6002,6 +6002,7 @@ function renderForms(){
   const sF=document.getElementById('flt-status')?.value||'';
   const _fq=(document.getElementById('form-search')?.value||'').toLowerCase().trim();
   const data=S.formations.filter(f=>{
+    if(byId(f.empId)?.archived) return false;
     if(eF&&f.empId!==eF)return false;
     if(tF&&f.type!==tF)return false;
     if(sF&&tSt(f.dateExpiration)!==sF)return false;
@@ -9090,8 +9091,10 @@ function renderPersonnel(){
   if(!emps.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">👥</div><p>Aucun employé dans cette catégorie</p></div>';return;}
 
   // Séparer : actifs (cartes) vs intérimaires hors production (liste compacte en bas)
-  const horsProd=emps.filter(p=>p.categorie==='interimaire'&&p.actif===false);
-  const actifs=emps.filter(p=>!(p.categorie==='interimaire'&&p.actif===false));
+  const archivedList=emps.filter(p=>p.archived);
+  const _live=emps.filter(p=>!p.archived);
+  const horsProd=_live.filter(p=>p.categorie==='interimaire'&&p.actif===false);
+  const actifs=_live.filter(p=>!(p.categorie==='interimaire'&&p.actif===false));
 
   grid.innerHTML=actifs.map(emp=>{
     const cat=CATS[emp.categorie]||{};const ini=(emp.nom[0]||'')+(emp.prenom[0]||'');
@@ -9148,6 +9151,28 @@ function renderPersonnel(){
         <span style="font-size:11px;color:#607090;background:rgba(255,255,255,0.06);border-radius:99px;padding:2px 9px">${horsProd.length}</span>
       </div>
       <div style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden">${rows}</div>
+    </div>`;
+  }
+  if(archivedList.length){
+    const arows=archivedList.map(emp=>{
+      const ini=(emp.nom[0]||'')+(emp.prenom[0]||'');
+      return `<div onclick="openPanel('${emp.id}')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;opacity:0.78">
+        <div style="width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,0.06);color:#8090a8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <span style="font-size:13px;font-weight:700;color:#a0b0c8">${emp.nom} ${emp.prenom}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#607090;margin-left:8px">${emp.trigramme}</span>
+          <div style="font-size:10px;color:#607090;margin-top:2px">📦 ${emp.archiveMotif||'Archivé'}${emp.archiveDate?' · '+disp(emp.archiveDate):''}${emp.archiveNote?' · '+emp.archiveNote:''}</div>
+        </div>
+        <button onclick="event.stopPropagation();reintegrerPersonnel('${emp.id}')" style="flex-shrink:0;background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.3);border-radius:8px;color:#34c759;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">♻️ Réintégrer</button>
+      </div>`;
+    }).join('');
+    grid.innerHTML+=`<div style="grid-column:1/-1;margin-top:20px">
+      <div onclick="_toggleArchivedSec()" style="display:flex;align-items:center;gap:8px;padding:10px 4px;border-top:2px solid rgba(255,255,255,0.1);cursor:pointer">
+        <span id="arch-sec-chev" style="color:#8090a8;font-size:12px">▶</span>
+        <span style="font-size:13px;font-weight:800;color:#8090a8">📦 Archivés</span>
+        <span style="font-size:11px;color:#607090;background:rgba(255,255,255,0.06);border-radius:99px;padding:2px 9px">${archivedList.length}</span>
+      </div>
+      <div id="arch-sec-body" style="display:none;background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden">${arows}</div>
     </div>`;
   }
 }
@@ -9627,6 +9652,7 @@ function openPanel(id){
         ${emp.niveau?`<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#c9a8ff;background:rgba(201,168,255,0.12);border:1px solid rgba(201,168,255,0.3);border-radius:6px;padding:2px 9px">🎖 ${emp.niveau}</div>`:''}
       </div>
     </div>
+    ${emp.archived?`<div style="margin-bottom:14px;padding:10px 12px;background:rgba(255,154,60,0.1);border:1px solid rgba(255,154,60,0.3);border-radius:10px;font-size:12px;color:#ffb454"><strong>📦 Archivé</strong> — ${emp.archiveMotif||''}${emp.archiveDate?' · le '+disp(emp.archiveDate):''}${emp.archiveNote?`<br><span style="color:var(--t3)">${emp.archiveNote}</span>`:''}</div>`:''}
     <div class="sdiv">Coordonnées</div>
     ${[emp.tel?`📞 ${emp.tel}`:'',emp.email?`📧 ${emp.email}`:'',emp.dateEmbauche?`📅 Embauché le ${disp(emp.dateEmbauche)}`:'',emp.dateFin?`📅 Fin contrat : ${disp(emp.dateFin)}`:''].filter(Boolean).map(s=>`<div class="irow"><span class="irow-k">${s}</span></div>`).join('')}
     <div class="sdiv" style="margin-top:14px">Formations (${mF.length})</div>
@@ -9640,11 +9666,17 @@ function openPanel(id){
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--glass-border)">
       <button class="btn btn-cyan btn-sm" onclick="editPersonnel('${id}')">✏ Modifier</button>
       <button class="btn btn-ghost btn-sm" onclick="closePanel();openFormModal();document.getElementById('f-emp').value='${id}'">+ Formation</button>
+      ${emp.archived?`<button class="btn btn-ghost btn-sm" onclick="reintegrerPersonnel('${id}')">♻️ Réintégrer</button>`:`<button class="btn btn-ghost btn-sm" onclick="openArchive('${id}')">📦 Archiver</button>`}
       <button class="btn btn-rose btn-sm" onclick="delPersonnel('${id}')">🗑 Supprimer</button>
     </div>`;
   document.getElementById('sidePanel').classList.add('on');
 }
 function closePanel(){document.getElementById('sidePanel').classList.remove('on');}
+let _archId=null;
+function openArchive(id){ const e=byId(id); if(!e)return; _archId=id; const nm=document.getElementById('arch-name'); if(nm)nm.textContent=`${e.prenom} ${e.nom}`; const mo=document.getElementById('arch-motif'); if(mo)mo.value='Démission'; const dt=document.getElementById('arch-date'); if(dt)dt.value=fmt(new Date()); const no=document.getElementById('arch-note'); if(no)no.value=''; document.getElementById('m-archive').style.display='flex'; }
+function confirmArchive(){ const e=byId(_archId); if(!e){document.getElementById('m-archive').style.display='none';return;} e.actif=false; e.archived=true; e.archiveDate=(document.getElementById('arch-date').value)||fmt(new Date()); e.archiveMotif=document.getElementById('arch-motif').value||'Autre'; e.archiveNote=(document.getElementById('arch-note').value||'').trim(); save(); document.getElementById('m-archive').style.display='none'; closePanel(); if(typeof renderPersonnel==='function')renderPersonnel(); if(typeof renderMaster==='function')renderMaster(); if(typeof renderWeekly==='function')renderWeekly(); if(typeof renderForms==='function')renderForms(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderDash==='function')renderDash(); if(typeof popSelects==='function')popSelects(); toast(`📦 ${e.prenom} ${e.nom} archivé(e)`); _archId=null; }
+function reintegrerPersonnel(id){ const e=byId(id); if(!e)return; e.actif=true; e.archived=false; delete e.archiveDate; delete e.archiveMotif; delete e.archiveNote; save(); closePanel(); if(typeof renderPersonnel==='function')renderPersonnel(); if(typeof renderMaster==='function')renderMaster(); if(typeof renderWeekly==='function')renderWeekly(); if(typeof renderForms==='function')renderForms(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderDash==='function')renderDash(); if(typeof popSelects==='function')popSelects(); toast(`♻️ ${e.prenom} ${e.nom} réintégré(e)`); }
+function _toggleArchivedSec(){ const b=document.getElementById('arch-sec-body'); const c=document.getElementById('arch-sec-chev'); if(!b)return; const open=b.style.display==='none'; b.style.display=open?'block':'none'; if(c)c.textContent=open?'▼':'▶'; }
 
 function updateAvrMoteur(val){
   const MOTEURS={
@@ -9975,6 +10007,7 @@ function renderAutorisations(){
   const _aq=(document.getElementById('auto-search')?.value||'').toLowerCase().trim();
 
   const data=(S.autorisations||[]).filter(a=>{
+    if(byId(a.empId)?.archived) return false;
     if(eF&&a.empId!==eF)return false;
     if(tF&&a.type!==tF)return false;
     if(sF&&tSt(a.dateExpiration)!==sF)return false;
@@ -10048,7 +10081,7 @@ function _autoToggleEmp(key){
 
 function renderAutoMatrix(){
   const el=document.getElementById('autoMatrixBox'); if(!el)return;
-  const rows=S.personnel.map(p=>{
+  const rows=S.personnel.filter(p=>!p.archived).map(p=>{
     const cat=CATS[p.categorie]||{};
     const mA={};
     (S.autorisations||[]).filter(a=>a.empId===p.id).forEach(a=>mA[a.type]=a);
@@ -14186,6 +14219,26 @@ if(document.readyState==='loading'){
   <div style="display:flex;gap:8px;margin-top:18px">
     <button onclick="confirmRhImport()" style="flex:1;padding:11px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.45);border-radius:10px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px">✅ Confirmer l'import</button>
     <button onclick="document.getElementById('m-rh-import').style.display='none';_rhImportData=null" style="flex:1;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px">Annuler</button>
+  </div>
+</div></div>
+
+<!-- Modal archivage -->
+<div id="m-archive" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.85);align-items:center;justify-content:center">
+<div style="background:#0d1628;border:1px solid rgba(0,210,255,0.3);border-radius:18px;padding:26px 24px;max-width:400px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+  <div style="font-size:34px;text-align:center;margin-bottom:6px">📦</div>
+  <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;text-align:center">Archiver <span id="arch-name"></span></div>
+  <div style="font-size:12px;color:#8090b0;margin-bottom:18px;text-align:center;line-height:1.5">La personne est conservée en historique et retirée des vues actives (prod, plannings, formations, autorisations).</div>
+  <label style="display:block;font-size:12px;font-weight:700;color:#a0b0c8;margin-bottom:5px">Motif</label>
+  <select id="arch-motif" style="width:100%;padding:10px;margin-bottom:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:14px">
+    <option>Démission</option><option>Fin de contrat (CDD)</option><option>Retraite</option><option>Licenciement</option><option>Rupture conventionnelle</option><option>Mutation</option><option>Autre</option>
+  </select>
+  <label style="display:block;font-size:12px;font-weight:700;color:#a0b0c8;margin-bottom:5px">Date de départ</label>
+  <input type="date" id="arch-date" style="width:100%;padding:10px;margin-bottom:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:14px">
+  <label style="display:block;font-size:12px;font-weight:700;color:#a0b0c8;margin-bottom:5px">Note (facultatif)</label>
+  <textarea id="arch-note" rows="2" style="width:100%;padding:10px;margin-bottom:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:14px;resize:vertical"></textarea>
+  <div style="display:flex;gap:10px">
+    <button onclick="document.getElementById('m-archive').style.display='none'" style="flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#a0b0c8;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700">✕ Annuler</button>
+    <button onclick="confirmArchive()" style="flex:1;padding:12px;background:rgba(0,210,255,0.15);border:1px solid rgba(0,210,255,0.4);border-radius:10px;color:#00d2ff;cursor:pointer;font-family:'Outfit',sans-serif;font-size:14px;font-weight:800">📦 Archiver</button>
   </div>
 </div></div>
 
