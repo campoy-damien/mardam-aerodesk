@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260621-FORMFILL -->
+<!-- AeroStaff Pro v7 — Build 20260712-MATRIXCOLOR -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -817,11 +817,13 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   -webkit-writing-mode:horizontal-tb;
   transform:none;
   white-space:normal;
-  word-break:break-word;
-  height:auto;min-width:48px;max-width:60px;width:60px;
+  word-break:normal;
+  overflow-wrap:break-word;
+  hyphens:none;
+  height:auto;min-width:54px;max-width:76px;width:auto;
   vertical-align:bottom;text-align:center;
-  padding:5px 3px 4px;font-size:8px;font-weight:700;
-  color:var(--t2);letter-spacing:.1px;line-height:1.3;
+  padding:5px 3px 4px;font-size:8.5px;font-weight:700;
+  color:var(--t2);letter-spacing:.1px;line-height:1.25;
   position:sticky;top:0;z-index:10;
 }
 .mtable tbody td{padding:8px 10px}
@@ -1123,7 +1125,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div id="alertsBox"><div class="empty"><div class="empty-ico">✅</div><p>Aucune alerte — tout est à jour !</p></div></div>
   </div>
   <div class="gc">
-    <div class="gc-head"><div class="gc-title">📊 Matrice formations</div></div>
+    <div class="gc-head"><div class="gc-title">📊 Matrice formations</div>
+      <div class="btn-row">
+        <button class="btn btn-cyan btn-sm" onclick="exportFormMatrixXls()">📊 Export Excel</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportFormMatrixPDF()">📄 Export PDF</button>
+      </div>
+    </div>
     <div id="matrixBox"></div>
   </div>
 </div>
@@ -1657,7 +1664,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
   <!-- Matrice -->
   <div class="gc">
-    <div class="gc-head"><div class="gc-title">🛡 Matrice des autorisations</div></div>
+    <div class="gc-head"><div class="gc-title">🛡 Matrice des autorisations</div>
+      <div class="btn-row">
+        <button class="btn btn-cyan btn-sm" onclick="exportAutoMatrixXls()">📊 Export Excel</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportAutoMatrixPDF()">📄 Export PDF</button>
+      </div>
+    </div>
     <div id="autoMatrixBox"></div>
   </div>
 
@@ -2505,7 +2517,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260621-FORMFILL · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260712-MATRIXCOLOR · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -5690,6 +5702,126 @@ function _sortByNom(list){
   return [...list].sort((a,b)=>(a.nom+' '+a.prenom).localeCompare(b.nom+' '+b.prenom,'fr',{sensitivity:'base'}));
 }
 
+/* ═══ EXPORTS EXCEL COLORÉS — MATRICES (helpers partagés) ═══ */
+// Couleur ARGB d'une catégorie, résolue depuis les variables CSS (fallback pour catégories à couleur codée en dur)
+function _catColArgb(cat){
+  const hard={recycling:'ff9a3c',part21:'0064c8',iq:'00a0ff'};
+  if(hard[cat]) return 'FF'+hard[cat];
+  const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+  const v=getComputedStyle(document.documentElement).getPropertyValue(map[cat]||'').trim();
+  return 'FF'+(v?v.replace('#','').slice(0,6):'cccccc');
+}
+// Style d'une cellule de matrice selon le statut de validité (fond pastel + texte contrasté, palette Excel classique)
+function _matStatus(s){
+  return ({
+    valid:  {bg:'FFC6EFCE',fg:'FF1E7E34',ic:'✓'},
+    warning:{bg:'FFFFEB9C',fg:'FF9C6500',ic:'⚠'},
+    expired:{bg:'FFFFC7CE',fg:'FF9C0006',ic:'✗'},
+    na:     {bg:'FFDDEBF7',fg:'FF2F5496',ic:'∞'},
+    none:   {bg:'FFF7F7F9',fg:'FFB4BAC6',ic:'—'}
+  })[s]||{bg:'FFFFFFFF',fg:'FF000000',ic:''};
+}
+// Constructeur générique d'une matrice Excel colorée (formations OU autorisations)
+async function _buildColoredMatrixXls(opts){
+  const {title,sheetName,fileName,staff,cols,colLabel,records,recField}=opts;
+  const wb=new ExcelJS.Workbook();
+  wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
+  const ws=wb.addWorksheet(sheetName,{views:[{state:'frozen',xSplit:2,ySplit:2}],properties:{defaultRowHeight:18}});
+
+  // ── Ligne titre (fusionnée) ──
+  const total=cols.length+2;
+  const tRow=ws.addRow([title]);
+  ws.mergeCells(1,1,1,total);
+  tRow.height=26; tRow.getCell(1).font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
+  tRow.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  tRow.getCell(1).alignment={vertical:'middle',indent:1};
+
+  // ── En-tête colonnes (texte vertical) ──
+  const header=['Employé','TRI',...cols.map(colLabel)];
+  const hRow=ws.addRow(header);
+  hRow.height=120;
+  hRow.eachCell((c,ci)=>{
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1A2440'}};
+    c.font={bold:true,size:ci<=2?10:9,color:{argb:'FFFFFFFF'}};
+    c.alignment=ci<=2
+      ?{horizontal:'center',vertical:'bottom',wrapText:true}
+      :{textRotation:90,horizontal:'center',vertical:'bottom'};
+    c.border={bottom:{style:'medium',color:{argb:'FF00D2FF'}},right:{style:'hair',color:{argb:'FF3A4560'}}};
+  });
+
+  // ── Lignes personnel ──
+  staff.forEach((p,idx)=>{
+    const m={};
+    (records||[]).filter(r=>r.empId===p.id).forEach(r=>{ m[r[recField]]=r; });
+    const vals=cols.map(t=>{
+      const r=m[t]; if(!r) return '—';
+      const s=tSt(r.dateExpiration); const st=_matStatus(s);
+      if(s==='na') return '∞';
+      return `${st.ic} ${r.dateExpiration?disp(r.dateExpiration):''}`.trim();
+    });
+    const row=ws.addRow([`${p.nom} ${p.prenom}`, p.trigramme||'—', ...vals]);
+    row.height=19;
+    // Colonne Employé colorée par catégorie
+    const c0=row.getCell(1);
+    c0.fill={type:'pattern',pattern:'solid',fgColor:{argb:_catColArgb(p.categorie)}};
+    c0.font={bold:true,size:9,color:{argb:'FF14203A'}};
+    c0.alignment={vertical:'middle',indent:1};
+    c0.border={right:{style:'thin',color:{argb:'FF9AA4B8'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
+    // Colonne TRI (zébrée)
+    const c1=row.getCell(2);
+    c1.fill={type:'pattern',pattern:'solid',fgColor:{argb:idx%2?'FFEEF2F9':'FFFFFFFF'}};
+    c1.font={bold:true,size:9,color:{argb:'FF1A2440'},name:'Consolas'};
+    c1.alignment={horizontal:'center',vertical:'middle'};
+    c1.border={right:{style:'thin',color:{argb:'FF9AA4B8'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
+    // Cellules statut
+    cols.forEach((t,i)=>{
+      const cell=row.getCell(i+3);
+      const r=m[t]; const s=r?tSt(r.dateExpiration):'none'; const st=_matStatus(s);
+      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:st.bg}};
+      cell.font={size:8,bold:s!=='none',color:{argb:st.fg}};
+      cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+      cell.border={right:{style:'hair',color:{argb:'FFDFE3EC'}},bottom:{style:'hair',color:{argb:'FFDFE3EC'}}};
+    });
+  });
+
+  // Largeurs de colonnes
+  ws.columns.forEach((col,i)=>{ col.width=i===0?24:i===1?7:12; });
+  // Filtre automatique sur la plage de données (tri/filtre dynamique dans Excel)
+  ws.autoFilter={from:{row:2,column:1},to:{row:2+staff.length,column:total}};
+
+  // ── Légende catégories ──
+  ws.addRow([]);
+  const presentCats=[...new Set(staff.map(s=>s.categorie))].filter(c=>CATS[c]);
+  if(presentCats.length){
+    const lc=ws.addRow(['LÉGENDE — Catégories de personnel']);
+    lc.getCell(1).font={bold:true,size:10,color:{argb:'FF1A2440'}};
+    presentCats.forEach(cat=>{
+      const r=ws.addRow([CATS[cat].lbl]); const c=r.getCell(1);
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:_catColArgb(cat)}};
+      c.font={bold:true,size:9,color:{argb:'FF14203A'}}; c.alignment={indent:1}; r.height=15;
+    });
+  }
+  // ── Légende statut ──
+  ws.addRow([]);
+  const ls=ws.addRow(['LÉGENDE — Statut de validité']);
+  ls.getCell(1).font={bold:true,size:10,color:{argb:'FF1A2440'}};
+  [['✓ Valide','valid'],['⚠ Expire bientôt (≤ 60 j)','warning'],['✗ Expiré','expired'],['∞ Sans limite','na'],['— Non détenue','none']].forEach(([lbl,s])=>{
+    const st=_matStatus(s);
+    const r=ws.addRow([lbl]); const c=r.getCell(1);
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:st.bg}};
+    c.font={bold:true,size:9,color:{argb:st.fg}}; c.alignment={indent:1}; r.height=15;
+  });
+  // Pied
+  const foot=ws.addRow([`Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${cols.length} colonne(s) · MARDAM AeroDesk Pro`]);
+  foot.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}};
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=fileName;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
 function popSelects(){
   ['flt-emp','f-emp','mp-emp','wk-emp','t-assign','a-emp','auto-flt-emp'].forEach(id=>{
     const sel=document.getElementById(id); if(!sel)return;
@@ -6120,6 +6252,64 @@ function exportFormXls(){
       toast('❌ Erreur export: '+e.message);
     }
   });
+}
+
+// Personnel affiché dans la matrice formations (identique au rendu : non archivés, triés par nom)
+function _formMatrixStaff(){
+  return _sortByNom(S.personnel.filter(p=>!p.archived));
+}
+// Export Excel COLORÉ de la MATRICE formations (personnes triées en ligne, formations en colonnes)
+function exportFormMatrixXls(){
+  const staff=_formMatrixStaff();
+  if(!staff.length){alert('Aucun personnel à exporter');return;}
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(()=>{
+    if(!window.ExcelJS){toast('Export coloré indisponible (connexion requise une fois)');return;}
+    _buildColoredMatrixXls({
+      title:'Matrice des formations & certifications',
+      sheetName:'Matrice formations',
+      fileName:'AeroStaff_Matrice_Formations.xlsx',
+      staff, cols:TRAININGS, colLabel:t=>t,
+      records:S.formations||[], recField:'type'
+    }).then(()=>toast('✅ Matrice formations colorée ✓'))
+      .catch(e=>{ console.error(e); toast('❌ Erreur export: '+e.message); });
+  });
+}
+// Export PDF de la MATRICE formations (fenêtre d'impression)
+function exportFormMatrixPDF(){
+  const staff=_formMatrixStaff();
+  if(!staff.length){ toast('Aucun personnel à exporter'); return; }
+  const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'};
+  const clr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
+  const th=TRAININGS.map(t=>`<th class="rot" title="${t}">${t}</th>`).join('');
+  const trs=staff.map(p=>{
+    const mF={};
+    S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
+    const tds=TRAININGS.map(t=>{
+      const f=mF[t];
+      if(!f) return `<td class="c muted">—</td>`;
+      const s=tSt(f.dateExpiration);
+      const tip=f.dateExpiration?`${t} · Exp ${disp(f.dateExpiration)}`:`${t} · Sans limite`;
+      return `<td class="c" style="color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
+    }).join('');
+    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Matrice des formations</title>
+  <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
+  h1{font-size:17px;margin:0 0 4px}.sub{color:#666;font-size:11px;margin-bottom:14px}
+  table{border-collapse:collapse;margin-top:8px}th,td{border:1px solid #ccd;padding:5px 6px;font-size:10px}
+  th{background:#eef3fb;color:#1a2440}.emp{text-align:left;font-weight:700;white-space:nowrap;min-width:120px}
+  .c{text-align:center}.tri{font-family:monospace;font-weight:700}.muted{color:#aab}
+  th.rot{height:90px;white-space:nowrap;vertical-align:bottom}
+  th.rot>*{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto}
+  .legend{margin-top:14px;font-size:11px;color:#444}.foot{margin-top:20px;display:flex;align-items:center;gap:8px}</style></head><body>
+  <h1>Matrice des formations &amp; certifications</h1>
+  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${TRAININGS.length} formation(s)</div>
+  <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}</tr></thead><tbody>${trs}</tbody></table>
+  <div class="legend"><b>Légende :</b> <span style="color:${clr.valid}">✓ valide</span> · <span style="color:${clr.warning}">⚠ expire bientôt</span> · <span style="color:${clr.expired}">✗ expiré</span> · <span style="color:${clr.na}">∞ sans limite</span> · — non détenue</div>
+  <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Matrice des formations');
 }
 function handleXlsImport(e){
   const file=e.target.files[0];if(!file)return;
@@ -10128,13 +10318,35 @@ function _autoToggleEmp(key){
   const t=document.getElementById('autoemptog-'+key); if(t) t.textContent=show?'▾':'▸';
 }
 
+// Libellé de colonne compact (retire le préfixe « Conduite — » pour l'en-tête, garde le type complet en tooltip)
+function _autoColLabel(t){
+  return String(t||'').replace(/^conduite\s*[—–-]\s*/i,'').trim() || String(t||'');
+}
+// Colonnes de la matrice = codes OPS fixes + autorisations de conduite / types personnalisés présents dans les données
+function _autoMatrixCols(){
+  const base=[...AUTORISATIONS_LIST];
+  const seen=new Set(base.map(c=>c.toUpperCase()));
+  const extra=[];
+  (S.autorisations||[]).forEach(a=>{
+    const t=(a.type||'').trim(); if(!t) return;
+    const k=t.toUpperCase();
+    if(!seen.has(k)){ seen.add(k); extra.push(t); }
+  });
+  extra.sort((a,b)=>a.localeCompare(b,'fr'));
+  return base.concat(extra);
+}
+// Personnel affiché dans la matrice = production active, hors archivés ET hors « hors production » — trié alphabétiquement (nom puis prénom)
+function _autoMatrixStaff(){
+  return _sortByNom(S.personnel.filter(p=>p.actif!==false && !p.archived));
+}
 function renderAutoMatrix(){
   const el=document.getElementById('autoMatrixBox'); if(!el)return;
-  const rows=S.personnel.filter(p=>!p.archived).map(p=>{
+  const cols=_autoMatrixCols();
+  const rows=_autoMatrixStaff().map(p=>{
     const cat=CATS[p.categorie]||{};
     const mA={};
     (S.autorisations||[]).filter(a=>a.empId===p.id).forEach(a=>mA[a.type]=a);
-    const cells=AUTORISATIONS_LIST.map(t=>{
+    const cells=cols.map(t=>{
       const a=mA[t];
       if(!a) return`<td style="text-align:center;vertical-align:middle"><span style="color:var(--t4);font-size:13px">—</span></td>`;
       const s=tSt(a.dateExpiration);
@@ -10144,16 +10356,16 @@ function renderAutoMatrix(){
       return`<td style="text-align:center;vertical-align:middle" title="${tip}"><span class="badge ${cl}" style="font-size:9px;padding:3px 7px">${ic}</span></td>`;
     }).join('');
     return`<tr>
-      <td style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:140px;border:1px solid rgba(255,255,255,0.05)">${p.prenom} ${p.nom}</td>
-      <td style="padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,0.05)"><span class="badge ${cat.b||'bn'}" style="font-size:9px;font-family:'JetBrains Mono',monospace">${p.trigramme}</span></td>
+      <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px;border:1px solid rgba(255,255,255,0.05)">${p.prenom} ${p.nom}</td>
+      <td class="mx-sticky-tri" style="padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,0.05)"><span class="badge ${cat.b||'bn'}" style="font-size:9px;font-family:'JetBrains Mono',monospace">${p.trigramme}</span></td>
       ${cells}
     </tr>`;
   }).join('');
 
-  el.innerHTML=`<div class="mwrap" style="padding:6px 4px 4px"><table class="mtable"><thead><tr>
-    <th style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 12px;text-align:left;min-width:140px;font-size:11px">Employé</th>
-    <th style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 8px;text-align:center;min-width:44px;font-size:11px">TRI</th>
-    ${AUTORISATIONS_LIST.map(t=>`<th class="rot" title="${t}">${t}</th>`).join('')}
+  el.innerHTML=`<div class="mwrap" style="padding:6px 4px 4px;overflow:auto;max-height:70vh"><table class="mtable"><thead><tr>
+    <th class="mx-sticky-name mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 12px;text-align:left;min-width:150px;font-size:11px">Employé</th>
+    <th class="mx-sticky-tri mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 8px;text-align:center;min-width:44px;font-size:11px">TRI</th>
+    ${cols.map(t=>{const isC=/^conduite/i.test(t);const lbl=_autoColLabel(t).replace(/ /g,'<br>');return `<th class="rot" title="${t}">${isC?'🚜 ':''}${lbl}</th>`;}).join('')}
   </tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -10301,6 +10513,63 @@ function exportAutoXls(){
   });
 }
 
+// Export Excel COLORÉ de la MATRICE autorisations (personnes triées en ligne, autorisations en colonnes)
+function exportAutoMatrixXls(){
+  const staff=_autoMatrixStaff();
+  const cols=_autoMatrixCols();
+  if(!staff.length){alert('Aucun personnel en production à exporter');return;}
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(()=>{
+    if(!window.ExcelJS){toast('Export coloré indisponible (connexion requise une fois)');return;}
+    _buildColoredMatrixXls({
+      title:'Matrice des autorisations',
+      sheetName:'Matrice autorisations',
+      fileName:'AeroStaff_Matrice_Autorisations.xlsx',
+      staff, cols, colLabel:_autoColLabel,
+      records:S.autorisations||[], recField:'type'
+    }).then(()=>toast('✅ Matrice autorisations colorée ✓'))
+      .catch(e=>{ console.error(e); toast('❌ Erreur export: '+e.message); });
+  });
+}
+
+// Export PDF de la MATRICE (fenêtre d'impression)
+function exportAutoMatrixPDF(){
+  const staff=_autoMatrixStaff();
+  const cols=_autoMatrixCols();
+  if(!staff.length){ toast('Aucun personnel en production à exporter'); return; }
+  const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'};
+  const clr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
+  const th=cols.map(t=>{const isC=/^conduite/i.test(t);return `<th class="rot" title="${t}">${isC?'🚜 ':''}${_autoColLabel(t)}</th>`;}).join('');
+  const trs=staff.map(p=>{
+    const mA={};
+    (S.autorisations||[]).filter(a=>a.empId===p.id).forEach(a=>mA[a.type]=a);
+    const tds=cols.map(t=>{
+      const a=mA[t];
+      if(!a) return `<td class="c muted">—</td>`;
+      const s=tSt(a.dateExpiration);
+      const tip=a.dateExpiration?`${t} · Exp ${disp(a.dateExpiration)}`:`${t} · Sans limite`;
+      return `<td class="c" style="color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
+    }).join('');
+    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Matrice des autorisations</title>
+  <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
+  h1{font-size:17px;margin:0 0 4px}.sub{color:#666;font-size:11px;margin-bottom:14px}
+  table{border-collapse:collapse;margin-top:8px}th,td{border:1px solid #ccd;padding:5px 6px;font-size:10px}
+  th{background:#eef3fb;color:#1a2440}.emp{text-align:left;font-weight:700;white-space:nowrap;min-width:120px}
+  .c{text-align:center}.tri{font-family:monospace;font-weight:700}.muted{color:#aab}
+  th.rot{height:80px;white-space:nowrap;vertical-align:bottom}
+  th.rot>*{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto}
+  .legend{margin-top:14px;font-size:11px;color:#444}.foot{margin-top:20px;display:flex;align-items:center;gap:8px}</style></head><body>
+  <h1>Matrice des autorisations</h1>
+  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) en production · ${cols.length} autorisation(s)</div>
+  <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}</tr></thead><tbody>${trs}</tbody></table>
+  <div class="legend"><b>Légende :</b> <span style="color:${clr.valid}">✓ valide</span> · <span style="color:${clr.warning}">⚠ expire bientôt</span> · <span style="color:${clr.expired}">✗ expiré</span> · <span style="color:${clr.na}">∞ sans limite</span> · — non détenue · 🚜 autorisation de conduite</div>
+  <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Matrice des autorisations');
+}
+
 
 /* ═══ PROGRAMME ACTIVITÉ — GANTT ═══ */
 
@@ -10414,13 +10683,15 @@ const AI_SUGGESTIONS={
     'Charge Airbus Part 21 cette semaine'
   ],
   '🛡 Formations':[
-    'Quelles formations expirent bientôt ?',
-    'Quelles formations expirent dans les 6 mois ?',
-    'Quelles autorisations expirent cette année ?',
-    'Échéances dans les 3 mois',
+    'État global des formations',
+    'Formations qui expirent dans 3 mois',
+    'Qui doit renouveler une formation ?',
+    'Formations expirées à ce jour',
     'Qui n\'a pas le CACES nacelle à jour ?',
-    'Habilitations à renouveler ce trimestre',
-    'Qui a une qualification déjà expirée ?'
+    'Qui a le CACES nacelle ?',
+    'État global des autorisations',
+    'Autorisations qui expirent bientôt',
+    'Qui a l\'autorisation ASTO ?'
   ],
   '🔎 Recherche croisée':[
     'Qui a le CACES nacelle et est dispo cette semaine ?',
@@ -11168,6 +11439,9 @@ function aiAnswer(q){
     return aiAnswerExpirations(n);
   }
 
+  // ── Suivi Formations & Autorisations (manquant / état global) — jamais le planning ──
+  { const _fs=aiFormationSuivi(n,q); if(_fs) return _fs; }
+
   // ── Recherche croisée : qualification (valide) + dispo/présence (+ catégorie) ──
   if(isQuestion){
     const hasQualCue = fhas('caces','habilitation','autorisation','qualif','certif','habilite') || /\bqui (a|ont|possede|possedent|detient|detiennent)\b/.test(n);
@@ -11558,6 +11832,77 @@ function aiHelpMessage(){
 }
 
 // ── Formations/autorisations qui expirent ──
+// ── Suivi Formations & Autorisations : "qui n'a pas X" (manquant) + "état global" ──
+// Renvoie du HTML, ou null si la question ne relève pas de ce cas (laisse le routeur continuer).
+function aiFormationSuivi(n,q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  n=(n||'').replace(/['’]/g,' '); // apostrophes → espace ("n'a pas" → "n a pas")
+  // Garde-fou : "en formation cette semaine / présent" = planning, pas le suivi réglementaire
+  if(/en formation|en stage/.test(n) && /(semaine|cette semaine|aujourd|present|planning|absent)/.test(n)) return null;
+
+  const formTypes=new Set(), authTypes=new Set();
+  (S.formations||[]).forEach(f=>{ if(f.type) formTypes.add(f.type); });
+  (S.autorisations||[]).forEach(a=>{ const t=a.type||a.nom; if(t) authTypes.add(t); });
+  const allTypes=[...new Set([...formTypes,...authTypes])];
+
+  // Type précisément cité (ex : "CACES nacelle", "ASTO", "EWIS")
+  let citedType=null,best=0;
+  allTypes.forEach(t=>{ const tn=norm(t); if(tn.length>=3 && n.includes(tn) && tn.length>best){best=tn.length;citedType=t;} });
+  if(!citedType){
+    allTypes.forEach(t=>{ norm(t).split(/[^a-z0-9]+/).filter(w=>w.length>=4).forEach(w=>{ if(n.includes(w)&&w.length>best){best=w.length;citedType=t;} }); });
+    if(best<4) citedType=null;
+  }
+
+  const globalCue=/(suivi|etat|recap|bilan|synthese|tableau|point|vue d|global|ou en (sont|est))/.test(n);
+  const missCue=/n a pas|n ont pas|ne possede|ne detien|\bsans\b|manque|qui n a/.test(n);
+  const domainCue=/autorisation|habilitation|certification|qualif|certif/.test(n) || citedType || (/formation/.test(n) && (globalCue||missCue));
+  if(!domainCue) return null;
+
+  const today=new Date(); today.setHours(0,0,0,0);
+  const daysTo=exp=>exp?Math.round((parseLocal(exp)-today)/86400000):null;
+
+  // ── (A) MANQUANT : "qui n'a pas <type> (à jour)" ──
+  if(missCue && citedType){
+    const scope=(S.personnel||[]).filter(p=>p.actif!==false && !p.archived && ['technicien','interimaire','chef'].includes(p.categorie));
+    const holders=new Set();
+    (S.formations||[]).concat(S.autorisations||[]).forEach(x=>{ const t=x.type||x.nom; if(t===citedType){ const d=daysTo(x.dateExpiration); if(d===null||d>=0) holders.add(x.empId); } });
+    const missing=scope.filter(p=>!holders.has(p.id)).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+    let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>qui n'a pas « ${citedType} » à jour</em> (production : tech./intér./chefs).</div>`;
+    h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">🚫 Sans « ${citedType} » valide — ${missing.length} personne(s)</div>`;
+    if(!missing.length) return h+`<div style="color:#34c759">✅ Tout le monde (production) est à jour.</div>`;
+    h+=missing.map(p=>`<div style="margin-bottom:2px">• ${_aiChip(p)} <span style="color:#8090a8;font-size:11px">(${_catLabel(p.categorie)})</span></div>`).join('');
+    return h;
+  }
+
+  // ── (B) ÉTAT GLOBAL / RÉCAP ──
+  if(globalCue && !citedType){
+    const wantAuth=/autorisation|habilitation/.test(n) && !/formation/.test(n);
+    const wantForm=/formation/.test(n) && !/autorisation|habilitation/.test(n);
+    const rows=[];
+    if(!wantAuth) (S.formations||[]).forEach(f=>{ const e=byId(f.empId); if(e) rows.push({emp:e,type:f.type,exp:f.dateExpiration}); });
+    if(!wantForm) (S.autorisations||[]).forEach(a=>{ const e=byId(a.empId); if(e) rows.push({emp:e,type:a.type||a.nom,exp:a.dateExpiration}); });
+    let ok=0,warn=0,exp=0; const urg=[];
+    rows.forEach(r=>{ const d=daysTo(r.exp); if(d===null){ok++;return;} if(d<0){exp++;urg.push({r,d});} else if(d<=60){warn++;urg.push({r,d});} else ok++; });
+    const scopeLbl=wantAuth?'autorisations':wantForm?'formations':'formations & autorisations';
+    urg.sort((a,b)=>a.d-b.d);
+    let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>état global des ${scopeLbl}</em>.</div>`;
+    h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:8px">🛡 Suivi ${scopeLbl} — ${rows.length} ligne(s)</div>`;
+    h+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+      <span style="background:rgba(52,199,89,0.14);color:#34c759;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700">✅ ${ok} valides</span>
+      <span style="background:rgba(255,208,96,0.14);color:#ffd060;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700">⏰ ${warn} à renouveler (≤60j)</span>
+      <span style="background:rgba(255,77,109,0.14);color:#ff8090;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700">🚨 ${exp} expirées</span>
+    </div>`;
+    if(urg.length){
+      h+=`<div style="font-weight:700;color:#a0b8d8;margin:4px 0 3px">Échéances les plus urgentes</div>`;
+      h+=urg.slice(0,8).map(({r,d})=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)"><span>${_aiChip(r.emp)} <span style="color:#8090a8;font-size:11px">${r.type}</span></span><span style="color:${d<0?'#ff8090':'#ffd060'};font-size:11px;white-space:nowrap">${d<0?'expiré '+Math.abs(d)+'j':disp(r.exp)+' · '+d+'j'}</span></div>`).join('');
+    }
+    h+=`<div style="margin-top:8px;font-size:11px;color:#8090a8">💡 Détail : « formations de [nom] », « qui a le ${[...formTypes][0]||'CACES nacelle'} ? », « qui n'a pas le ${[...formTypes][0]||'CACES nacelle'} à jour ? »</div>`;
+    return h;
+  }
+
+  return null; // les autres cas (échéances, "qui a X", fiche personne) restent gérés par le routeur
+}
+
 function aiAnswerExpirations(n){
   const today=new Date(); today.setHours(0,0,0,0);
   const all=[];
