@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260712-MATRIXCOLOR -->
+<!-- AeroStaff Pro v7 — Build 20260713-CARDFRAME -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2517,7 +2517,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260712-MATRIXCOLOR · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260713-CARDFRAME · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -5728,13 +5728,24 @@ async function _buildColoredMatrixXls(opts){
   wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
   const ws=wb.addWorksheet(sheetName,{views:[{state:'frozen',xSplit:2,ySplit:2}],properties:{defaultRowHeight:18}});
 
-  // ── Ligne titre (fusionnée) ──
+  // ── Ligne titre : DEUX fusions distinctes qui ne franchissent PAS la ligne de gel des colonnes (col.2/col.3),
+  //    sinon Excel dédouble le contenu de part et d'autre du volet figé (titre + colonne nom-prénom fantômes).
   const total=cols.length+2;
-  const tRow=ws.addRow([title]);
-  ws.mergeCells(1,1,1,total);
-  tRow.height=26; tRow.getCell(1).font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
-  tRow.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
-  tRow.getCell(1).alignment={vertical:'middle',indent:1};
+  const tRow=ws.addRow([]);
+  tRow.height=26;
+  ws.mergeCells(1,1,1,2);         // A1:B1 — zone figée (marque)
+  ws.mergeCells(1,3,1,total);     // C1:.. — zone défilante (titre)
+  const brandCell=tRow.getCell(1);
+  brandCell.value='MARDAM · LFBF';
+  brandCell.font={bold:true,size:10,color:{argb:'FF00D2FF'}};
+  brandCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  brandCell.alignment={vertical:'middle',horizontal:'center'};
+  tRow.getCell(2).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  const titleCell=tRow.getCell(3);
+  titleCell.value=title;
+  titleCell.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
+  titleCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  titleCell.alignment={vertical:'middle',indent:1};
 
   // ── En-tête colonnes (texte vertical) ──
   const header=['Employé','TRI',...cols.map(colLabel)];
@@ -6568,6 +6579,19 @@ function _chMsnLabel(cid){
   return '\ud83d\udd27 '+(t?t+' - ':'')+(ch.msn||(ch.nom||'Trav.').slice(0,8));
 }
 function _chIncomplete(cid){ const ch=S.chantiers.find(c=>c.id===cid); if(!ch) return false; return !((ch.avion||'').trim()) || !((ch.msn||'').trim()); }
+// Libellé court : MSN en premier (prioritaire sur cases étroites), type d'avion ensuite si présent
+function _chMsnShort(cid){
+  if(!cid) return '';
+  if(cid==='STO') return '\u2708\ufe0f STO';
+  if(cid==='AIRBUS') return '\u2708\ufe0f P21';
+  if(cid==='REC') return '\u267b\ufe0f REC';
+  if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(av.msn||'?')+(t?' \u00b7 '+t:''); }
+  const ch=S.chantiers.find(c=>c.id===cid);
+  if(!ch) return '\ud83d\udd27 Trav.';
+  const t=_avShort(ch.avion);
+  const msn=ch.msn||(ch.nom||'Trav.').slice(0,8);
+  return '\ud83d\udd27 '+msn+(t?' \u00b7 '+t:'');
+}
 
 // Personnes hors production (actif=false) ayant au moins un jour de planning sur la période (traçabilité)
 function _inactifsAvecPlanning(dates){
@@ -7884,6 +7908,25 @@ function renderRespGantt(){
     return mods;
   };
 
+  // Empilage d'intervalles (option A) : place chaque barre sur la 1re sous-ligne libre.
+  // Une seule ligne si aucun chevauchement ; une 2e/3e sous-ligne uniquement là où ça se chevauche.
+  function packLanes(items){
+    const arr=items.map(it=>({...it,_r:Math.max(it.r,it.l+1.4)})).sort((a,b)=>a.l-b.l||a._r-b._r);
+    const laneRight=[];
+    arr.forEach(it=>{
+      let placed=false;
+      for(let i=0;i<laneRight.length;i++){
+        if(it.l>=laneRight[i]-0.01){ laneRight[i]=it._r; it.lane=i; placed=true; break; }
+      }
+      if(!placed){ it.lane=laneRight.length; laneRight.push(it._r); }
+    });
+    return {arr,lanes:Math.max(1,laneRight.length)};
+  }
+  // Couleur de texte lisible selon le fond de la barre (YIQ)
+  const _txtOn=hex=>{const h=(hex||'').replace('#','');if(h.length<6)return '#fff';const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'#0b1020':'#ffffff';};
+
+  const PAD=6, MOD_H=22, CH_H=28, ABS_H=22, GAP=6;
+
   const rows=people.map(emp=>{
     const cat=CATS[emp.categorie]||{};
     const normalChantiers=S.chantiers.filter(c=>{
@@ -7896,71 +7939,92 @@ function renderRespGantt(){
       return start<=yearEnd && end>=yearStart;
     });
     const specialModules=getSpecialModules(emp.id);
-    const myChantiers=[...specialModules,...normalChantiers];
     const absenceBands=getAbsenceBands(emp.id);
 
-    // Person header row
-    let html=`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(16,23,38,0.90)">
-      <div style="width:180px;flex-shrink:0;padding:10px 14px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center">
+    // ── Packing des trois sections ──
+    const modPack=packLanes(specialModules.map(m=>({l:0,r:100,m})));
+    const chPack=packLanes(normalChantiers.map(c=>{
+      const l=toP(c.debut)??0, r=toP(c.fin)??100;
+      return {l,r,c};
+    }));
+    const absPack=packLanes(absenceBands.map(b=>{
+      const l=toP(b.start), r=toP(b.end);
+      return {l:l??0,r:r??0,b};
+    }));
+
+    const modH = specialModules.length ? modPack.lanes*MOD_H : 0;
+    const chH  = normalChantiers.length ? chPack.lanes*CH_H : 0;
+    const absH = absenceBands.length ? absPack.lanes*ABS_H : 0;
+
+    // Décalages verticaux (px) de chaque section
+    let cursor=PAD;
+    const modTop=cursor; if(modH) cursor+=modH+GAP;
+    const chTop=cursor;  if(chH)  cursor+=chH+GAP;
+    const absTop=cursor; if(absH) cursor+=absH;
+    const totalH=Math.max(42, cursor+PAD);
+
+    const chantierCount=normalChantiers.length;
+    const nothing = !modH && !chH && !absH;
+
+    // ── Barres ──
+    const modBars=modPack.arr.map(it=>{
+      const c=it.m, role=c.role||(c.resp===emp.id?'Resp.':'Chef');
+      const col=c.color||'#e67e22', txt=_txtOn(col);
+      const top=modTop+it.lane*MOD_H;
+      return `<div title="${c.nom} (${role})" style="position:absolute;top:${top}px;height:${MOD_H-4}px;left:0;width:100%;background:${col};opacity:0.92;border-radius:5px;z-index:2;display:flex;align-items:center;padding:0 8px;overflow:hidden">
+        <span style="font-size:10px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom} · ${role} · permanent</span>
+      </div>`;
+    }).join('');
+
+    const chBars=chPack.arr.map(it=>{
+      const c=it.c, role=c.role||(c.resp===emp.id?'Resp.':'Chef');
+      const l=it.l, w=Math.max(1.5,it.r-it.l);
+      const col=c.color||'#2979ff', txt=_txtOn(col);
+      const top=chTop+it.lane*CH_H;
+      const inc=_chIncomplete(c.id);
+      const over=it.lane>0;
+      const fullLbl=(inc?'\u26a0 ':'')+_chMsnLabel(c.id);
+      const shortLbl=((inc?'\u26a0 ':'')+_chMsnShort(c.id)).replace(/"/g,'');
+      const barTitle=`${c.nom} (${role}) · ${disp(c.debut||'')} → ${disp(c.fin||'')}${over?' · chevauchement':''}`;
+      return `<div onclick="editChantier('${c.id}')" title="${barTitle}"
+        style="position:absolute;top:${top}px;height:${CH_H-6}px;left:${l}%;width:${w}%;background:${col};border-radius:6px;cursor:pointer;z-index:3;box-shadow:0 2px 8px ${col}55;${over?'border-top:2px solid #ffb02e;':''}transition:opacity .15s;display:flex;align-items:center;padding:0 8px;overflow:hidden"
+        onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+        <span class="rg-chlbl" data-short="${shortLbl}" style="font-size:11px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fullLbl}</span>
+      </div>`;
+    }).join('');
+
+    const absBars=absPack.arr.map(it=>{
+      const b=it.b, l=it.l, w=Math.max(1.2,it.r-it.l);
+      const col=ABSENCE_COLORS[b.type]||'#6b7280', txt=_txtOn(col);
+      const lbl=ABSENCE_LABELS[b.type]||b.type;
+      const top=absTop+it.lane*ABS_H;
+      return `<div title="${lbl}: ${disp(b.start)} \u2192 ${disp(b.end)}" style="position:absolute;top:${top}px;height:${ABS_H-4}px;left:${l}%;width:${w}%;background:${col};opacity:0.9;border-radius:4px;z-index:2;display:flex;align-items:center;padding:0 6px;overflow:hidden">
+        <span style="font-size:10px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lbl}</span>
+      </div>`;
+    }).join('');
+
+    // Petites étiquettes de section + séparateur avant les absences
+    const modTag = modH?`<div style="position:absolute;top:${modTop-2}px;left:2px;font-size:8px;font-weight:800;color:#7d8aa5;letter-spacing:.5px;z-index:4;pointer-events:none">MODULES</div>`:'';
+    const absTag = absH?`<div style="position:absolute;top:${absTop-2}px;left:2px;font-size:8px;font-weight:800;color:#7d8aa5;letter-spacing:.5px;z-index:4;pointer-events:none">ABSENCES</div>`:'';
+    const absSep = absH?`<div style="position:absolute;top:${absTop-GAP/2}px;left:0;right:0;height:1px;background:rgba(255,255,255,0.08);z-index:1"></div>`:'';
+
+    const accent=cat.col||'#4a5a7a';
+    const html=`<div style="display:flex;align-items:stretch;margin:12px 0;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1.5px rgba(255,255,255,0.22),0 3px 12px rgba(0,0,0,0.35)">
+      <div style="width:180px;flex-shrink:0;padding:10px 14px;border-right:1px solid rgba(255,255,255,0.10);display:flex;flex-direction:column;justify-content:center;background:rgba(16,23,38,0.92);box-shadow:inset 4px 0 0 ${accent}">
         <div style="font-size:14px;font-weight:900;color:${cat.col||'#ffffff'}">${emp.nom} ${emp.prenom}</div>
         <div style="font-size:11px;color:#8090a8;margin-top:2px">${cat.lbl||emp.categorie}</div>
-        ${myChantiers.length===0?'<div style="font-size:10px;color:#4a5a7a;margin-top:3px">Aucun chantier</div>':''}
+        ${nothing?'<div style="font-size:10px;color:#4a5a7a;margin-top:3px">Aucun chantier</div>':`<div style="font-size:10px;color:#4a5a7a;margin-top:3px">${chantierCount} chantier${chantierCount>1?'s':''}</div>`}
       </div>
-      <div style="flex:1;position:relative;min-height:36px;display:flex;align-items:stretch">
-        <!-- Grid -->
+      <div style="flex:1;position:relative;height:${totalH}px;background:rgba(255,255,255,0.015)">
+        <!-- Grille mois -->
         <div style="position:absolute;inset:0;display:flex;pointer-events:none">
           ${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<div style="flex:1;border-right:1px solid rgba(255,255,255,0.04);${i===currentMonth?'background:rgba(0,210,255,0.03)':''}"></div>`).join('')}
         </div>
         ${todayLine}
-        <!-- Absence bands sur la ligne personne -->
-        ${absenceBands.map(b=>{
-          const l=toP(b.start), r=toP(b.end);
-          if(l===null||r===null) return '';
-          const col=ABSENCE_COLORS[b.type]||'#6b7280';
-          const lbl=ABSENCE_LABELS[b.type]||b.type;
-          if(b.type==='ferie'){
-            const center=(l+r)/2;
-            return`<div title="${lbl}: ${disp(b.start)}" style="position:absolute;top:4px;bottom:4px;left:${center}%;transform:translateX(-50%);background:#3a2e00;border:1px solid #ffd060;border-radius:4px;padding:0 6px;z-index:4;display:flex;align-items:center;white-space:nowrap">
-              <span style="font-size:9px;font-weight:800;color:#ffd060">Férié</span>
-            </div>`;
-          }
-          const w=Math.max(0.5,(r-l)+0.5);
-          return`<div title="${lbl}: ${disp(b.start)}→${disp(b.end)}" style="position:absolute;top:4px;bottom:4px;left:${l}%;width:${w}%;background:${col};border-radius:4px;z-index:2;opacity:0.8"></div>`;
-        }).join('')}
+        ${absSep}${modTag}${absTag}
+        ${modBars}${chBars}${absBars}
       </div>
     </div>`;
-
-    // One sub-row per chantier
-    myChantiers.forEach(c=>{
-      const role=c.role||(c.resp===emp.id?'Resp.':'Chef');
-      const l=c.full?0:(toP(c.debut)??0);
-      const r=c.full?100:(toP(c.fin)??100);
-      const w=Math.max(1.5,r-l);
-      const col=c.color||'#2979ff';
-      const clickAttr=c.special?'':`onclick="editChantier('${c.id}')" style="cursor:pointer;"`;
-      const barTitle=c.special?`${c.nom} (${role})`:`${c.nom} (${role}) · ${disp(c.debut||'')} → ${disp(c.fin||'')}`;
-
-      html+=`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.04);min-height:38px">
-        <!-- Label chantier -->
-        <div style="width:180px;flex-shrink:0;padding:8px 14px 8px 22px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center;background:rgba(0,0,0,0.15)">
-          <div ${c.special?'':`onclick="editChantier('${c.id}')" `}style="font-size:12px;font-weight:800;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${c.special?'':'cursor:pointer'}">${c.special?c.nom:_chMsnLabel(c.id)}</div>
-          ${(!c.special && _chIncomplete(c.id))?`<div style="font-size:9px;font-weight:700;color:#ff9a3c;margin-top:2px">\u26a0 \u00e0 compl\u00e9ter</div>`:''}
-        </div>
-        <!-- Barre Gantt -->
-        <div style="flex:1;position:relative;background:rgba(0,0,0,0.1)">
-          <!-- Grid -->
-          <div style="position:absolute;inset:0;display:flex;pointer-events:none">
-            ${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<div style="flex:1;border-right:1px solid rgba(255,255,255,0.04);${i===currentMonth?'background:rgba(0,210,255,0.02)':''}"></div>`).join('')}
-          </div>
-          ${todayLine}
-          <!-- Barre chantier -->
-          <div ${c.special?'':`onclick="editChantier('${c.id}')"`} title="${barTitle}"
-            style="position:absolute;top:6px;bottom:6px;left:${l}%;width:${w}%;background:${col};border-radius:6px;${c.special?'':'cursor:pointer;'}z-index:3;box-shadow:0 2px 10px ${col}55;transition:opacity .15s;display:flex;align-items:center;padding:0 8px"
-            onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
-          </div>
-        </div>
-      </div>`;
-    });
 
     return html;
   }).join('');
@@ -7974,6 +8038,13 @@ function renderRespGantt(){
       ${_ganttLegendHtml()}
     </div>
   </div>`;
+
+  // Priorité MSN : si le libellé complet (type - MSN) déborde de la barre, basculer sur le format court MSN-first
+  requestAnimationFrame(()=>{
+    el.querySelectorAll('.rg-chlbl').forEach(s=>{
+      if(s.scrollWidth>s.clientWidth+1 && s.dataset.short){ s.textContent=s.dataset.short; }
+    });
+  });
 }
 
 /* ── Détection conflits double affectation + absences ── */
