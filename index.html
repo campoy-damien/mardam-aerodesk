@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260713-CARDFRAME -->
+<!-- AeroStaff Pro v7 — Build 20260714-NOTICE -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -966,6 +966,24 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .cpcancel{flex:1;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#8090a8;font-size:13px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
 .cpsave{flex:2;padding:11px;background:linear-gradient(135deg,#2979ff,#00d2ff);border:none;border-radius:10px;color:#000;font-size:13px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;}
 
+/* ═══ Sélection copier/coller planning ═══ */
+#masterGrid .hd, #weeklyGrid .hd{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+#masterGrid.pl-selecting .hd, #weeklyGrid.pl-selecting .hd{ cursor:cell; }
+.hd.pl-sel{ box-shadow: inset 0 0 0 2px #22b8cf; background:rgba(34,184,207,0.16)!important; }
+.hd.pl-anchor{ box-shadow: inset 0 0 0 2.5px #14e0ff, 0 0 0 1px #14e0ff; animation:plPulse .45s ease; }
+@keyframes plPulse{0%{box-shadow:inset 0 0 0 2px #22b8cf, 0 0 0 0 rgba(34,184,207,.55)}100%{box-shadow:inset 0 0 0 2.5px #14e0ff, 0 0 0 9px rgba(34,184,207,0)}}
+.pl-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(180%);display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:16px;background:#0d1628;border:1px solid rgba(255,255,255,0.16);box-shadow:0 14px 44px rgba(0,0,0,0.6);z-index:9999;transition:transform .28s cubic-bezier(.2,.9,.25,1);max-width:calc(100vw - 20px);flex-wrap:wrap;justify-content:center;font-family:'Outfit',sans-serif;will-change:transform}
+.pl-bar.on{transform:translateX(-50%) translateY(0)}
+.pl-count{font-size:11px;font-weight:800;color:#04222a;background:#22b8cf;border-radius:999px;padding:5px 11px;white-space:nowrap}
+.pl-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#e8f0ff;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:8px 12px;cursor:pointer;transition:background .15s,transform .08s;white-space:nowrap;font-family:inherit}
+.pl-btn:hover{background:rgba(255,255,255,0.14)}
+.pl-btn:active{transform:scale(.94)}
+.pl-btn span{font-size:14px;line-height:1}
+.pl-btn.pl-danger{color:#ff9aa6;border-color:rgba(255,90,110,0.35);background:rgba(255,90,110,0.10)}
+.pl-btn.pl-danger:hover{background:rgba(255,90,110,0.20)}
+.pl-btn.pl-x{padding:8px 11px;color:#9fb0c8}
+.pl-note{font-size:11px;color:#9fb0c8;font-weight:700;white-space:nowrap}
+
 </style>
 </head>
 <body>
@@ -1221,6 +1239,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="btn btn-ghost btn-sm" onclick="thisWeek()">Cette semaine</button>
   </div>
   <div class="exprow">
+    <button class="btn btn-sm" onclick="copyPrevWeek()" style="background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;border:none;font-weight:800" title="Remplit uniquement les cases vides à partir de la semaine précédente (ne touche pas aux formations/congés déjà saisis)">📋 Recopier la semaine précédente</button>
     <button class="btn btn-mint btn-sm" onclick="exportWeekXls()">📊 Export Excel</button>
     <button class="btn btn-cyan btn-sm" onclick="exportWeekHtml()">📄 PDF / Imprimer</button>
     <button class="btn btn-rose btn-sm" onclick="openDayExtract()">📧 Extrait du jour</button>
@@ -2233,7 +2252,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Clic sur une case</strong> — saisir/modifier l'activité (mêmes données que le Planning Hebdo)<br>
         • <strong style="color:#ffd060">Filtres &amp; recherche</strong> — par personne, par année, et barre 🔍 (nom, prénom ou trigramme)<br>
         • <strong style="color:#ffd060">📊 Export Excel coloré</strong> — fichier .xlsx avec les couleurs des chantiers, personnel regroupé par catégorie, nom de chantier + MSN dans chaque case, volets figés et légendes<br>
-        • <strong style="color:#ffd060">📄 Export PDF</strong> — rendu coloré regroupé par catégorie, nom de chantier complet dans les cases + légende, idéal à envoyer aux collaborateurs
+        • <strong style="color:#ffd060">📄 Export PDF</strong> — rendu coloré regroupé par catégorie, nom de chantier complet dans les cases + légende, idéal à envoyer aux collaborateurs<br>
+        • <strong style="color:#ffd060">🖱 Sélection multiple (souris, ordinateur)</strong> — glisser pour sélectionner un bloc de cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V). Glisser sur une seule demi-journée (PM→PM ou AM→AM) ne sélectionne que celle-ci ; AM→PM prend les journées entières. Coller remplit toute la sélection sans toucher les demi-journées non sélectionnées<br>
+        • <strong style="color:#ffd060">🖌 Pinceau</strong> — dans l'éditeur d'une case, « Copier vers d'autres » puis taper les cases à remplir (fonctionne aussi sur iPad/iPhone)
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Après avoir saisi une case, le planning <strong>reste à la position où tu étais</strong> — plus besoin de rescroller. Mêmes données que le Planning Hebdo.</div>
       </div>
     </div>
@@ -2248,11 +2269,14 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Clic sur une case</strong> — Travail, Congé, Formation, Maladie, Déplacement…<br>
         • <strong style="color:#ffd060">Affectation chantier</strong> — Travail → choisir le chantier associé (y compris Stockage, Part 21, ou un avion en recyclage)<br>
         • <strong style="color:#ffd060">2 chantiers par demi-journée</strong> — une demi-journée peut porter un 2ᵉ chantier optionnel (jusqu'à 4 chantiers/jour). Les 3,5 h sont alors divisées à parts égales (1,75 h chacun). La case s'affiche en 2 bandes de couleur avec le MSN de chaque avion.<br>
-        • <strong style="color:#ffd060">Copier semaine</strong> — duplique le planning vers une autre semaine<br>
+        • <strong style="color:#ffd060">📋 Recopier la semaine précédente</strong> — bouton violet : remplit uniquement les cases <strong>vides</strong> de la semaine affichée à partir de la précédente. Formations, congés et absences déjà saisis sont conservés. Une bannière « Annuler » apparaît après coup<br>
+        • <strong style="color:#ffd060">🖌 Copier vers d'autres (pinceau)</strong> — depuis l'éditeur d'une case, arme son contenu (ex. une formation) puis tape les cases des autres personnes pour l'y appliquer, sans tout retaper. Compteur, Annuler et Terminer dans la barre du bas. <em>Marche sur iPad/iPhone et sur ordinateur.</em><br>
+        • <strong style="color:#ffd060">🖱 Sélection multiple à la souris (ordinateur)</strong> — glisser pour sélectionner plusieurs cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V, Échap pour quitter). Glisser sur les seuls après-midis (PM→PM) ne prend que les demi-journées PM ; AM→PM prend les journées entières. Coller remplit toute la sélection<br>
         • <strong style="color:#ffd060">📊 Export Excel coloré & 📄 PDF</strong> — rendu identique à l'app, avec couleurs, MSN des chantiers et légendes (cases scindées pour les demi-journées à 2 chantiers)<br>
         • <strong style="color:#ffd060">Sélecteurs employé + année</strong> — cibler une personne précise et sauter directement à une autre année<br>
         • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 par nom, prénom ou trigramme<br>
-        • <strong style="color:#ffd060">Navigation</strong> — ← Préc. / Aujourd'hui / Suiv. →
+        • <strong style="color:#ffd060">Navigation</strong> — ← Préc. / Cette semaine / Suiv. →
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(124,92,255,0.06);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📱 Sur <strong>iPad / iPhone</strong>, la sélection par glissement est désactivée (pour garder un défilement fluide) : utilise le <strong>🖌 pinceau</strong> pour appliquer un contenu à plusieurs cases. La sélection au glissement reste disponible sur ordinateur à la souris.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les absences saisies ici sont déduites automatiquement de la capacité dans Programme Activité. Après chaque saisie, la vue <strong>reste à la même position</strong> pour enchaîner les cases sans rescroller.</div>
       </div>
     </div>
@@ -2517,7 +2541,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260713-CARDFRAME · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260714-NOTICE · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2691,6 +2715,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   </div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-cell')">Annuler</button>
+    <button class="btn btn-ghost" onclick="armBrush()">🖌 Copier vers d'autres</button>
     <button class="btn btn-cyan" onclick="saveCellEdit()">Valider</button>
   </div>
 </div>
@@ -5697,6 +5722,19 @@ function goTab(name){
   }
 }
 
+// Ouvre le Master Planning ciblé sur une personne et le mois d'une absence/formation (clic depuis le Gantt responsables)
+function gotoMasterAbsence(empId, dateStr){
+  const d=(typeof parseLocal==='function')?parseLocal(dateStr):new Date(dateStr);
+  if(d && !isNaN(d)){ S.masterYear=d.getFullYear(); S.masterMonth=d.getMonth(); }
+  goTab('master');
+  const yr=document.getElementById('mp-year'); if(yr) yr.value=String(S.masterYear);
+  const em=document.getElementById('mp-emp'); if(em) em.value=empId;
+  const sq=document.getElementById('master-search'); if(sq) sq.value='';
+  if(typeof renderMaster==='function') renderMaster();
+  const p=(typeof byId==='function')?byId(empId):null;
+  if(typeof toast==='function') toast('\ud83d\udcc5 Master Planning'+(p?` — ${p.prenom} ${p.nom}`:''));
+}
+
 /* ═══ SELECTS ═══ */
 function _sortByNom(list){
   return [...list].sort((a,b)=>(a.nom+' '+a.prenom).localeCompare(b.nom+' '+b.prenom,'fr',{sensitivity:'base'}));
@@ -6629,7 +6667,7 @@ function buildGrid(emps,dates,containerId){
   let lastGroupKey = undefined;
   let sortisSepDone = false;
 
-  const rows=emps.map(emp=>{
+  const rows=emps.map((emp,rowIdx)=>{
     const cat=CATS[emp.categorie]||{};
     const inactive = emp.actif===false;
     let separator = '';
@@ -6694,7 +6732,7 @@ function buildGrid(emps,dates,containerId){
       }
     }
 
-    const cells=dates.map(d=>{
+    const cells=dates.map((d,dayIdx)=>{
       const ds=fmt(d);const wd=d.getDay();
       const isSat=wd===6,isSun=wd===0,isH=isHol(ds),isW=isSat||isSun;
       const amK=`${emp.id}_${ds}_AM`,pmK=`${emp.id}_${ds}_PM`;
@@ -6775,8 +6813,8 @@ function buildGrid(emps,dates,containerId){
       const pmDivStyle = pmTwo ? 'padding:0;overflow:hidden' : pmStyle;
       return`<td>
         <div class="hw">
-          <div class="hd ${amCls}" style="position:relative;${amDivStyle}" ${amClick} title="${amTitle2}${am.vm?' · VM '+am.vm:''}">${amInner}${vmBadge(am.vm)}</div>
-          <div class="hd ${pmCls}" style="position:relative;${pmDivStyle}" ${pmClick} title="${pmTitle2}${pm.vm?' · VM '+pm.vm:''}">${pmInner}${vmBadge(pm.vm)}</div>
+          <div class="hd ${amCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="AM" data-r="${rowIdx}" data-c="${dayIdx*2}" style="position:relative;${amDivStyle}" ${amClick} title="${amTitle2}${am.vm?' · VM '+am.vm:''}">${amInner}${vmBadge(am.vm)}</div>
+          <div class="hd ${pmCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="PM" data-r="${rowIdx}" data-c="${dayIdx*2+1}" style="position:relative;${pmDivStyle}" ${pmClick} title="${pmTitle2}${pm.vm?' · VM '+pm.vm:''}">${pmInner}${vmBadge(pm.vm)}</div>
         </div>
       </td>`;
     }).join('');
@@ -6818,6 +6856,306 @@ function buildGrid(emps,dates,containerId){
     _restore();
     requestAnimationFrame(_restore);
   }
+
+  // Sélection copier/coller : mémoriser la topologie de la grille courante + réappliquer la surbrillance
+  window.PLGRID={ container:containerId, rowEmps:emps.map(e=>e.id), cols:dates.flatMap(d=>{const ds=fmt(d);return [{ds,half:'AM'},{ds,half:'PM'}];}) };
+  if(typeof _plInit==='function') _plInit();
+  if(typeof _plApplyHighlight==='function') _plApplyHighlight();
+}
+
+/* ═══ MOTEUR SÉLECTION COPIER/COLLER PLANNING ═══ */
+window.PLSEL=window.PLSEL||{active:false,anchor:null,focus:null};
+window.PLCLIP=window.PLCLIP||null;
+window.PLUNDO=window.PLUNDO||null;
+let _plPress=null, _plHintShown=false;
+
+function _plInit(){
+  if(window._plReady) return; window._plReady=true;
+  // Sélection copier/coller réservée à la souris (ordinateur). Sur tactile (iPad/iPhone) : désactivée
+  // — le tap ouvre normalement l'éditeur de case et le défilement reste fluide.
+  window._plTouchOff = (navigator.maxTouchPoints>0) || ('ontouchstart' in window);
+  if(window._plTouchOff) return;
+  const bar=document.createElement('div');
+  bar.id='pl-bar'; bar.className='pl-bar';
+  bar.innerHTML=`
+    <span class="pl-count" id="pl-count">0</span>
+    <button class="pl-btn" onclick="_plCopy()"><span>📋</span>Copier</button>
+    <button class="pl-btn" id="pl-paste" onclick="_plPaste()"><span>📥</span>Coller</button>
+    <button class="pl-btn pl-danger" onclick="_plDelete()"><span>🗑️</span>Vider</button>
+    <button class="pl-btn" id="pl-undo" onclick="_plUndo()"><span>↩️</span>Annuler</button>
+    <button class="pl-btn pl-x" onclick="_plExit()" aria-label="Fermer la sélection">✕</button>`;
+  document.body.appendChild(bar);
+  document.addEventListener('pointerdown',_plDown,{passive:true});
+  document.addEventListener('pointermove',_plMove,{passive:true});
+  document.addEventListener('pointerup',_plUp,{passive:true});
+  document.addEventListener('keydown',_plKey);
+  if(!_plHintShown){ _plHintShown=true; setTimeout(()=>{ try{toast('💡 Astuce : glissez à la souris pour sélectionner, puis Copier/Coller');}catch(_){}}, 700); }
+}
+
+function _plCell(e){ const t=e.target; return (t&&t.closest)?t.closest('.hd[data-emp]'):null; }
+function _plInGrid(cell){ return !!(cell&&window.PLGRID&&cell.closest('#'+PLGRID.container)); }
+function _plRowIndex(id){ return PLGRID?PLGRID.rowEmps.indexOf(id):-1; }
+function _plColIndex(ds,half){ return PLGRID?PLGRID.cols.findIndex(c=>c.ds===ds&&c.half===half):-1; }
+
+function _plDown(e){
+  if(e.pointerType!=='mouse') return;            // tactile géré séparément (touch events)
+  if(e.button!==0) return;
+  const cell=_plCell(e);
+  if(!_plInGrid(cell)){
+    if(PLSEL.active){ const t=e.target; if(!(t&&t.closest&&t.closest('#pl-bar'))) _plExit(); }
+    return;
+  }
+  _plPress={startX:e.clientX,startY:e.clientY,cell,moved:false,dragging:false,mouse:true,shift:e.shiftKey};
+}
+function _plMove(e){
+  if(!_plPress) return;
+  const dx=Math.abs(e.clientX-_plPress.startX), dy=Math.abs(e.clientY-_plPress.startY);
+  if(!(dx>6||dy>6)) return;
+  _plPress.moved=true;
+  if(!_plPress.dragging){ _plEnter(_plPress.cell); _plPress.dragging=true; }  // glisser = nouvelle plage
+  const hd=_plPaintCell(e.clientX,e.clientY);
+  if(hd) _plExtendTo(hd);
+}
+function _plUp(e){
+  if(!_plPress) return;
+  const p=_plPress; _plPress=null;
+  if(p.dragging){ _plFlush(); return; }              // fin de glissement : plage définie (état exact)
+  if(PLSEL.active){
+    if(p.shift) _plExtendTo(p.cell);              // Maj+clic = étendre depuis l'ancre
+    else _plEnter(p.cell);                         // clic simple = nouvelle sélection 1 case
+  }
+  // hors sélection : le onclick openCell ouvre l'éditeur
+}
+
+/* ── Tactile : appui long puis glisser pour peindre la sélection · tap = une seule case ── */
+let _plTouch=null;
+function _plLock(e){ e.preventDefault(); }                 // bloque le scroll — attaché SEULEMENT pendant la peinture
+function _plUnlock(){ try{ document.removeEventListener('touchmove',_plLock); }catch(_){} }
+function _plCellAt(x,y){ const el=document.elementFromPoint(x,y); return (el&&el.closest)?el.closest('.hd[data-emp]'):null; }
+// Case sous le pointeur AVEC hystérésis verticale : évite les sauts de ligne/demi-journée lors d'un slide horizontal
+function _plPaintCell(x,y){
+  const hd=_plCellAt(x,y);
+  if(!hd||!_plInGrid(hd)) return null;
+  if(PLSEL.focus){
+    const curR=_plRowIndex(PLSEL.focus.empId);
+    const newR=+hd.dataset.r, newC=+hd.dataset.c;
+    if(!isNaN(curR)&&newR!==curR){
+      const rect=hd.getBoundingClientRect();
+      const into=(y-rect.top)/(rect.height||1);          // profondeur du doigt dans la nouvelle ligne (0..1)
+      const committed = newR>curR ? (into>0.45) : (into<0.55);
+      if(!committed){
+        const map=_plMap(), keep=map&&map[curR+'_'+newC];
+        if(keep) return keep;                            // garder la ligne, n'avancer que la colonne
+      }
+    }
+  }
+  return hd;
+}
+function _plTClear(){ if(_plTouch&&_plTouch.longTimer) clearTimeout(_plTouch.longTimer); _plTouch=null; _plUnlock(); }
+function _plTStart(e){
+  if(e.touches.length!==1){ _plTClear(); return; }
+  const t=e.touches[0];
+  const cell=(e.target&&e.target.closest)?e.target.closest('.hd[data-emp]'):null;  // pas de elementFromPoint ici (évite un layout forcé à chaque scroll)
+  if(!_plInGrid(cell)){
+    if(PLSEL.active){ if(!(e.target&&e.target.closest&&e.target.closest('#pl-bar'))) _plExit(); }
+    _plTouch=null; return;
+  }
+  _plTouch={x:t.clientX,y:t.clientY,cell,moved:false,painting:false,longTimer:null};
+  _plTouch.longTimer=setTimeout(()=>{
+    if(!_plTouch) return;
+    _plTouch.painting=true;
+    document.addEventListener('touchmove',_plLock,{passive:false});   // verrou scroll activé uniquement maintenant
+    _plEnter(_plTouch.cell);
+    if(navigator.vibrate){ try{navigator.vibrate(18);}catch(_){} }
+  },350);
+}
+function _plTMove(e){
+  if(!_plTouch) return;
+  const t=e.touches[0]; if(!t) return;
+  if(_plTouch.painting){                             // on peint : étendre (scroll déjà bloqué par _plLock)
+    const hd=_plPaintCell(t.clientX,t.clientY);
+    if(hd) _plExtendTo(hd);
+    return;
+  }
+  const dx=Math.abs(t.clientX-_plTouch.x), dy=Math.abs(t.clientY-_plTouch.y);
+  if(dx>8||dy>8){                                    // a bougé avant le long-press = défilement : on abandonne
+    if(_plTouch.longTimer) clearTimeout(_plTouch.longTimer);
+    _plTouch=null;
+  }
+}
+function _plTEnd(e){
+  if(!_plTouch) return;
+  if(_plTouch.longTimer) clearTimeout(_plTouch.longTimer);
+  const p=_plTouch; _plTouch=null;
+  if(p.painting){ _plUnlock(); _plFlush(); return; }   // fin de peinture : sélection exacte
+  if(!p.moved && PLSEL.active) _plEnter(p.cell);         // tap = choisir 1 case (le garde openCell empêche l'édition)
+  // hors sélection : le click ouvre l'éditeur normalement
+}
+function _plCancelPress(){ if(_plPress&&_plPress.timer) clearTimeout(_plPress.timer); _plPress=null; }
+
+let _plRaf=0, _plLastFocusKey='';
+function _plEnter(cell){
+  PLSEL.active=true;
+  PLSEL.anchor={empId:cell.dataset.emp,ds:cell.dataset.ds,half:cell.dataset.half};
+  PLSEL.focus={...PLSEL.anchor};
+  _plLastFocusKey=cell.dataset.emp+'_'+cell.dataset.ds+'_'+cell.dataset.half;
+  const cont=document.getElementById(PLGRID.container); if(cont) cont.classList.add('pl-selecting');
+  _plApplyHighlight(); _plUpdateBar();
+  const bar=document.getElementById('pl-bar'); if(bar) bar.classList.add('on');
+}
+function _plExtendTo(cell){
+  if(!PLSEL.active) return;
+  const key=cell.dataset.emp+'_'+cell.dataset.ds+'_'+cell.dataset.half;
+  if(key===_plLastFocusKey) return;                 // même case : rien à refaire
+  _plLastFocusKey=key;
+  PLSEL.focus={empId:cell.dataset.emp,ds:cell.dataset.ds,half:cell.dataset.half};
+  _plApplyHighlight(); _plUpdateBar();               // immédiat (mise à jour incrémentale légère) → pas de latence
+}
+function _plFlush(){ _plApplyHighlight(); _plUpdateBar(); }
+function _plExit(){
+  PLSEL.active=false; PLSEL.anchor=null; PLSEL.focus=null; _plLastFocusKey='';
+  if(typeof _plUnlock==='function') _plUnlock();
+  document.querySelectorAll('.hd.pl-sel,.hd.pl-anchor').forEach(c=>c.classList.remove('pl-sel','pl-anchor'));
+  document.querySelectorAll('.pl-selecting').forEach(c=>c.classList.remove('pl-selecting'));
+  window._plPrevRect=null; window._plPrevAnchorEl=null;
+  const bar=document.getElementById('pl-bar'); if(bar) bar.classList.remove('on');
+}
+
+// Table (r_c -> élément), construite une fois par rendu (mémorisée sur PLGRID)
+function _plMap(){
+  if(!window.PLGRID) return null;
+  if(PLGRID._map) return PLGRID._map;
+  const cont=document.getElementById(PLGRID.container); if(!cont) return null;
+  const map={};
+  cont.querySelectorAll('.hd[data-emp]').forEach(el=>{ map[el.dataset.r+'_'+el.dataset.c]=el; });
+  PLGRID._map=map; return map;
+}
+
+function _plRect(){
+  if(!PLSEL.active||!PLSEL.anchor||!PLSEL.focus||!window.PLGRID) return null;
+  const ar=_plRowIndex(PLSEL.anchor.empId), ac=_plColIndex(PLSEL.anchor.ds,PLSEL.anchor.half);
+  const fr=_plRowIndex(PLSEL.focus.empId),  fc=_plColIndex(PLSEL.focus.ds,PLSEL.focus.half);
+  if(ar<0||ac<0||fr<0||fc<0) return null;
+  const r0=Math.min(ar,fr), r1=Math.max(ar,fr);
+  const aD=ac>>1, fD=fc>>1, d0=Math.min(aD,fD), d1=Math.max(aD,fD);
+  const aH=ac&1, fH=fc&1;
+  const halves=(aH===fH)?[aH]:[0,1];   // même demi-journée aux deux bouts -> on ne prend que celle-là
+  return {r0,r1,d0,d1,halves,ar,ac};
+}
+// une case (r,c) est-elle dans la sélection ? (respecte le verrou AM/PM)
+function _plInSel(R,r,c){ if(!R) return false; if(r<R.r0||r>R.r1) return false; const d=c>>1, hh=c&1; return d>=R.d0&&d<=R.d1 && R.halves.indexOf(hh)>=0; }
+function _plCount(){ const R=_plRect(); return R?((R.r1-R.r0+1)*(R.d1-R.d0+1)*R.halves.length):0; }
+function _plCells(){
+  const R=_plRect(); if(!R) return [];
+  const out=[];
+  for(let r=R.r0;r<=R.r1;r++) for(let d=R.d0;d<=R.d1;d++) for(let hi=0;hi<R.halves.length;hi++){
+    const c=d*2+R.halves[hi]; const col=PLGRID.cols[c]; if(!col) continue;
+    const empId=PLGRID.rowEmps[r];
+    out.push({r,c,empId,ds:col.ds,half:col.half,key:`${empId}_${col.ds}_${col.half}`});
+  }
+  return out;
+}
+// Surbrillance incrémentale : ne touche que les cases dont l'état change (boîte englobante ancien∪nouveau)
+function _plApplyHighlight(){
+  const map=_plMap(); if(!map) return;
+  const R=PLSEL.active?_plRect():null;
+  const P=window._plPrevRect||null;
+  if(R||P){
+    const r0=Math.min(R?R.r0:1e9,P?P.r0:1e9), r1=Math.max(R?R.r1:-1,P?P.r1:-1);
+    const c0=Math.min(R?R.d0*2:1e9,P?P.d0*2:1e9), c1=Math.max(R?R.d1*2+1:-1,P?P.d1*2+1:-1);
+    for(let r=r0;r<=r1;r++) for(let c=c0;c<=c1;c++){
+      const el=map[r+'_'+c]; if(!el) continue;
+      const inSel=_plInSel(R,r,c);
+      if(el.classList.contains('pl-sel')!==inSel) el.classList.toggle('pl-sel',inSel);
+    }
+  }
+  if(window._plPrevAnchorEl){ window._plPrevAnchorEl.classList.remove('pl-anchor'); window._plPrevAnchorEl=null; }
+  if(R && PLSEL.anchor){
+    const el=map[_plRowIndex(PLSEL.anchor.empId)+'_'+_plColIndex(PLSEL.anchor.ds,PLSEL.anchor.half)];
+    if(el){ el.classList.add('pl-anchor'); window._plPrevAnchorEl=el; }
+  }
+  window._plPrevRect=R;
+}
+function _plUpdateBar(){
+  const n=_plCount();
+  const cEl=document.getElementById('pl-count'); if(cEl) cEl.textContent=n+(n>1?' cases':' case');
+  const paste=document.getElementById('pl-paste'); if(paste) paste.style.display=PLCLIP?'':'none';
+  const undo=document.getElementById('pl-undo');   if(undo)  undo.style.display=PLUNDO?'':'none';
+}
+function _plClone(o){ return o?JSON.parse(JSON.stringify(o)):o; }
+
+function _plCopy(){
+  const R=_plRect(); if(!R){ try{toast('Rien à copier');}catch(_){} return; }
+  const rows=R.r1-R.r0+1, cols=(R.d1-R.d0)*2+2, baseC=R.d0*2;
+  const data=[];
+  for(let i=0;i<rows;i++){ const line=[]; for(let j=0;j<cols;j++) line.push(undefined); data.push(line); } // undefined = trou (non sélectionné)
+  let n=0;
+  for(let r=R.r0;r<=R.r1;r++) for(let d=R.d0;d<=R.d1;d++) for(let hi=0;hi<R.halves.length;hi++){
+    const hh=R.halves[hi], c=d*2+hh, col=PLGRID.cols[c]; if(!col) continue;
+    const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
+    data[r-R.r0][c-baseC]=_plClone(S.planning[k])||null;   // null = case vide (à effacer au collage), objet = à poser
+    n++;
+  }
+  PLCLIP={rows,cols,data};
+  _plUpdateBar();
+  try{toast(`📋 ${n} case${n>1?'s':''} copiée${n>1?'s':''}`);}catch(_){}
+}
+function _plPaste(){
+  if(!PLCLIP){ try{toast('Presse-papier vide');}catch(_){} return; }
+  const R=_plRect(); if(!R){ try{toast('Choisis une destination');}catch(_){} return; }
+  const selRows=R.r1-R.r0+1, selCols=(R.d1-R.d0)*2+2, baseC=R.d0*2;
+  const rows=Math.max(selRows,PLCLIP.rows), cols=Math.max(selCols,PLCLIP.cols);   // couvre au moins la sélection, au moins le bloc
+  const undo=[]; let count=0;
+  for(let i=0;i<rows;i++) for(let j=0;j<cols;j++){
+    const src=PLCLIP.data[i%PLCLIP.rows][j%PLCLIP.cols];
+    if(src===undefined) continue;                          // trou : ne pas toucher la destination
+    const r=R.r0+i, c=baseC+j;
+    if(r>=PLGRID.rowEmps.length||c>=PLGRID.cols.length||!PLGRID.cols[c]) continue;
+    const k=`${PLGRID.rowEmps[r]}_${PLGRID.cols[c].ds}_${PLGRID.cols[c].half}`;
+    undo.push({key:k, prev:_plClone(S.planning[k])});
+    if(src&&src.type) S.planning[k]=_plClone(src); else delete S.planning[k];
+    count++;
+  }
+  PLUNDO={items:undo}; _plRefresh();
+  try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}`);}catch(_){}
+}
+function _plFill(){
+  if(!PLCLIP){ try{toast("Copie d'abord une case");}catch(_){} return; }
+  const pl=PLCLIP.data[0][0], cells=_plCells(); if(!cells.length) return;
+  const undo=[];
+  cells.forEach(o=>{ undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); if(pl&&pl.type) S.planning[o.key]=_plClone(pl); else delete S.planning[o.key]; });
+  PLUNDO={items:undo}; _plRefresh();
+  try{toast(`🪣 ${cells.length} case${cells.length>1?'s':''} remplie${cells.length>1?'s':''}`);}catch(_){}
+}
+function _plDelete(){
+  const cells=_plCells(); if(!cells.length) return;
+  const undo=[]; let n=0;
+  cells.forEach(o=>{ undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); if(S.planning[o.key]!==undefined){ delete S.planning[o.key]; n++; } });
+  PLUNDO={items:undo}; _plRefresh();
+  try{toast(`🗑️ ${n} case${n>1?'s':''} vidée${n>1?'s':''}`);}catch(_){}
+}
+function _plUndo(){
+  if(!PLUNDO){ try{toast('Rien à annuler');}catch(_){} return; }
+  PLUNDO.items.forEach(it=>{ if(it.prev===undefined) delete S.planning[it.key]; else S.planning[it.key]=it.prev; });
+  PLUNDO=null; _plRefresh();
+  try{toast('↩️ Annulé');}catch(_){}
+}
+function _plRefresh(){
+  try{ if(typeof save==='function') save(); }catch(_){}
+  const c=window.PLGRID&&PLGRID.container;
+  try{
+    if(c==='masterGrid'&&typeof renderMaster==='function') renderMaster();
+    else if(c==='weeklyGrid'&&typeof renderWeekly==='function') renderWeekly();
+  }catch(_){}
+  _plUpdateBar();
+}
+function _plKey(e){
+  if(!PLSEL.active) return;
+  const k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='c'){ e.preventDefault(); _plCopy(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='v'){ e.preventDefault(); _plPaste(); }
+  else if(k==='delete'){ e.preventDefault(); _plDelete(); }
+  else if(k==='escape'){ e.preventDefault(); _plExit(); }
 }
 
 /* ═══ MASTER ═══ */
@@ -6865,6 +7203,53 @@ function renderMaster(){
 /* ═══ WEEKLY ═══ */
 function chWeek(dir){S.weekStart=addD(S.weekStart,dir*7);renderWeekly();}
 function thisWeek(){S.weekStart=getMon(new Date());renderWeekly();}
+
+// Recopie la semaine précédente vers la semaine courante — NON DESTRUCTIF : ne remplit que les cases vides,
+// ne touche jamais aux formations/congés/absences déjà saisis.
+function copyPrevWeek(){
+  if(!S.weekStart) S.weekStart=getMon(new Date());
+  const mon=getMon(S.weekStart instanceof Date?S.weekStart:new Date(S.weekStart));
+  const prevMon=addD(mon,-7);
+  const only=(document.getElementById('wk-emp')||{}).value||'';   // si un employé est filtré, ne traiter que lui
+  const list=only?S.personnel.filter(p=>p.id===only):S.personnel.filter(p=>p.actif!==false && !p.archived);
+  const undo=[]; let filled=0;
+  list.forEach(p=>{
+    for(let i=0;i<7;i++){
+      const curD=fmt(addD(mon,i)), prevD=fmt(addD(prevMon,i));
+      if(isHol(curD)) continue;                                    // ne pas remplir un jour férié
+      ['AM','PM'].forEach(h=>{
+        const curK=`${p.id}_${curD}_${h}`;
+        if(S.planning[curK]) return;                               // NON destructif : case déjà remplie => on garde
+        const src=S.planning[`${p.id}_${prevD}_${h}`];
+        if(src&&src.type){
+          S.planning[curK]=JSON.parse(JSON.stringify(src));
+          undo.push({key:curK});
+          filled++;
+        }
+      });
+    }
+  });
+  if(!filled){ try{toast('Rien à recopier (semaine précédente vide, ou tout est déjà rempli)');}catch(_){} return; }
+  save(); renderWeekly(); renderMaster();
+  _bulkBanner(`${filled} demi-journée${filled>1?'s':''} recopiée${filled>1?'s':''} depuis S‑1 · cases déjà remplies conservées`, undo);
+}
+// Petite bannière d'annulation pour les actions groupées (réutilise le style .pl-bar)
+function _bulkBanner(msg, undoItems){
+  let b=document.getElementById('bulk-bar');
+  if(!b){ b=document.createElement('div'); b.id='bulk-bar'; b.className='pl-bar'; document.body.appendChild(b); }
+  b._undo=undoItems||[];
+  b.innerHTML=`<span class="pl-count">✓</span><span class="pl-note">${msg}</span>`+
+    `<button class="pl-btn" onclick="_bulkUndo()"><span>↩️</span>Annuler</button>`+
+    `<button class="pl-btn pl-x" onclick="_bulkHide()">OK</button>`;
+  b.classList.add('on');
+}
+function _bulkUndo(){
+  const b=document.getElementById('bulk-bar'); const items=(b&&b._undo)||[];
+  items.forEach(it=>{ if(it.prev===undefined) delete S.planning[it.key]; else S.planning[it.key]=it.prev; });
+  try{save();renderWeekly();renderMaster();}catch(_){}
+  _bulkHide(); try{toast('↩️ Annulé');}catch(_){}
+}
+function _bulkHide(){ const b=document.getElementById('bulk-bar'); if(b) b.classList.remove('on'); }
 function chWeekYear(y){ y=parseInt(y); if(!y)return; const d=new Date(S.weekStart); S.weekStart=getMon(new Date(y,d.getMonth(),Math.min(d.getDate(),28))); renderWeekly(); }
 
 function sortByChantier(personnel, weekDates){
@@ -6961,6 +7346,8 @@ function renderWeekly(){
 
 /* ═══ CELL EDIT ═══ */
 function openCell(empId,dateStr,half){
+  if(window.PLSEL&&PLSEL.active) return; // mode sélection : le tap gère la sélection, pas l'édition
+  if(window.PLBRUSH&&PLBRUSH.active){ _brushApply(empId,dateStr,half); return; } // mode pinceau : appliquer le contenu
   cellCtx={empId,dateStr,half};
   try{popSelects();}catch(e){console.warn('popSelects openCell:',e);} // options à jour (stockage/recyclage/chantiers)
   const k=`${empId}_${dateStr}_${half}`;const ex=S.planning[k]||{};
@@ -7095,6 +7482,59 @@ function saveCellEdit(){
   }
 
   save();closeM('m-cell');renderWeekly();renderMaster();cellCtx=null;
+}
+
+/* ═══ PINCEAU : copier le contenu d'une case vers d'autres (tactile + souris, sans geste) ═══ */
+window.PLBRUSH=window.PLBRUSH||{active:false,payload:null,undo:[]};
+function armBrush(){
+  if(!cellCtx){ return; }
+  const {empId,dateStr,half}=cellCtx;
+  const key=`${empId}_${dateStr}_${half}`;
+  saveCellEdit();                                   // sauvegarde d'abord la case courante (ferme l'éditeur)
+  const p=S.planning[key];
+  if(!p||!p.type){ try{toast("Choisis d'abord un statut à copier");}catch(_){} return; }
+  window.PLBRUSH={active:true, payload:JSON.parse(JSON.stringify(p)), undo:[]};
+  _brushBanner();
+  try{toast('🖌 Pinceau actif — tapez les cases à remplir');}catch(_){}
+}
+function _brushLabel(p){
+  const names={travail:'Travail',conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',recup:'Récup',rtt:'RTT'};
+  let base=names[p.type]||p.type, extra='';
+  if(p.type==='travail'&&p.chantierId){ const c=S.chantiers.find(x=>x.id===p.chantierId); extra=' · '+((c&&(c.msn||c.nom))||p.chantierId); }
+  else if(p.type==='formation_int'&&p.formInt){ extra=' · '+p.formInt; }
+  else if(p.note){ extra=' · '+p.note; }
+  return base+extra;
+}
+function _brushBanner(){
+  let b=document.getElementById('brush-bar');
+  if(!b){ b=document.createElement('div'); b.id='brush-bar'; b.className='pl-bar'; document.body.appendChild(b); }
+  const n=PLBRUSH.undo.length;
+  b.innerHTML=`<span class="pl-count">🖌 ${_brushLabel(PLBRUSH.payload)}</span>`+
+    `<span class="pl-note">Tapez les cases${n?' · '+n+' faite'+(n>1?'s':''):''}</span>`+
+    (n?`<button class="pl-btn" onclick="_brushUndo()"><span>↩️</span>Annuler</button>`:'')+
+    `<button class="pl-btn pl-x" onclick="_brushExit()">Terminer</button>`;
+  b.classList.add('on');
+}
+function _brushApply(empId,dateStr,half){
+  const k=`${empId}_${dateStr}_${half}`;
+  PLBRUSH.undo.push({key:k, prev:S.planning[k]?JSON.parse(JSON.stringify(S.planning[k])):undefined});
+  S.planning[k]=JSON.parse(JSON.stringify(PLBRUSH.payload));
+  try{save();}catch(_){}
+  try{renderWeekly();}catch(_){}
+  try{renderMaster();}catch(_){}
+  _brushBanner();
+}
+function _brushUndo(){
+  if(!PLBRUSH.undo.length){ try{toast('Rien à annuler');}catch(_){} return; }
+  PLBRUSH.undo.forEach(it=>{ if(it.prev===undefined) delete S.planning[it.key]; else S.planning[it.key]=it.prev; });
+  PLBRUSH.undo=[];
+  try{save();renderWeekly();renderMaster();}catch(_){}
+  _brushBanner();
+  try{toast('↩️ Annulé');}catch(_){}
+}
+function _brushExit(){
+  window.PLBRUSH={active:false,payload:null,undo:[]};
+  const b=document.getElementById('brush-bar'); if(b) b.classList.remove('on');
 }
 
 /* ═══ CHANTIERS ═══ */
@@ -7998,7 +8438,7 @@ function renderRespGantt(){
       const col=ABSENCE_COLORS[b.type]||'#6b7280', txt=_txtOn(col);
       const lbl=ABSENCE_LABELS[b.type]||b.type;
       const top=absTop+it.lane*ABS_H;
-      return `<div title="${lbl}: ${disp(b.start)} \u2192 ${disp(b.end)}" style="position:absolute;top:${top}px;height:${ABS_H-4}px;left:${l}%;width:${w}%;background:${col};opacity:0.9;border-radius:4px;z-index:2;display:flex;align-items:center;padding:0 6px;overflow:hidden">
+      return `<div onclick="gotoMasterAbsence('${emp.id}','${b.start}')" title="${lbl}: ${disp(b.start)} \u2192 ${disp(b.end)} \u00b7 ouvrir le Master Planning" style="position:absolute;top:${top}px;height:${ABS_H-4}px;left:${l}%;width:${w}%;background:${col};opacity:0.9;border-radius:4px;z-index:2;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;padding:0 6px;overflow:hidden" onmouseenter="this.style.opacity='0.65'" onmouseleave="this.style.opacity='0.9'">
         <span style="font-size:10px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lbl}</span>
       </div>`;
     }).join('');
