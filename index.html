@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260714-NOTICE -->
+<!-- AeroStaff Pro v7 — Build 20260714-GRIDFIX -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2541,7 +2541,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260714-NOTICE · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260714-GRIDFIX · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -6857,8 +6857,10 @@ function buildGrid(emps,dates,containerId){
     requestAnimationFrame(_restore);
   }
 
-  // Sélection copier/coller : mémoriser la topologie de la grille courante + réappliquer la surbrillance
-  window.PLGRID={ container:containerId, rowEmps:emps.map(e=>e.id), cols:dates.flatMap(d=>{const ds=fmt(d);return [{ds,half:'AM'},{ds,half:'PM'}];}) };
+  // Sélection copier/coller : mémoriser la topologie PAR grille (master/weekly) — évite que PLGRID pointe sur la mauvaise grille
+  const _grid={ container:containerId, rowEmps:emps.map(e=>e.id), cols:dates.flatMap(d=>{const ds=fmt(d);return [{ds,half:'AM'},{ds,half:'PM'}];}) };
+  window.PLGRIDS=window.PLGRIDS||{}; window.PLGRIDS[containerId]=_grid;
+  window.PLGRID=_grid;
   if(typeof _plInit==='function') _plInit();
   if(typeof _plApplyHighlight==='function') _plApplyHighlight();
 }
@@ -6901,6 +6903,11 @@ function _plDown(e){
   if(e.pointerType!=='mouse') return;            // tactile géré séparément (touch events)
   if(e.button!==0) return;
   const cell=_plCell(e);
+  // Aligner PLGRID sur la grille effectivement cliquée (master ou weekly), pas la dernière rendue
+  const cont=cell&&cell.closest?cell.closest('#masterGrid, #weeklyGrid'):null;
+  if(cont&&window.PLGRIDS&&PLGRIDS[cont.id]&&window.PLGRID!==PLGRIDS[cont.id]){
+    window.PLGRID=PLGRIDS[cont.id]; window._plPrevRect=null; window._plPrevAnchorEl=null;
+  }
   if(!_plInGrid(cell)){
     if(PLSEL.active){ const t=e.target; if(!(t&&t.closest&&t.closest('#pl-bar'))) _plExit(); }
     return;
@@ -7500,7 +7507,7 @@ function armBrush(){
 function _brushLabel(p){
   const names={travail:'Travail',conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',recup:'Récup',rtt:'RTT'};
   let base=names[p.type]||p.type, extra='';
-  if(p.type==='travail'&&p.chantierId){ const c=S.chantiers.find(x=>x.id===p.chantierId); extra=' · '+((c&&(c.msn||c.nom))||p.chantierId); }
+  if(p.type==='travail'&&p.chantierId){ extra=' · '+((typeof _chMsnLabel==='function'?_chMsnLabel(p.chantierId):'')||p.chantierId); }
   else if(p.type==='formation_int'&&p.formInt){ extra=' · '+p.formInt; }
   else if(p.note){ extra=' · '+p.note; }
   return base+extra;
@@ -7515,26 +7522,69 @@ function _brushBanner(){
     `<button class="pl-btn pl-x" onclick="_brushExit()">Terminer</button>`;
   b.classList.add('on');
 }
+// MAJ visuelle d'UNE SEULE demi-case, à l'identique de buildGrid (sans re-rendu global) → fluide sur iPad
+function _paintCellDOM(empId,ds,half){
+  const els=document.querySelectorAll(`.hd[data-emp="${empId}"][data-ds="${ds}"][data-half="${half}"]`);
+  if(!els.length) return;
+  const e=S.planning[`${empId}_${ds}_${half}`]||{}; const t=e.type||'';
+  let isH=false,isW=false; try{ isH=isHol(ds); const wd=parseLocal(ds).getDay(); isW=(wd===0||wd===6);}catch(_){}
+  const cls = t ? (HD_CSS[t]||'') : (isH?'hfe':isW?'hwe':'');
+  let style='';
+  if(t==='travail'&&e.chantierId){
+    const id=e.chantierId;
+    if(id==='STO') style='background:rgba(255,154,60,0.18);color:#ff9a3c;';
+    else if(id==='REC'||id.indexOf('REC_')===0) style='background:rgba(110,255,196,0.18);color:#6effc4;';
+    else if(id==='AIRBUS') style='background:rgba(0,100,200,0.18);color:#00a0ff;';
+    else { const ch=S.chantiers.find(c=>c.id===id); if(ch&&ch.color) style=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`; }
+  }
+  let lbl = (t==='travail'&&e.chantierId) ? _chMsnLabel(e.chantierId)
+    : t==='formation' ? (e.note||'Form.').slice(0,7)
+    : t==='formation_int' ? ('📖'+(e.formInt||'').slice(0,8))
+    : (HD_LBL[t]||'');
+  let inner;
+  if(t==='travail'&&e.chantierId&&e.chantierId2){
+    const c1=_chColor(e.chantierId),c2=_chColor(e.chantierId2),l1=_chMsnLabel(e.chantierId),l2=_chMsnLabel(e.chantierId2);
+    inner=`<div style="display:flex;height:100%;width:100%"><div style="flex:1;min-width:0;background:${hexRgba(c1,0.22)};color:${c1};display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;overflow:hidden;line-height:1;padding:0 1px">${l1}</div><div style="flex:1;min-width:0;background:${hexRgba(c2,0.22)};color:${c2};display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;overflow:hidden;line-height:1;padding:0 1px;border-left:1px solid rgba(255,255,255,0.28)">${l2}</div></div>`;
+    style='';
+  } else {
+    inner = lbl || (!t&&isH?'Férié':!t&&isW?'W-E':'');
+  }
+  const vmB = e.vm?`<span style="position:absolute;top:1px;right:2px;background:#22b8cf;color:#04222a;font-size:6.5px;font-weight:800;border-radius:3px;padding:0 2px;line-height:1.5;pointer-events:none;z-index:2">VM ${e.vm}</span>`:'';
+  els.forEach(el=>{ el.className='hd '+cls; el.style.cssText='position:relative;'+style; el.innerHTML=inner+vmB; });
+}
+let _brushSaveT=null;
+function _brushScheduleSave(){ if(_brushSaveT) clearTimeout(_brushSaveT); _brushSaveT=setTimeout(()=>{ _brushSaveT=null; try{save();}catch(_){} },700); }
 function _brushApply(empId,dateStr,half){
   const k=`${empId}_${dateStr}_${half}`;
   PLBRUSH.undo.push({key:k, prev:S.planning[k]?JSON.parse(JSON.stringify(S.planning[k])):undefined});
   S.planning[k]=JSON.parse(JSON.stringify(PLBRUSH.payload));
-  try{save();}catch(_){}
-  try{renderWeekly();}catch(_){}
-  try{renderMaster();}catch(_){}
-  _brushBanner();
+  _paintCellDOM(empId,dateStr,half);   // MAJ de la seule case → aucun re-rendu global
+  _brushBanner();                       // MAJ compteur
+  _brushScheduleSave();                 // sauvegarde différée (évite un save à chaque tap)
 }
 function _brushUndo(){
   if(!PLBRUSH.undo.length){ try{toast('Rien à annuler');}catch(_){} return; }
-  PLBRUSH.undo.forEach(it=>{ if(it.prev===undefined) delete S.planning[it.key]; else S.planning[it.key]=it.prev; });
+  PLBRUSH.undo.forEach(it=>{
+    if(it.prev===undefined) delete S.planning[it.key]; else S.planning[it.key]=it.prev;
+    const parts=it.key.split('_'); const half=parts.pop(), ds=parts.pop(), empId=parts.join('_');
+    _paintCellDOM(empId,ds,half);   // MAJ ciblée, pas de re-rendu global
+  });
   PLBRUSH.undo=[];
-  try{save();renderWeekly();renderMaster();}catch(_){}
-  _brushBanner();
+  _brushScheduleSave(); _brushBanner();
   try{toast('↩️ Annulé');}catch(_){}
 }
 function _brushExit(){
+  if(_brushSaveT){ clearTimeout(_brushSaveT); _brushSaveT=null; }
   window.PLBRUSH={active:false,payload:null,undo:[]};
   const b=document.getElementById('brush-bar'); if(b) b.classList.remove('on');
+  // Recalcul complet à la fin (une seule fois) : sauvegarde + grilles + agrégats
+  try{ if(typeof save==='function') save(); }catch(_){}
+  try{ if(typeof renderWeekly==='function') renderWeekly(); }catch(_){}
+  try{ if(typeof renderMaster==='function') renderMaster(); }catch(_){}
+  try{ if(typeof renderProgramme==='function') renderProgramme(); }catch(_){}
+  try{ if(typeof renderKPI==='function') renderKPI(); }catch(_){}
+  try{ if(typeof checkConflicts==='function') checkConflicts(); }catch(_){}
+  try{ toast('✅ Pinceau terminé — planning recalculé'); }catch(_){}
 }
 
 /* ═══ CHANTIERS ═══ */
