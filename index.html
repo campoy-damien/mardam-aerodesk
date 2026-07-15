@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260714-GRIDFIX -->
+<!-- AeroStaff Pro v7 — Build 20260715-REX -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -600,8 +600,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 /* ── Gantt Chart ── */
 .gantt-wrap{overflow-x:auto;padding:4px 0}
-.gantt-container{min-width:800px;position:relative}
-.gantt-label-col{width:220px;flex-shrink:0}
+.gantt-container{min-width:1760px;position:relative}
+.gantt-label-col{width:220px;flex-shrink:0;position:sticky;left:0;z-index:6;background:#0d1628}
+.gantt-weeks{position:relative;height:15px;background:rgba(16,23,38,0.90);border-bottom:1px solid rgba(255,255,255,0.07)}
+.gantt-wk{position:absolute;top:0;height:100%;display:flex;align-items:center;padding-left:3px;font-size:8px;font-weight:700;color:var(--t4);border-left:1px solid rgba(255,255,255,0.09);white-space:nowrap;letter-spacing:.2px}
+.gantt-wkline{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.035);pointer-events:none;z-index:0}
 .gantt-header{display:flex;margin-bottom:0}
 .gantt-months{flex:1;display:flex;background:rgba(16,23,38,0.90);border-bottom:1px solid rgba(255,255,255,0.07)}
 .gantt-month{flex:1;text-align:center;font-size:10px;font-weight:700;color:var(--t3);padding:6px 2px;letter-spacing:.5px;text-transform:uppercase;border-right:1px solid rgba(255,255,255,0.05);min-width:36px}
@@ -637,6 +640,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .gantt-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 100%);border-radius:99px;}
 .gantt-bar:hover{filter:brightness(1.25);box-shadow:0 0 16px rgba(255,255,255,0.15)}
 .gantt-today{position:absolute;top:0;bottom:0;width:2px;background:var(--rose);opacity:.75;z-index:3;pointer-events:none}
+/* Programme des chantiers — barres rectangulaires avec MSN inscrit */
+.pg-bar{position:absolute;border-radius:3px;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;padding:0 5px;transition:filter .15s;z-index:2}
+.pg-bar:hover{filter:brightness(1.22)}
+.pg-chlbl{font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .gantt-empty{text-align:center;padding:32px;color:var(--t4);font-size:13px}
 .gantt-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
 .gantt-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
@@ -1700,8 +1707,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="sh">
     <div class="sh-title">Programme <em>Activité</em></div>
     <div class="btn-row">
-      <select id="gantt-year" onchange="renderProgramme()" style="height:34px;border-radius:99px;padding:0 14px;width:100px"></select>
-      <button class="btn btn-ghost btn-sm" onclick="exportGanttPDF()">📄 Export PDF</button>
+      <label style="font-size:10px;color:#8090a8;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Année du programme</label>
+      <select id="gantt-year" onchange="renderProgramme()" title="Année affichée dans le Gantt des chantiers" style="height:34px;border-radius:99px;padding:0 14px;width:100px"></select>
+      <button class="btn btn-ghost btn-sm" onclick="exportGanttPDF()" title="Choisir une période, puis exporter en PDF ou en Excel">📤 Export data</button>
     </div>
   </div>
 
@@ -1724,8 +1732,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="gc-head">
       <div class="gc-title">📊 Programme des chantiers</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <div class="gantt-leg-item"><div class="gantt-leg-dot" style="background:#34c759"></div>Validés (En cours / À venir / Terminé)</div>
-        <div class="gantt-leg-item"><div class="gantt-leg-dot" style="background:#8e8e93"></div>Prévisionnels</div>
+        <div class="gantt-leg-item"><div class="gantt-leg-dot" style="background:linear-gradient(90deg,#2979ff,#7c5cff,#00c2a8)"></div>Couleur = chantier</div>
+        <div class="gantt-leg-item"><div class="gantt-leg-dot" style="background:repeating-linear-gradient(135deg,#8e8e93 0 3px,rgba(142,142,147,0.3) 3px 6px)"></div>Prévisionnel (hachuré)</div>
+        <div class="gantt-leg-item"><div class="gantt-leg-dot" style="background:#2979ff;border:2px solid rgba(255,255,255,0.65)"></div>En cours aujourd'hui</div>
       </div>
     </div>
     <div id="gantt1" class="gantt-wrap"></div>
@@ -2541,7 +2550,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260714-GRIDFIX · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260715-REX · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2932,6 +2941,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-chantier')">Annuler</button>
     <button class="btn btn-rose btn-sm" id="c-delbtn" onclick="deleteChantier()" style="display:none">🗑 Supprimer</button>
+    <button class="btn btn-ghost btn-sm" id="c-rexbtn" onclick="openRex(document.getElementById('ci').value)" style="display:none">📋 Fiche REX</button>
     <button class="btn btn-cyan" onclick="saveChantier()">Sauvegarder</button>
   </div>
 </div>
@@ -2958,6 +2968,49 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 
 <!-- Jours fériés — FONCTIONNEL -->
+<div class="mbg" id="m-rex">
+<div class="modal" style="max-width:1100px">
+  <div class="modal-title">📋 Fiche REX — Retour d'expérience</div>
+  <div id="rex-body" style="max-height:65vh;overflow-y:auto"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-rex')">Fermer</button>
+    <button class="btn btn-mint" onclick="rexXls()">📊 Excel</button>
+    <button class="btn btn-cyan" onclick="rexPdf()">📄 PDF</button>
+  </div>
+</div>
+</div>
+
+<div class="mbg" id="m-progpdf">
+<div class="modal" style="max-width:460px">
+  <div class="modal-title">📤 Export data — Programme Activité</div>
+  <div style="background:rgba(0,210,255,0.05);border:1px solid rgba(0,210,255,0.15);border-radius:var(--r12);padding:12px;margin-bottom:14px">
+    <p style="font-size:12px;color:var(--t2);line-height:1.6">
+      Choisis la <strong style="color:#fff">période</strong> à extraire, puis le format. L'export contiendra deux tableaux sur cette période :
+      le <strong style="color:var(--cyan)">besoin en personnel</strong> (par chantier × semaine) et le
+      <strong style="color:var(--cyan)">programme des chantiers</strong>.<br>
+      Les chantiers <strong>sans besoin</strong> sur la période et les chantiers <strong>terminés</strong> sont masqués.
+      L'<strong style="color:var(--mint)">Excel</strong> est dynamique : totaux et écarts recalculés à la saisie.
+    </p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="field" style="flex:1;min-width:140px"><label>Du</label><input type="date" id="pp-debut" onchange="_ppInfo()"></div>
+    <div class="field" style="flex:1;min-width:140px"><label>Au</label><input type="date" id="pp-fin" onchange="_ppInfo()"></div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+    <button class="btn btn-ghost btn-sm" onclick="setProgPdfRange(4)">4 semaines</button>
+    <button class="btn btn-ghost btn-sm" onclick="setProgPdfRange(13)">13 semaines</button>
+    <button class="btn btn-ghost btn-sm" onclick="setProgPdfRange(26)">6 mois</button>
+    <button class="btn btn-ghost btn-sm" onclick="setProgPdfRange(52)">1 an</button>
+  </div>
+  <div id="pp-info" style="font-size:11px;color:var(--t4);margin-bottom:4px"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-progpdf')">Annuler</button>
+    <button class="btn btn-mint" onclick="runProgXls()">📊 Excel</button>
+    <button class="btn btn-cyan" onclick="runProgPdf()">📄 PDF</button>
+  </div>
+</div>
+</div>
+
 <div class="mbg" id="m-hol">
 <div class="modal" style="max-width:560px">
   <div class="modal-title">🎉 Jours fériés & Jours spéciaux</div>
@@ -7091,37 +7144,59 @@ function _plUpdateBar(){
 }
 function _plClone(o){ return o?JSON.parse(JSON.stringify(o)):o; }
 
+// Colonnes réellement sélectionnées (indices), dans l'ordre
+function _plSelCols(R){
+  const out=[];
+  for(let d=R.d0;d<=R.d1;d++) for(let hi=0;hi<R.halves.length;hi++){
+    const c=d*2+R.halves[hi]; if(PLGRID.cols[c]) out.push(c);
+  }
+  return out;
+}
+// Presse-papier COMPACTÉ : uniquement les cases sélectionnées, sans trou ni parité AM/PM figée
+// → un après-midi copié peut se coller sur un matin, et inversement.
 function _plCopy(){
   const R=_plRect(); if(!R){ try{toast('Rien à copier');}catch(_){} return; }
-  const rows=R.r1-R.r0+1, cols=(R.d1-R.d0)*2+2, baseC=R.d0*2;
-  const data=[];
-  for(let i=0;i<rows;i++){ const line=[]; for(let j=0;j<cols;j++) line.push(undefined); data.push(line); } // undefined = trou (non sélectionné)
-  let n=0;
-  for(let r=R.r0;r<=R.r1;r++) for(let d=R.d0;d<=R.d1;d++) for(let hi=0;hi<R.halves.length;hi++){
-    const hh=R.halves[hi], c=d*2+hh, col=PLGRID.cols[c]; if(!col) continue;
-    const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
-    data[r-R.r0][c-baseC]=_plClone(S.planning[k])||null;   // null = case vide (à effacer au collage), objet = à poser
-    n++;
+  const cols=_plSelCols(R), data=[];
+  for(let r=R.r0;r<=R.r1;r++){
+    const line=cols.map(c=>{
+      const col=PLGRID.cols[c];
+      return _plClone(S.planning[`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`])||null;  // null = case vide
+    });
+    data.push(line);
   }
-  PLCLIP={rows,cols,data};
+  const rows=data.length, n=rows*cols.length;
+  // stride : si on a copié une seule demi-journée (PM seuls p.ex.), on avance de jour en jour au collage
+  PLCLIP={rows, cols:cols.length, data, stride:(R.halves.length===1?2:1)};
   _plUpdateBar();
   try{toast(`📋 ${n} case${n>1?'s':''} copiée${n>1?'s':''}`);}catch(_){}
 }
 function _plPaste(){
   if(!PLCLIP){ try{toast('Presse-papier vide');}catch(_){} return; }
   const R=_plRect(); if(!R){ try{toast('Choisis une destination');}catch(_){} return; }
-  const selRows=R.r1-R.r0+1, selCols=(R.d1-R.d0)*2+2, baseC=R.d0*2;
-  const rows=Math.max(selRows,PLCLIP.rows), cols=Math.max(selCols,PLCLIP.cols);   // couvre au moins la sélection, au moins le bloc
+  const selRows=[], selCols=_plSelCols(R);
+  for(let r=R.r0;r<=R.r1;r++) selRows.push(r);
+  let rowsIdx, colsIdx;
+  if(selRows.length*selCols.length>1){
+    rowsIdx=selRows; colsIdx=selCols;                       // destination multi-cases : on remplit EXACTEMENT la sélection (répétition si besoin)
+  } else {
+    rowsIdx=[]; colsIdx=[];                                  // destination = 1 case : on déroule la forme copiée à partir d'elle
+    for(let i=0;i<PLCLIP.rows;i++){ const r=R.r0+i; if(r<PLGRID.rowEmps.length) rowsIdx.push(r); }
+    for(let j=0;j<PLCLIP.cols;j++){ const c=selCols[0]+j*(PLCLIP.stride||1); if(c<PLGRID.cols.length&&PLGRID.cols[c]) colsIdx.push(c); }
+  }
   const undo=[]; let count=0;
-  for(let i=0;i<rows;i++) for(let j=0;j<cols;j++){
-    const src=PLCLIP.data[i%PLCLIP.rows][j%PLCLIP.cols];
-    if(src===undefined) continue;                          // trou : ne pas toucher la destination
-    const r=R.r0+i, c=baseC+j;
-    if(r>=PLGRID.rowEmps.length||c>=PLGRID.cols.length||!PLGRID.cols[c]) continue;
-    const k=`${PLGRID.rowEmps[r]}_${PLGRID.cols[c].ds}_${PLGRID.cols[c].half}`;
+  rowsIdx.forEach((r,i)=>colsIdx.forEach((c,j)=>{
+    const src=PLCLIP.data[i%PLCLIP.rows][j%PLCLIP.cols];     // répétition (carrelage) si la destination est plus grande
+    const col=PLGRID.cols[c]; if(!col) return;
+    const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
     undo.push({key:k, prev:_plClone(S.planning[k])});
     if(src&&src.type) S.planning[k]=_plClone(src); else delete S.planning[k];
     count++;
+  }));
+  // refléter la zone réellement collée dans la sélection
+  if(rowsIdx.length&&colsIdx.length){
+    const lc=colsIdx[colsIdx.length-1], fc=colsIdx[0];
+    PLSEL.anchor={empId:PLGRID.rowEmps[rowsIdx[0]],ds:PLGRID.cols[fc].ds,half:PLGRID.cols[fc].half};
+    PLSEL.focus ={empId:PLGRID.rowEmps[rowsIdx[rowsIdx.length-1]],ds:PLGRID.cols[lc].ds,half:PLGRID.cols[lc].half};
   }
   PLUNDO={items:undo}; _plRefresh();
   try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}`);}catch(_){}
@@ -7667,6 +7742,7 @@ function openChantierNew(){
 function editChantier(id){
   const c=S.chantiers.find(x=>x.id===id);if(!c)return;
   document.getElementById('ci').value=id;document.getElementById('c-delbtn').style.display='inline-flex';
+  { const rb=document.getElementById('c-rexbtn'); if(rb) rb.style.display='inline-flex'; }
   document.getElementById('c-nom').value=c.nom||'';document.getElementById('c-client').value=c.client||'';
   document.getElementById('c-msn').value=c.msn||'';
   // Charger type avion
@@ -8095,7 +8171,10 @@ function renderAvancement(){
           <div style="font-size:15px;font-weight:800;color:#ffffff">${c.nom}</div>
           <div style="font-size:12px;color:#a0b0cc;margin-top:3px">${c.client?'🏢 '+c.client+' · ':''}📅 ${disp(c.debut||'')} → ${disp(c.fin||'—')} · <strong style="color:#e0e8ff">${joursRestants}j restants</strong> · <strong style="color:#e0e8ff">${mhSupp>0?`${mhInitial}+${mhSupp}=${mhTotal}`:mhTotal} MH</strong></div>
         </div>
-        <span style="font-size:12px;font-weight:700;color:${statutColor};background:${statutColor}25;border:1px solid ${statutColor}66;border-radius:99px;padding:4px 12px;white-space:nowrap">${statutLabel}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn btn-ghost btn-xs" onclick="openRex('${c.id}')" title="Fiche retour d'expérience">📋 REX</button>
+          <span style="font-size:12px;font-weight:700;color:${statutColor};background:${statutColor}25;border:1px solid ${statutColor}66;border-radius:99px;padding:4px 12px;white-space:nowrap">${statutLabel}</span>
+        </div>
       </div>
       <!-- Barre progression -->
       <div style="margin-bottom:14px">
@@ -8202,6 +8281,340 @@ function _matchChantier(c,q){
     || (c.client||'').toLowerCase().includes(q)
     || (c.avion||'').toLowerCase().includes(q);
 }
+/* ═══ FICHE REX (retour d'expérience) ═══ */
+const REX_H_JOUR=7;            // 7 h par jour ⇒ 3,5 h par demi-journée (même règle que l'avancement)
+const REX_GROUPS=[
+  {k:'prod',   lbl:'Production',            cats:['technicien','interimaire'],        col:'#2979ff'},
+  {k:'soust',  lbl:'Sous-traitance',        cats:['prestataire'],                     col:'#7c5cff'},
+  {k:'improd', lbl:'Encadrement (improd.)', cats:['chef','expert','responsable'],     col:'#ff9a3c'},
+  {k:'autres', lbl:'Autres',                cats:['alternant','stagiaire','iq','part21','recycling'], col:'#8e8e93'}
+];
+const _rexGroupOf=cat=>{ const g=REX_GROUPS.find(g=>g.cats.includes(cat)); return g?g.k:'autres'; };
+
+// Collecte toutes les données du REX d'un chantier
+function rexData(cid){
+  const c=S.chantiers.find(x=>x.id===cid); if(!c) return null;
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement']);
+  const byEmp={};
+  const weekSet=new Set();
+  let hTot=0, hPartage=0;
+
+  Object.entries(S.planning||{}).forEach(([key,e])=>{
+    if(!e) return;
+    const prim=e.chantierId===cid, sec=e.chantierId2===cid;
+    if(!prim&&!sec) return;
+    const parts=key.split('_'); if(parts.length<3) return;
+    const half=parts[parts.length-1]; if(half!=='AM'&&half!=='PM') return;
+    const ds=parts.slice(1,-1).join('_');
+    const empId=parts[0];
+    const emp=byId(empId); if(!emp) return;
+    const d=parseLocal(ds); if(!d||isNaN(d)) return;
+    const partage=!!(e.chantierId&&e.chantierId2);
+    const h=partage?(REX_H_JOUR/2)/2:(REX_H_JOUR/2);   // 1,75 h si demi-journée partagée, sinon 3,5 h
+    const mon=fmt(getMon(d));
+    weekSet.add(mon);
+    if(!byEmp[empId]) byEmp[empId]={emp,h:0,hPartage:0,first:ds,last:ds,weeks:{}};
+    const o=byEmp[empId];
+    o.h+=h; if(partage) o.hPartage+=h;
+    if(ds<o.first) o.first=ds;
+    if(ds>o.last) o.last=ds;
+    o.weeks[mon]=(o.weeks[mon]||0)+h;
+    hTot+=h; if(partage) hPartage+=h;
+  });
+
+  const people=Object.values(byEmp).sort((a,b)=>b.h-a.h);
+  const groups={};
+  REX_GROUPS.forEach(g=>groups[g.k]={...g,h:0,n:0});
+  people.forEach(p=>{ const k=_rexGroupOf(p.emp.categorie); groups[k].h+=p.h; groups[k].n++; });
+
+  const weeks=[...weekSet].sort().map(s=>parseLocal(s));
+
+  const allDs=people.flatMap(p=>[p.first,p.last]).sort();
+  const reelDebut=allDs[0]||null, reelFin=allDs[allDs.length-1]||null;
+  let retard=null;
+  if(c.fin&&reelFin){
+    retard = reelFin>c.fin ?  (calcJoursOuvres(c.fin,reelFin)-1)
+           : reelFin<c.fin ? -(calcJoursOuvres(reelFin,c.fin)-1) : 0;
+  }
+
+  const ajouts=Array.isArray(c.mhAjouts)?c.mhAjouts:[];
+  const hSupp=ajouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0);
+  const budget=(c.manHours||0)+hSupp;
+
+  const slots=(S.slot?.entries||[]).filter(e=>c.msn&&String(e.msn)===String(c.msn))
+                                   .sort((a,b)=>String(a.debut||'').localeCompare(String(b.debut||'')));
+  const joursHangar=slots.reduce((s,e)=>s+(e.nbJours||0),0);
+
+  // Heures perdues par absence (personnes du chantier, sur la période réelle)
+  let hAbs=0;
+  if(reelDebut&&reelFin){
+    const ids=new Set(people.map(p=>p.emp.id));
+    Object.entries(S.planning||{}).forEach(([key,e])=>{
+      if(!e||!e.type||!ABSENT.has(e.type)) return;
+      const parts=key.split('_');
+      if(!ids.has(parts[0])) return;
+      const half=parts[parts.length-1]; if(half!=='AM'&&half!=='PM') return;
+      const ds=parts.slice(1,-1).join('_');
+      if(ds<reelDebut||ds>reelFin) return;
+      hAbs+=REX_H_JOUR/2;
+    });
+  }
+
+  return {c,people,groups,weeks,hTot,hPartage,hAbs,ajouts,hSupp,budget,
+          reelDebut,reelFin,retard,slots,joursHangar,hProd:groups.prod.h};
+}
+
+let _rexCur=null;
+// Corps HTML de la fiche — 'print' = palette claire pour le PDF
+function rexHtml(D,print){
+  const c=D.c;
+  const T =print?{bg:'#fff',fg:'#0d1e3d',mut:'#5a7090',line:'#dde6f0',head:'#eef3fb',card:'#f2f6fd'}
+                :{bg:'transparent',fg:'#e8f0ff',mut:'#8090a8',line:'rgba(255,255,255,0.08)',head:'rgba(255,255,255,0.05)',card:'rgba(255,255,255,0.04)'};
+  const h1=v=>Math.round(v*10)/10;
+  const pct=(a,b)=>b>0?Math.round(a/b*100):0;
+  const ecart=D.budget>0?h1(D.hProd-D.budget):0;
+  const ecartPct=D.budget>0?Math.round((D.hProd-D.budget)/D.budget*100):0;
+  const okCol=print?'#27500a':'#34c759', badCol=print?'#a32d2d':'#ff5c7a';
+  const card=(lbl,val,col)=>`<div style="background:${T.card};border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:${T.mut}">${lbl}</div><div style="font-size:16px;font-weight:800;color:${col||T.fg}">${val}</div></div>`;
+  const th=`padding:4px 6px;border:1px solid ${T.line};background:${T.head};color:${T.mut};font-size:10px;font-weight:700;text-align:left`;
+  const td=`padding:3px 6px;border:1px solid ${T.line};font-size:10px;color:${T.fg}`;
+
+  // KPI
+  const kpis=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0">
+    ${card('Heures production réelles',h1(D.hProd)+' h')}
+    ${card('Écart / budget', D.budget>0?`${ecart>0?'+':''}${ecart} h · ${ecartPct>0?'+':''}${ecartPct}%`:'—', D.budget>0?(ecart>0?badCol:okCol):T.fg)}
+    ${card('Jours hangar', D.joursHangar?D.joursHangar+' j ouvrés':'—')}
+    ${card('Livraison', D.retard===null?'—':(D.retard>0?`+${D.retard} j de retard`:D.retard<0?`${-D.retard} j d'avance`:"à l'heure"), D.retard===null?T.fg:(D.retard>0?badCol:okCol))}
+  </div>`;
+
+  // Répartition par groupe
+  const gRows=REX_GROUPS.map(g=>{
+    const o=D.groups[g.k]; if(!o.h) return '';
+    return `<tr><td style="${td};border-left:3px solid ${g.col};font-weight:700">${g.lbl}</td>
+      <td style="${td};text-align:center">${o.n}</td>
+      <td style="${td};text-align:center;font-weight:700">${h1(o.h)} h</td>
+      <td style="${td};text-align:center">${pct(o.h,D.hTot)} %</td></tr>`;
+  }).join('');
+  const tGroups=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
+    <thead><tr><th style="${th}">Catégorie d'heures</th><th style="${th};text-align:center">Pers.</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th></tr></thead>
+    <tbody>${gRows}<tr><td style="${td};font-weight:800;background:${T.head}">Total toutes catégories</td><td style="${td};text-align:center;background:${T.head}">${D.people.length}</td><td style="${td};text-align:center;font-weight:800;background:${T.head}">${h1(D.hTot)} h</td><td style="${td};background:${T.head}"></td></tr></tbody></table>`;
+
+  // Détail par personne
+  const pRows=D.people.map(p=>{
+    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+    return `<tr><td style="${td};font-weight:700">${p.emp.nom} ${p.emp.prenom}</td>
+      <td style="${td};color:${g.col}">${(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie}</td>
+      <td style="${td};text-align:center;font-weight:700">${h1(p.h)}</td>
+      <td style="${td};text-align:center">${pct(p.h,D.hTot)} %</td>
+      <td style="${td};text-align:center">${p.hPartage?h1(p.hPartage)+' h':'—'}</td>
+      <td style="${td};text-align:center">${disp(p.first)} → ${disp(p.last)}</td></tr>`;
+  }).join('');
+  const tPeople=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
+    <thead><tr><th style="${th}">Personne</th><th style="${th}">Catégorie</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th><th style="${th};text-align:center">dont partagées</th><th style="${th};text-align:center">1re → dernière</th></tr></thead>
+    <tbody>${pRows||`<tr><td style="${td}" colspan="6">Aucune affectation trouvée dans le planning</td></tr>`}</tbody></table>`;
+
+  // Hangar
+  const sRows=D.slots.map(e=>{
+    const pos=SLOT_POSITIONS.find(p=>p.id===e.pos);
+    return `<tr><td style="${td};border-left:3px solid ${pos?pos.col:'#888'};font-weight:700">${pos?pos.lbl:'Pos. '+e.pos}</td>
+      <td style="${td};text-align:center">${disp(e.debut)}</td><td style="${td};text-align:center">${disp(e.fin)}</td>
+      <td style="${td};text-align:center;font-weight:700">${e.nbJours||0}</td>
+      <td style="${td}">${e.notes||'—'}</td></tr>`;
+  }).join('');
+  const tSlots=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
+    <thead><tr><th style="${th}">Emplacement</th><th style="${th};text-align:center">Du</th><th style="${th};text-align:center">Au</th><th style="${th};text-align:center">Jours ouvrés</th><th style="${th}">Notes</th></tr></thead>
+    <tbody>${sRows||`<tr><td style="${td}" colspan="5">Aucun passage hangar enregistré pour le MSN ${c.msn||'—'}</td></tr>`}</tbody></table>`;
+
+  // Heures ajoutées
+  const aRows=D.ajouts.map(a=>`<tr><td style="${td}">${a.motif||'(sans motif)'}</td>
+    <td style="${td};text-align:center;font-weight:700">${a.heures}</td>
+    <td style="${td};text-align:center">${pct(parseFloat(a.heures)||0,D.hSupp)} %</td></tr>`).join('');
+  const tAjouts=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
+    <thead><tr><th style="${th}">Motif</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part de la dérive</th></tr></thead>
+    <tbody>${aRows||`<tr><td style="${td}" colspan="3">Aucune heure ajoutée</td></tr>`}
+    ${D.hSupp?`<tr><td style="${td};font-weight:800;background:${T.head}">Total</td><td style="${td};text-align:center;font-weight:800;background:${T.head}">${D.hSupp}</td><td style="${td};background:${T.head}"></td></tr>`:''}</tbody></table>`;
+
+  // Mini master planning par semaine
+  const wk=D.weeks;
+  const maxW=Math.max(1,...D.people.map(p=>Math.max(0,...Object.values(p.weeks))));
+  const wHead=wk.map(m=>`<th style="${th};text-align:center;min-width:34px">S${wkN(m)}</th>`).join('');
+  const wRows=D.people.map(p=>{
+    const tds=wk.map(m=>{
+      const v=p.weeks[fmt(m)]||0;
+      if(!v) return `<td style="${td};text-align:center;color:${T.mut}">—</td>`;
+      const a=0.15+0.85*(v/maxW);
+      const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+      return `<td style="${td};text-align:center;font-weight:700;background:${hexRgba(g.col,a)};color:${a>0.55?'#fff':T.fg}">${h1(v)}</td>`;
+    }).join('');
+    return `<tr><td style="${td};font-weight:700;white-space:nowrap">${p.emp.nom} ${p.emp.prenom}</td>${tds}</tr>`;
+  }).join('');
+  const effRow=`<tr><td style="${td};font-weight:800;background:${T.head}">Effectif présent</td>${
+    wk.map(m=>`<td style="${td};text-align:center;font-weight:800;background:${T.head}">${D.people.filter(p=>p.weeks[fmt(m)]).length}</td>`).join('')}</tr>`;
+  const tPlan=wk.length?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+    <thead><tr><th style="${th}">Personne</th>${wHead}</tr></thead><tbody>${wRows}${effRow}</tbody></table></div>
+    <div style="font-size:9px;color:${T.mut};margin-top:3px">Heures par personne et par semaine · intensité = charge · dernière ligne = nombre de personnes présentes</div>`
+    :`<div style="font-size:11px;color:${T.mut}">Aucune semaine travaillée</div>`;
+
+  const sec=(t,inner)=>`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:800;color:${T.fg};margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid ${T.line}">${t}</div>${inner}</div>`;
+
+  return `<div style="color:${T.fg}">
+    <div style="font-size:13px;font-weight:800">${c.nom}</div>
+    <div style="font-size:11px;color:${T.mut};margin-top:2px">
+      ${c.client?c.client+' · ':''}${c.msn?'MSN '+c.msn+' · ':''}${c.avion||''}
+      · prévu ${disp(c.debut||'')} → ${disp(c.fin||'—')}
+      ${D.reelDebut?` · réalisé ${disp(D.reelDebut)} → ${disp(D.reelFin)}`:''}
+      ${byId(c.chef)?` · chef : ${byId(c.chef).prenom} ${byId(c.chef).nom}`:''}
+    </div>
+    ${kpis}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+      ${card('Budget (initial + ajouts)',D.budget?`${c.manHours||0} + ${D.hSupp} = ${D.budget} h`:'—')}
+      ${card('Heures perdues (absences)',h1(D.hAbs)+' h')}
+      ${card('Heures partagées (2 chantiers)',h1(D.hPartage)+' h')}
+      ${card('Rendement hangar',D.joursHangar?h1(D.hProd/D.joursHangar)+' h/jour':'—')}
+    </div>
+    ${sec('1 · Répartition des heures',tGroups)}
+    ${sec('2 · Qui est intervenu',tPeople)}
+    ${sec('3 · Occupation hangar',tSlots)}
+    ${sec('4 · Heures ajoutées en cours de chantier',tAjouts)}
+    ${sec('5 · Affectation semaine par semaine',tPlan)}
+  </div>`;
+}
+
+function openRex(cid){
+  const D=rexData(cid);
+  if(!D){ toast('Chantier introuvable'); return; }
+  _rexCur=D;
+  document.getElementById('rex-body').innerHTML=rexHtml(D,false);
+  closeM('m-chantier');
+  openM('m-rex');
+}
+function rexPdf(){
+  if(!_rexCur){ toast('Aucune fiche'); return; }
+  const D=_rexCur, c=D.c;
+  const sub=`${c.client?c.client+' · ':''}${c.msn?'MSN '+c.msn:''} · ${Math.round(D.hProd*10)/10} h production`;
+  openPrintView(pdfBase('Retour d\'expérience — '+c.nom, sub, 'landscape', rexHtml(D,true)), 'REX '+c.nom);
+  toast('Export PDF ✓');
+}
+function rexXls(){
+  if(!_rexCur){ toast('Aucune fiche'); return; }
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(async()=>{
+    if(!window.ExcelJS){ toast('Export coloré indisponible (connexion requise une fois)'); return; }
+    try{ await _buildRexXls(_rexCur); toast('✅ Excel REX généré'); }
+    catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
+async function _buildRexXls(D){
+  const c=D.c, h1=v=>Math.round(v*10)/10;
+  const argb=hex=>'FF'+String(hex||'#2979ff').replace('#','').slice(0,6).toUpperCase();
+  const wb=new ExcelJS.Workbook(); wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
+  const ws=wb.addWorksheet('REX',{properties:{defaultRowHeight:16}});
+  let r=1;
+  const title=t=>{ const row=ws.getRow(r++); row.getCell(1).value=t; row.getCell(1).font={bold:true,size:12,color:{argb:'FF1A2440'}}; };
+  const headRow=cells=>{ const row=ws.getRow(r++); cells.forEach((v,i)=>{ const cl=row.getCell(i+1); cl.value=v;
+      cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1A2440'}}; cl.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+      cl.alignment={horizontal:i?'center':'left',indent:i?0:1}; }); };
+  const dataRow=(cells,opt)=>{ const row=ws.getRow(r++); cells.forEach((v,i)=>{ const cl=row.getCell(i+1); cl.value=v;
+      cl.font={size:9,bold:!!(opt&&opt.bold),color:{argb:(opt&&opt.fg)||'FF14203A'}};
+      cl.alignment={horizontal:i?'center':'left',indent:i?0:1};
+      if(opt&&opt.fill) cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:opt.fill}};
+      const br={bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
+      if(i===0&&opt&&opt.accent) br.left={style:'thick',color:{argb:argb(opt.accent)}};
+      cl.border=br; }); return row; };
+
+  ws.mergeCells(1,1,1,7); const t=ws.getCell('A1');
+  t.value=`Retour d'expérience — ${c.nom}`;
+  t.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
+  t.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  t.alignment={vertical:'middle',indent:1}; ws.getRow(1).height=26; r=2;
+  ws.mergeCells(2,1,2,7);
+  ws.getCell('A2').value=`${c.client||''} ${c.msn?'· MSN '+c.msn:''} · prévu ${disp(c.debut||'')} → ${disp(c.fin||'—')}${D.reelDebut?` · réalisé ${disp(D.reelDebut)} → ${disp(D.reelFin)}`:''}`;
+  ws.getCell('A2').font={italic:true,size:9,color:{argb:'FF8A93A5'}}; r=4;
+
+  title('Synthèse');
+  const ecart=D.budget>0?h1(D.hProd-D.budget):0;
+  headRow(['Indicateur','Valeur']);
+  dataRow(['Heures production réelles',h1(D.hProd)],{bold:true});
+  dataRow(['Budget (initial + ajouts)',D.budget||0]);
+  dataRow(['Écart / budget',ecart],{bold:true,fill:ecart>0?'FFFFC7CE':'FFC6EFCE',fg:ecart>0?'FF9C0006':'FF1E7E34'});
+  dataRow(['Jours hangar (ouvrés)',D.joursHangar||0]);
+  dataRow(['Retard (jours ouvrés)',D.retard===null?'—':D.retard],{fill:(D.retard||0)>0?'FFFFC7CE':'FFC6EFCE'});
+  dataRow(['Heures perdues (absences)',h1(D.hAbs)]);
+  dataRow(['Heures partagées (2 chantiers)',h1(D.hPartage)]);
+  dataRow(['Rendement hangar (h/jour)',D.joursHangar?h1(D.hProd/D.joursHangar):'—']);
+  r++;
+
+  title('1 · Répartition des heures');
+  headRow(['Catégorie','Personnes','Heures','Part %']);
+  REX_GROUPS.forEach(g=>{ const o=D.groups[g.k]; if(!o.h) return;
+    dataRow([g.lbl,o.n,h1(o.h),D.hTot?Math.round(o.h/D.hTot*100):0],{bold:true,accent:g.col}); });
+  dataRow(['Total',D.people.length,h1(D.hTot),100],{bold:true,fill:'FFDDE6F5'});
+  r++;
+
+  title('2 · Qui est intervenu');
+  headRow(['Personne','Catégorie','Heures','Part %','dont partagées','1re','Dernière']);
+  D.people.forEach(p=>{
+    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+    dataRow([`${p.emp.nom} ${p.emp.prenom}`,(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie,h1(p.h),
+             D.hTot?Math.round(p.h/D.hTot*100):0, p.hPartage?h1(p.hPartage):0, disp(p.first), disp(p.last)],{accent:g.col});
+  });
+  r++;
+
+  title('3 · Occupation hangar');
+  headRow(['Emplacement','Du','Au','Jours ouvrés','Notes']);
+  if(D.slots.length) D.slots.forEach(e=>{ const pos=SLOT_POSITIONS.find(p=>p.id===e.pos);
+    dataRow([pos?pos.lbl:'Pos. '+e.pos,disp(e.debut),disp(e.fin),e.nbJours||0,e.notes||''],{accent:pos?pos.col:'#888888'}); });
+  else dataRow(['Aucun passage hangar enregistré','','','','']);
+  r++;
+
+  title('4 · Heures ajoutées en cours de chantier');
+  headRow(['Motif','Heures','Part de la dérive %']);
+  if(D.ajouts.length){
+    D.ajouts.forEach(a=>dataRow([a.motif||'(sans motif)',parseFloat(a.heures)||0,D.hSupp?Math.round((parseFloat(a.heures)||0)/D.hSupp*100):0]));
+    dataRow(['Total',D.hSupp,100],{bold:true,fill:'FFDDE6F5'});
+  } else dataRow(['Aucune heure ajoutée','','']);
+  r++;
+
+  title('5 · Affectation semaine par semaine (heures)');
+  headRow(['Personne',...D.weeks.map(m=>'S'+wkN(m))]);
+  D.people.forEach(p=>{
+    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+    const row=ws.getRow(r++);
+    const nm=row.getCell(1); nm.value=`${p.emp.nom} ${p.emp.prenom}`;
+    nm.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(g.col)}};
+    nm.alignment={indent:1};
+    D.weeks.forEach((m,i)=>{
+      const v=p.weeks[fmt(m)]||0, cl=row.getCell(2+i);
+      cl.value=v||null; cl.numFmt='0.0';
+      cl.alignment={horizontal:'center'};
+      cl.font={size:9,bold:!!v,color:{argb:'FF14203A'}};
+      if(v) cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(g.col)}};
+      cl.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
+    });
+  });
+  const effRow=ws.getRow(r++);
+  effRow.getCell(1).value='Effectif présent';
+  effRow.getCell(1).font={bold:true,size:9}; effRow.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}};
+  D.weeks.forEach((m,i)=>{ const cl=effRow.getCell(2+i);
+    cl.value=D.people.filter(p=>p.weeks[fmt(m)]).length;
+    cl.font={bold:true,size:9}; cl.alignment={horizontal:'center'};
+    cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}}; });
+
+  ws.getColumn(1).width=30;
+  for(let i=2;i<=Math.max(8,D.weeks.length+1);i++) ws.getColumn(i).width=11;
+  const foot=ws.getRow(r+2);
+  foot.getCell(1).value=`Établi le ${disp(fmt(new Date()))} · Site LFBF · MARDAM AeroDesk Pro`;
+  foot.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}};
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`REX_${String(c.msn||c.nom||'chantier').replace(/[^A-Za-z0-9]/g,'_')}.xlsx`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
 function renderChantiers(){
   // Populate year selector
   const yrSel=document.getElementById('gantt-resp-year');
@@ -8238,6 +8651,7 @@ function renderChantiers(){
                 <div style="font-size:10px;color:#607090">${sub}</div>
               </div>
               ${chef?`<span style="font-size:10px;color:#607090;flex-shrink:0">${chef.trigramme}</span>`:''}
+              ${!isPrev?`<button class="btn btn-ghost btn-xs" style="flex-shrink:0" title="Fiche retour d'expérience" onclick="event.stopPropagation();openRex('${c.id}')">📋</button>`:''}
             </div>`;
           }).join('')+`</div>`}
       </div>`;
@@ -11186,7 +11600,7 @@ function renderProgramme(){
     renderAvionsKpi();
     renderChargeCapaTable(year);
     const all=[
-      ...S.chantiers.filter(c=>['encours','futur','termine'].includes(c.statut)&&_chantierInYear(c,year)),
+      ...S.chantiers.filter(c=>['encours','futur'].includes(c.statut)&&_chantierInYear(c,year)),
       ...S.chantiers.filter(c=>c.statut==='prevision'&&_chantierInYear(c,year))
     ];
     buildGantt('gantt1', all, year);
@@ -14089,8 +14503,8 @@ function buildBesoinEditTable(year,weeks){
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;cursor:pointer" onclick="document.getElementById('besoinEditBody').style.display=document.getElementById('besoinEditBody').style.display==='none'?'block':'none';this.querySelector('.chev').textContent=document.getElementById('besoinEditBody').style.display==='none'?'▸':'▾'">
       <div style="font-size:12px;font-weight:800;color:#ffd060">✏️ Ajuster les besoins par chantier × semaine</div>
       <div style="display:flex;align-items:center;gap:8px" onclick="event.stopPropagation()">
-        <label style="font-size:10px;color:#8090a8;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Année</label>
-        <select onchange="setBesoinEditYear(this.value)" style="height:28px;border-radius:8px;padding:0 8px;background:#1a2440;color:#ffd060;border:1px solid rgba(255,208,96,0.3);font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer">${yearOptions}</select>
+        <label style="font-size:10px;color:#8090a8;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Année du tableau</label>
+        <select onchange="setBesoinEditYear(this.value)" title="Année de ce tableau d'ajustement uniquement — n'affecte pas le Gantt" style="height:28px;border-radius:8px;padding:0 8px;background:#1a2440;color:#ffd060;border:1px solid rgba(255,208,96,0.3);font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer">${yearOptions}</select>
         <span class="chev" style="color:#ffd060;font-size:13px">▾</span>
       </div>
     </div>
@@ -14175,79 +14589,81 @@ function buildGantt(containerId, chantiers, year){
   };
 
   const currentMonth = today.getFullYear() === year ? today.getMonth() : -1;
+  const todayPct     = toPercent(todayStr);
+  const todayLine    = today.getFullYear()===year ? `<div class="gantt-today" style="left:${todayPct}%"></div>` : '';
+  const gridCols     = months.map(m=>`<div class="gantt-gcol${m===currentMonth?' cur-col':''}"></div>`).join('');
+  const headerMois   = months.map(m=>`<div class="gantt-month${m===currentMonth?' cur':''}">${MONTHS_SHORT[m]}</div>`).join('');
 
-  // Couleurs selon statut — vert unique pour gantt1, gris pour prévision
-  const STATUT_COLORS = {
-    encours:  {bg:'#34c759', glow:'rgba(52,199,89,0.35)'},
-    futur:    {bg:'#34c759', glow:'rgba(52,199,89,0.35)'},
-    termine:  {bg:'#34c759', glow:'rgba(52,199,89,0.25)'},
-    prevision:{bg:'#8e8e93', glow:'rgba(142,142,147,0.25)'},
+  // Repères de semaine (lundis de l'année) : en-tête + lignes de grille fines
+  const weeks=[];
+  { const d=new Date(year,0,1);
+    while(d.getDay()!==1) d.setDate(d.getDate()+1);
+    while(d.getFullYear()===year){ weeks.push({pct:toPercent(fmt(d)), n:wkN(d)}); d.setDate(d.getDate()+7); }
+  }
+  const weekHead  = weeks.map(w=>`<span class="gantt-wk" style="left:${w.pct}%">S${w.n}</span>`).join('');
+  const weekLines = weeks.map(w=>`<div class="gantt-wkline" style="left:${w.pct}%"></div>`).join('');
+
+  // Couleur = celle du chantier ; à défaut, couleur auto STABLE dérivée de son id/nom
+  const AUTO_PAL=['#2979ff','#00c2a8','#7c5cff','#ff9a3c','#ff5c8a','#00a0ff','#8bc34a','#00bcd4','#ffb300','#9c27b0'];
+  const barColor = c => {
+    if(c.color) return c.color;
+    const s=String(c.id||c.nom||''); let h=0;
+    for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+    return AUTO_PAL[h%AUTO_PAL.length];
   };
+  const txtOn = hex => { const x=(hex||'').replace('#','');
+    if(x.length<6) return '#fff';
+    const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);
+    return (r*299+g*587+b*114)/1000>150?'#0b1020':'#ffffff'; };
 
-  // Pas de re-tri : l'ordre passé (validés puis prévisionnels) est conservé
-  const sorted = chantiers;
+  const LANE=18, ROW=26;
+  const STATUT_LBL={encours:'En cours',futur:'À venir',termine:'Terminé',prevision:'Prévisionnel'};
 
-  // Header mois
-  const headerMois = months.map(m=>{
-    const isCur = m === currentMonth;
-    return `<div class="gantt-month${isCur?' cur':''}">${MONTHS_SHORT[m]}</div>`;
-  }).join('');
+  // Libellé de barre : MSN inscrit dans la barre (complet = MSN · type avion si la place le permet)
+  const msnOf = c => {
+    const m=(c.msn||'').trim();
+    if(m) return m;
+    const g=(c.nom||'').match(/MSN\s*([A-Z0-9-]+)/i);
+    return g?g[1]:((c.nom||'').trim()||'—');
+  };
+  const barFull = c => { const t=_avShort(c.avion||''); return msnOf(c)+(t?' · '+t:''); };
 
-  // Détecte le premier prévisionnel pour insérer un séparateur
-  const firstPrevIdx = sorted.findIndex(c=>c.statut==='prevision');
+  // Une ligne par chantier, triées par date de début
+  const sorted=[...chantiers].map(c=>{
+    let l=c.debut?toPercent(c.debut):null, r=c.fin?toPercent(c.fin):null;
+    if(l===null&&r===null){ l=10; r=90; }
+    else if(l===null){ l=Math.max(0,r-10); }
+    else if(r===null){ r=Math.min(100,l+10); }
+    if(r<=l) r=Math.min(100,l+1);
+    return {c,l,r};
+  }).sort((a,b)=>a.l-b.l||a.r-b.r);
 
-  // Lignes
-  const rows = sorted.map((c,idx)=>{
-    const col  = STATUT_COLORS[c.statut]?.bg   || '#34c759';
-    const glow = STATUT_COLORS[c.statut]?.glow || 'rgba(52,199,89,0.3)';
+  const rowsHtml = sorted.map(it=>{
+    const c=it.c, col=barColor(c);
+    const isPrev=c.statut==='prevision';
+    // Prévisionnel = hachuré · Terminé = plus pâle · Actif aujourd'hui = liseré blanc
+    const bg = isPrev
+      ? `repeating-linear-gradient(135deg,${col} 0 5px,${hexRgba(col,0.28)} 5px 10px)`
+      : col;
+    const op = c.statut==='termine' ? 0.6 : (isPrev ? 0.9 : 1);
+    const isActive = !isPrev && todayPct!=null && todayPct>=it.l && todayPct<=it.r;
+    const dr=[c.debut?disp(c.debut):'', c.fin?disp(c.fin):''].filter(Boolean).join(' → ');
+    const st=STATUT_LBL[c.statut]||'';
+    const tip=`${c.nom}${st?' · '+st:''}${dr?' · '+dr:''}`;
+    const full=barFull(c), short=msnOf(c);
 
-    // Séparateur avant les prévisionnels
-    const separator = (idx===firstPrevIdx && firstPrevIdx>0)
-      ? `<div style="display:flex;align-items:center;gap:0">
-          <div style="width:220px;flex-shrink:0;padding:6px 14px;background:rgba(142,142,147,0.08);border-top:1px dashed rgba(142,142,147,0.3);border-bottom:1px dashed rgba(142,142,147,0.3)">
-            <span style="font-size:10px;font-weight:700;color:#8e8e93;text-transform:uppercase;letter-spacing:.8px">🔮 Prévisionnels</span>
-          </div>
-          <div style="flex:1;height:100%;border-top:1px dashed rgba(142,142,147,0.3);border-bottom:1px dashed rgba(142,142,147,0.3);background:rgba(142,142,147,0.04);padding:6px 0"></div>
-        </div>` : '';
-
-    // Positions barre
-    let left  = c.debut ? toPercent(c.debut) : null;
-    let right = c.fin   ? toPercent(c.fin)   : null;
-    if(left === null && right === null){ left = 10; right = 90; }
-    else if(left === null){ left = Math.max(0, right - 10); }
-    else if(right === null){ right = Math.min(100, left + 10); }
-    if(right <= left) right = Math.min(100, left + 1);
-
-    const width = right - left;
-    const barLabel = '';
-
-    // Bordure si chantier actif aujourd'hui
-    const todayPct = toPercent(todayStr);
-    const isActive = todayPct >= left && todayPct <= right;
-    const borderStr = isActive ? `2px solid rgba(255,255,255,0.6)` : 'none';
-
-    // Dates d'affichage
-    const dateRange = [c.debut?disp(c.debut):'', c.fin?disp(c.fin):''].filter(Boolean).join(' → ');
-
-    // Grid cols
-    const gridCols = months.map(m=>`<div class="gantt-gcol${m===currentMonth?' cur-col':''}"></div>`).join('');
-
-    // Ligne today
-    const todayLine = today.getFullYear()===year
-      ? `<div class="gantt-today" style="left:${toPercent(todayStr)}%"></div>` : '';
-
-    return separator + `<div class="gantt-row" style="${c.statut==='prevision'?'opacity:0.85':''}">
-      <div class="gantt-row-label">
-        <div class="glabel-name">${c.nom}</div>
-        ${dateRange ? `<div class="glabel-client" style="margin-top:3px;color:var(--t3)">📅 ${dateRange}</div>` : ''}
+    return `<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div class="gantt-label-col" style="padding:4px 12px;display:flex;align-items:center;border-right:1px solid rgba(255,255,255,0.06);gap:7px">
+        <span style="width:9px;height:9px;border-radius:2px;flex-shrink:0;background:${col};${isPrev?'opacity:.7':''}"></span>
+        <span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${tip}">${c.nom}</span>
       </div>
-      <div class="gantt-timeline">
+      <div class="gantt-timeline" style="height:${ROW}px">
         <div class="gantt-grid">${gridCols}</div>
+        ${weekLines}
         ${todayLine}
-        <div class="gantt-bar"
-          style="left:${left}%;width:${width}%;background:${col};box-shadow:0 2px 10px ${glow};border:${borderStr}"
-          title="${c.nom}${c.debut?' · '+disp(c.debut):''}${c.fin?' → '+disp(c.fin):''}">
-          ${barLabel}
+        <div class="pg-bar" onclick="editChantier('${c.id}')" title="${tip}"
+          style="top:${(ROW-LANE)/2}px;height:${LANE}px;left:${it.l}%;width:${Math.max(0.6,it.r-it.l)}%;background:${bg};opacity:${op};${isActive?'box-shadow:0 0 0 2px rgba(255,255,255,0.7);':`box-shadow:0 1px 4px ${hexRgba(col,0.4)};`}">
+          <span class="pg-chlbl" data-short="${short}" style="color:${txtOn(col)}">${full}</span>
         </div>
       </div>
     </div>`;
@@ -14255,11 +14671,26 @@ function buildGantt(containerId, chantiers, year){
 
   el.innerHTML = `<div class="gantt-container">
     <div class="gantt-header">
-      <div class="gantt-label-col" style="padding:6px 14px;font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,0.07)">Chantier</div>
-      <div class="gantt-months">${headerMois}</div>
+      <div class="gantt-label-col" style="padding:6px 12px;font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:flex-end">Chantier</div>
+      <div style="flex:1;min-width:0">
+        <div class="gantt-months">${headerMois}</div>
+        <div class="gantt-weeks">${weekHead}</div>
+      </div>
     </div>
-    <div class="gantt-rows">${rows}</div>
+    <div class="gantt-rows">${rowsHtml}</div>
   </div>`;
+
+  requestAnimationFrame(()=>{
+    // Priorité MSN : si « MSN · type » déborde de la barre, ne garder que le MSN
+    el.querySelectorAll('.pg-chlbl').forEach(s=>{
+      if(s.scrollWidth>s.clientWidth+1 && s.dataset.short) s.textContent=s.dataset.short;
+    });
+    // Amener la ligne « aujourd'hui » juste à droite de la colonne des noms (les mois écoulés passent derrière)
+    const tl=el.querySelector('.gantt-timeline');
+    if(tl && todayPct!=null && today.getFullYear()===year){
+      el.scrollLeft=Math.max(0,(todayPct/100)*tl.offsetWidth-40);
+    }
+  });
 }
 
 /* ═══ PDF EXPORT BASE ═══ */
@@ -14349,46 +14780,345 @@ function pdfBase(title,subtitle,orientation,content){
   </body></html>`;
 }
 
+// Ouvre la fenêtre de choix de période (l'export réel est fait par runProgPdf)
 function exportGanttPDF(){
-  const year=parseInt(document.getElementById('gantt-year')?.value)||new Date().getFullYear();
-  const MONTHS=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-  const today=new Date();
-  const yearStart=new Date(year,0,1);
-  const yearMs=new Date(year+1,0,1)-yearStart;
-  const toPct=ds=>{if(!ds)return null;const d=parseLocal(ds);return Math.min(100,Math.max(0,(d-yearStart)/yearMs*100));};
-  const todayPct=today.getFullYear()===year?toPct(fmt(today)):null;
-  const STATUT={encours:{col:'#2979ff',lbl:'En cours'},futur:{col:'#34c759',lbl:'À venir'},termine:{col:'#8e8e93',lbl:'Terminé'},prevision:{col:'#ff9a3c',lbl:'Prévision'}};
-  const renderRows=chantiers=>{
-    if(!chantiers.length) return'<tr><td colspan="2" style="text-align:center;color:#8898bb;padding:16px">Aucun chantier</td></tr>';
-    return [...chantiers].sort((a,b)=>(!a.debut?1:!b.debut?-1:a.debut.localeCompare(b.debut))).map(c=>{
-      let l=toPct(c.debut),r=toPct(c.fin);
-      if(l===null&&r===null){l=10;r=90;}else if(l===null){l=Math.max(0,r-10);}else if(r===null){r=Math.min(100,l+10);}
-      if(r<=l)r=Math.min(100,l+1);const w=r-l;
-      const st=STATUT[c.statut]||STATUT.prevision;
-      const dr=[c.debut?disp(c.debut):'',c.fin?disp(c.fin):''].filter(Boolean).join(' → ');
-      return`<tr><td style="min-width:160px;background:#f8faff;border:1px solid #dde6f0">
-        <div style="font-weight:700;color:#0d1e3d;font-size:11px;border-left:3px solid ${c.color||st.col};padding-left:6px">${c.nom}</div>
-        ${c.client?`<div style="font-size:9px;color:#5a7090">${c.client}</div>`:''}
-        ${dr?`<div style="font-size:9px;color:#8898bb">${dr}</div>`:''}
-      </td><td style="padding:0;border:1px solid #dde6f0">
-        <div style="position:relative;height:40px;background:#f0f4ff">
-          <div style="position:absolute;top:0;bottom:0;display:flex;width:100%">${Array.from({length:12},()=>`<div style="flex:1;border-right:1px solid #dde6f0"></div>`).join('')}</div>
-          ${todayPct!==null?`<div style="position:absolute;top:0;bottom:0;left:${todayPct}%;width:2px;background:#ff4d6d;z-index:2"></div>`:''}
-          <div style="position:absolute;top:50%;transform:translateY(-50%);left:${l}%;width:${w}%;background:${c.color||st.col};border-radius:4px;height:22px;display:flex;align-items:center;padding:0 6px;z-index:1">
-            <span style="font-size:8px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w>6?c.nom:''}</span>
+  const d=document.getElementById('pp-debut'), f=document.getElementById('pp-fin');
+  if(d&&!d.value){ setProgPdfRange(13); }
+  openM('m-progpdf');
+}
+function setProgPdfRange(nbWeeks){
+  const mon=getMon(new Date());
+  const d=document.getElementById('pp-debut'), f=document.getElementById('pp-fin');
+  if(d) d.value=fmt(mon);
+  if(f) f.value=fmt(addD(mon,nbWeeks*7-1));
+  _ppInfo();
+}
+function _ppInfo(){
+  const el=document.getElementById('pp-info'); if(!el) return;
+  const w=_ppWeeks(); 
+  el.textContent = w.length ? `${w.length} semaine${w.length>1?'s':''} — S${wkN(w[0])} → S${wkN(w[w.length-1])}` : '';
+}
+// Liste des lundis couvrant la période saisie
+function _ppWeeks(){
+  const dv=document.getElementById('pp-debut')?.value, fv=document.getElementById('pp-fin')?.value;
+  if(!dv||!fv) return [];
+  let mon=getMon(parseLocal(dv)); const end=parseLocal(fv);
+  if(end<mon) return [];
+  const out=[];
+  while(mon<=end && out.length<106){ out.push(new Date(mon)); mon=addD(mon,7); }
+  return out;
+}
+// Besoin techniciens d'un chantier pour une semaine (même règle qu'à l'écran : override hebdo sinon théorique)
+function _ppBesoin(c,mon){
+  const wEnd=addD(mon,6);
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  const ov=S.besoinOverrides?.[`${c.id}_${wk}`];
+  const hasOv=ov!=null&&ov!=='';
+  const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
+  const dansP=(!d||d<=wEnd)&&(!f||f>=mon);
+  if(dansP) return hasOv?(parseInt(ov)||0):(c.ressources?.technicien||0);
+  if(hasOv) return parseInt(ov)||0;
+  return 0;
+}
+// Capacité technicien réelle d'une semaine (depuis le planning), même règle qu'à l'écran
+function _ppCapa(mon){
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  let j=0;
+  techs.forEach(emp=>{
+    [0,1,2,3,4].forEach(i=>{
+      const ds=fmt(addD(mon,i));
+      if(isHol(ds)) return;
+      ['AM','PM'].forEach(h=>{
+        const e=S.planning[`${emp.id}_${ds}_${h}`];
+        const t=e?e.type:'travail';
+        if(!ABSENT.has(t)) j+=0.5;
+      });
+    });
+  });
+  return Math.round(j/5*10)/10;
+}
+
+// Données communes aux exports (PDF/Excel) : semaines, chantiers retenus, capacité
+function _ppData(){
+  const weeks=_ppWeeks();
+  if(!weeks.length) return null;
+  const cands=S.chantiers.filter(c=>['encours','futur','prevision'].includes(c.statut));
+  const rows=cands.map(c=>({c, vals:weeks.map(m=>_ppBesoin(c,m))}))
+                  .filter(r=>r.vals.some(v=>v>0))
+                  .sort((a,b)=>(!a.c.debut?1:!b.c.debut?-1:a.c.debut.localeCompare(b.c.debut)));
+  return {weeks, rows, capa:weeks.map(m=>_ppCapa(m))};
+}
+
+// Export EXCEL coloré et dynamique : formules SOMME/écart + mise en forme conditionnelle vivante
+function runProgXls(){
+  const D=_ppData();
+  if(!D){ toast('Période invalide'); return; }
+  if(!D.rows.length){ toast('Aucun chantier avec besoin sur cette période'); return; }
+  toast('⏳ Génération de l\'export coloré…');
+  _loadExcelJS(async()=>{
+    if(!window.ExcelJS){ toast('Export coloré indisponible (connexion requise une fois)'); return; }
+    try{ await _buildProgXls(D); toast('✅ Excel généré — formules actives'); }
+    catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
+
+async function _buildProgXls(D){
+  const {weeks,rows,capa}=D;
+  const colL=n=>{let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;};
+  const AUTO=['#2979ff','#00c2a8','#7c5cff','#ff9a3c','#ff5c8a','#00a0ff','#8bc34a','#00bcd4','#ffb300','#9c27b0'];
+  const colOf=c=>{ if(c.color) return c.color; const s=String(c.id||c.nom||''); let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return AUTO[h%AUTO.length]; };
+  const argb=hex=>'FF'+String(hex||'#2979ff').replace('#','').slice(0,6).toUpperCase();
+  const txtOn=hex=>{const x=String(hex||'').replace('#','');if(x.length<6)return 'FFFFFFFF';const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'FF0B1020':'FFFFFFFF';};
+  const msnOf=c=>{ const m=(c.msn||'').trim(); if(m) return m; const g=(c.nom||'').match(/MSN\s*([A-Z0-9-]+)/i); return g?g[1]:(c.nom||'—'); };
+
+  const nW=weeks.length, lastC=colL(1+nW), todayWk=fmt(getMon(new Date()));
+  const wb=new ExcelJS.Workbook(); wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
+  const ws=wb.addWorksheet('Programme',{views:[{state:'frozen',xSplit:1,ySplit:4}],properties:{defaultRowHeight:16}});
+
+  // ── Titre ──
+  ws.mergeCells(1,1,1,1+nW);
+  const t=ws.getCell('A1');
+  t.value=`Programme Activité — ${disp(fmt(weeks[0]))} → ${disp(fmt(addD(weeks[nW-1],6)))}`;
+  t.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
+  t.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+  t.alignment={vertical:'middle',indent:1}; ws.getRow(1).height=26;
+  ws.mergeCells(2,1,2,1+nW);
+  const st=ws.getCell('A2');
+  st.value=`Site LFBF · ${nW} semaine(s) · ${rows.length} chantier(s) · les cases bleues sont modifiables : les totaux et écarts se recalculent`;
+  st.font={italic:true,size:9,color:{argb:'FF8A93A5'}};
+
+  // ── Section 1 ──
+  const s1=ws.getRow(3); s1.getCell(1).value='1 · Besoin en personnel (par chantier × semaine)';
+  s1.getCell(1).font={bold:true,size:11,color:{argb:'FF1A2440'}};
+
+  const R_HEAD=4;
+  const head=ws.getRow(R_HEAD);
+  head.getCell(1).value='Chantier';
+  weeks.forEach((m,i)=>{ head.getCell(2+i).value=`S${wkN(m)}\n${m.getDate()}/${m.getMonth()+1}`; });
+  head.height=28;
+  head.eachCell((c,i)=>{
+    const cur=i>1 && fmt(weeks[i-2])===todayWk;
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:cur?'FF7A1030':'FF1A2440'}};
+    c.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    c.alignment={horizontal:i===1?'left':'center',vertical:'middle',wrapText:true,indent:i===1?1:0};
+    c.border={bottom:{style:'medium',color:{argb:'FF00D2FF'}}};
+  });
+
+  // ── Lignes chantiers (valeurs modifiables) ──
+  const R0=R_HEAD+1;
+  rows.forEach((r,ri)=>{
+    const row=ws.getRow(R0+ri), c=r.c, col=colOf(c);
+    const nm=row.getCell(1);
+    nm.value=`${c.nom}${c.statut==='prevision'?' (prév.)':''}`;
+    nm.font={bold:true,size:9,color:{argb:'FF14203A'}};
+    nm.alignment={vertical:'middle',indent:1};
+    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(col)}};
+    nm.font={bold:true,size:9,color:{argb:txtOn(col)}};
+    r.vals.forEach((v,i)=>{
+      const cell=row.getCell(2+i);
+      cell.value=v||null;                                   // vide si aucun besoin
+      cell.numFmt='0';
+      cell.alignment={horizontal:'center',vertical:'middle'};
+      cell.font={size:9,bold:!!v,color:{argb:'FF14203A'}};
+      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};   // bleu pâle = saisissable
+      cell.border={right:{style:'hair',color:{argb:'FFDFE3EC'}},bottom:{style:'hair',color:{argb:'FFDFE3EC'}}};
+    });
+  });
+
+  // ── Totaux (FORMULES vivantes) ──
+  const R_TOT=R0+rows.length, R_DIS=R_TOT+1, R_ECA=R_DIS+1;
+  const mk=(rIdx,label,fill)=>{
+    const row=ws.getRow(rIdx);
+    row.getCell(1).value=label;
+    row.getCell(1).font={bold:true,size:9,color:{argb:'FF14203A'}};
+    row.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:fill}};
+    row.getCell(1).alignment={vertical:'middle',indent:1};
+    return row;
+  };
+  const rowTot=mk(R_TOT,'Besoin total','FFDDE6F5');
+  const rowDis=mk(R_DIS,'Dispo (techniciens)','FFDDE6F5');
+  const rowEca=mk(R_ECA,'Écart (Dispo − Besoin)','FFDDE6F5');
+  weeks.forEach((m,i)=>{
+    const L=colL(2+i);
+    const cT=rowTot.getCell(2+i);
+    cT.value={formula:`SUM(${L}${R0}:${L}${R0+rows.length-1})`};   // se recalcule si tu changes un besoin
+    cT.numFmt='0'; cT.font={bold:true,size:9,color:{argb:'FF14203A'}};
+    cT.alignment={horizontal:'center'};
+    cT.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}};
+
+    const cD=rowDis.getCell(2+i);
+    cD.value=capa[i];                                              // modifiable
+    cD.numFmt='0.0'; cD.font={bold:true,size:9,color:{argb:'FF14203A'}};
+    cD.alignment={horizontal:'center'};
+    cD.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};
+
+    const cE=rowEca.getCell(2+i);
+    cE.value={formula:`${L}${R_DIS}-${L}${R_TOT}`};                // se recalcule si besoin OU dispo change
+    cE.numFmt='+0.0;-0.0;0'; cE.font={bold:true,size:9};
+    cE.alignment={horizontal:'center'};
+  });
+
+  // ── Mise en forme CONDITIONNELLE : la couleur suit la valeur, en direct ──
+  ws.addConditionalFormatting({
+    ref:`B${R_ECA}:${lastC}${R_ECA}`,
+    rules:[
+      {type:'cellIs',operator:'lessThan',formulae:['0'],priority:1,
+       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFC7CE'}},font:{color:{argb:'FF9C0006'},bold:true}}},
+      {type:'cellIs',operator:'greaterThan',formulae:['0'],priority:2,
+       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFC6EFCE'}},font:{color:{argb:'FF1E7E34'},bold:true}}},
+      {type:'cellIs',operator:'equal',formulae:['0'],priority:3,
+       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFEB9C'}},font:{color:{argb:'FF9C6500'},bold:true}}}
+    ]
+  });
+  // Barres de données sur le besoin total
+  ws.addConditionalFormatting({
+    ref:`B${R_TOT}:${lastC}${R_TOT}`,
+    rules:[{type:'dataBar',cfvo:[{type:'min'},{type:'max'}],color:{argb:'FF2979FF'},priority:4}]
+  });
+
+  // ── Section 2 : programme des chantiers (bandes colorées, mêmes colonnes) ──
+  const R_S2=R_ECA+2;
+  ws.getRow(R_S2).getCell(1).value='2 · Programme des chantiers';
+  ws.getRow(R_S2).getCell(1).font={bold:true,size:11,color:{argb:'FF1A2440'}};
+  const R_H2=R_S2+1;
+  const h2=ws.getRow(R_H2);
+  h2.getCell(1).value='Chantier';
+  weeks.forEach((m,i)=>{ h2.getCell(2+i).value=`S${wkN(m)}`; });
+  h2.eachCell((c,i)=>{
+    const cur=i>1 && fmt(weeks[i-2])===todayWk;
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:cur?'FF7A1030':'FF1A2440'}};
+    c.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+    c.alignment={horizontal:i===1?'left':'center',indent:i===1?1:0};
+  });
+  rows.forEach((r,ri)=>{
+    const row=ws.getRow(R_H2+1+ri), c=r.c, col=colOf(c), isPrev=c.statut==='prevision';
+    const nm=row.getCell(1);
+    nm.value=`${c.nom}${c.statut==='prevision'?' (prév.)':''}`;
+    nm.font={bold:true,size:9,color:{argb:txtOn(col)}};
+    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(col)}};
+    nm.alignment={vertical:'middle',indent:1};
+    const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
+    let first=true;
+    weeks.forEach((m,i)=>{
+      const wEnd=addD(m,6);
+      const inside=(!d||d<=wEnd)&&(!f||f>=m);
+      const cell=row.getCell(2+i);
+      if(inside){
+        cell.fill={type:'pattern',pattern:isPrev?'lightUp':'solid',fgColor:{argb:argb(col)},bgColor:{argb:'FFFFFFFF'}};
+        if(first){ cell.value=msnOf(c); first=false; }
+        cell.font={size:8,bold:true,color:{argb:txtOn(col)}};
+        cell.alignment={horizontal:'left',vertical:'middle'};
+      } else {
+        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F9FC'}};
+      }
+      cell.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
+    });
+  });
+
+  // Largeurs + pied
+  ws.getColumn(1).width=32;
+  for(let i=0;i<nW;i++) ws.getColumn(2+i).width=7;
+  const foot=ws.getRow(R_H2+2+rows.length+1);
+  foot.getCell(1).value=`Établi le ${disp(fmt(new Date()))} · Section 2 : couleur = chantier, hachuré = prévisionnel · MARDAM AeroDesk Pro`;
+  foot.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}};
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`Programme_Activite_${fmt(weeks[0])}_${fmt(addD(weeks[nW-1],6))}.xlsx`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+  closeM('m-progpdf');
+}
+
+function runProgPdf(){
+  const weeks=_ppWeeks();
+  if(!weeks.length){ toast('Période invalide'); return; }
+  const wStart=weeks[0], wEnd=addD(weeks[weeks.length-1],6);
+
+  // Chantiers retenus : non terminés + ayant un besoin sur la période
+  const cands=S.chantiers.filter(c=>['encours','futur','prevision'].includes(c.statut));
+  const rows=cands.map(c=>({c, vals:weeks.map(m=>_ppBesoin(c,m))}))
+                  .filter(r=>r.vals.some(v=>v>0))
+                  .sort((a,b)=>(!a.c.debut?1:!b.c.debut?-1:a.c.debut.localeCompare(b.c.debut)));
+  if(!rows.length){ toast('Aucun chantier avec besoin sur cette période'); return; }
+
+  const capa=weeks.map(m=>_ppCapa(m));
+  const tot =weeks.map((m,i)=>rows.reduce((s,r)=>s+r.vals[i],0));
+  const todayWk=fmt(getMon(new Date()));
+
+  const AUTO=['#2979ff','#00c2a8','#7c5cff','#ff9a3c','#ff5c8a','#00a0ff','#8bc34a','#00bcd4','#ffb300','#9c27b0'];
+  const colOf=c=>{ if(c.color) return c.color; const s=String(c.id||c.nom||''); let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return AUTO[h%AUTO.length]; };
+  const txtOn=hex=>{const x=(hex||'').replace('#','');if(x.length<6)return '#fff';const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'#0b1020':'#ffffff';};
+  const msnOf=c=>{ const m=(c.msn||'').trim(); if(m) return m; const g=(c.nom||'').match(/MSN\s*([A-Z0-9-]+)/i); return g?g[1]:(c.nom||'—'); };
+
+  const thWk=weeks.map(m=>{
+    const cur=fmt(m)===todayWk;
+    return `<th style="min-width:34px;${cur?'background:#7a1030':''}">${cur?'📍':''}S${wkN(m)}<br><span style="font-weight:400;font-size:8px">${m.getDate()}/${m.getMonth()+1}</span></th>`;
+  }).join('');
+
+  // ── Tableau 1 : besoin en personnel ──
+  const bodyBesoin=rows.map(r=>{
+    const c=r.c, col=colOf(c);
+    const tds=r.vals.map((v,i)=>{
+      const cur=fmt(weeks[i])===todayWk;
+      return `<td style="text-align:center;font-weight:${v?'700':'400'};color:${v?'#0d1e3d':'#c8d4e4'};${cur?'background:#fff0f3;':''}">${v||'·'}</td>`;
+    }).join('');
+    return `<tr>
+      <td style="border-left:3px solid ${col};min-width:150px">
+        <div style="font-weight:700;font-size:10px;color:#0d1e3d">${c.nom}${c.statut==='prevision'?' <span style="color:#8898bb;font-weight:400">(prév.)</span>':''}</div>
+        ${c.client?`<div style="font-size:8px;color:#8898bb">${c.client} · théo. ${(c.ressources?.technicien)||0}T</div>`:''}
+      </td>${tds}</tr>`;
+  }).join('');
+  const rowTot=`<tr><td style="font-weight:800;background:#eef3fb">Besoin total</td>${tot.map(v=>`<td style="text-align:center;font-weight:800;background:#eef3fb">${v}</td>`).join('')}</tr>`;
+  const rowCapa=`<tr><td style="font-weight:800;background:#eef3fb">Dispo (techs)</td>${capa.map(v=>`<td style="text-align:center;font-weight:700;background:#eef3fb">${v}</td>`).join('')}</tr>`;
+  const rowEcart=`<tr><td style="font-weight:800;background:#eef3fb">Écart</td>${capa.map((v,i)=>{
+    const e=Math.round((v-tot[i])*10)/10;
+    const bg=e<0?'#fdeaea':'#eaf7ee', fg=e<0?'#a32d2d':'#27500a';
+    return `<td style="text-align:center;font-weight:800;background:${bg};color:${fg}">${e>0?'+':''}${e}</td>`;
+  }).join('')}</tr>`;
+
+  const t1=`<div class="section">
+    <div class="section-title">1 · Besoin en personnel (par chantier × semaine)</div>
+    <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Chantier</th>${thWk}</tr></thead>
+    <tbody>${bodyBesoin}${rowTot}${rowCapa}${rowEcart}</tbody></table>
+    <div style="font-size:8px;color:#8898bb;margin-top:4px">Écart = Dispo − Besoin · rouge = sous-effectif · 📍 = semaine en cours · « · » = pas de besoin</div>
+  </div>`;
+
+  // ── Tableau 2 : programme des chantiers (même période, échelle semaine) ──
+  const spanMs=addD(wEnd,1)-wStart;
+  const pct=d=>Math.min(100,Math.max(0,(parseLocal(d)-wStart)/spanMs*100));
+  const todayPct=(new Date()>=wStart&&new Date()<=wEnd)?((new Date()-wStart)/spanMs*100):null;
+  const bodyGantt=rows.map(r=>{
+    const c=r.c, col=colOf(c), isPrev=c.statut==='prevision';
+    let l=c.debut?pct(c.debut):0, rr=c.fin?pct(c.fin):100;
+    const cutL=c.debut&&parseLocal(c.debut)<wStart, cutR=c.fin&&parseLocal(c.fin)>wEnd;
+    if(rr<=l) rr=Math.min(100,l+1);
+    const bg=isPrev?`repeating-linear-gradient(135deg,${col} 0 4px,${col}55 4px 8px)`:col;
+    return `<tr>
+      <td style="border-left:3px solid ${col};min-width:150px"><div style="font-weight:700;font-size:10px;color:#0d1e3d">${c.nom}</div>
+      <div style="font-size:8px;color:#8898bb">${[c.debut?disp(c.debut):'',c.fin?disp(c.fin):''].filter(Boolean).join(' → ')}</div></td>
+      <td style="padding:0">
+        <div style="position:relative;height:20px;background:#f7faff">
+          <div style="position:absolute;inset:0;display:flex">${weeks.map(()=>`<div style="flex:1;border-right:1px solid #e6edf7"></div>`).join('')}</div>
+          ${todayPct!==null?`<div style="position:absolute;top:0;bottom:0;left:${todayPct}%;width:1.5px;background:#e24b4a;z-index:2"></div>`:''}
+          <div style="position:absolute;top:3px;height:14px;left:${l}%;width:${Math.max(0.7,rr-l)}%;background:${bg};border-radius:2px;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;${cutL?'border-left:2px solid #0d1e3d;':''}${cutR?'border-right:2px solid #0d1e3d;':''}">
+            <span style="font-size:8px;font-weight:700;color:${txtOn(col)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cutL?'◀ ':''}${msnOf(c)}${cutR?' ▶':''}</span>
           </div>
         </div>
       </td></tr>`;
-    }).join('');
-  };
-  const ch1=S.chantiers.filter(c=>['encours','futur','termine'].includes(c.statut));
-  const ch2=S.chantiers.filter(c=>c.statut==='prevision');
-  const content2=`<div class="section"><div class="section-title">🔧 Chantiers actifs (${ch1.length})</div>
-    <table><thead><tr><th style="text-align:left;width:180px">Chantier</th><th style="padding:0"><div style="display:grid;grid-template-columns:repeat(12,1fr)">${MONTHS.map(m=>`<div style="text-align:center;padding:5px 2px;font-size:9px">${m}</div>`).join('')}</div></th></tr></thead>
-    <tbody>${renderRows(ch1)}</tbody></table></div>
-  ${ch2.length?`<div class="section"><div class="section-title">🔮 Prévisionnels (${ch2.length})</div>
-    <table><thead><tr><th style="text-align:left;width:180px">Chantier</th><th></th></tr></thead><tbody>${renderRows(ch2)}</tbody></table></div>`:''}`;
-  openPrintView(pdfBase(`Programme Activité ${year}`,`${ch1.length+ch2.length} chantiers`,'landscape',content2), `Programme Activité ${year}`);
+  }).join('');
+  const t2=`<div class="section">
+    <div class="section-title">2 · Programme des chantiers</div>
+    <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Chantier</th><th style="padding:0"><div style="display:flex">${weeks.map(m=>`<div style="flex:1;text-align:center;padding:4px 0;font-size:8px">S${wkN(m)}</div>`).join('')}</div></th></tr></thead>
+    <tbody>${bodyGantt}</tbody></table>
+    <div style="font-size:8px;color:#8898bb;margin-top:4px">Couleur = chantier · hachuré = prévisionnel · trait rouge = aujourd'hui · ◀ ▶ = le chantier déborde de la période · terminés exclus</div>
+  </div>`;
+
+  const sub=`${disp(fmt(wStart))} → ${disp(fmt(wEnd))} · ${weeks.length} semaine${weeks.length>1?'s':''} · ${rows.length} chantier${rows.length>1?'s':''}`;
+  closeM('m-progpdf');
+  openPrintView(pdfBase('Programme Activité',sub,'landscape',t1+t2), 'Programme Activité');
   toast('Export PDF ✓');
 }
 
