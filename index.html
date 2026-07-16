@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260715-REX -->
+<!-- AeroStaff Pro v7 — Build 20260715-REX2 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2550,7 +2550,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260715-REX · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260715-REX2 · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -8290,6 +8290,44 @@ const REX_GROUPS=[
   {k:'autres', lbl:'Autres',                cats:['alternant','stagiaire','iq','part21','recycling'], col:'#8e8e93'}
 ];
 const _rexGroupOf=cat=>{ const g=REX_GROUPS.find(g=>g.cats.includes(cat)); return g?g.k:'autres'; };
+// Couleurs réelles des catégories de personnel (mêmes que les variables CSS de l'app)
+const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',
+  alternant:'#00e5b0',stagiaire:'#84fab0',interimaire:'#c084fc',prestataire:'#ffdd00',
+  recycling:'#ff9a3c',part21:'#0064c8',iq:'#00a0ff'};
+const _catHex=cat=>CAT_HEX[cat]||'#8e8e93';
+// Ordre : groupe (prod → sous-trait. → encadrement → autres), puis catégorie, puis alphabétique
+const _catOrder=Object.keys(CATS);
+function _rexSort(people){
+  const gi=k=>REX_GROUPS.findIndex(g=>g.k===k);
+  return [...people].sort((a,b)=>{
+    const ga=gi(_rexGroupOf(a.emp.categorie)), gb=gi(_rexGroupOf(b.emp.categorie));
+    if(ga!==gb) return ga-gb;
+    const ca=_catOrder.indexOf(a.emp.categorie), cb=_catOrder.indexOf(b.emp.categorie);
+    if(ca!==cb) return ca-cb;
+    return (a.emp.nom+' '+a.emp.prenom).localeCompare(b.emp.nom+' '+b.emp.prenom,'fr',{sensitivity:'base'});
+  });
+}
+// Mutualise les passages hangar consécutifs sur le même emplacement (aucun jour ouvré entre les deux)
+function _rexMergeSlots(slots){
+  const s=[...slots].sort((a,b)=>(a.pos-b.pos)||String(a.debut||'').localeCompare(String(b.debut||'')));
+  const out=[];
+  s.forEach(e=>{
+    const prev=out[out.length-1];
+    if(prev && prev.pos===e.pos && prev.fin && e.debut){
+      const gapStart=fmt(addD(parseLocal(prev.fin),1)), gapEnd=fmt(addD(parseLocal(e.debut),-1));
+      const contigu = e.debut<=prev.fin || gapStart>gapEnd || calcJoursOuvres(gapStart,gapEnd)===0;
+      if(contigu){
+        prev.fin = e.fin>prev.fin ? e.fin : prev.fin;
+        prev.nbJours=(prev.nbJours||0)+(e.nbJours||0);
+        prev._n=(prev._n||1)+1;
+        const n=[prev.notes,e.notes].filter(Boolean).join(' · ');
+        prev.notes=n; return;
+      }
+    }
+    out.push({...e});
+  });
+  return out.sort((a,b)=>String(a.debut||'').localeCompare(String(b.debut||'')));
+}
 
 // Collecte toutes les données du REX d'un chantier
 function rexData(cid){
@@ -8324,8 +8362,14 @@ function rexData(cid){
 
   const people=Object.values(byEmp).sort((a,b)=>b.h-a.h);
   const groups={};
-  REX_GROUPS.forEach(g=>groups[g.k]={...g,h:0,n:0});
-  people.forEach(p=>{ const k=_rexGroupOf(p.emp.categorie); groups[k].h+=p.h; groups[k].n++; });
+  REX_GROUPS.forEach(g=>groups[g.k]={...g,h:0,n:0,cats:{}});
+  people.forEach(p=>{
+    const k=_rexGroupOf(p.emp.categorie);
+    groups[k].h+=p.h; groups[k].n++;
+    const cc=groups[k].cats;
+    if(!cc[p.emp.categorie]) cc[p.emp.categorie]={cat:p.emp.categorie,h:0,n:0};
+    cc[p.emp.categorie].h+=p.h; cc[p.emp.categorie].n++;
+  });
 
   const weeks=[...weekSet].sort().map(s=>parseLocal(s));
 
@@ -8341,8 +8385,8 @@ function rexData(cid){
   const hSupp=ajouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0);
   const budget=(c.manHours||0)+hSupp;
 
-  const slots=(S.slot?.entries||[]).filter(e=>c.msn&&String(e.msn)===String(c.msn))
-                                   .sort((a,b)=>String(a.debut||'').localeCompare(String(b.debut||'')));
+  const slotsRaw=(S.slot?.entries||[]).filter(e=>c.msn&&String(e.msn)===String(c.msn));
+  const slots=_rexMergeSlots(slotsRaw);
   const joursHangar=slots.reduce((s,e)=>s+(e.nbJours||0),0);
 
   // Heures perdues par absence (personnes du chantier, sur la période réelle)
@@ -8387,23 +8431,30 @@ function rexHtml(D,print){
     ${card('Livraison', D.retard===null?'—':(D.retard>0?`+${D.retard} j de retard`:D.retard<0?`${-D.retard} j d'avance`:"à l'heure"), D.retard===null?T.fg:(D.retard>0?badCol:okCol))}
   </div>`;
 
-  // Répartition par groupe
+  // Répartition par groupe, détaillée par catégorie
   const gRows=REX_GROUPS.map(g=>{
     const o=D.groups[g.k]; if(!o.h) return '';
-    return `<tr><td style="${td};border-left:3px solid ${g.col};font-weight:700">${g.lbl}</td>
-      <td style="${td};text-align:center">${o.n}</td>
-      <td style="${td};text-align:center;font-weight:700">${h1(o.h)} h</td>
-      <td style="${td};text-align:center">${pct(o.h,D.hTot)} %</td></tr>`;
+    const cats=Object.values(o.cats).sort((a,b)=>_catOrder.indexOf(a.cat)-_catOrder.indexOf(b.cat));
+    const sub=cats.map(cc=>`<tr>
+      <td style="${td};padding-left:22px;color:${T.mut}">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${_catHex(cc.cat)};margin-right:6px"></span>${(CATS[cc.cat]||{}).lbl||cc.cat}</td>
+      <td style="${td};text-align:center;color:${T.mut}">${cc.n}</td>
+      <td style="${td};text-align:center;color:${T.mut}">${h1(cc.h)} h</td>
+      <td style="${td};text-align:center;color:${T.mut}">${pct(cc.h,D.hTot)} %</td></tr>`).join('');
+    return `<tr><td style="${td};border-left:3px solid ${g.col};font-weight:800;background:${T.head}">${g.lbl}</td>
+      <td style="${td};text-align:center;font-weight:800;background:${T.head}">${o.n}</td>
+      <td style="${td};text-align:center;font-weight:800;background:${T.head}">${h1(o.h)} h</td>
+      <td style="${td};text-align:center;font-weight:800;background:${T.head}">${pct(o.h,D.hTot)} %</td></tr>${sub}`;
   }).join('');
   const tGroups=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
     <thead><tr><th style="${th}">Catégorie d'heures</th><th style="${th};text-align:center">Pers.</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th></tr></thead>
     <tbody>${gRows}<tr><td style="${td};font-weight:800;background:${T.head}">Total toutes catégories</td><td style="${td};text-align:center;background:${T.head}">${D.people.length}</td><td style="${td};text-align:center;font-weight:800;background:${T.head}">${h1(D.hTot)} h</td><td style="${td};background:${T.head}"></td></tr></tbody></table>`;
 
-  // Détail par personne
-  const pRows=D.people.map(p=>{
-    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
-    return `<tr><td style="${td};font-weight:700">${p.emp.nom} ${p.emp.prenom}</td>
-      <td style="${td};color:${g.col}">${(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie}</td>
+  // Détail par personne — trié par type puis alphabétiquement
+  const pRows=_rexSort(D.people).map(p=>{
+    const hex=_catHex(p.emp.categorie);
+    return `<tr><td style="${td};border-left:3px solid ${hex};font-weight:700">${p.emp.nom} ${p.emp.prenom}</td>
+      <td style="${td}"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${hex};margin-right:6px"></span><span style="color:${hex};font-weight:700">${(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie}</span></td>
       <td style="${td};text-align:center;font-weight:700">${h1(p.h)}</td>
       <td style="${td};text-align:center">${pct(p.h,D.hTot)} %</td>
       <td style="${td};text-align:center">${p.hPartage?h1(p.hPartage)+' h':'—'}</td>
@@ -8416,7 +8467,7 @@ function rexHtml(D,print){
   // Hangar
   const sRows=D.slots.map(e=>{
     const pos=SLOT_POSITIONS.find(p=>p.id===e.pos);
-    return `<tr><td style="${td};border-left:3px solid ${pos?pos.col:'#888'};font-weight:700">${pos?pos.lbl:'Pos. '+e.pos}</td>
+    return `<tr><td style="${td};border-left:3px solid ${pos?pos.col:'#888'};font-weight:700">${pos?pos.lbl:'Pos. '+e.pos}${e._n>1?` <span style="color:${T.mut};font-weight:400">(${e._n} passages mutualisés)</span>`:''}</td>
       <td style="${td};text-align:center">${disp(e.debut)}</td><td style="${td};text-align:center">${disp(e.fin)}</td>
       <td style="${td};text-align:center;font-weight:700">${e.nbJours||0}</td>
       <td style="${td}">${e.notes||'—'}</td></tr>`;
@@ -8438,15 +8489,15 @@ function rexHtml(D,print){
   const wk=D.weeks;
   const maxW=Math.max(1,...D.people.map(p=>Math.max(0,...Object.values(p.weeks))));
   const wHead=wk.map(m=>`<th style="${th};text-align:center;min-width:34px">S${wkN(m)}</th>`).join('');
-  const wRows=D.people.map(p=>{
+  const wRows=_rexSort(D.people).map(p=>{
+    const hex=_catHex(p.emp.categorie);
     const tds=wk.map(m=>{
       const v=p.weeks[fmt(m)]||0;
       if(!v) return `<td style="${td};text-align:center;color:${T.mut}">—</td>`;
       const a=0.15+0.85*(v/maxW);
-      const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
-      return `<td style="${td};text-align:center;font-weight:700;background:${hexRgba(g.col,a)};color:${a>0.55?'#fff':T.fg}">${h1(v)}</td>`;
+      return `<td style="${td};text-align:center;font-weight:700;background:${hexRgba(hex,a)};color:${a>0.55?'#fff':T.fg}">${h1(v)}</td>`;
     }).join('');
-    return `<tr><td style="${td};font-weight:700;white-space:nowrap">${p.emp.nom} ${p.emp.prenom}</td>${tds}</tr>`;
+    return `<tr><td style="${td};border-left:3px solid ${hex};font-weight:700;white-space:nowrap">${p.emp.nom} ${p.emp.prenom}</td>${tds}</tr>`;
   }).join('');
   const effRow=`<tr><td style="${td};font-weight:800;background:${T.head}">Effectif présent</td>${
     wk.map(m=>`<td style="${td};text-align:center;font-weight:800;background:${T.head}">${D.people.filter(p=>p.weeks[fmt(m)]).length}</td>`).join('')}</tr>`;
@@ -8547,23 +8598,26 @@ async function _buildRexXls(D){
   title('1 · Répartition des heures');
   headRow(['Catégorie','Personnes','Heures','Part %']);
   REX_GROUPS.forEach(g=>{ const o=D.groups[g.k]; if(!o.h) return;
-    dataRow([g.lbl,o.n,h1(o.h),D.hTot?Math.round(o.h/D.hTot*100):0],{bold:true,accent:g.col}); });
+    dataRow([g.lbl,o.n,h1(o.h),D.hTot?Math.round(o.h/D.hTot*100):0],{bold:true,accent:g.col,fill:'FFEEF3FB'});
+    Object.values(o.cats).sort((a,b)=>_catOrder.indexOf(a.cat)-_catOrder.indexOf(b.cat)).forEach(cc=>{
+      dataRow(['   '+((CATS[cc.cat]||{}).lbl||cc.cat),cc.n,h1(cc.h),D.hTot?Math.round(cc.h/D.hTot*100):0],{accent:_catHex(cc.cat)});
+    });
+  });
   dataRow(['Total',D.people.length,h1(D.hTot),100],{bold:true,fill:'FFDDE6F5'});
   r++;
 
   title('2 · Qui est intervenu');
   headRow(['Personne','Catégorie','Heures','Part %','dont partagées','1re','Dernière']);
-  D.people.forEach(p=>{
-    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+  _rexSort(D.people).forEach(p=>{
     dataRow([`${p.emp.nom} ${p.emp.prenom}`,(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie,h1(p.h),
-             D.hTot?Math.round(p.h/D.hTot*100):0, p.hPartage?h1(p.hPartage):0, disp(p.first), disp(p.last)],{accent:g.col});
+             D.hTot?Math.round(p.h/D.hTot*100):0, p.hPartage?h1(p.hPartage):0, disp(p.first), disp(p.last)],{accent:_catHex(p.emp.categorie)});
   });
   r++;
 
   title('3 · Occupation hangar');
   headRow(['Emplacement','Du','Au','Jours ouvrés','Notes']);
   if(D.slots.length) D.slots.forEach(e=>{ const pos=SLOT_POSITIONS.find(p=>p.id===e.pos);
-    dataRow([pos?pos.lbl:'Pos. '+e.pos,disp(e.debut),disp(e.fin),e.nbJours||0,e.notes||''],{accent:pos?pos.col:'#888888'}); });
+    dataRow([(pos?pos.lbl:'Pos. '+e.pos)+(e._n>1?` (${e._n} passages mutualisés)`:''),disp(e.debut),disp(e.fin),e.nbJours||0,e.notes||''],{accent:pos?pos.col:'#888888'}); });
   else dataRow(['Aucun passage hangar enregistré','','','','']);
   r++;
 
@@ -8577,19 +8631,19 @@ async function _buildRexXls(D){
 
   title('5 · Affectation semaine par semaine (heures)');
   headRow(['Personne',...D.weeks.map(m=>'S'+wkN(m))]);
-  D.people.forEach(p=>{
-    const g=REX_GROUPS.find(g=>g.k===_rexGroupOf(p.emp.categorie));
+  _rexSort(D.people).forEach(p=>{
+    const hex=_catHex(p.emp.categorie);
     const row=ws.getRow(r++);
     const nm=row.getCell(1); nm.value=`${p.emp.nom} ${p.emp.prenom}`;
-    nm.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
-    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(g.col)}};
+    nm.font={bold:true,size:9,color:{argb:'FF14203A'}};
+    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(hex)}};
     nm.alignment={indent:1};
     D.weeks.forEach((m,i)=>{
       const v=p.weeks[fmt(m)]||0, cl=row.getCell(2+i);
       cl.value=v||null; cl.numFmt='0.0';
       cl.alignment={horizontal:'center'};
       cl.font={size:9,bold:!!v,color:{argb:'FF14203A'}};
-      if(v) cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(g.col)}};
+      if(v) cl.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(hex)}};
       cl.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
     });
   });
