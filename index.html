@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260715-REX2 -->
+<!-- AeroStaff Pro v7 — Build 20260716-ARCHIVE -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -56,11 +56,46 @@ window.addEventListener('unhandledrejection', function(ev){
 
 // Safe localStorage wrapper (fallback for QuickLook/file:// restrictions)
 var _memStore = {};
+var _storageKO = false;          // vrai si la dernière écriture locale a échoué (quota plein)
 var _safeStorage = {
   getItem: function(k){ try{ return localStorage.getItem(k); } catch(e){ return _memStore[k]||null; } },
-  setItem: function(k,v){ try{ localStorage.setItem(k,v); } catch(e){ _memStore[k]=v; } },
+  setItem: function(k,v){
+    try{ localStorage.setItem(k,v); delete _memStore[k]; return true; }
+    catch(e){ _memStore[k]=v; return false; }   // ⚠ mémoire vive : perdu au rechargement
+  },
   removeItem: function(k){ try{ localStorage.removeItem(k); } catch(e){ delete _memStore[k]; } }
 };
+// Estimation du stockage utilisé / disponible
+function storageInfo(){
+  let used=0;
+  try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); used+=(k.length+(localStorage.getItem(k)||'').length)*2; } }
+  catch(e){ try{ used=JSON.stringify(S).length*2; }catch(_){} }
+  const iOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const quota=(iOS?5:10)*1024*1024;
+  return {used, quota, pct:Math.min(100,Math.round(used/quota*100))};
+}
+// Bandeau d'alerte persistant quand la sauvegarde locale ne passe plus
+function _storageAlert(){
+  let b=document.getElementById('storage-alert');
+  if(!b){
+    b=document.createElement('div'); b.id='storage-alert';
+    b.style.cssText='position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:100000;max-width:min(560px,94vw);padding:12px 14px;border-radius:12px;background:#3a0d16;border:1px solid #ff5c7a;box-shadow:0 10px 40px rgba(0,0,0,.6);font-family:\'Outfit\',sans-serif';
+    document.body.appendChild(b);
+  }
+  const si=storageInfo();
+  b.innerHTML=`<div style="display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:20px">🛑</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:800;color:#ff9aa6">Sauvegarde locale impossible — stockage plein</div>
+      <div style="font-size:11px;color:#ffd0d8;line-height:1.6;margin-top:3px">
+        Le navigateur refuse d'écrire (${(si.used/1024/1024).toFixed(1)} Mo utilisés).
+        <strong>Tes modifications ne seront pas conservées au rechargement.</strong><br>
+        Fais une <strong>sauvegarde JSON</strong> maintenant${S.gdrive?.connected?', ou vérifie que la synchro Drive est bien passée':''}, puis allège les données (années anciennes).
+      </div>
+    </div>
+    <button onclick="this.parentNode.parentNode.remove()" style="background:none;border:none;color:#ff9aa6;font-size:16px;cursor:pointer;padding:0 4px">✕</button>
+  </div>`;
+}
 // SheetJS chargé à la demande (pas au démarrage pour éviter Script error iOS)
 window._xlsxLoaded=false;
 function _loadSheetJS(cb){
@@ -1097,6 +1132,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="drive-dot" id="driveDot"></div>
       <span id="driveLbl">Google Drive</span>
     </div>
+    <div class="drive-pill" id="storagePill" onclick="openStorage()" title="Stockage local utilisé" style="cursor:pointer">
+      <div class="drive-dot" id="storageDot"></div>
+      <span id="storageLbl">—</span>
+    </div>
     <button class="hbtn hbtn-ghost" onclick="exportAll()">💾 <span>Backup</span></button>
     <button class="hbtn hbtn-ghost" onclick="document.getElementById('jsonIn').click()">📥 <span>Restaurer</span></button>
     <button id="btn-manage-users" class="hbtn hbtn-ghost" onclick="openManageUsers()" style="display:none">👥 <span>Utilisateurs</span></button>
@@ -1262,7 +1301,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 <div class="page" id="pg-chantiers">
   <div class="sh">
     <div class="sh-title">Suivi des <em>Chantiers</em></div>
-    <button class="btn btn-cyan btn-sm" onclick="openChantierNew()">+ Nouveau chantier</button>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsPointIn').click()" title="Importer un extract de pointage HR_ALLJob (heures réelles)">⏱ Import pointage</button>
+      <button class="btn btn-cyan btn-sm" onclick="openChantierNew()">+ Nouveau chantier</button>
+    </div>
   </div>
 
   <!-- Alerte double affectation -->
@@ -2196,6 +2238,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button onclick="scrollNotice('n-master')" class="btn btn-ghost btn-sm">📅 Master Planning</button>
     <button onclick="scrollNotice('n-weekly')" class="btn btn-ghost btn-sm">🗓 Planning Hebdo</button>
     <button onclick="scrollNotice('n-chantiers')" class="btn btn-ghost btn-sm">🔧 Chantiers</button>
+    <button onclick="scrollNotice('n-rex')" class="btn btn-ghost btn-sm">📋 Fiche REX</button>
     <button onclick="scrollNotice('n-stockage')" class="btn btn-ghost btn-sm">✈️ Stockage</button>
     <button onclick="scrollNotice('n-recycling')" class="btn btn-ghost btn-sm">♻️ Recyclage</button>
     <button onclick="scrollNotice('n-personnel')" class="btn btn-ghost btn-sm">👥 Personnel</button>
@@ -2380,6 +2423,52 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « Import suivi RH (2 fichiers) » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code) et les <strong>autorisations de conduite</strong> du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
       </div>
     </div>
+    <div class="notice-section" id="n-rex" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">📋</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Fiche REX — Retour d'expérience</div><div style="font-size:11px;color:var(--t4)">Bilan d'un chantier : heures, hangar, dérive, affectations</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:12px;color:var(--t2);line-height:1.7">
+        <strong style="color:var(--cyan)">Où la trouver</strong> — bouton <strong>📋 REX</strong> sur les cartes du Suivi des chantiers, icône <strong>📋</strong> sur les chantiers terminés du kanban, ou <strong>📋 Fiche REX</strong> dans la fiche d'un chantier. Disponible <strong>en cours</strong> comme <strong>après clôture</strong>.<br>
+        Partage : aperçu à l'écran, <strong>📄 PDF</strong> pour animer une réunion, <strong>📊 Excel</strong> coloré pour retravailler les chiffres.<br><br>
+
+        <strong style="color:#ff9a3c">⚠ Comment les heures sont calculées</strong><br>
+        Deux chiffres coexistent :<br>
+        • <strong style="color:#fff">Théorique</strong> — reconstitué depuis le Master Planning : 1 demi-journée = <strong>3,5 h</strong> (base 7 h/jour), ou <strong>1,75 h</strong> si la demi-journée est partagée entre 2 chantiers. <strong style="color:#ff5c7a">Les heures supplémentaires n'y figurent pas</strong> : l'app ne saisit que des demi-journées.<br>
+        • <strong style="color:#fff">Réel</strong> — durées <strong>pointées</strong>, importées depuis ton extract <strong>HR_ALLJob</strong> (feuille PERSLOGS, colonne JOB DURATION). C'est là que les heures supp apparaissent.<br>
+        • <strong style="color:var(--cyan)">Delta réel / théorique</strong> — l'écart entre les deux, par personne et au total.<br><br>
+
+        <strong style="color:var(--cyan)">⏱ Import du pointage</strong> — bouton dans <strong>Suivi des Chantiers</strong>. Tu déposes un ou plusieurs extracts HR_ALLJob (multi-sélection possible) :<br>
+        • Les <strong>MSN sont normalisés sur 5 chiffres</strong> avec zéros à gauche des deux côtés (5796 ↔ 05796), donc le rattachement au chantier marche quel que soit le format<br>
+        • Les personnes sont reconnues par <strong>trigramme</strong>, sinon par nom + prénom. Celles absentes de l'app sont cumulées sur une ligne <strong>« Personnel hors périmètre »</strong><br>
+        • Toutes les classes sont comptées (INCLUDED, EXCLUDED…) — le détail par classe est affiché avant validation<br>
+        • Un <strong>aperçu</strong> précède l'import : période détectée, heures par chantier, MSN sans chantier correspondant<br>
+        • <strong style="color:#ffd060">Réimporter la même période écrase</strong> au lieu d'additionner : aucun risque de double comptage si tu relances un fichier. Un extract couvre une semaine, il faut donc importer chaque semaine du chantier<br><br>
+
+        <strong style="color:var(--cyan)">Les catégories d'heures</strong><br>
+        • <strong>Production</strong> = techniciens + intérimaires → c'est le chiffre comparé au budget<br>
+        • <strong>Sous-traitance</strong> = prestataires<br>
+        • <strong>Encadrement (improductif)</strong> = chefs d'équipe, experts, responsables projet<br>
+        • <strong>Autres</strong> = alternants, stagiaires, inspecteurs qualité… (affiché seulement s'il y a des heures)<br>
+        Chaque groupe est <strong>détaillé par catégorie</strong>, aux couleurs du personnel.<br><br>
+
+        <strong style="color:var(--cyan)">Les indicateurs</strong><br>
+        • <strong>Budget</strong> = heures initiales du chantier <em>+</em> toutes les heures ajoutées dans le Suivi<br>
+        • <strong>Écart / budget</strong> = heures de production théoriques − budget (rouge = dépassement)<br>
+        • <strong>Jours hangar</strong> = somme des jours ouvrés des passages en hangar, rattachés par <strong>MSN</strong>. Deux passages consécutifs sur le <strong>même emplacement</strong> sont <strong>mutualisés</strong> en une ligne (un week-end ne coupe pas la continuité)<br>
+        • <strong>Livraison</strong> = dernière demi-journée travaillée vs date de fin prévue, en jours ouvrés. <strong style="color:#ffd060">Affiché seulement pour un chantier terminé</strong> — sur un chantier en cours, le planning n'est rempli que jusqu'à une certaine date, la comparaison n'aurait aucun sens<br>
+        • <strong>Rendement hangar</strong> = heures de production ÷ jours d'immobilisation (utilise le réel dès qu'un pointage est importé)<br><br>
+
+        <strong style="color:var(--cyan)">Les 5 sections</strong><br>
+        <strong>1 · Répartition des heures</strong> — par groupe puis par catégorie<br>
+        <strong>2 · Qui est intervenu</strong> — trié par type puis par ordre alphabétique : heures théoriques, réelles, delta, part, première → dernière intervention<br>
+        <strong>3 · Occupation hangar</strong> — emplacements, dates, jours ouvrés, notes<br>
+        <strong>4 · Heures ajoutées</strong> — chaque motif saisi dans le Suivi, avec sa part dans la dérive<br>
+        <strong>5 · Affectation semaine par semaine</strong> — mini master planning dédié : heures par personne et par semaine, intensité = charge, effectif présent en bas<br>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,154,60,0.06);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 La fiche ne lit que le planning : une personne <strong>oubliée dans le Master Planning</strong> n'apparaîtra pas et ses heures manqueront. Les chiffres valent ce que vaut la saisie.</div>
+      </div>
+    </div>
+
     <div class="notice-section" id="n-programme" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
         <span style="font-size:20px">📊</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Programme Activité</div><div style="font-size:11px;color:var(--t4)">Charge / capacité & Gantt annuel</div></div>
@@ -2550,7 +2639,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260715-REX2 · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260716-ARCHIVE · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2968,6 +3057,53 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 
 <!-- Jours fériés — FONCTIONNEL -->
+<input type="file" id="archIn" accept=".json" style="display:none" onchange="handleArchiveFile(event)">
+
+<div class="mbg" id="m-archive-year">
+<div class="modal" style="max-width:560px">
+  <div class="modal-title">📦 Archiver une année révolue</div>
+  <div id="arch-body" style="max-height:60vh;overflow-y:auto"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-archive-year')">Fermer</button>
+    <button class="btn btn-mint" onclick="pickArchive()">📂 Consulter une archive</button>
+  </div>
+</div>
+</div>
+
+<div class="mbg" id="m-archive-done">
+<div class="modal" style="max-width:520px">
+  <div class="modal-title">✅ Archivage terminé</div>
+  <div id="arch-done-body"></div>
+  <div class="mfooter">
+    <button class="btn btn-cyan" onclick="closeM('m-archive-done')" style="width:100%">J'ai compris</button>
+  </div>
+</div>
+</div>
+
+<div class="mbg" id="m-storage">
+<div class="modal" style="max-width:520px">
+  <div class="modal-title">💾 Stockage local</div>
+  <div id="storage-body"></div>
+  <div class="mfooter" style="flex-wrap:wrap">
+    <button class="btn btn-ghost" onclick="closeM('m-storage')">Fermer</button>
+    <button class="btn btn-ghost btn-sm" onclick="pickArchive()">📂 Consulter une archive</button>
+    <button class="btn btn-gold btn-sm" onclick="closeM('m-storage');openArchive()">📦 Archiver une année</button>
+    <button class="btn btn-cyan btn-sm" onclick="exportAll()">💾 Sauvegarder</button>
+  </div>
+</div>
+</div>
+
+<div class="mbg" id="m-pointage">
+<div class="modal" style="max-width:620px">
+  <div class="modal-title">⏱ Import pointage — heures réelles</div>
+  <div id="pt-body"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-pointage');_pointData=null">Annuler</button>
+    <button class="btn btn-cyan" onclick="applyPointage()">Importer</button>
+  </div>
+</div>
+</div>
+
 <div class="mbg" id="m-rex">
 <div class="modal" style="max-width:1100px">
   <div class="modal-title">📋 Fiche REX — Retour d'expérience</div>
@@ -3103,8 +3239,20 @@ const FILE_NAME   = 'AeroStaff_Data.json';
 
 function doPost(e) {
   try {
-    const data = e.postData.contents;
-    saveToFile(data);
+    const raw = e.postData.contents;
+    let p = {};
+    try { p = JSON.parse(raw); } catch(_) {}
+
+    // Archive d'une année révolue -> fichier séparé
+    if (p.action === 'archive' && p.fileName) {
+      writeFile(p.fileName, JSON.stringify(p.data));
+      return ContentService
+        .createTextOutput(JSON.stringify({ok:true,archived:p.year}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Sauvegarde normale
+    saveToFile(raw);
     return ContentService
       .createTextOutput(JSON.stringify({ok:true}))
       .setMimeType(ContentService.MimeType.JSON);
@@ -3112,6 +3260,15 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ok:false,error:err.message}))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function writeFile(name, content) {
+  const files = DriveApp.getFilesByName(name);
+  if (files.hasNext()) {
+    files.next().setContent(content);
+  } else {
+    DriveApp.createFile(name, content, MimeType.PLAIN_TEXT);
   }
 }
 
@@ -3288,6 +3445,7 @@ function saveToFile(data) {
 <!-- Hidden inputs -->
 <input type="file" id="xlsIn"  accept=".xlsx,.xls,.xlsm" style="display:none" onchange="handleXlsImport(event)">
 <input type="file" id="xlsRhIn" accept=".xlsx,.xls,.xlsm" multiple style="display:none" onchange="handleRhImport(event)">
+<input type="file" id="xlsPointIn" accept=".xlsx,.xls,.xlsm" multiple style="display:none" onchange="handlePointageImport(event)">
 <input type="file" id="jsonIn" accept=".json"       style="display:none" onchange="handleJsonImport(event)">
 <script>
 /* ═══════════════════════════════════════
@@ -3333,6 +3491,7 @@ let S = {
   weekStart:null, masterMonth:new Date().getMonth(), masterYear:new Date().getFullYear(),
   gdrive:{connected:false,fileId:null,clientId:'',userEmail:'',lastSync:null},
   besoinOverrides:{},  // {chantierId_YYYY-SNN: nbTechs} — ajustement manuel hebdo du besoin
+  realHours:{},        // {chantierId_empId_YYYY-MM-DD: heures} — pointage réel importé (HR_ALLJob)
 };
 let cellCtx=null, cellType='', cellVM=false;
 
@@ -4001,16 +4160,28 @@ function schedDriveSync(){
 }
 
 function save(){
+  // Mode consultation d'archive : lecture seule stricte — on n'écrit RIEN.
+  if(window._archiveMode){ try{toast('📁 Lecture seule — archive non modifiable');}catch(_){} return; }
   // Horodater la sauvegarde locale : sans ça, le pull Drive considère le distant
   // comme "plus récent" et écrase les modifications locales (perte de données).
   if(S.gdrive){ S.gdrive.lastModified=new Date().toISOString(); }
-  try{_safeStorage.setItem('asp4',JSON.stringify(S));}catch(e){}
+  let ok=false;
+  try{ ok=_safeStorage.setItem('asp4',JSON.stringify(S)); }catch(e){ ok=false; }
+  if(!ok){                       // quota dépassé → l'écriture n'a PAS eu lieu sur le disque
+    _storageKO=true;
+    try{ _storageAlert(); }catch(_){}
+  } else if(_storageKO){         // retour à la normale
+    _storageKO=false;
+    const b=document.getElementById('storage-alert'); if(b) b.remove();
+  }
   if(S.gdrive?.connected && S.gdrive?.gasUrl) schedDriveSync();
+  try{ refreshStoragePill(); }catch(_){}
 }
 
 // ── Récupération auto depuis le Drive (pull) ──
 let _pullInProgress=false;
 async function pullFromDrive(silent){
+  if(window._archiveMode) return;   // consultation d'archive : ne pas écraser l'affichage
   if(!S.gdrive?.connected || !S.gdrive?.gasUrl || _pullInProgress) return;
   _pullInProgress=true;
   try{
@@ -8281,7 +8452,417 @@ function _matchChantier(c,q){
     || (c.client||'').toLowerCase().includes(q)
     || (c.avion||'').toLowerCase().includes(q);
 }
-/* ═══ FICHE REX (retour d'expérience) ═══ */
+// Rafraîchit la pastille de stockage de l'en-tête
+function refreshStoragePill(){
+  const lbl=document.getElementById('storageLbl'), dot=document.getElementById('storageDot');
+  if(!lbl||!dot) return;
+  const si=storageInfo();
+  lbl.textContent=(si.used/1024/1024).toFixed(1)+' Mo';
+  const col = si.pct>=90?'#ff4d6d' : si.pct>=80?'#ffd060' : '#34c759';
+  dot.style.background=col; dot.style.boxShadow='0 0 8px '+col;
+  lbl.style.color = si.pct>=80 ? col : '';
+  if(si.pct>=80 && !window._storageWarned){
+    window._storageWarned=true;
+    try{ toast(`⚠ Stockage à ${si.pct}% — pense à sauvegarder et alléger les anciennes données`); }catch(_){}
+  }
+}
+// Détail du stockage : poids de chaque poste
+function openStorage(){
+  const si=storageInfo();
+  const mo=b=>(b/1024/1024).toFixed(2)+' Mo';
+  const ko=b=>(b/1024).toFixed(0)+' Ko';
+  const part=(lbl,obj,note)=>{
+    let b=0,n=0;
+    try{ const s=JSON.stringify(obj||{}); b=s.length*2; n=Array.isArray(obj)?obj.length:Object.keys(obj||{}).length; }catch(_){}
+    return {lbl,b,n,note};
+  };
+  const parts=[
+    part('Master Planning (demi-journées)',S.planning,'poste le plus lourd'),
+    part('Heures réelles (pointage importé)',S.realHours,''),
+    part('Chantiers',S.chantiers,''),
+    part('Personnel',S.personnel,''),
+    part('Formations',S.formations,''),
+    part('Autorisations',S.autorisations,''),
+    part('Ajustements de besoin',S.besoinOverrides,''),
+  ].sort((a,b)=>b.b-a.b);
+  let totalS=0; try{ totalS=JSON.stringify(S).length*2; }catch(_){}
+  const col = si.pct>=90?'#ff4d6d' : si.pct>=80?'#ffd060' : '#34c759';
+
+  document.getElementById('storage-body').innerHTML=`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px">
+        <span><strong style="color:#fff">${mo(si.used)}</strong> utilisés</span>
+        <span style="color:${col};font-weight:800">${si.pct}%</span>
+      </div>
+      <div style="height:10px;border-radius:99px;background:rgba(255,255,255,0.07);overflow:hidden">
+        <div style="height:100%;width:${si.pct}%;background:${col};border-radius:99px;transition:width .3s"></div>
+      </div>
+      <div style="font-size:10px;color:var(--t4);margin-top:4px">Limite estimée du navigateur : ~${(si.quota/1024/1024).toFixed(0)} Mo</div>
+    </div>
+    <div style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Répartition</div>
+    ${parts.filter(p=>p.b>0).map(p=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div><span style="font-size:12px;color:#e0e8ff">${p.lbl}</span>
+          <span style="font-size:10px;color:var(--t4)"> · ${p.n.toLocaleString('fr')} entrées${p.note?' · '+p.note:''}</span></div>
+        <strong style="font-size:12px;color:var(--cyan);white-space:nowrap">${p.b>500*1024?mo(p.b):ko(p.b)}</strong>
+      </div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:7px 0;margin-top:2px">
+      <strong style="font-size:12px;color:#fff">Total des données de l'app</strong>
+      <strong style="font-size:12px;color:#fff">${mo(totalS)}</strong>
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:${si.pct>=80?'rgba(255,77,109,0.08)':'rgba(0,210,255,0.05)'};border-left:3px solid ${col};border-radius:0 8px 8px 0;font-size:11px;color:var(--t3);line-height:1.6">
+      ${si.pct>=80
+        ? '🛑 <strong>Stockage bientôt saturé.</strong> Fais une sauvegarde JSON, puis allège : les années de planning passées sont le principal poste. Au-delà de la limite, les modifications ne seraient plus conservées au rechargement.'
+        : '💡 Le Master Planning pèse ~3 Mo par année entièrement remplie. La sauvegarde JSON régulière (et la synchro Drive) reste ta meilleure protection.'}
+    </div>`;
+  openM('m-storage');
+}
+
+/* ═══ ARCHIVAGE DES ANNÉES RÉVOLUES ═══ */
+// Une archive est un instantané AUTONOME : relisible seule dans 3 ans, même si les chantiers ont changé.
+const _yearOfPlanKey = k => { const p=k.split('_'); return (p[p.length-2]||'').slice(0,4); };  // empId_YYYY-MM-DD_AM
+const _yearOfRealKey = k => { const p=k.split('_'); return (p[p.length-1]||'').slice(0,4); };  // chId_empId_YYYY-MM-DD
+
+function archivableYears(){
+  const cur=new Date().getFullYear(), y={};
+  Object.keys(S.planning||{}).forEach(k=>{ const a=_yearOfPlanKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
+  Object.keys(S.realHours||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
+  return Object.keys(y).sort().map(a=>({year:+a, entries:y[a]}));
+}
+function _buildArchive(year){
+  const plan={}, real={};
+  Object.entries(S.planning||{}).forEach(([k,v])=>{ if(_yearOfPlanKey(k)===String(year)) plan[k]=v; });
+  Object.entries(S.realHours||{}).forEach(([k,v])=>{ if(_yearOfRealKey(k)===String(year)) real[k]=v; });
+  return {
+    _type:'aerostaff-archive', _version:1, year,
+    createdAt:new Date().toISOString(), site:'LFBF',
+    personnel:S.personnel, chantiers:S.chantiers, formations:S.formations,
+    autorisations:S.autorisations, holidays:S.holidays,
+    slot:S.slot, stockage:S.stockage, recycling:S.recycling, airbus:S.airbus,
+    besoinOverrides:S.besoinOverrides,
+    planning:plan, realHours:real
+  };
+}
+function openArchive(){
+  const list=archivableYears();
+  const si=storageInfo();
+  const done=(S.archives||[]).map(a=>a.year);
+  document.getElementById('arch-body').innerHTML=`
+    <div style="background:rgba(0,210,255,0.05);border:1px solid rgba(0,210,255,0.15);border-radius:12px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--t2);line-height:1.7">
+      Archiver une année <strong style="color:#fff">révolue</strong> sort son planning et ses heures réelles du stockage du navigateur pour libérer de la place.<br>
+      L'archive est <strong style="color:var(--cyan)">téléchargée en fichier</strong>${S.gdrive?.connected?' <strong>et envoyée sur ton Drive</strong>':''}, puis relisible à tout moment via <strong>📂 Consulter une archive</strong>.<br>
+      <span style="color:#ffd060">Rien n'est supprimé tant que le fichier n'est pas téléchargé.</span>
+    </div>
+    <div style="font-size:11px;color:var(--t4);margin-bottom:6px">Stockage actuel : <strong style="color:${si.pct>=80?'#ff4d6d':'#e0e8ff'}">${(si.used/1024/1024).toFixed(1)} Mo (${si.pct}%)</strong></div>
+    ${list.length?list.map(o=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#e0e8ff">Année ${o.year}${done.includes(o.year)?' <span style="font-size:10px;color:#34c759">✓ déjà archivée</span>':''}</div>
+          <div style="font-size:11px;color:var(--t4)">${o.entries.toLocaleString('fr')} entrées</div>
+        </div>
+        <button class="btn btn-cyan btn-sm" onclick="doArchive(${o.year})">📦 Archiver</button>
+      </div>`).join('')
+      :'<div style="font-size:12px;color:var(--t4);padding:10px 0">Aucune année révolue à archiver pour le moment.</div>'}
+    ${(S.archives||[]).length?`<div style="margin-top:12px;font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Historique</div>
+      ${S.archives.map(a=>`<div style="font-size:11px;color:var(--t4);padding:3px 0">📦 ${a.year} — ${disp(a.date)} · ${a.entries.toLocaleString('fr')} entrées${a.drive?' · Drive ✓':''}</div>`).join('')}`:''}`;
+  openM('m-archive-year');
+}
+function doArchive(year){
+  const arch=_buildArchive(year);
+  const n=Object.keys(arch.planning).length+Object.keys(arch.realHours).length;
+  if(!n){ toast('Aucune donnée pour '+year); return; }
+  const json=JSON.stringify(arch);
+  confirmDel(`Archiver l'année ${year} ?`,
+    `Le fichier va être téléchargé${S.gdrive?.connected?' et envoyé sur ton Drive':''}.\n\n`+
+    `${n.toLocaleString('fr')} entrées (planning + heures réelles) seront ensuite RETIRÉES du stockage local — personnel, chantiers et formations sont conservés.\n\n`+
+    `Tu pourras relire cette année à tout moment via « Consulter une archive ».`,
+    ()=>{
+      // 1) Téléchargement du fichier — AVANT toute purge
+      try{
+        const blob=new Blob([json],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url;
+        a.download=`AeroStaff_Archive_${year}.json`; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1500);
+      }catch(e){ toast('❌ Téléchargement impossible — archivage annulé'); return; }
+      // 2) Envoi Drive (nécessite le script Apps Script à jour)
+      let drive=false;
+      if(S.gdrive?.connected && S.gdrive?.gasUrl){
+        try{
+          fetch(S.gdrive.gasUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+            body:JSON.stringify({action:'archive',year,fileName:`AeroStaff_Archive_${year}.json`,data:arch})});
+          drive=true;
+        }catch(e){ console.warn('Drive archive:',e); }
+      }
+      // 3) Purge locale de l'année
+      Object.keys(S.planning||{}).forEach(k=>{ if(_yearOfPlanKey(k)===String(year)) delete S.planning[k]; });
+      Object.keys(S.realHours||{}).forEach(k=>{ if(_yearOfRealKey(k)===String(year)) delete S.realHours[k]; });
+      if(!S.archives) S.archives=[];
+      S.archives=S.archives.filter(a=>a.year!==year);
+      S.archives.push({year,date:fmt(new Date()),entries:n,drive});
+      save();
+      closeM('m-archive-year');
+      _archiveDoneReminder(year,n,drive);
+      try{ refreshStoragePill(); }catch(_){}
+    });
+}
+// ── Rappel APRÈS : où est l'archive et comment la relire ──
+function _archiveDoneReminder(year,n,drive){
+  const si=storageInfo();
+  document.getElementById('arch-done-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:40px">📦</div>
+      <div style="font-size:16px;font-weight:900;color:#fff;margin-top:4px">Année ${year} archivée</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:3px">${n.toLocaleString('fr')} entrées sorties du stockage · maintenant à ${(si.used/1024/1024).toFixed(1)} Mo (${si.pct}%)</div>
+    </div>
+    <div style="background:rgba(52,199,89,0.06);border-left:3px solid #34c759;border-radius:0 10px 10px 0;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--t2);line-height:1.7">
+      <strong style="color:#fff">Où est ton archive ?</strong><br>
+      📄 Fichier <strong style="color:var(--mint)">AeroStaff_Archive_${year}.json</strong> dans tes téléchargements — mets-le en lieu sûr (réseau, cloud).<br>
+      ${drive?'☁️ Une copie a été envoyée sur ton Google Drive (dossier AeroStaff).':'☁️ Drive non connecté : le fichier local est ta seule copie.'}
+    </div>
+    <div style="background:rgba(0,210,255,0.06);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:10px 12px;font-size:12px;color:var(--t2);line-height:1.7">
+      <strong style="color:#fff">Comment la relire plus tard ?</strong><br>
+      Bouton <strong style="color:var(--cyan)">📂 Consulter une archive</strong> — depuis la pastille de stockage de l'en-tête.<br>
+      L'app passe en <strong>lecture seule</strong> : tu navigues partout, tu exportes en PDF/Excel, et tes données courantes ne sont jamais touchées.
+    </div>`;
+  openM('m-archive-done');
+}
+
+/* ── Mode consultation d'archive (lecture seule) ── */
+let _liveState=null;
+function pickArchive(){ document.getElementById('archIn').click(); }
+function handleArchiveFile(ev){
+  const f=(ev.target.files||[])[0]; ev.target.value='';
+  if(!f) return;
+  const fr=new FileReader();
+  fr.onload=e=>{
+    let a=null;
+    try{ a=JSON.parse(e.target.result); }catch(err){ toast('❌ Fichier illisible'); return; }
+    if(!a || a._type!=='aerostaff-archive'){ toast('❌ Ce fichier n\'est pas une archive AeroStaff'); return; }
+    enterArchiveMode(a);
+  };
+  fr.readAsText(f);
+}
+function enterArchiveMode(a){
+  if(window._archiveMode) exitArchiveMode(true);
+  _liveState=S;                       // on met de côté les données courantes (jamais touchées)
+  window._archiveMode=true;
+  S=Object.assign({}, a, {gdrive:{connected:false}, weekStart:getMon(new Date(a.year,0,15)),
+      masterYear:a.year, masterMonth:0, archives:_liveState.archives});
+  let b=document.getElementById('archive-banner');
+  if(!b){ b=document.createElement('div'); b.id='archive-banner';
+    b.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99997;padding:7px 14px;background:linear-gradient(90deg,#5a3d00,#7a5200);border-bottom:2px solid #ffd060;display:flex;align-items:center;justify-content:center;gap:14px;font-family:\'Outfit\',sans-serif';
+    document.body.appendChild(b); }
+  b.innerHTML=`<span style="font-size:12px;font-weight:800;color:#ffd060">📁 ARCHIVE ${a.year} — LECTURE SEULE</span>
+    <span style="font-size:11px;color:#ffe9b0">Aucune modification ne sera enregistrée</span>
+    <button onclick="exitArchiveMode()" style="background:#ffd060;border:none;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:800;color:#3a2800;cursor:pointer;font-family:inherit">Quitter l'archive</button>`;
+  document.body.style.paddingTop='34px';
+  closeM('m-archive-year'); closeM('m-storage');
+  try{ popSelects(); }catch(_){}
+  goTab('dashboard');
+  toast(`📁 Archive ${a.year} ouverte — lecture seule`);
+}
+function exitArchiveMode(silent){
+  if(!window._archiveMode) return;
+  window._archiveMode=false;
+  if(_liveState) S=_liveState;
+  _liveState=null;
+  const b=document.getElementById('archive-banner'); if(b) b.remove();
+  document.body.style.paddingTop='';
+  try{ popSelects(); }catch(_){}
+  goTab('dashboard');
+  if(!silent) toast('✅ Retour à tes données courantes');
+}
+// ── Rappel AVANT : proposer l'archivage d'une année révolue ──
+function archiveReminder(){
+  if(window._archiveMode) return;
+  const list=archivableYears();
+  if(!list.length) return;
+  const done=(S.archives||[]).map(a=>a.year);
+  const todo=list.filter(o=>!done.includes(o.year));
+  if(!todo.length) return;
+  const si=storageInfo();
+  // Proposé si le stockage se remplit (>60%) ou si l'année vient de se terminer (jan-mars)
+  const m=new Date().getMonth();
+  if(si.pct<60 && m>2) return;
+  // Report possible 30 jours
+  if(S.archiveSnooze && new Date(S.archiveSnooze)>new Date()) return;
+  const y=todo[todo.length-1];
+  let b=document.getElementById('arch-remind');
+  if(!b){ b=document.createElement('div'); b.id='arch-remind';
+    b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:9998;max-width:340px;padding:13px 15px;border-radius:14px;background:#0d1628;border:1px solid rgba(255,208,96,0.4);box-shadow:0 14px 44px rgba(0,0,0,.6);font-family:\'Outfit\',sans-serif';
+    document.body.appendChild(b); }
+  b.innerHTML=`<div style="display:flex;gap:9px;align-items:flex-start">
+      <span style="font-size:20px">📦</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:800;color:#ffd060">L'année ${y.year} est terminée</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.6;margin-top:3px">
+          Tu peux l'archiver pour libérer de la place (${y.entries.toLocaleString('fr')} entrées · stockage à ${si.pct}%).
+          L'archive reste consultable à tout moment.
+        </div>
+        <div style="display:flex;gap:6px;margin-top:9px">
+          <button onclick="document.getElementById('arch-remind').remove();openArchive()" style="flex:1;padding:6px;background:#ffd060;border:none;border-radius:8px;font-size:11px;font-weight:800;color:#3a2800;cursor:pointer;font-family:inherit">Archiver ${y.year}</button>
+          <button onclick="snoozeArchive()" style="padding:6px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;font-size:11px;font-weight:700;color:#9fb0c8;cursor:pointer;font-family:inherit">Plus tard</button>
+        </div>
+      </div>
+    </div>`;
+}
+function snoozeArchive(){
+  const d=new Date(); d.setDate(d.getDate()+30);
+  S.archiveSnooze=d.toISOString(); save();
+  const b=document.getElementById('arch-remind'); if(b) b.remove();
+  toast('Rappel reporté de 30 jours');
+}
+
+/* ═══ IMPORT POINTAGE (heures réelles) — extract HR_ALLJob / PERSLOGS ═══ */
+// Stockage : S.realHours["<chantierId>_<empId|__HORS__>_<YYYY-MM-DD>"] = heures
+// Réimporter la même période écrase les mêmes clés → aucun double comptage.
+const _msn5=v=>{ const s=String(v==null?'':v).trim(); return /^\d+$/.test(s)?s.padStart(5,'0'):s.toUpperCase(); };
+
+function handlePointageImport(ev){
+  const files=[...(ev.target.files||[])];
+  ev.target.value='';
+  if(!files.length) return;
+  toast('⏳ Lecture du pointage…');
+  _loadSheetJS(async()=>{
+    if(typeof XLSX==='undefined'){ toast('Lecture Excel indisponible hors ligne'); return; }
+    try{
+      let logs=[];
+      for(const f of files) logs=logs.concat(await _readPointageFile(f));
+      if(!logs.length){ toast('❌ Aucune ligne de pointage trouvée (feuille PERSLOGS ?)'); return; }
+      _pointPreview(logs);
+    }catch(e){ console.error(e); toast('❌ Erreur lecture: '+e.message); }
+  });
+}
+
+function _readPointageFile(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error('lecture impossible'));
+    fr.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+        const shName=wb.SheetNames.find(n=>/perslogs/i.test(n))||wb.SheetNames[0];
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets[shName],{header:1,raw:true,cellDates:true});
+        // Trouver la ligne d'en-tête (celle qui contient EMPLOYEE CODE)
+        let hi=-1;
+        for(let i=0;i<Math.min(40,rows.length);i++){
+          const line=(rows[i]||[]).map(v=>String(v||'').toUpperCase());
+          if(line.some(v=>v.includes('EMPLOYEE CODE'))){ hi=i; break; }
+        }
+        if(hi<0) return res([]);
+        const hdr=(rows[hi]||[]).map(v=>String(v||'').trim().toUpperCase());
+        const col=(...names)=>{ for(const n of names){ const i=hdr.indexOf(n); if(i>=0) return i; } return -1; };
+        const iCode=col('EMPLOYEE CODE'), iFn=col('FISRT NAME','FIRST NAME'), iLn=col('LAST NAME'),
+              iMsn=col('MSN'), iDur=col('JOB DURATION (MH)','JOB DURATION'), iStart=col('DATE/TIME STARTED'),
+              iClass=col('CLASS');
+        const out=[];
+        for(let i=hi+1;i<rows.length;i++){
+          const r=rows[i]||[]; if(!r[iCode]) continue;
+          const h=parseFloat(String(r[iDur]).replace(',','.'));
+          if(!isFinite(h)||h<=0) continue;
+          const msn=_msn5(r[iMsn]); if(!msn||msn==='00000') continue;
+          let d=r[iStart];
+          if(!(d instanceof Date)){
+            const s=String(d||'').trim();
+            let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+            if(m){
+              let[,a,b,y]=m; a=+a; b=+b; y=+y; if(y<100) y+=2000;
+              // jj/mm/aaaa si le 1er nombre ne peut pas être un mois, sinon m/j/aa (format US de l'extract)
+              d = a>12 ? new Date(y,b-1,a) : new Date(y,a-1,b);
+            } else d=new Date(s);
+          }
+          if(!d||isNaN(d)) continue;
+          out.push({code:String(r[iCode]||'').trim().toUpperCase(),
+                    prenom:String(r[iFn]||'').trim(), nom:String(r[iLn]||'').trim(),
+                    msn, h, ds:fmt(d), cls:String(r[iClass]||'').trim().toUpperCase()});
+        }
+        res(out);
+      }catch(err){ rej(err); }
+    };
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+let _pointData=null;
+function _pointPreview(logs){
+  // Index des chantiers par MSN normalisé
+  const byMsn={};
+  S.chantiers.forEach(c=>{ const m=_msn5(c.msn); if(m) (byMsn[m]=byMsn[m]||[]).push(c); });
+  // Index du personnel par trigramme puis par nom+prénom
+  const byTri={}, byName={};
+  S.personnel.forEach(p=>{
+    if(p.trigramme) byTri[String(p.trigramme).trim().toUpperCase()]=p;
+    byName[`${p.nom} ${p.prenom}`.toUpperCase().replace(/\s+/g,' ').trim()]=p;
+  });
+
+  const agg={}, dates=new Set(), clsTot={};
+  let hTot=0, hMatch=0, hHors=0, hNoCh=0;
+  const chSet=new Set(), horsSet=new Set(), msnInconnus={};
+
+  logs.forEach(l=>{
+    hTot+=l.h; clsTot[l.cls||'—']=(clsTot[l.cls||'—']||0)+l.h;
+    const chs=byMsn[l.msn];
+    if(!chs||!chs.length){ hNoCh+=l.h; msnInconnus[l.msn]=(msnInconnus[l.msn]||0)+l.h; return; }
+    const c=chs[0];                                     // MSN → chantier (le 1er si plusieurs)
+    const p=byTri[l.code]||byName[`${l.nom} ${l.prenom}`.toUpperCase().replace(/\s+/g,' ').trim()];
+    const empId=p?p.id:'__HORS__';
+    if(p) hMatch+=l.h; else { hHors+=l.h; horsSet.add(l.code); }
+    chSet.add(c.id); dates.add(l.ds);
+    const k=`${c.id}_${empId}_${l.ds}`;
+    agg[k]=(agg[k]||0)+l.h;
+  });
+
+  Object.keys(agg).forEach(k=>agg[k]=Math.round(agg[k]*100)/100);
+  const ds=[...dates].sort();
+  _pointData={agg, dates:ds, chIds:[...chSet]};
+
+  const r1=v=>Math.round(v*10)/10;
+  const chLines=[...chSet].map(id=>{
+    const c=S.chantiers.find(x=>x.id===id);
+    const h=Object.entries(agg).filter(([k])=>k.startsWith(id+'_')).reduce((s,[,v])=>s+v,0);
+    return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <span style="font-size:12px;color:#e0e8ff">${c?c.nom:id}</span>
+      <strong style="font-size:12px;color:var(--cyan)">${r1(h)} h</strong></div>`;
+  }).join('');
+  const msnLines=Object.entries(msnInconnus).sort((a,b)=>b[1]-a[1]).slice(0,6)
+    .map(([m,h])=>`<span style="font-size:11px;color:#8090a8">MSN ${m} (${r1(h)} h)</span>`).join(' · ');
+
+  document.getElementById('pt-body').innerHTML=`
+    <div style="background:rgba(0,210,255,0.05);border:1px solid rgba(0,210,255,0.15);border-radius:12px;padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Période détectée : <strong style="color:#fff">${disp(ds[0])} → ${disp(ds[ds.length-1])}</strong> · ${logs.length} lignes de pointage · <strong style="color:#fff">${r1(hTot)} h</strong> au total<br>
+        <strong style="color:var(--cyan)">${r1(hMatch+hHors)} h</strong> rattachées à ${chSet.size} chantier(s) · dont <strong style="color:#ffd060">${r1(hHors)} h</strong> hors périmètre (${horsSet.size} personnes inconnues)<br>
+        <span style="color:#8090a8">${r1(hNoCh)} h ignorées (MSN sans chantier)</span>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--t4);margin-bottom:4px">Par classe : ${Object.entries(clsTot).map(([k,v])=>`${k} ${r1(v)} h`).join(' · ')}</div>
+    <div style="max-height:200px;overflow-y:auto;margin-bottom:10px">${chLines||'<div style="color:#8090a8;font-size:12px">Aucun chantier reconnu</div>'}</div>
+    ${msnLines?`<div style="font-size:11px;color:var(--t4);margin-bottom:8px">MSN sans chantier : ${msnLines}</div>`:''}
+    <div style="padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:11px;color:var(--t3)">
+      ⚠ Les heures déjà importées sur ces <strong>mêmes jours</strong> seront remplacées (pas d'addition) — tu peux réimporter le même fichier sans risque.
+    </div>`;
+  openM('m-pointage');
+}
+
+function applyPointage(){
+  if(!_pointData){ toast('Rien à importer'); return; }
+  if(!S.realHours) S.realHours={};
+  // Purge des clés existantes sur les mêmes chantiers ET mêmes jours (idempotence)
+  const dset=new Set(_pointData.dates), chset=new Set(_pointData.chIds);
+  Object.keys(S.realHours).forEach(k=>{
+    const parts=k.split('_'); const ds=parts[parts.length-1];
+    const chId=parts[0];
+    if(chset.has(chId)&&dset.has(ds)) delete S.realHours[k];
+  });
+  Object.entries(_pointData.agg).forEach(([k,v])=>{ S.realHours[k]=v; });
+  save();
+  const n=Object.keys(_pointData.agg).length;
+  closeM('m-pointage');
+  _pointData=null;
+  toast(`✅ Pointage importé — ${n} entrées`);
+  try{ renderChantiers(); }catch(_){}
+}
 const REX_H_JOUR=7;            // 7 h par jour ⇒ 3,5 h par demi-journée (même règle que l'avancement)
 const REX_GROUPS=[
   {k:'prod',   lbl:'Production',            cats:['technicien','interimaire'],        col:'#2979ff'},
@@ -8404,8 +8985,26 @@ function rexData(cid){
     });
   }
 
+  // Heures RÉELLES issues du pointage importé (S.realHours)
+  const realByEmp={}; let hReel=0, hReelHors=0;
+  Object.entries(S.realHours||{}).forEach(([k,v])=>{
+    if(!k.startsWith(cid+'_')) return;
+    const rest=k.slice(cid.length+1);
+    const i=rest.lastIndexOf('_'); if(i<0) return;
+    const empId=rest.slice(0,i);
+    realByEmp[empId]=(realByEmp[empId]||0)+v;
+    hReel+=v; if(empId==='__HORS__') hReelHors+=v;
+  });
+  people.forEach(p=>{ p.hReel=realByEmp[p.emp.id]||0; });
+  // Personnel hors périmètre : ligne dédiée
+  const horsH=realByEmp['__HORS__']||0;
+  // Réel « production » = réel des personnes production + hors périmètre (pointage non rattaché à une fiche)
+  const hReelProd=people.filter(p=>_rexGroupOf(p.emp.categorie)==='prod').reduce((s,p)=>s+(p.hReel||0),0)+horsH;
+
   return {c,people,groups,weeks,hTot,hPartage,hAbs,ajouts,hSupp,budget,
-          reelDebut,reelFin,retard,slots,joursHangar,hProd:groups.prod.h};
+          reelDebut,reelFin,retard,slots,joursHangar,hProd:groups.prod.h,
+          cloture:c.statut==='termine',
+          hReel,hReelProd,horsH,hasReal:hReel>0};
 }
 
 let _rexCur=null;
@@ -8418,6 +9017,8 @@ function rexHtml(D,print){
   const pct=(a,b)=>b>0?Math.round(a/b*100):0;
   const ecart=D.budget>0?h1(D.hProd-D.budget):0;
   const ecartPct=D.budget>0?Math.round((D.hProd-D.budget)/D.budget*100):0;
+  const delta=h1(D.hReelProd-D.hProd);
+  const deltaPct=D.hProd>0?Math.round((D.hReelProd-D.hProd)/D.hProd*100):0;
   const okCol=print?'#27500a':'#34c759', badCol=print?'#a32d2d':'#ff5c7a';
   const card=(lbl,val,col)=>`<div style="background:${T.card};border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:${T.mut}">${lbl}</div><div style="font-size:16px;font-weight:800;color:${col||T.fg}">${val}</div></div>`;
   const th=`padding:4px 6px;border:1px solid ${T.line};background:${T.head};color:${T.mut};font-size:10px;font-weight:700;text-align:left`;
@@ -8425,10 +9026,10 @@ function rexHtml(D,print){
 
   // KPI
   const kpis=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0">
-    ${card('Heures production réelles',h1(D.hProd)+' h')}
+    ${card('Heures production théoriques',h1(D.hProd)+' h')}
     ${card('Écart / budget', D.budget>0?`${ecart>0?'+':''}${ecart} h · ${ecartPct>0?'+':''}${ecartPct}%`:'—', D.budget>0?(ecart>0?badCol:okCol):T.fg)}
     ${card('Jours hangar', D.joursHangar?D.joursHangar+' j ouvrés':'—')}
-    ${card('Livraison', D.retard===null?'—':(D.retard>0?`+${D.retard} j de retard`:D.retard<0?`${-D.retard} j d'avance`:"à l'heure"), D.retard===null?T.fg:(D.retard>0?badCol:okCol))}
+    ${card('Livraison', D.cloture?(D.retard===null?'—':(D.retard>0?`+${D.retard} j de retard`:D.retard<0?`${-D.retard} j d'avance`:"à l'heure")):'chantier en cours', D.cloture&&D.retard!==null?(D.retard>0?badCol:okCol):T.mut)}
   </div>`;
 
   // Répartition par groupe, détaillée par catégorie
@@ -8453,16 +9054,25 @@ function rexHtml(D,print){
   // Détail par personne — trié par type puis alphabétiquement
   const pRows=_rexSort(D.people).map(p=>{
     const hex=_catHex(p.emp.categorie);
+    const dl=D.hasReal?h1((p.hReel||0)-p.h):null;
     return `<tr><td style="${td};border-left:3px solid ${hex};font-weight:700">${p.emp.nom} ${p.emp.prenom}</td>
       <td style="${td}"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${hex};margin-right:6px"></span><span style="color:${hex};font-weight:700">${(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie}</span></td>
-      <td style="${td};text-align:center;font-weight:700">${h1(p.h)}</td>
+      <td style="${td};text-align:center">${h1(p.h)}</td>
+      <td style="${td};text-align:center;font-weight:700">${D.hasReal?(p.hReel?h1(p.hReel):'—'):'—'}</td>
+      <td style="${td};text-align:center;font-weight:700;color:${dl===null?T.mut:(dl>0?badCol:dl<0?okCol:T.mut)}">${dl===null||!p.hReel?'—':(dl>0?'+':'')+dl}</td>
       <td style="${td};text-align:center">${pct(p.h,D.hTot)} %</td>
-      <td style="${td};text-align:center">${p.hPartage?h1(p.hPartage)+' h':'—'}</td>
       <td style="${td};text-align:center">${disp(p.first)} → ${disp(p.last)}</td></tr>`;
   }).join('');
+  const horsRow=D.horsH?`<tr><td style="${td};border-left:3px solid #8e8e93;font-weight:700;font-style:italic">Personnel hors périmètre</td>
+      <td style="${td};color:${T.mut}">non suivi dans l'app</td>
+      <td style="${td};text-align:center;color:${T.mut}">—</td>
+      <td style="${td};text-align:center;font-weight:700">${h1(D.horsH)}</td>
+      <td style="${td};text-align:center;color:${T.mut}">—</td>
+      <td style="${td};text-align:center;color:${T.mut}">—</td>
+      <td style="${td};text-align:center;color:${T.mut}">—</td></tr>`:'';
   const tPeople=`<table style="width:100%;border-collapse:collapse;margin-bottom:12px">
-    <thead><tr><th style="${th}">Personne</th><th style="${th}">Catégorie</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th><th style="${th};text-align:center">dont partagées</th><th style="${th};text-align:center">1re → dernière</th></tr></thead>
-    <tbody>${pRows||`<tr><td style="${td}" colspan="6">Aucune affectation trouvée dans le planning</td></tr>`}</tbody></table>`;
+    <thead><tr><th style="${th}">Personne</th><th style="${th}">Catégorie</th><th style="${th};text-align:center">Théorique</th><th style="${th};text-align:center">Réel</th><th style="${th};text-align:center">Delta</th><th style="${th};text-align:center">Part</th><th style="${th};text-align:center">1re → dernière</th></tr></thead>
+    <tbody>${pRows||`<tr><td style="${td}" colspan="7">Aucune affectation trouvée dans le planning</td></tr>`}${horsRow}</tbody></table>`;
 
   // Hangar
   const sRows=D.slots.map(e=>{
@@ -8517,11 +9127,16 @@ function rexHtml(D,print){
       ${byId(c.chef)?` · chef : ${byId(c.chef).prenom} ${byId(c.chef).nom}`:''}
     </div>
     ${kpis}
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px">
       ${card('Budget (initial + ajouts)',D.budget?`${c.manHours||0} + ${D.hSupp} = ${D.budget} h`:'—')}
-      ${card('Heures perdues (absences)',h1(D.hAbs)+' h')}
-      ${card('Heures partagées (2 chantiers)',h1(D.hPartage)+' h')}
-      ${card('Rendement hangar',D.joursHangar?h1(D.hProd/D.joursHangar)+' h/jour':'—')}
+      ${card('Heures production réelles', D.hasReal?h1(D.hReelProd)+' h':'— (pointage non importé)', D.hasReal?T.fg:T.mut)}
+      ${card('Delta réel / théorique', D.hasReal?`${delta>0?'+':''}${delta} h · ${deltaPct>0?'+':''}${deltaPct}%`:'—', D.hasReal?(delta>0?badCol:okCol):T.mut)}
+      ${card('Rendement hangar',D.joursHangar?h1((D.hasReal?D.hReelProd:D.hProd)/D.joursHangar)+' h/jour':'—')}
+    </div>
+    <div style="font-size:9px;color:${T.mut};margin-bottom:12px;line-height:1.5">
+      ⚠ <strong>Théorique</strong> = 3,5 h par demi-journée planifiée (1,75 h si partagée entre 2 chantiers) — les heures supplémentaires n'y figurent pas.
+      <strong>Réel</strong> = durées pointées importées depuis l'extract HR_ALLJob (toutes classes confondues)${D.horsH?` · dont ${h1(D.horsH)} h de personnel hors périmètre`:''}.
+      ${D.hasReal?'':'Importe un pointage depuis Suivi des Chantiers → ⏱ Import pointage pour activer le réel.'}
     </div>
     ${sec('1 · Répartition des heures',tGroups)}
     ${sec('2 · Qui est intervenu',tPeople)}
@@ -8542,7 +9157,7 @@ function openRex(cid){
 function rexPdf(){
   if(!_rexCur){ toast('Aucune fiche'); return; }
   const D=_rexCur, c=D.c;
-  const sub=`${c.client?c.client+' · ':''}${c.msn?'MSN '+c.msn:''} · ${Math.round(D.hProd*10)/10} h production`;
+  const sub=`${c.client?c.client+' · ':''}${c.msn?'MSN '+c.msn:''} · ${Math.round(D.hProd*10)/10} h production (théoriques)`;
   openPrintView(pdfBase('Retour d\'expérience — '+c.nom, sub, 'landscape', rexHtml(D,true)), 'REX '+c.nom);
   toast('Export PDF ✓');
 }
@@ -8585,14 +9200,17 @@ async function _buildRexXls(D){
   title('Synthèse');
   const ecart=D.budget>0?h1(D.hProd-D.budget):0;
   headRow(['Indicateur','Valeur']);
-  dataRow(['Heures production réelles',h1(D.hProd)],{bold:true});
+  dataRow(['Heures production théoriques',h1(D.hProd)],{bold:true});
+  dataRow(['Heures production réelles (pointage)',D.hasReal?h1(D.hReelProd):'—'],{bold:true});
+  { const dl=h1(D.hReelProd-D.hProd);
+    dataRow(['Delta réel / théorique',D.hasReal?dl:'—'],{bold:true,fill:D.hasReal?(dl>0?'FFFFC7CE':'FFC6EFCE'):'FFF2F2F2',fg:dl>0?'FF9C0006':'FF1E7E34'}); }
   dataRow(['Budget (initial + ajouts)',D.budget||0]);
-  dataRow(['Écart / budget',ecart],{bold:true,fill:ecart>0?'FFFFC7CE':'FFC6EFCE',fg:ecart>0?'FF9C0006':'FF1E7E34'});
+  dataRow(['Écart théorique / budget',ecart],{bold:true,fill:ecart>0?'FFFFC7CE':'FFC6EFCE',fg:ecart>0?'FF9C0006':'FF1E7E34'});
   dataRow(['Jours hangar (ouvrés)',D.joursHangar||0]);
-  dataRow(['Retard (jours ouvrés)',D.retard===null?'—':D.retard],{fill:(D.retard||0)>0?'FFFFC7CE':'FFC6EFCE'});
-  dataRow(['Heures perdues (absences)',h1(D.hAbs)]);
-  dataRow(['Heures partagées (2 chantiers)',h1(D.hPartage)]);
-  dataRow(['Rendement hangar (h/jour)',D.joursHangar?h1(D.hProd/D.joursHangar):'—']);
+  dataRow(['Retard (jours ouvrés)',D.cloture?(D.retard===null?'—':D.retard):'chantier en cours'],{fill:D.cloture&&(D.retard||0)>0?'FFFFC7CE':'FFC6EFCE'});
+  dataRow(['Rendement hangar (h/jour)',D.joursHangar?h1((D.hasReal?D.hReelProd:D.hProd)/D.joursHangar):'—']);
+  { const n=ws.getRow(r++); n.getCell(1).value='⚠ Théorique = 3,5 h par demi-journée planifiée (1,75 h si partagée). Réel = durées pointées importées (HR_ALLJob).';
+    n.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}}; }
   r++;
 
   title('1 · Répartition des heures');
@@ -8607,11 +9225,13 @@ async function _buildRexXls(D){
   r++;
 
   title('2 · Qui est intervenu');
-  headRow(['Personne','Catégorie','Heures','Part %','dont partagées','1re','Dernière']);
+  headRow(['Personne','Catégorie','Théorique','Réel','Delta','Part %','1re','Dernière']);
   _rexSort(D.people).forEach(p=>{
+    const dl=D.hasReal&&p.hReel?h1(p.hReel-p.h):'';
     dataRow([`${p.emp.nom} ${p.emp.prenom}`,(CATS[p.emp.categorie]||{}).lbl||p.emp.categorie,h1(p.h),
-             D.hTot?Math.round(p.h/D.hTot*100):0, p.hPartage?h1(p.hPartage):0, disp(p.first), disp(p.last)],{accent:_catHex(p.emp.categorie)});
+             p.hReel?h1(p.hReel):'', dl, D.hTot?Math.round(p.h/D.hTot*100):0, disp(p.first), disp(p.last)],{accent:_catHex(p.emp.categorie)});
   });
+  if(D.horsH) dataRow(['Personnel hors périmètre','non suivi dans l\'app','',h1(D.horsH),'','','',''],{accent:'#8e8e93'});
   r++;
 
   title('3 · Occupation hangar');
@@ -15908,6 +16528,9 @@ function _initApp(){
     const gy=document.getElementById('gantt-year');
     if(gy&&!gy.options.length){const cy=new Date().getFullYear();for(let y=cy-1;y<=2060;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;gy.appendChild(o);}}
     goTab('dashboard');
+    try{ refreshStoragePill(); }catch(e){console.warn('storagePill:',e);}
+    // Rappel AVANT : proposer d'archiver une année révolue
+    try{ setTimeout(()=>{ try{archiveReminder();}catch(_){} }, 2500); }catch(e){}
     // Vérifier les formations internes à confirmer
     try{
       updateFormConfirmBadge();
