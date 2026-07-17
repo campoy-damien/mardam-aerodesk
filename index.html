@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260716-GASCODE -->
+<!-- AeroStaff Pro v7 — Build 20260717-WPFULL -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2239,6 +2239,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button onclick="scrollNotice('n-weekly')" class="btn btn-ghost btn-sm">🗓 Planning Hebdo</button>
     <button onclick="scrollNotice('n-chantiers')" class="btn btn-ghost btn-sm">🔧 Chantiers</button>
     <button onclick="scrollNotice('n-rex')" class="btn btn-ghost btn-sm">📋 Fiche REX</button>
+    <button onclick="scrollNotice('n-import-point')" class="btn btn-ghost btn-sm">⏱ Import pointage</button>
+    <button onclick="scrollNotice('n-sync')" class="btn btn-ghost btn-sm" style="border-color:rgba(110,255,196,0.4);color:#6effc4">💾 Stockage & archives</button>
     <button onclick="scrollNotice('n-stockage')" class="btn btn-ghost btn-sm">✈️ Stockage</button>
     <button onclick="scrollNotice('n-recycling')" class="btn btn-ghost btn-sm">♻️ Recyclage</button>
     <button onclick="scrollNotice('n-personnel')" class="btn btn-ghost btn-sm">👥 Personnel</button>
@@ -2595,15 +2597,53 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     </div>
     <div class="notice-section" id="n-sync" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
-        <span style="font-size:20px">💾</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Sauvegarde & Synchronisation</div><div style="font-size:11px;color:var(--t4)">Sécuriser et partager tes données</div></div>
+        <span style="font-size:20px">💾</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Sauvegarde, stockage & archives</div><div style="font-size:11px;color:var(--t4)">Sécuriser tes données, surveiller la place, archiver les années passées</div></div>
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">Automatique en local</strong> — chaque modification est sauvegardée immédiatement dans le navigateur<br>
         • <strong style="color:#ffd060">Synchro Google Drive bidirectionnelle ☁️</strong> — tes appareils (Windows, iPad, iPhone) se synchronisent tout seuls. Quand tu reviens sur l'app, elle récupère automatiquement la dernière version si un autre appareil a fait des modifications plus récentes (petit message "✓ Données mises à jour")<br>
-        • <strong style="color:#ffd060">Export / Import JSON 💾</strong> — sauvegarde ou recharge une copie complète des données
+        • <strong style="color:#ffd060">Export / Import JSON 💾</strong> — sauvegarde ou recharge une copie complète des données<br><br>
+
+        <strong style="color:var(--cyan)">💾 Jauge de stockage</strong><br>
+        Une pastille dans l'en-tête affiche en permanence le volume utilisé : <strong style="color:#34c759">vert</strong>, <strong style="color:#ffd060">ambre à 80 %</strong>, <strong style="color:#ff4d6d">rouge à 90 %</strong>.
+        Un clic ouvre le détail : barre de progression, limite du navigateur (~5 Mo sur iPad/iPhone, ~10 Mo sur PC) et <strong>répartition par poste</strong>.<br>
+        <span style="color:var(--t4)">Ordre de grandeur : le Master Planning pèse ~3 Mo par année entièrement remplie, le pointage importé ~0,6 Mo/an.</span><br><br>
+
+        <strong style="color:#ff5c7a">🛑 Alerte de saturation</strong><br>
+        Si le navigateur refuse d'écrire (stockage plein), un <strong>bandeau rouge</strong> s'affiche en haut de l'écran. C'est important : dans ce cas <strong style="color:#fff">les modifications ne survivraient pas au rechargement</strong>. Il faut alors sauvegarder en JSON et archiver une année.<br><br>
+
+        <strong style="color:var(--cyan)">📦 Archiver une année révolue</strong><br>
+        Depuis la pastille de stockage. Sort le planning et les heures réelles d'une année <strong>terminée</strong> du navigateur pour libérer de la place :<br>
+        • Seules les années <strong>révolues</strong> sont proposées — l'année en cours ne peut pas être archivée<br>
+        • L'archive est <strong>téléchargée en fichier</strong> (<span style="font-family:'JetBrains Mono',monospace">AeroStaff_Archive_2025.json</span>) <strong>avant toute suppression</strong> — si le téléchargement échoue, rien n'est purgé<br>
+        • Une copie part sur le <strong>Drive</strong> (même nom) si ton script Apps Script est à jour — bouton <strong>🔧 Voir le code du script</strong> dans la fenêtre Drive, puis <strong>Déployer → Gérer les déploiements → crayon → Nouvelle version</strong><br>
+        • L'archive est <strong>autonome</strong> : elle embarque personnel, chantiers, formations et slots figés, donc elle se relit seule dans 3 ans même si tout a changé<br>
+        • Personnel, chantiers et formations restent dans l'app — seuls le planning et les heures de l'année sortent<br><br>
+
+        <strong style="color:var(--cyan)">📂 Consulter une archive</strong><br>
+        Depuis la pastille de stockage. Tu choisis le fichier, l'app bascule en <strong style="color:#ffd060">lecture seule</strong> avec un bandeau jaune (« 📁 ARCHIVE 2025 — LECTURE SEULE »). Tu navigues dans tous les onglets, tu exportes en PDF/Excel.
+        <strong>Tes données courantes ne sont jamais touchées</strong> : toute écriture (y compris la synchro Drive) est bloquée. « Quitter l'archive » les restaure telles quelles.
         <div style="margin-top:10px;padding:8px 12px;background:rgba(110,255,196,0.05);border-left:3px solid #6effc4;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 La synchro se déclenche au retour sur l'app et toutes les 2-3 min. Elle ne charge la version distante que si elle est plus récente que la tienne — ta version récente ne se fait jamais écraser.</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ La synchro Drive n'attend pas de réponse de Google (contrainte technique) : l'app ne peut pas confirmer qu'un envoi a réussi. Pour une archive, <strong>vérifie sa présence dans ton Drive</strong> — le fichier téléchargé reste ta copie de référence.</div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(255,77,109,0.05);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ Vider le cache du navigateur supprime les données locales. Garde Google Drive activé pour ne rien perdre.</div>
+      </div>
+    </div>
+
+    <div class="notice-section" id="n-import-point" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">⏱</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Import pointage (heures réelles)</div><div style="font-size:11px;color:var(--t4)">Extract HR_ALLJob → heures réellement passées par chantier</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        Dans <strong>Suivi des Chantiers</strong>, le bouton <strong style="color:#ffd060">⏱ Import pointage</strong> charge un ou plusieurs extracts <strong>HR_ALLJob</strong> (feuille PERSLOGS). Ce sont les <strong style="color:#fff">durées réellement pointées</strong> — donc les heures supplémentaires y figurent, contrairement au planning.<br>
+        • <strong style="color:#ffd060">MSN normalisés</strong> — complétés à 5 chiffres avec zéros à gauche des deux côtés (5796 ↔ 05796), donc le rattachement au chantier marche quel que soit le format. Les MSN 00000 (carte administrative) sont ignorés<br>
+        • <strong style="color:#ffd060">Correspondance</strong> — par trigramme, sinon par nom + prénom. Les personnes absentes de l'app sont cumulées sur une ligne <strong>« Personnel hors périmètre »</strong><br>
+        • <strong style="color:#ffd060">Toutes les classes comptées</strong> (INCLUDED, EXCLUDED…) — le détail par classe s'affiche avant validation<br>
+        • <strong style="color:#ffd060">Aperçu avant import</strong> — période détectée, heures par chantier, MSN sans chantier correspondant. Rien n'est écrit tant que tu n'as pas confirmé<br>
+        • <strong style="color:#ffd060">Réimport sans risque</strong> — les heures d'un même chantier sur les <strong>mêmes jours</strong> sont remplacées, jamais additionnées<br>
+        • Les heures alimentent la <strong>Fiche REX</strong> : colonnes Théorique / Réel / Delta par personne
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Un extract couvre une semaine : il faut donc importer chaque semaine du chantier pour avoir un REX complet. Nécessite une connexion (lecture des fichiers Excel).</div>
       </div>
     </div>
 
@@ -2639,7 +2679,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260716-GASCODE · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260717-WPFULL · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3497,6 +3537,8 @@ let S = {
   gdrive:{connected:false,fileId:null,clientId:'',userEmail:'',lastSync:null},
   besoinOverrides:{},  // {chantierId_YYYY-SNN: nbTechs} — ajustement manuel hebdo du besoin
   realHours:{},        // {chantierId_empId_YYYY-MM-DD: heures} — pointage réel importé (HR_ALLJob)
+  realBreak:{},        // {chantierId_YYYY-MM-DD: {w:{wp:h}, s:{spec:h}, m:{nature:h}, o:{wo:h}}}
+  woLbl:{},            // {wo: {j:libellé, w:workpack}} — dictionnaire partagé des ordres de travail
 };
 let cellCtx=null, cellType='', cellVM=false;
 
@@ -3963,10 +4005,20 @@ function addUser(){
   openManageUsers();
   toast(`✅ Utilisateur ${nom} créé`);
 }
-function confirmDel(title, msg, onConfirm){
+function confirmDel(title, msg, onConfirm, opts){
+  const o=opts||{};
   document.getElementById('confirm-del-title').textContent=title;
   document.getElementById('confirm-del-msg').textContent=msg||'Cette action est irréversible.';
-  document.getElementById('confirm-del-btn').onclick=()=>{
+  const ic=document.getElementById('confirm-del-icon'); if(ic) ic.textContent=o.icon||'🗑️';
+  const bt=document.getElementById('confirm-del-btn');
+  bt.textContent=o.btn||'🗑 Supprimer';
+  // Variante non destructive (archivage, etc.)
+  if(o.safe){
+    bt.style.background='rgba(0,210,255,0.18)'; bt.style.border='1px solid rgba(0,210,255,0.45)'; bt.style.color='#00d2ff';
+  }else{
+    bt.style.background='rgba(255,77,109,0.2)'; bt.style.border='1px solid rgba(255,77,109,0.4)'; bt.style.color='#ff4d6d';
+  }
+  bt.onclick=()=>{
     document.getElementById('m-confirm-del').style.display='none';
     onConfirm();
   };
@@ -8496,6 +8548,8 @@ function openStorage(){
   const parts=[
     part('Master Planning (demi-journées)',S.planning,'poste le plus lourd'),
     part('Heures réelles (pointage importé)',S.realHours,''),
+    part('Détail pointage (WP, spécialités, WO)',S.realBreak,''),
+    part('Libellés des ordres de travail',S.woLbl,''),
     part('Chantiers',S.chantiers,''),
     part('Personnel',S.personnel,''),
     part('Formations',S.formations,''),
@@ -8544,12 +8598,21 @@ function archivableYears(){
   const cur=new Date().getFullYear(), y={};
   Object.keys(S.planning||{}).forEach(k=>{ const a=_yearOfPlanKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
   Object.keys(S.realHours||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
+  Object.keys(S.realBreak||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
   return Object.keys(y).sort().map(a=>({year:+a, entries:y[a]}));
 }
+// Toutes les années présentes dans les données (archivables ou non) — pour expliquer l'état vide
+function _yearsPresent(){
+  const y=new Set();
+  Object.keys(S.planning||{}).forEach(k=>{ const a=_yearOfPlanKey(k); if(/^\d{4}$/.test(a)) y.add(a); });
+  Object.keys(S.realHours||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)) y.add(a); });
+  return [...y].sort();
+}
 function _buildArchive(year){
-  const plan={}, real={};
+  const plan={}, real={}, brk={};
   Object.entries(S.planning||{}).forEach(([k,v])=>{ if(_yearOfPlanKey(k)===String(year)) plan[k]=v; });
   Object.entries(S.realHours||{}).forEach(([k,v])=>{ if(_yearOfRealKey(k)===String(year)) real[k]=v; });
+  Object.entries(S.realBreak||{}).forEach(([k,v])=>{ if(_yearOfRealKey(k)===String(year)) brk[k]=v; });
   return {
     _type:'aerostaff-archive', _version:1, year,
     createdAt:new Date().toISOString(), site:'LFBF',
@@ -8557,7 +8620,7 @@ function _buildArchive(year){
     autorisations:S.autorisations, holidays:S.holidays,
     slot:S.slot, stockage:S.stockage, recycling:S.recycling, airbus:S.airbus,
     besoinOverrides:S.besoinOverrides,
-    planning:plan, realHours:real
+    planning:plan, realHours:real, realBreak:brk, woLbl:S.woLbl
   };
 }
 function openArchive(){
@@ -8579,7 +8642,12 @@ function openArchive(){
         </div>
         <button class="btn btn-cyan btn-sm" onclick="doArchive(${o.year})">📦 Archiver</button>
       </div>`).join('')
-      :'<div style="font-size:12px;color:var(--t4);padding:10px 0">Aucune année révolue à archiver pour le moment.</div>'}
+      :`<div style="padding:14px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 10px 10px 0;font-size:12px;color:var(--t2);line-height:1.7">
+          <strong style="color:#ffd060">Rien à archiver pour l'instant.</strong><br>
+          L'archivage ne concerne que les années <strong>révolues</strong> (${new Date().getFullYear()-1} et avant).
+          Tes données actuelles portent uniquement sur ${_yearsPresent().join(', ')||'l\'année en cours'} — l'année en cours ne peut pas être archivée, tu en as besoin tous les jours.<br>
+          <span style="color:var(--t4)">Reviens ici en janvier ${new Date().getFullYear()+1} : ${new Date().getFullYear()} deviendra archivable.</span>
+        </div>`}
     ${(S.archives||[]).length?`<div style="margin-top:12px;font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Historique</div>
       ${S.archives.map(a=>`<div style="font-size:11px;color:var(--t4);padding:3px 0">📦 ${a.year} — ${disp(a.date)} · ${a.entries.toLocaleString('fr')} entrées${a.drive?' · Drive ✓':''}</div>`).join('')}`:''}`;
   openM('m-archive-year');
@@ -8595,25 +8663,28 @@ function doArchive(year){
     `Tu pourras relire cette année à tout moment via « Consulter une archive ».`,
     ()=>{
       // 1) Téléchargement du fichier — AVANT toute purge
+      const fname=`AeroStaff_Archive_${year}.json`;
       try{
         const blob=new Blob([json],{type:'application/json'});
         const url=URL.createObjectURL(blob);
         const a=document.createElement('a'); a.href=url;
-        a.download=`AeroStaff_Archive_${year}.json`; a.click();
+        a.download=fname; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(()=>URL.revokeObjectURL(url),1500);
+        toast('⬇️ '+fname+' — vérifie tes téléchargements');
       }catch(e){ toast('❌ Téléchargement impossible — archivage annulé'); return; }
       // 2) Envoi Drive (nécessite le script Apps Script à jour)
       let drive=false;
       if(S.gdrive?.connected && S.gdrive?.gasUrl){
         try{
           fetch(S.gdrive.gasUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-            body:JSON.stringify({action:'archive',year,fileName:`AeroStaff_Archive_${year}.json`,data:arch})});
+            body:JSON.stringify({action:'archive',year,fileName:fname,data:arch})});
           drive=true;
         }catch(e){ console.warn('Drive archive:',e); }
       }
       // 3) Purge locale de l'année
       Object.keys(S.planning||{}).forEach(k=>{ if(_yearOfPlanKey(k)===String(year)) delete S.planning[k]; });
       Object.keys(S.realHours||{}).forEach(k=>{ if(_yearOfRealKey(k)===String(year)) delete S.realHours[k]; });
+      Object.keys(S.realBreak||{}).forEach(k=>{ if(_yearOfRealKey(k)===String(year)) delete S.realBreak[k]; });
       if(!S.archives) S.archives=[];
       S.archives=S.archives.filter(a=>a.year!==year);
       S.archives.push({year,date:fmt(new Date()),entries:n,drive});
@@ -8621,7 +8692,7 @@ function doArchive(year){
       closeM('m-archive-year');
       _archiveDoneReminder(year,n,drive);
       try{ refreshStoragePill(); }catch(_){}
-    });
+    },{icon:'📦',btn:'📦 Archiver et télécharger',safe:true});
 }
 // ── Rappel APRÈS : où est l'archive et comment la relire ──
 function _archiveDoneReminder(year,n,drive){
@@ -8772,7 +8843,8 @@ function _readPointageFile(file){
         const col=(...names)=>{ for(const n of names){ const i=hdr.indexOf(n); if(i>=0) return i; } return -1; };
         const iCode=col('EMPLOYEE CODE'), iFn=col('FISRT NAME','FIRST NAME'), iLn=col('LAST NAME'),
               iMsn=col('MSN'), iDur=col('JOB DURATION (MH)','JOB DURATION'), iStart=col('DATE/TIME STARTED'),
-              iClass=col('CLASS');
+              iClass=col('CLASS'), iWp=col('WP'), iWo=col('WO'), iSpec=col('SPECIALITY'),
+              iMr=col('MR TYPE'), iJob=col('AIRCRAFT JOB'), iAta=col('ATA');
         const out=[];
         for(let i=hi+1;i<rows.length;i++){
           const r=rows[i]||[]; if(!r[iCode]) continue;
@@ -8792,7 +8864,12 @@ function _readPointageFile(file){
           if(!d||isNaN(d)) continue;
           out.push({code:String(r[iCode]||'').trim().toUpperCase(),
                     prenom:String(r[iFn]||'').trim(), nom:String(r[iLn]||'').trim(),
-                    msn, h, ds:fmt(d), cls:String(r[iClass]||'').trim().toUpperCase()});
+                    msn, h, ds:fmt(d), cls:String(r[iClass]||'').trim().toUpperCase(),
+                    wp:String(r[iWp]||'').trim(), wo:String(r[iWo]||'').trim(),
+                    spec:String(r[iSpec]||'').trim().toUpperCase(),
+                    mr:String(r[iMr]||'').trim().toUpperCase(),
+                    job:String(r[iJob]||'').replace(/\s+/g,' ').trim().slice(0,60),
+                    ata:String(r[iAta]||'').trim()});
         }
         res(out);
       }catch(err){ rej(err); }
@@ -8813,9 +8890,10 @@ function _pointPreview(logs){
     byName[`${p.nom} ${p.prenom}`.toUpperCase().replace(/\s+/g,' ').trim()]=p;
   });
 
-  const agg={}, dates=new Set(), clsTot={};
+  const agg={}, brk={}, lbl={}, dates=new Set(), clsTot={};
   let hTot=0, hMatch=0, hHors=0, hNoCh=0;
   const chSet=new Set(), horsSet=new Set(), msnInconnus={};
+  const r2=v=>Math.round(v*100)/100;
 
   logs.forEach(l=>{
     hTot+=l.h; clsTot[l.cls||'—']=(clsTot[l.cls||'—']||0)+l.h;
@@ -8828,11 +8906,22 @@ function _pointPreview(logs){
     chSet.add(c.id); dates.add(l.ds);
     const k=`${c.id}_${empId}_${l.ds}`;
     agg[k]=(agg[k]||0)+l.h;
+    // Répartitions par (chantier, jour). Spécialité et nature sont croisées par workpack ("WP|valeur")
+    // pour permettre le détail par WP ; le total global reste calculable par sommation.
+    const bk=`${c.id}_${l.ds}`;
+    const o=brk[bk]=brk[bk]||{};
+    const add=(dim,val)=>{ if(!val) return; o[dim]=o[dim]||{}; o[dim][val]=r2((o[dim][val]||0)+l.h); };
+    const wp=l.wp||'—';
+    add('w',l.wp);
+    add('s', l.spec?wp+'|'+l.spec:''); 
+    add('m', l.mr?wp+'|'+l.mr:'');
+    add('o',l.wo);
+    if(l.wo && !lbl[l.wo]) lbl[l.wo]={j:l.job, w:l.wp};
   });
 
-  Object.keys(agg).forEach(k=>agg[k]=Math.round(agg[k]*100)/100);
+  Object.keys(agg).forEach(k=>agg[k]=r2(agg[k]));
   const ds=[...dates].sort();
-  _pointData={agg, dates:ds, chIds:[...chSet]};
+  _pointData={agg, brk, lbl, dates:ds, chIds:[...chSet]};
 
   const r1=v=>Math.round(v*10)/10;
   const chLines=[...chSet].map(id=>{
@@ -8865,6 +8954,8 @@ function _pointPreview(logs){
 function applyPointage(){
   if(!_pointData){ toast('Rien à importer'); return; }
   if(!S.realHours) S.realHours={};
+  if(!S.realBreak) S.realBreak={};
+  if(!S.woLbl) S.woLbl={};
   // Purge des clés existantes sur les mêmes chantiers ET mêmes jours (idempotence)
   const dset=new Set(_pointData.dates), chset=new Set(_pointData.chIds);
   Object.keys(S.realHours).forEach(k=>{
@@ -8872,13 +8963,21 @@ function applyPointage(){
     const chId=parts[0];
     if(chset.has(chId)&&dset.has(ds)) delete S.realHours[k];
   });
+  Object.keys(S.realBreak).forEach(k=>{
+    const parts=k.split('_'); const ds=parts[parts.length-1];
+    const chId=parts[0];
+    if(chset.has(chId)&&dset.has(ds)) delete S.realBreak[k];
+  });
   Object.entries(_pointData.agg).forEach(([k,v])=>{ S.realHours[k]=v; });
+  Object.entries(_pointData.brk).forEach(([k,v])=>{ S.realBreak[k]=v; });
+  Object.entries(_pointData.lbl).forEach(([k,v])=>{ S.woLbl[k]=v; });
   save();
   const n=Object.keys(_pointData.agg).length;
   closeM('m-pointage');
   _pointData=null;
   toast(`✅ Pointage importé — ${n} entrées`);
   try{ renderChantiers(); }catch(_){}
+  try{ refreshStoragePill(); }catch(_){}
 }
 const REX_H_JOUR=7;            // 7 h par jour ⇒ 3,5 h par demi-journée (même règle que l'avancement)
 const REX_GROUPS=[
@@ -9018,10 +9117,61 @@ function rexData(cid){
   // Réel « production » = réel des personnes production + hors périmètre (pointage non rattaché à une fiche)
   const hReelProd=people.filter(p=>_rexGroupOf(p.emp.categorie)==='prod').reduce((s,p)=>s+(p.hReel||0),0)+horsH;
 
+  // Répartitions issues du pointage : workpacks, spécialités, nature, ordres de travail
+  const dim={w:{},s:{},m:{},o:{}}, wpDays={};
+  Object.entries(S.realBreak||{}).forEach(([k,v])=>{
+    if(!k.startsWith(cid+'_')) return;
+    const ds=k.slice(cid.length+1);
+    ['w','s','m','o'].forEach(d=>{
+      if(!v[d]) return;
+      Object.entries(v[d]).forEach(([val,h])=>{ dim[d][val]=(dim[d][val]||0)+h; });
+    });
+    if(v.w) Object.keys(v.w).forEach(wp=>{
+      const o=wpDays[wp]=wpDays[wp]||{first:ds,last:ds};
+      if(ds<o.first) o.first=ds; if(ds>o.last) o.last=ds;
+    });
+  });
+  const round=o=>{ Object.keys(o).forEach(k=>o[k]=Math.round(o[k]*100)/100); return o; };
+  ['w','s','m','o'].forEach(d=>round(dim[d]));
+  // Décroisement "WP|valeur" -> totaux globaux + détail par WP
+  const split=src=>{
+    const glob={}, byWp={};
+    Object.entries(src).forEach(([k,h])=>{
+      const i=k.indexOf('|');
+      const wp=i<0?'—':k.slice(0,i), val=i<0?k:k.slice(i+1);
+      glob[val]=Math.round(((glob[val]||0)+h)*100)/100;
+      (byWp[wp]=byWp[wp]||{})[val]=Math.round((((byWp[wp]||{})[val]||0)+h)*100)/100;
+    });
+    return {glob,byWp};
+  };
+  const S_=split(dim.s), M_=split(dim.m);
+  // Ordres de travail regroupés par workpack (le WP vient du dictionnaire des libellés)
+  const woByWp={};
+  Object.entries(dim.o).forEach(([wo,h])=>{
+    const wp=S.woLbl?.[wo]?.w||'—';
+    (woByWp[wp]=woByWp[wp]||[]).push({wo,h,job:S.woLbl?.[wo]?.j||''});
+  });
+  Object.values(woByWp).forEach(a=>a.sort((x,y)=>y.h-x.h));
+  // Workpacks : heures, période, nombre d'ordres de travail, et leur détail propre
+  const wps=Object.entries(dim.w).map(([wp,h])=>({
+    wp, h,
+    nWo:(woByWp[wp]||[]).length,
+    first:wpDays[wp]?.first, last:wpDays[wp]?.last,
+    spec:M_&&S_.byWp[wp]?S_.byWp[wp]:{},
+    mr:M_.byWp[wp]||{},
+    wos:woByWp[wp]||[]
+  })).sort((a,b)=>b.h-a.h);
+  // Top ordres de travail (tous WP confondus)
+  const wos=Object.entries(dim.o).map(([wo,h])=>({wo,h,job:S.woLbl?.[wo]?.j||'',wp:S.woLbl?.[wo]?.w||''}))
+                                 .sort((a,b)=>b.h-a.h);
+  const hDim=Object.values(dim.o).reduce((s,v)=>s+v,0);
+
   return {c,people,groups,weeks,hTot,hPartage,hAbs,ajouts,hSupp,budget,
           reelDebut,reelFin,retard,slots,joursHangar,hProd:groups.prod.h,
           cloture:c.statut==='termine',
-          hReel,hReelProd,horsH,hasReal:hReel>0};
+          hReel,hReelProd,horsH,hasReal:hReel>0,
+          dim:{w:dim.w,s:S_.glob,m:M_.glob,o:dim.o},
+          wps,wos,hDim,nWo:wos.length};
 }
 
 let _rexCur=null;
@@ -9135,6 +9285,78 @@ function rexHtml(D,print){
 
   const sec=(t,inner)=>`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:800;color:${T.fg};margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid ${T.line}">${t}</div>${inner}</div>`;
 
+  // ── Sections issues du pointage (workpacks, spécialités, nature, ordres de travail) ──
+  const pctD=v=>D.hDim>0?Math.round(v/D.hDim*100):0;
+  const barCell=(v,col)=>`<td style="${td};padding:2px 6px"><div style="height:9px;border-radius:99px;background:${hexRgba(col,0.20)};overflow:hidden"><div style="height:100%;width:${pctD(v)}%;background:${col};border-radius:99px"></div></div></td>`;
+
+  const tWps=D.wps.length?D.wps.map((w,idx)=>{
+    const mini=(lbl,obj,col)=>{
+      const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+      if(!rows.length) return '';
+      return `<div style="flex:1;min-width:150px">
+        <div style="font-size:9px;font-weight:800;color:${T.mut};text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">${lbl}</div>
+        ${rows.map(([k,v])=>`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+          <span style="width:7px;height:7px;border-radius:2px;background:${col};flex-shrink:0"></span>
+          <span style="font-size:10px;color:${T.fg};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${k}</span>
+          <span style="font-size:10px;font-weight:700;color:${T.fg}">${h1(v)} h</span>
+          <span style="font-size:9px;color:${T.mut};width:32px;text-align:right">${w.h>0?Math.round(v/w.h*100):0}%</span>
+        </div>`).join('')}
+      </div>`;
+    };
+    const topW=w.wos.slice(0,5);
+    return `<div style="border:1px solid ${T.line};border-radius:8px;padding:9px 11px;margin-bottom:8px;border-left:3px solid #2979ff;background:${print?'#fbfcfe':'rgba(41,121,255,0.04)'}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:7px">
+        <div style="font-size:13px;font-weight:900;color:${T.fg};font-family:'JetBrains Mono',monospace">WP ${w.wp||'—'}</div>
+        <div style="font-size:10px;color:${T.mut}">
+          <strong style="color:${T.fg};font-size:12px">${h1(w.h)} h</strong> · ${pctD(w.h)} % du chantier · ${w.nWo} ordre${w.nWo>1?'s':''} de travail
+          ${w.first?` · ${disp(w.first)} → ${disp(w.last)}`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${mini('Nature du travail',w.mr,'#ff9a3c')}
+        ${mini('Spécialités',w.spec,'#7c5cff')}
+        ${topW.length?`<div style="flex:1.4;min-width:190px">
+          <div style="font-size:9px;font-weight:800;color:${T.mut};text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Principaux ordres de travail</div>
+          ${topW.map(o=>`<div style="display:flex;gap:6px;margin-bottom:2px">
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.fg};font-weight:700">${o.wo}</span>
+            <span style="font-size:9px;color:${T.mut};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.job}</span>
+            <span style="font-size:10px;font-weight:700;color:${T.fg}">${h1(o.h)} h</span>
+          </div>`).join('')}
+          ${w.wos.length>5?`<div style="font-size:9px;color:${T.mut};margin-top:2px">+ ${w.wos.length-5} autre${w.wos.length-5>1?'s':''}</div>`:''}
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join(''):'';
+
+  const dimTable=(obj,col)=>{
+    const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+    if(!rows.length) return '';
+    return `<table style="width:100%;border-collapse:collapse">
+      <tbody>${rows.map(([k,v])=>`<tr>
+        <td style="${td};border-left:3px solid ${col};font-weight:700">${k||'—'}</td>
+        <td style="${td};text-align:center;font-weight:700;width:70px">${h1(v)} h</td>
+        <td style="${td};text-align:center;width:50px">${pctD(v)} %</td>
+        ${barCell(v,col)}</tr>`).join('')}</tbody></table>`;
+  };
+
+  const top=D.wos.slice(0,20);
+  const tWos=top.length?`<table style="width:100%;border-collapse:collapse">
+    <thead><tr><th style="${th};width:34px">#</th><th style="${th}">Ordre de travail</th><th style="${th}">WP</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th></tr></thead>
+    <tbody>${top.map((w,i)=>`<tr>
+      <td style="${td};text-align:center;color:${T.mut}">${i+1}</td>
+      <td style="${td}"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${T.fg}">${w.wo}</span>${w.job?`<div style="font-size:9px;color:${T.mut};margin-top:1px">${w.job}</div>`:''}</td>
+      <td style="${td};font-family:'JetBrains Mono',monospace;font-size:9px">${w.wp||'—'}</td>
+      <td style="${td};text-align:center;font-weight:700">${h1(w.h)}</td>
+      <td style="${td};text-align:center">${pctD(w.h)} %</td></tr>`).join('')}</tbody></table>
+    <div style="font-size:9px;color:${T.mut};margin-top:3px">${D.nWo} ordres de travail au total sur ce chantier · les 20 plus consommateurs représentent ${pctD(top.reduce((s,w)=>s+w.h,0))} % des heures pointées</div>`:'';
+
+  const secPoint = D.hasReal ? [
+    D.wps.length?sec(`6 · Détail par workpack (${D.wps.length})`,tWps):'',
+    Object.keys(D.dim.m).length?sec('7 · Nature du travail — tous workpacks',dimTable(D.dim.m,'#ff9a3c')+`<div style="font-size:9px;color:${T.mut};margin-top:3px">Ce qui n'était pas au programme initial (non-routine, demande client) explique la dérive.</div>`):'',
+    Object.keys(D.dim.s).length?sec('8 · Spécialités — tous workpacks',dimTable(D.dim.s,'#7c5cff')):'',
+    tWos?sec('9 · Top 20 des ordres de travail',tWos):''
+  ].join('') : '';
+
   return `<div style="color:${T.fg}">
     <div style="font-size:13px;font-weight:800">${c.nom}</div>
     <div style="font-size:11px;color:${T.mut};margin-top:2px">
@@ -9160,6 +9382,7 @@ function rexHtml(D,print){
     ${sec('3 · Occupation hangar',tSlots)}
     ${sec('4 · Heures ajoutées en cours de chantier',tAjouts)}
     ${sec('5 · Affectation semaine par semaine',tPlan)}
+    ${secPoint}
   </div>`;
 }
 
@@ -9294,6 +9517,44 @@ async function _buildRexXls(D){
 
   ws.getColumn(1).width=30;
   for(let i=2;i<=Math.max(8,D.weeks.length+1);i++) ws.getColumn(i).width=11;
+
+  // ── Sections issues du pointage ──
+  if(D.hasReal){
+    const pctD=v=>D.hDim>0?Math.round(v/D.hDim*100):0;
+    r+=2;
+    if(D.wps.length){
+      title(`6 · Détail par workpack (${D.wps.length})`);
+      D.wps.forEach(w=>{
+        headRow([`WP ${w.wp||'—'}`,'Heures','Part %','Ordres de travail','Du','Au']);
+        dataRow(['Total du workpack',h1(w.h),pctD(w.h),w.nWo||'',w.first?disp(w.first):'',w.last?disp(w.last):''],{bold:true,accent:'#2979ff',fill:'FFEAF2FE'});
+        const sub=(lbl,obj,col)=>{
+          const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]); if(!rows.length) return;
+          rows.forEach(([k,v],i)=>dataRow([(i===0?lbl+' : ':'   ')+k,h1(v),w.h>0?Math.round(v/w.h*100):0,'','',''],{accent:col}));
+        };
+        sub('Nature',w.mr,'#ff9a3c');
+        sub('Spécialité',w.spec,'#7c5cff');
+        w.wos.slice(0,5).forEach((o,i)=>dataRow([(i===0?'Top WO : ':'   ')+o.wo+(o.job?' — '+o.job:''),h1(o.h),w.h>0?Math.round(o.h/w.h*100):0,'','',''],{accent:'#00c2a8'}));
+        r++;
+      });
+    }
+    const dimSec=(t,obj,col)=>{
+      const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]); if(!rows.length) return;
+      title(t); headRow(['Libellé','Heures','Part %']);
+      rows.forEach(([k,v])=>dataRow([k||'—',h1(v),pctD(v)],{accent:col}));
+      r++;
+    };
+    dimSec('7 · Nature du travail',D.dim.m,'#ff9a3c');
+    dimSec('8 · Répartition par spécialité',D.dim.s,'#7c5cff');
+    if(D.wos.length){
+      title('9 · Top 20 des ordres de travail');
+      headRow(['#','Ordre de travail','WP','Libellé','Heures','Part %']);
+      D.wos.slice(0,20).forEach((w,i)=>dataRow([i+1,w.wo,w.wp||'',w.job||'',h1(w.h),pctD(w.h)],{accent:'#00c2a8'}));
+      { const n=ws.getRow(r++); n.getCell(1).value=`${D.nWo} ordres de travail au total sur ce chantier`;
+        n.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}}; }
+      r++;
+    }
+  }
+
   const foot=ws.getRow(r+2);
   foot.getCell(1).value=`Établi le ${disp(fmt(new Date()))} · Site LFBF · MARDAM AeroDesk Pro`;
   foot.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}};
@@ -16633,7 +16894,7 @@ if(document.readyState==='loading'){
 <!-- Modal confirmation — EN DERNIER pour z-index correct -->
 <div id="m-confirm-del" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center">
 <div style="background:#0d1628;border:1px solid rgba(255,77,109,0.3);border-radius:18px;padding:28px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
-  <div style="font-size:36px;margin-bottom:10px">🗑️</div>
+  <div id="confirm-del-icon" style="font-size:36px;margin-bottom:10px">🗑️</div>
   <div id="confirm-del-title" style="font-size:18px;font-weight:900;color:#fff;margin-bottom:8px">Supprimer ?</div>
   <div id="confirm-del-msg" style="font-size:13px;color:#8090b0;margin-bottom:24px;white-space:pre-line;text-align:left;max-height:260px;overflow-y:auto;line-height:1.55"></div>
   <div style="display:flex;gap:10px">
