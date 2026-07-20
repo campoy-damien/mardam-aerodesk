@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260717-WPFULL -->
+<!-- AeroStaff Pro v7 — Build 20260717-WPSPLIT -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2679,7 +2679,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260717-WPFULL · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260717-WPSPLIT · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2714,9 +2714,16 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="CDCCL">CDCCL</option>
         <option value="Safety Training">Safety Training</option>
         <option value="MOE/PART 145">MOE/PART 145</option>
-        <option value="HF & SMS">HF & SMS</option>
         <option value="Competencies">Competencies</option>
-        <option value="English">English</option>
+        <option value="CACES CHARIOT">CACES CHARIOT</option>
+        <option value="CACES TRACMA">CACES TRACMA</option>
+        <option value="CACES NACELLE">CACES NACELLE</option>
+        <option value="WELCOME HSE">WELCOME HSE</option>
+        <option value="TRAVAIL EN HAUTEUR">TRAVAIL EN HAUTEUR</option>
+        <option value="RISQUE CHIMIQUE">RISQUE CHIMIQUE</option>
+        <option value="ACCEUIL MOE">ACCEUIL MOE</option>
+        <option value="AIRE DE TRAFFIC">AIRE DE TRAFFIC</option>
+        <option value="NEW ARRIVAL TRAINING">NEW ARRIVAL TRAINING</option>
         <option value="Aircraft Dismantling Process">Aircraft Dismantling Process</option>
       </select>
       <div style="font-size:10px;color:var(--t4);margin-top:5px">📅 Le lendemain de la formation, l'app vous demandera confirmation pour mettre la formation à jour.</div>
@@ -8806,6 +8813,16 @@ function snoozeArchive(){
 // Stockage : S.realHours["<chantierId>_<empId|__HORS__>_<YYYY-MM-DD>"] = heures
 // Réimporter la même période écrase les mêmes clés → aucun double comptage.
 const _msn5=v=>{ const s=String(v==null?'':v).trim(); return /^\d+$/.test(s)?s.padStart(5,'0'):s.toUpperCase(); };
+// MSN d'un chantier : champ dédié, sinon déduit du nom ("… — MSN5796" ou nom = "55275")
+function _chMsnKey(c){
+  const m=_msn5(c.msn); if(m) return m;
+  const s=String(c.nom||'').trim();
+  let g=s.match(/MSN\s*0*(\d{2,6})\b/i);        // nom généré : "AIR FRANCE — A220 — MSN55278"
+  if(g) return _msn5(g[1]);
+  g=s.match(/^0*(\d{2,6})$/);                    // ancien nom : "55275", "3441"
+  if(g) return _msn5(g[1]);
+  return '';
+}
 
 function handlePointageImport(ev){
   const files=[...(ev.target.files||[])];
@@ -8880,9 +8897,13 @@ function _readPointageFile(file){
 
 let _pointData=null;
 function _pointPreview(logs){
-  // Index des chantiers par MSN normalisé
-  const byMsn={};
-  S.chantiers.forEach(c=>{ const m=_msn5(c.msn); if(m) (byMsn[m]=byMsn[m]||[]).push(c); });
+  // Index des chantiers par MSN normalisé (champ msn, sinon déduit du nom)
+  const byMsn={}, sansMsn=[];
+  S.chantiers.forEach(c=>{
+    const m=_chMsnKey(c);
+    if(m) (byMsn[m]=byMsn[m]||[]).push(c);
+    else if(['encours','futur','termine'].includes(c.statut)) sansMsn.push(c.nom);
+  });
   // Index du personnel par trigramme puis par nom+prénom
   const byTri={}, byName={};
   S.personnel.forEach(p=>{
@@ -8945,6 +8966,11 @@ function _pointPreview(logs){
     <div style="font-size:11px;color:var(--t4);margin-bottom:4px">Par classe : ${Object.entries(clsTot).map(([k,v])=>`${k} ${r1(v)} h`).join(' · ')}</div>
     <div style="max-height:200px;overflow-y:auto;margin-bottom:10px">${chLines||'<div style="color:#8090a8;font-size:12px">Aucun chantier reconnu</div>'}</div>
     ${msnLines?`<div style="font-size:11px;color:var(--t4);margin-bottom:8px">MSN sans chantier : ${msnLines}</div>`:''}
+    ${!chSet.size?`<div style="padding:10px 12px;background:rgba(255,77,109,0.08);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:8px">
+      🛑 <strong style="color:#ff9aa6">Aucun chantier reconnu</strong> — rien ne sera importé.<br>
+      Vérifie que le <strong>MSN de tes chantiers</strong> correspond à ceux du fichier. Le MSN est lu dans le champ <em>MSN</em> de la fiche chantier, ou déduit de son nom s'il contient un numéro.
+     </div>`:''}
+    ${sansMsn.length?`<div style="font-size:10px;color:var(--t4);margin-bottom:8px">⚠ ${sansMsn.length} chantier(s) sans MSN exploitable (ignorés) : ${sansMsn.slice(0,5).join(', ')}${sansMsn.length>5?'…':''}</div>`:''}
     <div style="padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:11px;color:var(--t3)">
       ⚠ Les heures déjà importées sur ces <strong>mêmes jours</strong> seront remplacées (pas d'addition) — tu peux réimporter le même fichier sans risque.
     </div>`;
@@ -9082,7 +9108,8 @@ function rexData(cid){
   const hSupp=ajouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0);
   const budget=(c.manHours||0)+hSupp;
 
-  const slotsRaw=(S.slot?.entries||[]).filter(e=>c.msn&&String(e.msn)===String(c.msn));
+  const msnKey=(typeof _chMsnKey==='function')?_chMsnKey(c):String(c.msn||'');
+  const slotsRaw=(S.slot?.entries||[]).filter(e=>msnKey && _msn5(e.msn)===msnKey);
   const slots=_rexMergeSlots(slotsRaw);
   const joursHangar=slots.reduce((s,e)=>s+(e.nbJours||0),0);
 
@@ -9303,7 +9330,7 @@ function rexHtml(D,print){
         </div>`).join('')}
       </div>`;
     };
-    const topW=w.wos.slice(0,5);
+    const topW=w.wos;
     return `<div style="border:1px solid ${T.line};border-radius:8px;padding:9px 11px;margin-bottom:8px;border-left:3px solid #2979ff;background:${print?'#fbfcfe':'rgba(41,121,255,0.04)'}">
       <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:7px">
         <div style="font-size:13px;font-weight:900;color:${T.fg};font-family:'JetBrains Mono',monospace">WP ${w.wp||'—'}</div>
@@ -9316,13 +9343,12 @@ function rexHtml(D,print){
         ${mini('Nature du travail',w.mr,'#ff9a3c')}
         ${mini('Spécialités',w.spec,'#7c5cff')}
         ${topW.length?`<div style="flex:1.4;min-width:190px">
-          <div style="font-size:9px;font-weight:800;color:${T.mut};text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Principaux ordres de travail</div>
+          <div style="font-size:9px;font-weight:800;color:${T.mut};text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Ordres de travail (${topW.length})</div>
           ${topW.map(o=>`<div style="display:flex;gap:6px;margin-bottom:2px">
             <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${T.fg};font-weight:700">${o.wo}</span>
             <span style="font-size:9px;color:${T.mut};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.job}</span>
-            <span style="font-size:10px;font-weight:700;color:${T.fg}">${h1(o.h)} h</span>
+            <span style="font-size:10px;font-weight:700;color:${T.fg};white-space:nowrap">${h1(o.h)} h</span>
           </div>`).join('')}
-          ${w.wos.length>5?`<div style="font-size:9px;color:${T.mut};margin-top:2px">+ ${w.wos.length-5} autre${w.wos.length-5>1?'s':''}</div>`:''}
         </div>`:''}
       </div>
     </div>`;
@@ -9339,22 +9365,54 @@ function rexHtml(D,print){
         ${barCell(v,col)}</tr>`).join('')}</tbody></table>`;
   };
 
-  const top=D.wos.slice(0,20);
-  const tWos=top.length?`<table style="width:100%;border-collapse:collapse">
-    <thead><tr><th style="${th};width:34px">#</th><th style="${th}">Ordre de travail</th><th style="${th}">WP</th><th style="${th};text-align:center">Heures</th><th style="${th};text-align:center">Part</th></tr></thead>
-    <tbody>${top.map((w,i)=>`<tr>
-      <td style="${td};text-align:center;color:${T.mut}">${i+1}</td>
-      <td style="${td}"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${T.fg}">${w.wo}</span>${w.job?`<div style="font-size:9px;color:${T.mut};margin-top:1px">${w.job}</div>`:''}</td>
-      <td style="${td};font-family:'JetBrains Mono',monospace;font-size:9px">${w.wp||'—'}</td>
-      <td style="${td};text-align:center;font-weight:700">${h1(w.h)}</td>
-      <td style="${td};text-align:center">${pctD(w.h)} %</td></tr>`).join('')}</tbody></table>
-    <div style="font-size:9px;color:${T.mut};margin-top:3px">${D.nWo} ordres de travail au total sur ce chantier · les 20 plus consommateurs représentent ${pctD(top.reduce((s,w)=>s+w.h,0))} % des heures pointées</div>`:'';
+  // Matrice : lignes = valeurs, colonnes = workpacks (+ total)
+  const matrix=(dimKey,col)=>{
+    const wps=D.wps;
+    const vals={};
+    wps.forEach(w=>Object.entries(w[dimKey]||{}).forEach(([k,v])=>{ vals[k]=(vals[k]||0)+v; }));
+    const rows=Object.entries(vals).sort((a,b)=>b[1]-a[1]);
+    if(!rows.length) return '';
+    return `<table style="width:100%;border-collapse:collapse">
+      <thead><tr><th style="${th}">Libellé</th>
+        ${wps.map(w=>`<th style="${th};text-align:center;border-bottom:2px solid #2979ff">WP ${w.wp||'—'}</th>`).join('')}
+        <th style="${th};text-align:center;background:${print?'#e6edf9':'rgba(255,255,255,0.10)'}">Total</th>
+        <th style="${th};width:90px"></th></tr></thead>
+      <tbody>${rows.map(([k,tot])=>`<tr>
+        <td style="${td};border-left:3px solid ${col};font-weight:700">${k||'—'}</td>
+        ${wps.map(w=>{const v=(w[dimKey]||{})[k]||0;
+          return `<td style="${td};text-align:center;color:${v?T.fg:T.mut};font-weight:${v?'700':'400'}">${v?h1(v)+' h':'—'}</td>`;}).join('')}
+        <td style="${td};text-align:center;font-weight:800;background:${print?'#f2f6fd':'rgba(255,255,255,0.05)'}">${h1(tot)} h</td>
+        ${barCell(tot,col)}</tr>`).join('')}
+      <tr><td style="${td};font-weight:800;background:${T.head}">Total</td>
+        ${wps.map(w=>`<td style="${td};text-align:center;font-weight:800;background:${T.head}">${h1(w.h)} h</td>`).join('')}
+        <td style="${td};text-align:center;font-weight:800;background:${T.head}">${h1(D.hDim)} h</td>
+        <td style="${td};background:${T.head}"></td></tr></tbody></table>`;
+  };
+
+  // Top 20 des ordres de travail, séparé par workpack
+  const tWos=D.wps.map(w=>{
+    const top=w.wos.slice(0,20);
+    if(!top.length) return '';
+    return `<div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:800;color:${T.fg};font-family:'JetBrains Mono',monospace;margin-bottom:3px;padding-left:3px;border-left:3px solid #2979ff">
+        WP ${w.wp||'—'} <span style="font-family:'Outfit',sans-serif;font-weight:400;color:${T.mut}">— ${h1(w.h)} h · ${w.nWo} ordre${w.nWo>1?'s':''} de travail${w.nWo>20?' · les 20 premiers ci-dessous':''}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr><th style="${th};width:30px">#</th><th style="${th}">Ordre de travail</th><th style="${th};text-align:center;width:70px">Heures</th><th style="${th};text-align:center;width:60px">% du WP</th></tr></thead>
+        <tbody>${top.map((o,i)=>`<tr>
+          <td style="${td};text-align:center;color:${T.mut}">${i+1}</td>
+          <td style="${td}"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${T.fg}">${o.wo}</span>${o.job?`<div style="font-size:9px;color:${T.mut};margin-top:1px">${o.job}</div>`:''}</td>
+          <td style="${td};text-align:center;font-weight:700">${h1(o.h)}</td>
+          <td style="${td};text-align:center">${w.h>0?Math.round(o.h/w.h*100):0} %</td></tr>`).join('')}</tbody></table>
+      ${w.nWo>20?`<div style="font-size:9px;color:${T.mut};margin-top:2px">+ ${w.nWo-20} autre${w.nWo-20>1?'s':''} — total détaillé en section 6</div>`:''}
+    </div>`;
+  }).join('');
 
   const secPoint = D.hasReal ? [
     D.wps.length?sec(`6 · Détail par workpack (${D.wps.length})`,tWps):'',
-    Object.keys(D.dim.m).length?sec('7 · Nature du travail — tous workpacks',dimTable(D.dim.m,'#ff9a3c')+`<div style="font-size:9px;color:${T.mut};margin-top:3px">Ce qui n'était pas au programme initial (non-routine, demande client) explique la dérive.</div>`):'',
-    Object.keys(D.dim.s).length?sec('8 · Spécialités — tous workpacks',dimTable(D.dim.s,'#7c5cff')):'',
-    tWos?sec('9 · Top 20 des ordres de travail',tWos):''
+    sec('7 · Nature du travail par workpack',matrix('mr','#ff9a3c')+`<div style="font-size:9px;color:${T.mut};margin-top:3px">Ce qui n'était pas au programme initial (non-routine, demande client) explique la dérive.</div>`),
+    sec('8 · Spécialités par workpack',matrix('spec','#7c5cff')),
+    tWos?sec('9 · Top 20 des ordres de travail par workpack',tWos):''
   ].join('') : '';
 
   return `<div style="color:${T.fg}">
