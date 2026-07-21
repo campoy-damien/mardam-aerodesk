@@ -167,6 +167,7 @@ console.log('%c© 2025 Damien Campoy — MARDAM AeroDesk Pro','color:#00d2ff;fon
   --responsable: #e040fb;
   --tech:      #a88c6a;
   --expert:    #2979ff;
+  --workshop:  #00c2a8;
   --alt:       #00e5b0;
   --stag:      #84fab0;
   --interim:   #c084fc;
@@ -430,6 +431,7 @@ body::before{
 .b-part21{background:rgba(0,100,200,0.12);color:#0064c8;border:1px solid rgba(0,160,255,0.3)}
 .b-iq{background:rgba(0,160,255,0.12);color:#00a0ff;border:1px solid rgba(0,160,255,0.3)}
 .b-exp{background:rgba(41,121,255,0.12);color:#82b1ff;border:1px solid rgba(41,121,255,0.25)}
+.b-workshop{background:rgba(0,194,168,0.14);color:#4de3cd;border:1px solid rgba(0,194,168,0.3)}
 .b-alt{background:rgba(0,229,176,0.12);color:var(--alt);border:1px solid rgba(0,229,176,0.25)}
 .b-stag{background:rgba(132,250,176,0.12);color:var(--stag);border:1px solid rgba(132,250,176,0.25)}
 .b-int{background:rgba(192,132,252,0.12);color:var(--purple);border:1px solid rgba(192,132,252,0.25)}
@@ -741,6 +743,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .sc.responsable::before{background:linear-gradient(90deg,#e040fb,#ea80fc)}
 .sc.technicien::before{background:linear-gradient(90deg,#a88c6a,#c9a87c)}
 .sc.expert::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.sc.workshop::before{background:linear-gradient(90deg,#00c2a8,#4de3cd)}
 .sc.alternant::before{background:linear-gradient(90deg,var(--mint),var(--lime))}
 .sc.stagiaire::before{background:linear-gradient(90deg,var(--stag),#b2fcc9)}
 .sc.interimaire::before{background:linear-gradient(90deg,var(--purple),#e8b4ff)}
@@ -1654,6 +1657,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="ftab" onclick="filterStaff('chef',this)">Chefs d'équipe</button>
     <button class="ftab" onclick="filterStaff('technicien',this)">Techniciens</button>
     <button class="ftab" onclick="filterStaff('expert',this)">Experts</button>
+    <button class="ftab" onclick="filterStaff('workshop',this)" style="color:#00c2a8;border-color:rgba(0,194,168,0.3)">🛠 Workshop Manager</button>
     <button class="ftab" onclick="filterStaff('recycling',this)" style="color:#ff9a3c;border-color:rgba(255,154,60,0.3)">♻️ A/C Recycling</button>
     <button class="ftab" onclick="filterStaff('part21',this)" style="color:#0064c8;border-color:rgba(0,160,255,0.3)">✈️ Tech Part 21</button>
     <button class="ftab" onclick="filterStaff('iq',this)" style="color:#00a0ff;border-color:rgba(0,160,255,0.3)">🔍 Insp. Qualité</button>
@@ -1756,6 +1760,16 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <button class="btn btn-cyan btn-sm" onclick="exportCertifXls()">📊 Export Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="exportCertifPDF()">📄 Export PDF</button>
     </div>
+  </div>
+  <!-- Navigateur de semaine + extrait présence -->
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 10px;padding:8px 12px;border:1px solid var(--glass-border);border-radius:12px;background:var(--glass-1)">
+    <button class="btn btn-ghost btn-sm" onclick="certifWeekPrev()">← Préc.</button>
+    <span id="certif-week-lbl" style="font-size:14px;font-weight:800;color:var(--t1);min-width:230px;text-align:center">Semaine —</span>
+    <button class="btn btn-ghost btn-sm" onclick="certifWeekNext()">Suiv. →</button>
+    <button class="btn btn-cyan btn-sm" onclick="certifWeekThis()">Cette semaine</button>
+    <span style="flex:1"></span>
+    <button class="btn btn-rose btn-sm" onclick="exportCertifWeekXls()">📊 Extrait semaine (Excel)</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCertifWeekPDF()">📄 Extrait semaine (PDF)</button>
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:6px 0 12px">
     <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="certif-search" placeholder="Nom, prénom ou trigramme…" oninput="renderCertif()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:220px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
@@ -2412,7 +2426,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">Fiche</strong> — prénom, nom, trigramme, catégorie, poste, contrat, coordonnées<br>
-        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager<br>
+        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Workshop Manager, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager<br>
         • <strong style="color:#ffd060">Niveau</strong> — pour Technicien et Intérimaire, un menu (Meca Niveau 1/2/3, Tech Niveau 1/2/3/4) à côté du téléphone ; affiché sur la fiche profil<br>
         • <strong style="color:#ffd060">Actif/Inactif</strong> — les inactifs n'apparaissent pas dans les plannings<br>
         • <strong style="color:#ffd060">Trigramme</strong> — identifiant court dans les plannings (ex: DCA)<br>
@@ -2475,7 +2489,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <strong style="color:var(--cyan)">Les catégories d'heures</strong><br>
         • <strong>Production</strong> = techniciens + intérimaires → c'est le chiffre comparé au budget<br>
         • <strong>Sous-traitance</strong> = prestataires<br>
-        • <strong>Encadrement (improductif)</strong> = chefs d'équipe, experts, responsables projet<br>
+        • <strong>Encadrement (improductif)</strong> = chefs d'équipe, experts, workshop managers, responsables projet<br>
         • <strong>Autres</strong> = alternants, stagiaires, inspecteurs qualité… (affiché seulement s'il y a des heures)<br>
         Chaque groupe est <strong>détaillé par catégorie</strong>, aux couleurs du personnel.<br><br>
 
@@ -2951,6 +2965,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="chef">Chef d'équipe</option>
         <option value="technicien">Technicien / Mécanicien</option>
         <option value="expert">Expert</option>
+        <option value="workshop">Workshop Manager</option>
         <option value="alternant">Alternant</option>
         <option value="stagiaire">Stagiaire</option>
         <option value="interimaire">Intérimaire</option>
@@ -3590,6 +3605,7 @@ const CATS = {
   chef:       { lbl:"Chef d'équipe",        col:'var(--chef)',        b:'b-chef'},
   technicien: {lbl:'Technicien/Mécan.',   col:'var(--tech)',   b:'b-tech'},
   expert:     {lbl:'Expert',              col:'var(--expert)', b:'b-exp'},
+  workshop:   {lbl:'Workshop Manager',    col:'var(--workshop)', b:'b-workshop'},
   alternant:  {lbl:'Alternant',           col:'var(--alt)',    b:'b-alt'},
   stagiaire:  {lbl:'Stagiaire',           col:'var(--stag)',   b:'b-stag'},
   interimaire:{lbl:'Intérimaire',         col:'var(--interim)',      b:'b-int'},
@@ -6171,7 +6187,7 @@ function _sortByNom(list){
 function _catColArgb(cat){
   const hard={recycling:'ff9a3c',part21:'0064c8',iq:'00a0ff'};
   if(hard[cat]) return 'FF'+hard[cat];
-  const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+  const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
   const v=getComputedStyle(document.documentElement).getPropertyValue(map[cat]||'').trim();
   return 'FF'+(v?v.replace('#','').slice(0,6):'cccccc');
 }
@@ -7182,7 +7198,7 @@ function buildGrid(emps,dates,containerId){
       if(groupKey !== lastGroupKey){
         lastGroupKey = groupKey;
         const catInfo = CATS[groupKey] || {lbl: groupKey, col:'rgba(255,255,255,0.3)'};
-        const catIcons = {chef:'👷', responsable:'🎯', expert:'🔬', technicien:'🔧', recycling:'♻️', interimaire:'⏱', prestataire:'🤝', alternant:'📚', stagiaire:'🎓', part21:'✈️', iq:'🔍'};
+        const catIcons = {chef:'👷', responsable:'🎯', expert:'🔬', workshop:'🛠',  technicien:'🔧', recycling:'♻️', interimaire:'⏱', prestataire:'🤝', alternant:'📚', stagiaire:'🎓', part21:'✈️', iq:'🔍'};
         separator = `<tr>
           <td colspan="${numCols}" style="padding:5px 14px 4px;background:rgba(16,23,38,0.90);border-top:2px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.06)">
             <span style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:${catInfo.col||'rgba(255,255,255,0.35)'}">
@@ -7652,7 +7668,7 @@ function _plKey(e){
 function chMonth(dir){S.masterMonth+=dir;if(S.masterMonth>11){S.masterMonth=0;S.masterYear++;}if(S.masterMonth<0){S.masterMonth=11;S.masterYear--;}renderMaster();}
 function goToday(){S.masterMonth=new Date().getMonth();S.masterYear=new Date().getFullYear();renderMaster();}
 /* ═══ TRI PERSONNEL ═══ */
-const CAT_ORDER = {chef:1, responsable:2, expert:3, technicien:4, recycling:5, interimaire:6, prestataire:7, alternant:8, stagiaire:9, part21:10, iq:11};
+const CAT_ORDER = {chef:1, responsable:2, expert:3, workshop:3.5, technicien:4, recycling:5, interimaire:6, prestataire:7, alternant:8, stagiaire:9, part21:10, iq:11};
 function sortPersonnel(list){
   return [...list].sort((a,b)=>{
     const oa = CAT_ORDER[a.categorie] || 99;
@@ -9205,12 +9221,12 @@ const REX_H_JOUR=7;            // 7 h par jour ⇒ 3,5 h par demi-journée (mêm
 const REX_GROUPS=[
   {k:'prod',   lbl:'Production',            cats:['technicien','interimaire'],        col:'#2979ff'},
   {k:'soust',  lbl:'Sous-traitance',        cats:['prestataire'],                     col:'#7c5cff'},
-  {k:'improd', lbl:'Encadrement (improd.)', cats:['chef','expert','responsable'],     col:'#ff9a3c'},
+  {k:'improd', lbl:'Encadrement (improd.)', cats:['chef','expert','responsable','workshop'],     col:'#ff9a3c'},
   {k:'autres', lbl:'Autres',                cats:['alternant','stagiaire','iq','part21','recycling'], col:'#8e8e93'}
 ];
 const _rexGroupOf=cat=>{ const g=REX_GROUPS.find(g=>g.cats.includes(cat)); return g?g.k:'autres'; };
 // Couleurs réelles des catégories de personnel (mêmes que les variables CSS de l'app)
-const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',
+const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',workshop:'#00c2a8',
   alternant:'#00e5b0',stagiaire:'#84fab0',interimaire:'#c084fc',prestataire:'#ffdd00',
   recycling:'#ff9a3c',part21:'#0064c8',iq:'#00a0ff'};
 const _catHex=cat=>CAT_HEX[cat]||'#8e8e93';
@@ -11591,7 +11607,7 @@ function toggleInterimaire(id){
   const emp=S.personnel.find(p=>p.id===id);
   if(!emp) return;
   emp.actif = emp.actif===false ? true : false;
-  save();
+  if(typeof _certifPurgeOut==='function')_certifPurgeOut(); save();
   renderPersonnel();
   renderMaster();
   renderWeekly();
@@ -11925,7 +11941,7 @@ function refuseProlong(empId,pid){
 }
 function setHorsProd(empId){
   const emp=byId(empId); if(!emp) return;
-  emp.actif=false; save(); renderPersonnel(); if(typeof renderDash==='function')renderDash(); closeM('m-prolong');
+  emp.actif=false;  if(typeof _certifPurgeOut==='function')_certifPurgeOut(); save(); renderPersonnel(); if(typeof renderDash==='function')renderDash(); closeM('m-prolong');
   toast(`${emp.prenom} ${emp.nom} passé en hors production`);
 }
 
@@ -12084,7 +12100,7 @@ function openPanel(id){
 function closePanel(){document.getElementById('sidePanel').classList.remove('on');}
 let _archId=null;
 function openArchive(id){ const e=byId(id); if(!e)return; _archId=id; const nm=document.getElementById('arch-name'); if(nm)nm.textContent=`${e.prenom} ${e.nom}`; const mo=document.getElementById('arch-motif'); if(mo)mo.value='Démission'; const dt=document.getElementById('arch-date'); if(dt)dt.value=fmt(new Date()); const no=document.getElementById('arch-note'); if(no)no.value=''; document.getElementById('m-archive').style.display='flex'; }
-function confirmArchive(){ const e=byId(_archId); if(!e){document.getElementById('m-archive').style.display='none';return;} e.actif=false; e.archived=true; e.archiveDate=(document.getElementById('arch-date').value)||fmt(new Date()); e.archiveMotif=document.getElementById('arch-motif').value||'Autre'; e.archiveNote=(document.getElementById('arch-note').value||'').trim(); save(); document.getElementById('m-archive').style.display='none'; closePanel(); if(typeof renderPersonnel==='function')renderPersonnel(); if(typeof renderMaster==='function')renderMaster(); if(typeof renderWeekly==='function')renderWeekly(); if(typeof renderForms==='function')renderForms(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderDash==='function')renderDash(); if(typeof popSelects==='function')popSelects(); toast(`📦 ${e.prenom} ${e.nom} archivé(e)`); _archId=null; }
+function confirmArchive(){ const e=byId(_archId); if(!e){document.getElementById('m-archive').style.display='none';return;} e.actif=false; e.archived=true; e.archiveDate=(document.getElementById('arch-date').value)||fmt(new Date()); e.archiveMotif=document.getElementById('arch-motif').value||'Autre'; e.archiveNote=(document.getElementById('arch-note').value||'').trim();  if(typeof _certifPurgeOut==='function')_certifPurgeOut(); save(); document.getElementById('m-archive').style.display='none'; closePanel(); if(typeof renderPersonnel==='function')renderPersonnel(); if(typeof renderMaster==='function')renderMaster(); if(typeof renderWeekly==='function')renderWeekly(); if(typeof renderForms==='function')renderForms(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderDash==='function')renderDash(); if(typeof popSelects==='function')popSelects(); toast(`📦 ${e.prenom} ${e.nom} archivé(e)`); _archId=null; }
 function reintegrerPersonnel(id){ const e=byId(id); if(!e)return; e.actif=true; e.archived=false; delete e.archiveDate; delete e.archiveMotif; delete e.archiveNote; save(); closePanel(); if(typeof renderPersonnel==='function')renderPersonnel(); if(typeof renderMaster==='function')renderMaster(); if(typeof renderWeekly==='function')renderWeekly(); if(typeof renderForms==='function')renderForms(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderDash==='function')renderDash(); if(typeof popSelects==='function')popSelects(); toast(`♻️ ${e.prenom} ${e.nom} réintégré(e)`); }
 function _toggleArchivedSec(){ const b=document.getElementById('arch-sec-body'); const c=document.getElementById('arch-sec-chev'); if(!b)return; const open=b.style.display==='none'; b.style.display=open?'block':'none'; if(c)c.textContent=open?'▼':'▶'; }
 
@@ -12184,7 +12200,7 @@ function toggleMoteurAutre(val){
 }
 
 function togglePrestFields(cat){
-  const CDI_CATS=['technicien','chef','expert','responsable','recycling','part21','iq'];
+  const CDI_CATS=['technicien','chef','expert','workshop','responsable','recycling','part21','iq'];
   const isPrest=cat==='prestataire';
   const isInt=cat==='interimaire';
 
@@ -12767,9 +12783,83 @@ function exportAutoMatrixPDF(){
      types:[{ type, cats:[B1/B2/C], taxi:bool, pfIdle:bool, pfMax:bool, exp }] }]
    ═══════════════════════════════════════════════════════════ */
 const CERTIF_CATS=['B1','B2','C'];
+// Catalogue officiel des types avion, groupés par constructeur (couleur de bandeau)
+const CERTIF_AC_GROUPS=[
+  {maker:'Airbus', color:'#F2D024', tint:'#FCF7E0', head:'#FBF3CF', txt:'#4A3A00', types:[
+    'AIRBUS A319/A320/A321 (IAE V2500)',
+    'AIRBUS A318/A319/A320/A321 (CFM56)',
+    'AIRBUS A319/A320/A321 (IAE PW1100G)',
+    'AIRBUS A319/A320/A321 (CFM LEAP-1A)'
+  ]},
+  {maker:'Boeing', color:'#8FD14F', tint:'#EFF8E4', head:'#E7F5D8', txt:'#1F3D06', types:[
+    'BOEING 737-300/400/500 (CFM56)',
+    'BOEING 737-600/700/800/900 (CFM56)',
+    'BOEING 737-7/8/9 (CFM LEAP-1B)'
+  ]},
+  {maker:'ATR', color:'#9DB7D4', tint:'#EEF3F9', head:'#E8EEF6', txt:'#1E3348', types:[
+    'ATR 42-200/300 series (PW PWC120)',
+    'ATR 42-400/500 / 72-212A (PW PWC120)',
+    'ATR 72-100/200 series (PW PWC120)',
+    'ATR DELTA 600'
+  ]},
+  {maker:'Airbus A220', color:'#F0A030', tint:'#FDF0DD', head:'#FCE9CF', txt:'#4A2C00', types:[
+    'AIRBUS A220 / BD-500 SERIES (PW1500G)'
+  ]}
+];
+const CERTIF_AC_ALL=CERTIF_AC_GROUPS.reduce((a,g)=>a.concat(g.types),[]);
+// Constructeur / couleurs d'un type donné (pour matrice & export)
+function _acMeta(type){ for(const g of CERTIF_AC_GROUPS){ if(g.types.includes(type)) return g; } return {maker:'Autre',color:'#9aa0a6',tint:'#f1f1f1',head:'#e8e8e8',txt:'#333'}; }
 
 function _certifStaff(){ return _sortByNom(S.personnel.filter(p=>p.actif!==false && !p.archived)); }
 function _certifByEmp(id){ return (S.certifiants||[]).find(c=>c.empId===id); }
+
+/* ═══ SEMAINE & PRÉSENCE — Certifying Staff ═══ */
+let _certifWeek=null; // lundi de la semaine affichée (indépendant du planning)
+function _certifWeekMon(){ if(!_certifWeek) _certifWeek=getMon(new Date()); if(!(_certifWeek instanceof Date)) _certifWeek=getMon(_certifWeek); return _certifWeek; }
+function certifWeekPrev(){ _certifWeek=addD(_certifWeekMon(),-7); renderCertif(); }
+function certifWeekNext(){ _certifWeek=addD(_certifWeekMon(),7); renderCertif(); }
+function certifWeekThis(){ _certifWeek=getMon(new Date()); renderCertif(); }
+const _CERTIF_ABS={conge:'congé',maladie:'maladie',formation:'formation',formation_int:'formation',absence:'absence',deplacement:'déplacement'};
+// Purge : retire de la liste certifiant toute personne archivée ou hors production
+function _certifPurgeOut(){
+  if(!Array.isArray(S.certifiants)) return 0;
+  const before=S.certifiants.length;
+  S.certifiants=S.certifiants.filter(c=>{ const e=byId(c.empId); return e && !e.archived && e.actif!==false; });
+  return before-S.certifiants.length;
+}
+// Présence d'une personne sur la semaine (lundi->dimanche). Retourne statut + détail jour par jour.
+function _certifPresence(empId, mon){
+  const days=[];
+  let presH=0, absH=0;                        // demi-journées travaillées / absentes (jours ouvrés)
+  for(let i=0;i<7;i++){
+    const dt=addD(mon,i), ds=fmt(dt), we=(i>=5), hol=isHol(ds);
+    const amE=S.planning[`${empId}_${ds}_AM`], pmE=S.planning[`${empId}_${ds}_PM`];
+    const slot=e=>{ if(!e||!e.type) return 'none'; if(e.type==='travail') return 'site'; if(_CERTIF_ABS[e.type]) return e.type; if(e.type==='ferie'||e.type==='we') return 'off'; return 'site'; };
+    const am=slot(amE), pm=slot(pmE);
+    if(!we && !hol){
+      [am,pm].forEach(s=>{ if(s==='site') presH++; else if(_CERTIF_ABS[s]) absH++; });
+    }
+    days.push({date:ds, dow:D3[i], we, hol, am, pm, amNote:amE?.note||'', pmNote:pmE?.note||''});
+  }
+  const absDays=absH/2, presDays=presH/2;
+  let status;
+  if(presH===0) status = absH>0 ? 'absent' : 'unplanned';
+  else status = absDays>=1.5 ? 'partial' : 'site';
+  // Note résumant les absences (jours + motif)
+  const parts=[];
+  days.forEach(d=>{ if(d.we||d.hol) return;
+    const mm=new Set(); [d.am,d.pm].forEach(s=>{ if(_CERTIF_ABS[s]) mm.add(_CERTIF_ABS[s]); });
+    if(mm.size){ const full=(_CERTIF_ABS[d.am]&&_CERTIF_ABS[d.pm]); parts.push(`${d.dow.toLowerCase()}${full?'':' ½'} (${[...mm].join('/')})`); }
+  });
+  const note=parts.join(', ');
+  return {status, days, absDays, presDays, note};
+}
+const _CERTIF_PRES_META={
+  site:   {c:'#6effc4',bg:'rgba(110,255,196,0.12)',bd:'rgba(110,255,196,0.3)',ic:'✅',lbl:'Sur site'},
+  partial:{c:'#ffc06a',bg:'rgba(255,192,106,0.12)',bd:'rgba(255,192,106,0.32)',ic:'🟡',lbl:'Partiel'},
+  absent: {c:'#ff8a99',bg:'rgba(255,107,125,0.12)',bd:'rgba(255,107,125,0.32)',ic:'⛔',lbl:'Absent'},
+  unplanned:{c:'var(--t3)',bg:'rgba(255,255,255,0.03)',bd:'var(--glass-border)',ic:'◻️',lbl:'Non planifié'}
+};
 // Colonnes = tous les types avion présents dans les fiches, triés
 function _certifCols(){
   const set=new Set();
@@ -12796,24 +12886,34 @@ function renderCertif(){
   const box=document.getElementById('certifMatrixBox'); if(!box) return;
   const q=(document.getElementById('certif-search')?.value||'').toLowerCase().trim();
 
+  // Sécurité : purge des archivés / hors production éventuellement encore inscrits
+  if(_certifPurgeOut()>0) save();
+
+  // Semaine affichée
+  const mon=_certifWeekMon(), end=addD(mon,6);
+  const wl=document.getElementById('certif-week-lbl');
+  if(wl) wl.textContent=`Semaine ${wkN(mon)} · ${mon.getDate()} ${MO[mon.getMonth()].slice(0,3)} – ${end.getDate()} ${MO[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
+
   // Uniquement les personnes AYANT une fiche certifiant (hors archivés / hors effectif)
   let list=(S.certifiants||[]).map(c=>({c,emp:byId(c.empId)}))
     .filter(x=>x.emp && !x.emp.archived && !_empHorsEffectif(x.c.empId));
   if(q) list=list.filter(x=>_matchStaff(x.emp,q));
 
-  // Compteur licences à renouveler / expirées
-  const licRank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
-  const nRenew=list.filter(x=>x.c.licExp && (tSt(x.c.licExp)==='expired'||tSt(x.c.licExp)==='warning')).length;
+  // Présence de la semaine pour chaque certifiant
+  list.forEach(x=>{ x.pres=_certifPresence(x.emp.id, mon); });
 
-  // Tri : licences expirées/bientôt d'abord, puis alphabétique
-  list.sort((a,b)=>{
-    const ra=licRank(a.c.licExp?tSt(a.c.licExp):'na'), rb=licRank(b.c.licExp?tSt(b.c.licExp):'na');
-    if(ra!==rb) return ra-rb;
-    return `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr');
-  });
+  // Compteur licences + présence
+  const nRenew=list.filter(x=>x.c.licExp && (tSt(x.c.licExp)==='expired'||tSt(x.c.licExp)==='warning')).length;
+  const nSite=list.filter(x=>x.pres.status==='site').length;
+  const nPart=list.filter(x=>x.pres.status==='partial').length;
+  const nAbs=list.filter(x=>x.pres.status==='absent').length;
+
+  // Tri : sur site → partiel → absent → non planifié, puis nom de famille
+  const rank={site:0,partial:1,absent:2,unplanned:3};
+  list.sort((a,b)=>{ const r=(rank[a.pres.status]??3)-(rank[b.pres.status]??3); if(r) return r; return `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr',{sensitivity:'base'}); });
 
   const sub=document.getElementById('certif-count');
-  if(sub) sub.textContent=`${list.length} certifiant${list.length>1?'s':''}${nRenew?` · ${nRenew} licence${nRenew>1?'s':''} à renouveler`:''}`;
+  if(sub) sub.textContent=`${list.length} certifiant${list.length>1?'s':''} · ${nSite} sur site · ${nPart} partiel${nPart>1?'s':''} · ${nAbs} absent${nAbs>1?'s':''} en S${wkN(mon)}${nRenew?` · ${nRenew} licence${nRenew>1?'s':''} à renouveler`:''}`;
 
   if(!list.length){
     box.innerHTML=`<div style="text-align:center;padding:56px 20px;color:var(--t3)">
@@ -12841,10 +12941,15 @@ function renderCertif(){
   };
   const initials=e=>((e.prenom||' ')[0]+(e.nom||' ')[0]).toUpperCase();
 
-  const cards=list.map(({c,emp})=>{
+  const cards=list.map(({c,emp,pres})=>{
     const types=(c.types||[]).filter(t=>t.type);
     const st=c.licExp?tSt(c.licExp):'na';
     const lm=licMeta[st]||licMeta.na;
+    const pm=_CERTIF_PRES_META[pres.status]||_CERTIF_PRES_META.unplanned;
+    const presBanner=`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:${pm.bg};border:0.5px solid ${pm.bd};margin-bottom:8px">
+        <span style="font-size:13px">${pm.ic}</span>
+        <span style="font-size:12px;font-weight:700;color:${pm.c}">${pm.lbl}${pres.note?`<span style="font-weight:500;color:var(--t2)"> · ${pres.note}</span>`:''}</span>
+      </div>`;
     const typeRows=types.length?types.map(ty=>`
       <div style="padding:11px 0;border-top:0.5px solid var(--glass-border)">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
@@ -12863,10 +12968,11 @@ function renderCertif(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,210,255,0.14);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--cyan);flex-shrink:0">${initials(emp)}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${emp.prenom} ${emp.nom}</div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(emp.nom||'').toUpperCase()} <span style="font-weight:500;color:var(--t2)">${emp.prenom||''}</span></div>
           <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace">${emp.trigramme||'—'}</div>
         </div>
       </div>
+      ${presBanner}
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:10px;background:${lm.bg};border:0.5px solid ${lm.bd}">
         <span style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:${lm.c}">🪪 ${lm.lbl}</span>
         <span style="font-size:12px;color:${lm.c};font-family:'JetBrains Mono',monospace">${c.licExp?disp(c.licExp):(c.licNum||'—')}</span>
@@ -12886,8 +12992,9 @@ let _certifDraftTypes=[]; // types en cours de saisie (copie de travail)
 function openCertifFiche(empId){
   _certifEditId=empId||'';
   const sel=document.getElementById('cf-emp');
-  // Remplir la liste des employés (production active)
-  sel.innerHTML='<option value="">— choisir —</option>'+_certifStaff().map(p=>`<option value="${p.id}">${p.prenom} ${p.nom}${p.trigramme?' ('+p.trigramme+')':''}</option>`).join('');
+  // Remplir la liste des employés (production active), triés par nom de famille
+  const emps=_certifStaff().slice().sort((a,b)=>`${a.nom} ${a.prenom}`.localeCompare(`${b.nom} ${b.prenom}`,'fr',{sensitivity:'base'}));
+  sel.innerHTML='<option value="">— choisir —</option>'+emps.map(p=>`<option value="${p.id}">${(p.nom||'').toUpperCase()} ${p.prenom||''}${p.trigramme?' ('+p.trigramme+')':''}</option>`).join('');
   const c=empId?_certifByEmp(empId):null;
   sel.value=empId||'';
   sel.disabled=!!empId; // en édition, employé figé
@@ -12914,7 +13021,10 @@ function renderCertifTypes(){
     const chk=(field,label)=>{ const on=!!t[field]; return `<button type="button" onclick="certifToggleFlag(${i},'${field}')" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid ${on?'rgba(0,210,255,0.4)':'var(--glass-border)'};background:${on?'rgba(0,210,255,0.12)':'transparent'};color:${on?'var(--cyan)':'var(--t3)'}">${on?'☑':'☐'} ${label}</button>`; };
     return `<div style="border:1px solid var(--glass-border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--glass-1)">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-        <input type="text" value="${(t.type||'').replace(/"/g,'&quot;')}" oninput="_certifDraftTypes[${i}].type=this.value" placeholder="Type avion (ex: A320)" style="width:150px;padding:6px 10px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t1);font-size:12px;font-weight:700">
+        <select onchange="_certifDraftTypes[${i}].type=this.value" style="width:280px;max-width:100%;padding:6px 10px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t1);font-size:12px;font-weight:700">
+          <option value="">— Choisir un type avion —</option>
+          ${CERTIF_AC_GROUPS.map(g=>`<optgroup label="${g.maker}">${g.types.map(ty=>`<option value="${ty.replace(/"/g,'&quot;')}"${t.type===ty?' selected':''}>${ty}</option>`).join('')}</optgroup>`).join('')}
+        </select>
         <div style="display:flex;align-items:center;gap:5px">${catBtns}</div>
         <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
           <span style="font-size:11px;color:var(--t3)">exp.</span>
@@ -12956,82 +13066,209 @@ function delCertif(){
   toast('🗑 Fiche supprimée');
 }
 
-/* ── Export Excel ── */
-function exportCertifXls(){
-  const cols=_certifCols();
-  const staff=_certifStaff();
-  if(!staff.length){ toast('Aucun personnel à exporter'); return; }
+/* ── Export Excel — matrice groupée par constructeur ── */
+function exportCertifXls(opts){
+  opts=opts||{};
+  let list = opts.list || (S.certifiants||[]).map(c=>({c,emp:byId(c.empId)})).filter(x=>x.emp&&!x.emp.archived&&!_empHorsEffectif(x.c.empId));
+  if(!list.length){ toast(opts.emptyMsg||'Aucun certifiant à exporter'); return; }
+  list.sort((a,b)=>`${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr',{sensitivity:'base'}));
+  const presCol=!!opts.presence;   // colonne présence (extrait semaine)
+  const used=new Set(); list.forEach(x=>(x.c.types||[]).forEach(t=>{ if(t.type)used.add(t.type); }));
+  const groups=CERTIF_AC_GROUPS.map(g=>({...g,cols:g.types.filter(t=>used.has(t))})).filter(g=>g.cols.length);
+  const flatCols=groups.reduce((a,g)=>a.concat(g.cols.map(t=>({type:t,g}))),[]);
+  const tractUsed=list.some(x=>(S.autorisations||[]).some(z=>z.empId===x.c.empId&&_autoGroup(z)==='tractage'));
+  const hx=h=>'FF'+h.replace('#','').toUpperCase();
+  const P=presCol?1:0;              // décalage colonne présence
+
   _loadExcelJS(async()=>{
     try{
       const wb=new ExcelJS.Workbook(); wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
-      const ws=wb.addWorksheet('Certifying Staff',{views:[{state:'frozen',xSplit:2,ySplit:1}]});
-      const header=['Nom Prénom','TRI',...cols,'Lic. N°','Lic. Exp.'];
-      const hr=ws.addRow(header);
-      hr.eachCell(c=>{ c.font={bold:true,color:{argb:'FFFFFFFF'}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF16213E'}}; c.alignment={horizontal:'center',vertical:'middle'}; });
-      staff.forEach(p=>{
-        const c=_certifByEmp(p.id);
-        const mT={}; if(c)(c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
-        const cells=cols.map(col=>{
-          const t=mT[col]; if(!t) return '';
+      const ws=wb.addWorksheet(opts.sheetName||'Certifying Staff',{views:[{state:'frozen',xSplit:1,ySplit:2}]});
+      const nCol=1+P+flatCols.length+(tractUsed?1:0)+1;
+
+      // Colonne Présence (fusionnée sur 2 lignes) juste après le nom
+      if(presCol){ ws.mergeCells(1,2,2,2); const pc=ws.getCell(1,2); pc.value=`Présence S${opts.wk||''}`.trim(); pc.font={bold:true}; pc.alignment={horizontal:'center',vertical:'middle',wrapText:true}; pc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEEF3FB'}}; }
+
+      // Ligne 1 : bandeaux constructeur (fusionnés)
+      let ci=2+P;
+      groups.forEach(g=>{
+        const start=ci, end=ci+g.cols.length-1;
+        const cell=ws.getCell(1,start); cell.value=g.maker;
+        cell.font={bold:true,color:{argb:hx(g.txt)}}; cell.alignment={horizontal:'center',vertical:'middle'};
+        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:hx(g.color)}};
+        if(end>start) ws.mergeCells(1,start,1,end);
+        for(let k=start;k<=end;k++){ ws.getCell(1,k).fill={type:'pattern',pattern:'solid',fgColor:{argb:hx(g.color)}}; ws.getCell(1,k).border={bottom:{style:'thin',color:{argb:'FFFFFFFF'}}}; }
+        ci=end+1;
+      });
+      if(tractUsed){ ws.mergeCells(1,ci,2,ci); const t=ws.getCell(1,ci); t.value='Tractage avion (push back)'; t.font={bold:true}; t.alignment={horizontal:'center',vertical:'middle',wrapText:true}; t.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEEF3FB'}}; ci++; }
+      ws.mergeCells(1,ci,2,ci); const lc=ws.getCell(1,ci); lc.value='Licence Part 66'; lc.font={bold:true}; lc.alignment={horizontal:'center',vertical:'middle',wrapText:true}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEEF3FB'}};
+      ws.mergeCells(1,1,2,1); const nm=ws.getCell(1,1); nm.value='Nom Prénom'; nm.font={bold:true,color:{argb:'FFFFFFFF'}}; nm.alignment={horizontal:'left',vertical:'middle'}; nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF16213E'}};
+
+      // Ligne 2 : types
+      let cj=2+P;
+      flatCols.forEach(({type,g})=>{ const cell=ws.getCell(2,cj); cell.value=type; cell.font={color:{argb:hx(g.txt)},size:9}; cell.alignment={horizontal:'center',vertical:'middle',wrapText:true}; cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:hx(g.head)}}; cj++; });
+
+      // Lignes de données
+      list.forEach(({c,emp,pres})=>{
+        const mT={}; (c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
+        const vals=[`${(emp.nom||'').toUpperCase()} ${emp.prenom||''}`];
+        if(presCol){ const part=pres&&pres.status==='partial'; vals.push((part?'Partiel':'Sur site')+(pres&&pres.note?' — '+pres.note:'')); }
+        flatCols.forEach(({type})=>{
+          const t=mT[type];
+          if(!t){ vals.push(''); return; }
           const parts=[];
           if((t.cats||[]).length) parts.push(t.cats.join('/'));
-          if(t.taxi) parts.push('Taxi');
           const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
-          if(pf.length) parts.push('PF:'+pf.join('+'));
-          return parts.join(' · ');
+          if(pf.length) parts.push('Point fixe : '+pf.join(' + '));
+          if(t.taxi) parts.push('Taxiing');
+          vals.push(parts.join('\n'));
         });
-        const row=ws.addRow([`${p.prenom} ${p.nom}`,p.trigramme||'',...cells,c?.licNum||'',c?.licExp?disp(c.licExp):'']);
+        if(tractUsed){ const a=(S.autorisations||[]).find(z=>z.empId===c.empId&&_autoGroup(z)==='tractage'); vals.push(a?(a.dateExpiration?'✓ '+disp(a.dateExpiration):'✓'):''); }
+        vals.push(c.licExp?disp(c.licExp):(c.licNum||''));
+        const row=ws.addRow(vals);
+        row.eachCell(cell=>{ cell.alignment={vertical:'top',wrapText:true}; });
+        row.getCell(1).font={bold:true};
+        // présence colorée
+        if(presCol){ const part=pres&&pres.status==='partial'; const cell=ws.getCell(row.number,2); cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:part?'FFB8790A':'FF1E8F4E'}}; cell.font={color:{argb:'FFFFFFFF'},bold:true}; cell.alignment={vertical:'middle',wrapText:true}; }
+        // teinte constructeur sur les cellules de type
+        flatCols.forEach(({g},k)=>{ ws.getCell(row.number,2+P+k).fill={type:'pattern',pattern:'solid',fgColor:{argb:hx(g.tint)}}; });
         // couleur licence
-        if(c&&c.licExp){ const s=tSt(c.licExp); const fg={valid:'FF1E8F4E',warning:'FFB8790A',expired:'FFC0392B'}[s]; if(fg){ const lc=row.getCell(header.length); lc.font={color:{argb:'FFFFFFFF'},bold:true}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:fg}}; } }
+        if(c.licExp){ const s=tSt(c.licExp); const fg={valid:'FF1E8F4E',warning:'FFB8790A',expired:'FFC0392B'}[s]; if(fg){ const cell=ws.getCell(row.number,nCol); cell.font={color:{argb:'FFFFFFFF'},bold:true}; cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:fg}}; cell.alignment={horizontal:'center',vertical:'middle'}; } }
       });
-      ws.columns.forEach((col,i)=>{ col.width=i===0?22:(i===1?8:(i>=header.length-2?12:16)); });
+
+      ws.getColumn(1).width=22;
+      if(presCol) ws.getColumn(2).width=28;
+      for(let k=0;k<flatCols.length;k++) ws.getColumn(2+P+k).width=20;
+      if(tractUsed) ws.getColumn(2+P+flatCols.length).width=16;
+      ws.getColumn(nCol).width=14;
+
       const buf=await wb.xlsx.writeBuffer();
       const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AeroStaff_Certifying_Staff.xlsx'; a.click();
-      toast('✅ Export Certifying Staff ✓');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=opts.fileName||'AeroStaff_Certifying_Staff.xlsx'; a.click();
+      toast(opts.toast||'✅ Export Certifying Staff ✓');
     }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
   });
 }
 
-/* ── Export PDF ── */
-function exportCertifPDF(){
-  const cols=_certifCols();
-  const staff=_certifStaff();
-  if(!staff.length){ toast('Aucun personnel à exporter'); return; }
+/* ── Export PDF — matrice groupée par constructeur ── */
+function exportCertifPDF(opts){
+  opts=opts||{};
+  let list = opts.list || (S.certifiants||[]).map(c=>({c,emp:byId(c.empId)})).filter(x=>x.emp&&!x.emp.archived&&!_empHorsEffectif(x.c.empId));
+  if(!list.length){ toast(opts.emptyMsg||'Aucun certifiant à exporter'); return; }
+  list.sort((a,b)=>`${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr',{sensitivity:'base'}));
+
+  // Types réellement utilisés, dans l'ordre du catalogue
+  const used=new Set(); list.forEach(x=>(x.c.types||[]).forEach(t=>{ if(t.type)used.add(t.type); }));
+  const groups=CERTIF_AC_GROUPS.map(g=>({...g,cols:g.types.filter(t=>used.has(t))})).filter(g=>g.cols.length);
+  const flatCols=groups.reduce((a,g)=>a.concat(g.cols),[]);
+  const tractUsed=list.some(x=>{ const a=(S.autorisations||[]).find(z=>z.empId===x.c.empId&&_autoGroup(z)==='tractage'); return !!a; });
+  const presCol=!!opts.presence; // colonne présence si extrait semaine
+
   const licClr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
+  const shortType=t=>t.replace(/^(AIRBUS|BOEING|ATR)\s*/i,'').replace(/ series/i,'');
   const cellHtml=t=>{
-    if(!t) return '—';
-    const cats=(t.cats||[]).length?`<b style="color:#6a5acd">${t.cats.join('/')}</b>`:'';
-    const bits=[]; if(t.taxi)bits.push('<span style="color:#0a7ea4">T</span>');
+    if(!t) return '<span style="color:#bbb">—</span>';
+    const cats=(t.cats||[]).length?`<b style="font-size:11px">${t.cats.join('/')}</b>`:'<span style="color:#bbb">—</span>';
     const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
-    if(pf.length)bits.push('<span style="color:#c0562a">'+pf.join('+')+'</span>');
-    return `${cats}${cats&&bits.length?'<br>':''}${bits.join(' ')}`||'·';
+    const pfl=pf.length?`<div style="font-size:8px;color:#555">Point fixe : ${pf.join(' + ')}</div>`:'';
+    const tx=t.taxi?'<div style="font-size:8px;color:#0a6a8a">Taxiing</div>':'';
+    return `${cats}${pfl}${tx}`;
   };
-  const th=cols.map(c=>`<th class="rot" title="${c}">${c}</th>`).join('');
-  const trs=staff.map(p=>{
-    const c=_certifByEmp(p.id);
-    const mT={}; if(c)(c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
-    const tds=cols.map(col=>`<td class="c">${cellHtml(mT[col])}</td>`).join('');
-    const s=c&&c.licExp?tSt(c.licExp):'na';
-    const lic=c&&c.licExp?`<span style="color:${licClr[s]||'#333'};font-weight:700">${disp(c.licExp)}</span>`:'—';
-    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}<td class="c">${lic}</td></tr>`;
+
+  // En-têtes : bandeau constructeur + type
+  const gh=groups.map(g=>`<th colspan="${g.cols.length}" style="background:${g.color};color:${g.txt};border:1px solid #fff">${g.maker}</th>`).join('');
+  const th2=groups.map(g=>g.cols.map(t=>`<th class="typ" style="background:${g.head};color:${g.txt}" title="${t}">${shortType(t)}</th>`).join('')).join('');
+  const extraTop=`${presCol?'<th rowspan="2" class="side">Présence</th>':''}${tractUsed?'<th rowspan="2" class="side">Tractage avion<br><span style="font-weight:400">(push back)</span></th>':''}<th rowspan="2" class="side">Licence<br>Part 66</th>`;
+
+  const trs=list.map(({c,emp,pres})=>{
+    const mT={}; (c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
+    const tds=groups.map(g=>g.cols.map(col=>{
+      const meta=g;
+      return `<td class="c" style="background:${meta.tint}">${cellHtml(mT[col])}</td>`;
+    }).join('')).join('');
+    let presTd='';
+    if(presCol){ const part=pres&&pres.status==='partial'; presTd=`<td class="c" style="font-size:9px">${part?`<b style="color:#b8790a">Partiel</b>${pres.note?`<div style="font-size:7px;color:#666">${pres.note}</div>`:''}`:'<b style="color:#1e8f4e">Sur site</b>'}</td>`; }
+    let tract='';
+    if(tractUsed){ const a=(S.autorisations||[]).find(z=>z.empId===c.empId&&_autoGroup(z)==='tractage'); tract=`<td class="c">${a?(a.dateExpiration?`✓<br><span style="font-size:8px">${disp(a.dateExpiration)}</span>`:'✓'):'<span style="color:#bbb">—</span>'}</td>`; }
+    const s=c.licExp?tSt(c.licExp):'na';
+    const lic=c.licExp?`<span style="color:${licClr[s]||'#333'};font-weight:700">${disp(c.licExp)}</span>`:(c.licNum?c.licNum:'<span style="color:#bbb">—</span>');
+    return `<tr><td class="emp"><b>${(emp.nom||'').toUpperCase()}</b> ${emp.prenom||''}</td>${tds}${presTd}${tract}<td class="c">${lic}</td></tr>`;
   }).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Certifying Staff</title>
-  <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
-  h1{font-size:17px;margin:0 0 4px}.sub{color:#666;font-size:11px;margin-bottom:14px}
-  table{border-collapse:collapse;margin-top:8px}th,td{border:1px solid #ccd;padding:5px 6px;font-size:10px}
-  th{background:#eef3fb;color:#1a2440}.emp{text-align:left;font-weight:700;white-space:nowrap;min-width:120px}
-  .c{text-align:center}.tri{font-family:monospace;font-weight:700}
-  th.rot{height:70px;white-space:nowrap;vertical-align:bottom}
-  th.rot>*{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto}
-  .legend{margin-top:14px;font-size:11px;color:#444}.foot{margin-top:20px;display:flex;align-items:center;gap:8px}</style></head><body>
-  <h1>Certifying Staff — habilitations avions</h1>
-  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${cols.length} type(s) avion</div>
-  <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}<th>Part 66</th></tr></thead><tbody>${trs}</tbody></table>
-  <div class="legend"><b>Légende :</b> <b style="color:#6a5acd">B1/B2/C</b> catégorie · <span style="color:#0a7ea4">T</span> taxiing · <span style="color:#c0562a">Idle / Max</span> point fixe · Part 66 = expiration licence</div>
+
+  const title=opts.title||'Certifying Staff — habilitations avions';
+  const sub=opts.sub||`Site LFBF · Établi le ${disp(fmt(new Date()))} · ${list.length} certifiant(s) · ${flatCols.length} type(s) avion`;
+  const presLeg=presCol?' · <b>Présence</b> sur la semaine (partiels notés)':'';
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
+  <style>@page{size:A4 landscape;margin:10mm}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:6px;font-size:11px}
+  h1{font-size:16px;margin:0 0 3px}.sub{color:#666;font-size:10px;margin-bottom:10px}
+  table{border-collapse:collapse;width:100%}
+  th,td{border:1px solid #cfd6e4;padding:4px 5px}
+  th{font-weight:700;font-size:9px;text-align:center}
+  .typ{font-weight:400;font-size:8px;line-height:1.25;vertical-align:bottom;min-width:64px}
+  .side{background:#eef3fb;color:#1a2440;vertical-align:middle;min-width:70px}
+  .emp{text-align:left;white-space:nowrap;background:#fafbfd}
+  .c{text-align:center;vertical-align:top}
+  .legend{margin-top:12px;font-size:10px;color:#444}.foot{margin-top:16px;display:flex;align-items:center;gap:8px}</style></head><body>
+  <h1>${title}</h1>
+  <div class="sub">${sub}</div>
+  <table>
+    <thead>
+      <tr><th rowspan="2" class="emp" style="vertical-align:middle">Nom Prénom</th>${gh}${extraTop}</tr>
+      <tr>${th2}</tr>
+    </thead>
+    <tbody>${trs}</tbody>
+  </table>
+  <div class="legend"><b>Légende :</b> <b>B1 / B2 / C</b> catégorie de certification · <b>Point fixe</b> Idle (ralenti) / Max (plein régime) · <b>Taxiing</b> autorisation de roulage · <b>Tractage avion</b> push back (par personne) · <b>Licence Part 66</b> échéance en couleur${presLeg}</div>
   <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
   </body></html>`;
-  openPrintView(html,'PDF — Certifying Staff');
+  openPrintView(html,opts.printTitle||'PDF — Certifying Staff');
+}
+
+/* ── Extrait de semaine : présence des certifiants sur site (PDF + Excel) ── */
+// Résumé habilitations condensé (texte) d'un certifiant
+function _certifHabSummary(c){
+  return (c.types||[]).filter(t=>t.type).map(t=>{
+    const parts=[]; if((t.cats||[]).length) parts.push(t.cats.join('/'));
+    const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
+    if(pf.length) parts.push('PF '+pf.join('+'));
+    if(t.taxi) parts.push('Taxi');
+    return `${t.type}${parts.length?' ('+parts.join(' · ')+')':''}`;
+  }).join(' · ');
+}
+// Personnes présentes (site + partiel) sur la semaine, triées, avec présence calculée
+function _certifWeekPresent(mon){
+  return (S.certifiants||[]).map(c=>({c,emp:byId(c.empId)}))
+    .filter(x=>x.emp && !x.emp.archived && !_empHorsEffectif(x.c.empId))
+    .map(x=>({...x, pres:_certifPresence(x.emp.id, mon)}))
+    .filter(x=>x.pres.status==='site' || x.pres.status==='partial')
+    .sort((a,b)=>`${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr',{sensitivity:'base'}));
+}
+
+function exportCertifWeekPDF(){
+  const mon=_certifWeekMon(), end=addD(mon,6);
+  const list=_certifWeekPresent(mon);
+  if(!list.length){ toast(`Aucun certifiant sur site en S${wkN(mon)}`); return; }
+  exportCertifPDF({
+    list,
+    presence:true,
+    title:`Certifying Staff — présents en semaine ${wkN(mon)}`,
+    sub:`Site LFBF · ${disp(fmt(mon))} → ${disp(fmt(end))} · ${list.length} certifiant(s) présent(s) sur site · absents toute la semaine non listés`,
+    printTitle:`Extrait S${wkN(mon)} — Certifiants sur site`
+  });
+}
+
+function exportCertifWeekXls(){
+  const mon=_certifWeekMon(), end=addD(mon,6);
+  const list=_certifWeekPresent(mon);
+  if(!list.length){ toast(`Aucun certifiant sur site en S${wkN(mon)}`); return; }
+  exportCertifXls({
+    list,
+    presence:true,
+    wk:wkN(mon),
+    sheetName:`Certifiants S${wkN(mon)}`,
+    fileName:`AeroStaff_Certifiants_S${wkN(mon)}.xlsx`,
+    toast:`✅ Extrait S${wkN(mon)} exporté`
+  });
 }
 
 
@@ -13675,7 +13912,7 @@ function aiGetContext(){
   });
 
   // Compute MH consumed per chantier (techniciens + intérimaires uniquement)
-  const EXCLURE_MH_AI=new Set(['chef','expert','manager','responsable']);
+  const EXCLURE_MH_AI=new Set(['chef','expert','manager','workshop','responsable']);
   const techOnlyIds=new Set(S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
   const mhInfo=chantiersActifs.map(c=>{
     let mhCons=0;
@@ -14179,7 +14416,7 @@ function aiListCategory(n){
 }
 
 function _catLabel(c){
-  return {responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant',expert:'Expert'}[c]||c;
+  return {responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant',expert:'Expert',workshop:'Workshop Manager'}[c]||c;
 }
 
 // ── Navigation depuis les réponses de l'assistant (réponses cliquables) ──
@@ -14642,7 +14879,7 @@ function aiEffectif(){
   const act=(S.personnel||[]).filter(p=>p.actif!==false);
   const byCat={};
   act.forEach(p=>{byCat[p.categorie]=(byCat[p.categorie]||0)+1;});
-  const order=['responsable','chef','expert','technicien','part21','iq','recycling','interimaire','prestataire','alternant','stagiaire'];
+  const order=['responsable','chef','expert','workshop','technicien','part21','iq','recycling','interimaire','prestataire','alternant','stagiaire'];
   const prod=(byCat['technicien']||0)+(byCat['interimaire']||0);
   let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">👥 Effectif total : ${act.length} personne(s)</div>`;
   html+=order.filter(c=>byCat[c]).map(c=>`<div style="margin-bottom:2px">• <strong>${byCat[c]}</strong> ${_catLabel(c)}</div>`).join('');
@@ -14731,7 +14968,7 @@ function aiAnswerMois(moisIdx,n){
 
 // ── Infos d'une personne ──
 function aiAnswerPerson(p){
-  const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert'}[p.categorie]||p.categorie;
+  const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert',workshop:'Workshop Manager'}[p.categorie]||p.categorie;
   let html=`<div style="font-weight:800;color:#c0e0ff;font-size:15px">${p.nom} ${p.prenom}</div>
   <div style="font-size:11px;color:#8090a8;margin-bottom:8px">${p.trigramme||''} · ${cat} · ${p.contrat||''}</div>`;
   const forms=(S.formations||[]).filter(f=>f.empId===p.id);
@@ -16659,7 +16896,7 @@ function exportMasterPDF(){
 
   let lastGroup=undefined;let bodyRows='';
   const numCols=dates.length+1;
-  const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
+  const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',workshop:'🛠',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
   emps.forEach(emp=>{
     const gKey=emp.categorie||'autre';
     if(gKey!==lastGroup){
@@ -16922,7 +17159,7 @@ async function _buildColoredWeekXls(){
   // Couleurs catégories (résolues)
   const cs=getComputedStyle(document.documentElement);
   const catCol=c=>{
-    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
     const v=cs.getPropertyValue(map[c]||'').trim();
     return v?v.replace('#',''):'cccccc';
   };
@@ -17047,7 +17284,7 @@ async function _buildColoredMasterXls(){
 
   const cs=getComputedStyle(document.documentElement);
   const catCol=c=>{
-    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
     let v=cs.getPropertyValue(map[c]||'').trim();
     if(!v){const cc=CATS[c]?.col||'';if(cc.startsWith('#'))v=cc;else if(cc.startsWith('var(')){v=cs.getPropertyValue(cc.slice(4,-1).trim()).trim();}}
     return v?v.replace('#',''):'cccccc';
