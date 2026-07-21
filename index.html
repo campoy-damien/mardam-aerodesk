@@ -1160,6 +1160,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <button class="tab" id="tb-personnel" onclick="goTab('personnel')">👥 Personnel</button>
   <button class="tab" id="tb-todo"      onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
   <button class="tab" id="tb-autorisations" onclick="goTab('autorisations')">🛡 Autorisations<span class="tab-notif" id="nt-auto"></span></button>
+  <button class="tab" id="tb-certif" onclick="goTab('certif')">🛫 Certifying Staff<span class="tab-notif" id="nt-certif"></span></button>
   <button class="tab" id="tb-programme" onclick="goTab('programme')">📊 Programme Activité</button>
   <button class="tab" id="tb-kpi" onclick="goTab('kpi')">📈 Tableau KPI</button>
   <button class="tab" id="tb-airbus" onclick="goTab('airbus')">🛩 Airbus Activité</button>
@@ -1215,10 +1216,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="fgrid" style="margin-bottom:0">
         <div class="field"><label>Employé</label><select id="flt-emp" onchange="renderForms()"><option value="">Tous</option></select></div>
         <div class="field"><label>Type</label>
-          <select id="flt-type" onchange="renderForms()">
+          <select id="flt-type" onchange="renderForms()" style="text-transform:uppercase">
             <option value="">Tous</option>
             <option>CACES NACELLE</option><option>CACES CHARIOT</option><option>CACES TRACMA</option><option>CACES TELESCO</option><option>CACES GERBEUR</option><option>EWIS</option><option>CDCCL</option><option>SAFETY TRAINING</option>
-            <option>English Test</option><option>MOE / PART 145</option><option>Welcome HSE</option>
+            <option>English Test</option><option>MOE / PART 145</option><option>ACCUEIL HSE</option>
             <option>Travail en hauteur</option>
             <option>Risque chimiques</option><option>Compétences</option><option>Licence Part 66</option><option>Pushback</option>
           </select>
@@ -1743,7 +1744,31 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 </div><!-- /pg-autorisations -->
 
-<!-- PROGRAMME ACTIVITÉ -->
+<!-- CERTIFYING STAFF -->
+<div class="page" id="pg-certif">
+  <div class="sh">
+    <div>
+      <div class="sh-title">🛫 Certifying Staff</div>
+      <div id="certif-count" style="color:var(--t3);font-size:13px;margin-top:4px">Habilitations avions · Licence Part 66</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-cyan btn-sm" onclick="openCertifFiche('')">➕ Nouvelle fiche</button>
+      <button class="btn btn-cyan btn-sm" onclick="exportCertifXls()">📊 Export Excel</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCertifPDF()">📄 Export PDF</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:6px 0 12px">
+    <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="certif-search" placeholder="Nom, prénom ou trigramme…" oninput="renderCertif()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:220px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
+    <div style="font-size:11px;color:var(--t3);display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <span><span style="display:inline-block;padding:0 6px;border-radius:99px;background:rgba(124,110,230,0.18);color:#b9aeff;font-weight:700">B1</span> catégorie</span>
+      <span><span style="display:inline-block;width:18px;text-align:center;border-radius:3px;background:rgba(0,210,255,0.15);color:var(--cyan);font-weight:700">T</span> taxiing</span>
+      <span><span style="display:inline-block;padding:0 5px;border-radius:3px;background:rgba(239,159,39,0.18);color:#ffbf5a;font-weight:700">Idle</span> ralenti</span>
+      <span><span style="display:inline-block;padding:0 5px;border-radius:3px;background:rgba(216,90,48,0.2);color:#ff8a5c;font-weight:700">Max</span> plein régime</span>
+    </div>
+  </div>
+  <div id="certifMatrixBox"></div>
+</div><!-- /pg-certif -->
+
 <!-- PROGRAMME ACTIVITÉ -->
 <div class="page" id="pg-programme">
   <div class="sh">
@@ -2712,19 +2737,20 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="Global Refresh">🔄 Global Refresh (met à jour EWIS + CDCCL + Safety Training + MOE/PART 145)</option>
         <option value="EWIS">EWIS</option>
         <option value="CDCCL">CDCCL</option>
-        <option value="Safety Training">Safety Training</option>
+        <option value="Safety Training">SAFETY TRAINING</option>
         <option value="MOE/PART 145">MOE/PART 145</option>
-        <option value="Competencies">Competencies</option>
+        <option value="Competencies">COMPETENCIES</option>
         <option value="CACES CHARIOT">CACES CHARIOT</option>
         <option value="CACES TRACMA">CACES TRACMA</option>
         <option value="CACES NACELLE">CACES NACELLE</option>
-        <option value="WELCOME HSE">WELCOME HSE</option>
+        <option value="CACES TELESCO">CACES TELESCO</option>
+        <option value="CACES GERBEUR">CACES GERBEUR</option>
         <option value="TRAVAIL EN HAUTEUR">TRAVAIL EN HAUTEUR</option>
         <option value="RISQUE CHIMIQUE">RISQUE CHIMIQUE</option>
-        <option value="ACCEUIL MOE">ACCEUIL MOE</option>
+        <option value="ACCUEIL HSE">ACCUEIL HSE</option>
         <option value="AIRE DE TRAFFIC">AIRE DE TRAFFIC</option>
         <option value="NEW ARRIVAL TRAINING">NEW ARRIVAL TRAINING</option>
-        <option value="Aircraft Dismantling Process">Aircraft Dismantling Process</option>
+        <option value="Aircraft Dismantling Process">AIRCRAFT DISMANTLING PROCESS</option>
       </select>
       <div style="font-size:10px;color:var(--t4);margin-top:5px">📅 Le lendemain de la formation, l'app vous demandera confirmation pour mettre la formation à jour.</div>
     </div>
@@ -2758,6 +2784,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="week">Semaine entière (cet employé)</option>
         <option value="custom">Jours personnalisés...</option>
         <option value="multiweek">Plusieurs semaines...</option>
+        <option value="range">De date à date...</option>
       </select>
     </div>
 
@@ -2857,6 +2884,22 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         </div>
       </div>
     </div>
+
+    <!-- De date à date -->
+    <div id="cellDateRange" style="display:none;margin-top:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Période à remplir (jours ouvrés, AM + PM)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="margin:0">
+          <label>Du</label>
+          <input type="date" id="cellRangeStart" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t1);padding:8px;font-family:'Outfit',sans-serif;box-sizing:border-box">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Au</label>
+          <input type="date" id="cellRangeEnd" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t1);padding:8px;font-family:'Outfit',sans-serif;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:8px">Les week-ends et jours fériés sont ignorés automatiquement.</div>
+    </div>
   </div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-cell')">Annuler</button>
@@ -2876,7 +2919,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field" style="grid-column:1/-1"><label>Type de formation *</label>
       <select id="f-type">
         <option>CACES NACELLE</option><option>CACES CHARIOT</option><option>CACES TRACMA</option><option>CACES TELESCO</option><option>CACES GERBEUR</option><option>EWIS</option><option>CDCCL</option><option>SAFETY TRAINING</option>
-        <option>English Test</option><option>MOE / PART 145</option><option>Welcome HSE</option>
+        <option>English Test</option><option>MOE / PART 145</option><option>ACCUEIL HSE</option>
         <option>Travail en hauteur</option>
         <option>Risque chimiques</option><option>Compétences</option>
         <option>Licence Part 66</option><option>Pushback</option><option>Autre</option>
@@ -3464,6 +3507,33 @@ function saveToFile(data) {
 </div>
 </div>
 
+<!-- Modal Fiche Certifying Staff -->
+<div class="mbg" id="m-certif">
+<div class="modal" style="max-width:720px">
+  <div class="modal-title">🛫 Fiche Certifying Staff</div>
+  <div class="fgrid">
+    <div class="field" style="grid-column:1/-1"><label>Employé *</label><select id="cf-emp"></select></div>
+    <div class="field"><label>Licence Part 66 — N°</label><input type="text" id="cf-licnum" placeholder="Ex: FR.66.12845"></div>
+    <div class="field"><label>Licence Part 66 — Expiration</label><input type="date" id="cf-licexp"></div>
+  </div>
+  <div id="cf-taxihint" style="display:none;margin:8px 0 4px;padding:8px 12px;border-radius:8px;background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);font-size:12px;color:var(--cyan)">
+    ℹ️ Taxi trouvé dans les documents importés (exp. <span id="cf-taxidate">—</span>). Cochez « Taxiing » sur les types concernés.
+  </div>
+  <div style="margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);font-weight:700">Types avion qualifiés</label>
+      <button type="button" class="btn btn-cyan btn-xs" onclick="certifAddType()">➕ Ajouter un type</button>
+    </div>
+    <div id="cf-types"></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-certif')">Annuler</button>
+    <button class="btn btn-rose btn-sm" id="cf-delbtn" onclick="delCertif()" style="display:none">🗑 Supprimer</button>
+    <button class="btn btn-cyan" onclick="saveCertif()">Sauvegarder</button>
+  </div>
+</div>
+</div>
+
 <!-- Modal Extrait du jour -->
 <div class="mbg" id="m-dayextract">
 <div class="modal" style="max-width:440px">
@@ -3503,8 +3573,15 @@ function saveToFile(data) {
 /* ═══════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════ */
-const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','Welcome HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback','Aircraft Dismantling','Visite Médicale'];
+const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','ACCUEIL HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback','Aircraft Dismantling','Visite Médicale'];
 const AUTORISATIONS_LIST = ['AMEC','ASTO','IMEC','ISTO','AELE','IELE','ASTR','ISTR','ACOM','ICOM','AENB','IENB','ABAT','IBAT','RUN','PART21','IPNT'];
+// ── Segrégation Autorisations : Tractage avion (push back) vs Conduite d'engins ──
+const TRACTAGE_LABEL='Tractage avion';
+const _isPushback=t=>/push[\s-]*back/i.test(String(t||''));          // PUSHBACK / PUSH BACK / PUSH-BACK
+const _isTaxiCol=t=>/^taxi(ing|ng)?$/i.test(String(t||'').trim());   // TAXI / TAXING / TAXIING (retiré des autorisations)
+const _isWeightCol=t=>/^weig(ht)?/i.test(String(t||'').trim());      // WEIG / WEIGHT ... (supprimé)
+// Groupe d'une autorisation : 'tractage' si marqué grp ou libellé pushback, sinon 'conduite'
+const _autoGroup=a=>{ if(!a) return 'conduite'; if(a.grp==='tractage') return 'tractage'; if(_isPushback(a.type)) return 'tractage'; return 'conduite'; };
 const MO = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const D3 = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const CCOLORS = ['#2962FF','#00ACC1','#00897B','#43A047','#9E9D24','#F57F17','#E64A19','#E53935','#D81B60','#8E24AA','#5E35B1','#3949AB','#6D4C41','#546E7A','#0288D1','#7CB342','#FF7043','#EC407A','#6A1B9A','#283593','#1B5E20','#AD1457','#827717','#00838F'];
@@ -3558,6 +3635,16 @@ const parseLocal = s=>{ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2
 const getMon= d=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); const w=x.getDay(); x.setDate(x.getDate()-(w===0?6:w-1)); x.setHours(0,0,0,0); return x; };
 const wkN   = d=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+3-(x.getDay()+6)%7); const w1=new Date(x.getFullYear(),0,4); return 1+Math.round(((x-w1)/86400000-3+(w1.getDay()+6)%7)/7); };
 const byId  = id=>S.personnel.find(p=>p.id===id);
+
+// Vrai si la personne n'est plus dans les effectifs (archivée, ou intérimaire/CDI passé inactif).
+// Utilisé pour ne plus générer de rappels formations/autorisations ni polluer les onglets.
+function _empHorsEffectif(empId){
+  const e=byId(empId);
+  if(!e) return true;                 // introuvable → à ignorer
+  if(e.archived) return true;         // ancien CDI archivé
+  if(e.actif===false) return true;    // intérimaire hors production / inactif
+  return false;
+}
 
 // Utilitaires UI réinjectés
 function toast(msg){
@@ -3664,11 +3751,11 @@ const RH_MAP_QUALITE={
   'English':'English Test',
   'Competencies':'Compétences',
   'Aircraft Dismantling Process':'Aircraft Dismantling',
-  'Welcome':'Welcome HSE'
+  'Welcome':'ACCUEIL HSE'
   // Ignorés : HF & SMS, Delta Safety Training, Global Refresh
 };
 const RH_MAP_SSE={
-  'Welcome':'Welcome HSE',
+  'Welcome':'ACCUEIL HSE',
   'RISQUES CHIMIQUES':'Risque chimiques',
   'TRAVAIL EN HAUTEUR':'Travail en hauteur',
   'MEDICAL VISIT':'Visite Médicale',
@@ -4100,7 +4187,7 @@ function doCPwd(){
     const PROD_VERSION='2026-05-23';
     const alreadyLoaded=_safeStorage.getItem('asp4_prod_version');
     if(alreadyLoaded!==PROD_VERSION){
-      const prodData={"personnel":[{"id":"x1779111740033ay3","prenom":"Benoit","nom":"Couthouly","trigramme":"CTY","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111775911vvj","prenom":"Baher","nom":"Mikdart","trigramme":"BMI","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111821278bhq","prenom":"Antoine","nom":"WUITHIER","trigramme":"WTR","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111855385awf","prenom":"José","nom":"SANCHEZ","trigramme":"SLS","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791119039414wc","prenom":"Adrien","nom":"ABERT","trigramme":"ADA","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111948609b8t","prenom":"Yosmel","nom":"PEREZ ALVAREZ","trigramme":"PEY","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111988073du0","prenom":"Zakariyae","nom":"N'HILI","trigramme":"ZAN","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112051314zlu","prenom":"Julien","nom":"GUILLOSSOU","trigramme":"GUJ","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112078441dy8","prenom":"Mohamed","nom":"BAOU","trigramme":"BOU","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112109325y54","prenom":"Gwendolynn","nom":"BESNARD","trigramme":"GWB","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112143277qtn","prenom":"Roberto","nom":"CASTANON","trigramme":"CST","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112179039hiz","prenom":"Christopher","nom":"CASTERS","trigramme":"CTS","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112241444xw2","prenom":"CAZEMAJOU","nom":"Pierre-Louis","trigramme":"PLC","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112287187ey1","prenom":"DELACRUZ","nom":"Cherrisma","trigramme":"CDC","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112351235t8e","prenom":"DAVID","nom":"Angélique","trigramme":"DVD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"2026-05-18","dateFin":""},{"id":"x17791123849106iz","prenom":"Corentin","nom":"DEMATONS","trigramme":"COD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112407290y2d","prenom":"Rami","nom":"DHIBI","trigramme":"RAD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791124458825r8","prenom":"Pouya","nom":"ENAYAT KHANI","trigramme":"POE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112478930t5h","prenom":"Faatoa","nom":"HAPAIRAI","trigramme":"HAF","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791125109519na","prenom":"Axel","nom":"KACI","trigramme":"KCI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791125770963b8","prenom":"El miloud","nom":"KADDOURI","trigramme":"KDI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112635277h6n","prenom":"Wassil","nom":"LATRECHE","trigramme":"LHE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791126635162ap","prenom":"Terence","nom":"NIRDE","trigramme":"TEN","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112689762gy9","prenom":"Raphaelle","nom":"NUX","trigramme":"NUX","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791127130759lc","prenom":"Enzo","nom":"PARDO","trigramme":"EPA","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791127397804yk","prenom":"Vincent","nom":"QUESSARD","trigramme":"QSD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112767142iyw","prenom":"Pierre","nom":"RENTSCH","trigramme":"PRH","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791128000475fl","prenom":"Ronan","nom":"SCHOEMAECKER","trigramme":"SCR","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112818814st2","prenom":"Thomas","nom":"STYLES","trigramme":"THS","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112841889aha","prenom":"Larbi","nom":"TAOUSSI","trigramme":"TSI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791128645048di","prenom":"Martin","nom":"ZORDAN","trigramme":"ZDN","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779113006763sed","prenom":"Walid","nom":"RAHALI","trigramme":"RHI","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791210380280qc","prenom":"Florence","nom":"ANCILOTTI","trigramme":"NLT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121235298ry4","prenom":"Jésus","nom":"ALONZO","trigramme":"ANO","categorie":"expert","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121288854xrf","prenom":"Benjamin","nom":"CASTEROU","trigramme":"CTU","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121309706785","prenom":"Nicolas","nom":"COLLOT","trigramme":"NCO","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912134594823m","prenom":"Romain","nom":"MOULIES","trigramme":"MLS","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121372321f87","prenom":"Pascal","nom":"POIRIER","trigramme":"POP","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791214077486in","prenom":"Gregory","nom":"FAIX","trigramme":"GFX","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121890379jzt","prenom":"Slim","nom":"AGUILOU","trigramme":"AIU","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121946946gkm","prenom":"Mustapha","nom":"BAHLOUL","trigramme":"BLM","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779122023746dod","prenom":"Antony","nom":"CATERINA","trigramme":"AHC","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779122203565yr9","prenom":"Fabien","nom":"DELHUMEAU","trigramme":"FDE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779125906826mru","prenom":"Jean-francois","nom":"CHASSONERIE","trigramme":"CAE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779125967766kof","prenom":"Abderhaman","nom":"CHAYADMI","trigramme":"CYI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791260214772te","prenom":"Patrice","nom":"BRANGER","trigramme":"BGR","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791264761015vd","prenom":"Lionel","nom":"KEROMNES","trigramme":"KRS","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126529492kgo","prenom":"Patrice","nom":"DUPONT","trigramme":"DPT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126559808k3y","prenom":"Adel","nom":"GHAZOUANI","trigramme":"AGH","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126590454yoa","prenom":"Hichem","nom":"GHAZOUANI","trigramme":"HGH","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791266317870as","prenom":"Mickael","nom":"GOHE","trigramme":"MGO","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126654329w10","prenom":"Alexis","nom":"GOULET","trigramme":"GUT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126694429l5w","prenom":"Erwan","nom":"HALUATR","trigramme":"HUR","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126733025vs6","prenom":"Pierre","nom":"Saint-criq","trigramme":"SAP","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791267959705uo","prenom":"Kamel","nom":"HATIF","trigramme":"MTF","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126978468bn8","prenom":"Kevin","nom":"IVAHA","trigramme":"IAA","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127070180ua0","prenom":"HAYTEM","nom":"KALLALA","trigramme":"KLA","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127169376gl6","prenom":"Pierre-jean","nom":"POUSSARD","trigramme":"PJE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127200829upf","prenom":"Cedric","nom":"KOATAIBA","trigramme":"CKO","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127223453g2u","prenom":"Paul","nom":"KORNGUT","trigramme":"KNT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127243067j41","prenom":"Emmanuel","nom":"CONSEIL","trigramme":"COE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127273023kjz","prenom":"Arnaud","nom":"LARIGALDIE","trigramme":"ARL","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127309629f25","prenom":"Lorenzo","nom":"MICCOLI","trigramme":"LMI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791273368217ms","prenom":"Dan","nom":"MIGUET","trigramme":"MUT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127377554ht1","prenom":"Willies","nom":"MORSI","trigramme":"WMI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791274043498r6","prenom":"Jean-pierre","nom":"NORMANT","trigramme":"NOP","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127439291fjr","prenom":"Jamel","nom":"OMRI","trigramme":"ORI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127462516e35","prenom":"Joel","nom":"RENAUD","trigramme":"RUD","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127487287985","prenom":"Stéphane","nom":"RDRIGUEZ","trigramme":"ROD","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127606561nit","prenom":"Youcef","nom":"HAMDANI","trigramme":"HAI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127669428yxe","prenom":"Rodolphe","nom":"SIROUGNET","trigramme":"SGT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791277226704zq","prenom":"Vincent","nom":"DRUJON","trigramme":"DRV","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127869002eiv","prenom":"Hugo","nom":"CALAIS","trigramme":"CIS","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127904177hur","prenom":"Dimitri","nom":"GOYETTE","trigramme":"GYE","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791279485109bo","prenom":"Claire","nom":"GRATIEN","trigramme":"GIN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128002031hxo","prenom":"Jean-felix","nom":"KOCK AM BRINK","trigramme":"KAK","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912802348070p","prenom":"Jerome","nom":"RAYAPIN","trigramme":"RPN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791280580514dz","prenom":"Leo","nom":"SINGARIN","trigramme":"SGN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128086363074","prenom":"Robin","nom":"TOZZATO","trigramme":"TZO","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912815184724g","prenom":"Pierrre-jean","nom":"DE BORTOLI","trigramme":"PJD","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912817430191o","prenom":"Florent","nom":"LENIVET","trigramme":"FLN","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128212680o2j","prenom":"Céline","nom":"COLLADO","trigramme":"COL","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128253913gtf","prenom":"Christian","nom":"BANOS","trigramme":"BNS","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791282930388pi","prenom":"Jordan","nom":"JULIEN","trigramme":"JUJ","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128352588vhe","prenom":"Stephane","nom":"PERRIN","trigramme":"PRN","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""}],"formations":[{"id":"x17791764048120e5","empId":"x1779111740033ay3","type":"CACES NACELLE","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176462717uod","empId":"x1779111740033ay3","type":"CACES CHARIOT","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176494567yw2","empId":"x1779111740033ay3","type":"CACES TRACMA","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176567562dkk","empId":"x1779111740033ay3","type":"CACES TELESCO","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176604340mo7","empId":"x1779111740033ay3","type":"EWIS","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x17791766473471ps","empId":"x1779111740033ay3","type":"CDCCL","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176693123c7i","empId":"x1779111740033ay3","type":"SAFETY TRAINING","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176739863g3a","empId":"x1779111740033ay3","type":"SAFETY TRAINING","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x17791767804075q8","empId":"x1779111740033ay3","type":"English Test","dateObtention":"","dateExpiration":"2027-12-02","notes":""},{"id":"x1779176817593w0v","empId":"x1779111740033ay3","type":"MOE / PART 145","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176902042xy4","empId":"x1779111740033ay3","type":"Welcome HSE","dateObtention":"","dateExpiration":"2028-01-18","notes":""},{"id":"x1779176977750k2o","empId":"x1779111740033ay3","type":"Travail en hauteur","dateObtention":"","dateExpiration":"2027-03-23","notes":""},{"id":"x17791770395261h2","empId":"x1779111740033ay3","type":"Risque chimiques","dateObtention":"","dateExpiration":"2027-07-28","notes":""},{"id":"x1779177119420gp9","empId":"x1779111740033ay3","type":"Compétences","dateObtention":"","dateExpiration":"2027-02-24","notes":""},{"id":"x1779177154651vkz","empId":"x1779111740033ay3","type":"Licence Part 66","dateObtention":"","dateExpiration":"2029-12-11","notes":""}],"planning":{"x17791119039414wc_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x1779111740033ay3_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111775911vvj_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111988073du0_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779122203565yr9_2026-05-25_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-25_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-26_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-26_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-27_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-27_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-28_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-28_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-29_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-29_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779111855385awf_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"}},"chantiers":[{"id":"x1779172633021zsg","nom":"55275","client":"AIR FRANCE ","statut":"encours","resp":"x17791282930388pi","chef":"x1779111740033ay3","debut":"2026-05-11","fin":"2026-06-05","desc":"","equipe":[],"color":"#2979ff","ressources":{"technicien":12},"manHours":0},{"id":"x1779172691615g6o","nom":"STRU","client":"","statut":"encours","resp":"","chef":"x17791119039414wc","debut":"2026-01-01","fin":"2026-12-31","desc":"Activité structure sur les chantiers cours ","equipe":[],"color":"#c084fc","ressources":{},"manHours":0},{"id":"x1779172805344iw0","nom":"PART21","client":"AIRBUS","statut":"encours","resp":"","chef":"x1779111988073du0","debut":"2026-01-01","fin":"2026-12-31","desc":"Activité FRC pour Airbus PART21","equipe":[],"color":"#00e5b0","ressources":{},"manHours":0},{"id":"x1779172938321v2l","nom":"STO","client":"","statut":"futur","resp":"x1779128212680o2j","chef":"x1779111775911vvj","debut":"2026-01-01","fin":"2026-12-31","desc":"","equipe":[],"color":"#ff9a3c","ressources":{},"manHours":0},{"id":"x1779185068237cmi","nom":"3441","client":"AIR FRANCE ","statut":"encours","resp":"x1779128352588vhe","chef":"x1779111855385awf","debut":"2026-04-30","fin":"2026-05-29","desc":"Phase out + changement de train ","equipe":[],"color":"#ff6b9d","ressources":{"technicien":4},"manHours":0},{"id":"x177918528929642e","nom":"12142","client":"AIRBUS PART 145","statut":"encours","resp":"x1779128253913gtf","chef":"x1779111821278bhq","debut":"2025-12-18","fin":"2026-05-29","desc":"Modification Cabine ","equipe":[],"color":"#a78bfa","ressources":{"technicien":6},"manHours":0},{"id":"x1779185386713uz3","nom":"5598","client":"AIRBUS / JETSTAR","statut":"encours","resp":"x177912815184724g","chef":"x1779111948609b8t","debut":"2026-04-01","fin":"2026-05-29","desc":"","equipe":[],"color":"#84fab0","ressources":{"technicien":4},"manHours":0},{"id":"x1779185649466pv8","nom":"5796","client":"AIRBUS / JETSTAR ","statut":"futur","resp":"","chef":"x1779111948609b8t","debut":"2026-05-25","fin":"2026-08-14","desc":"","equipe":[],"color":"#84fab0","ressources":{"technicien":8},"manHours":0},{"id":"x1779185876045wtj","nom":"50017","client":"SWISS","statut":"termine","resp":"x177912817430191o","chef":"x1779111740033ay3","debut":"2026-05-04","fin":"2026-05-15","desc":"Engine removal ","equipe":[],"color":"#ffd060","ressources":{"technicien":4},"manHours":0},{"id":"x177918598417994l","nom":"9388","client":"CCB","statut":"futur","resp":"x177912815184724g","chef":"x1779113006763sed","debut":"2026-05-18","fin":"2026-05-22","desc":"Engine removal ","equipe":[],"color":"#ff6b9d","ressources":{"technicien":3},"manHours":0},{"id":"x1779186076962g7a","nom":"50013","client":"SWISS ","statut":"futur","resp":"x1779128352588vhe","chef":"x1779111855385awf","debut":"2026-05-18","fin":"2026-06-26","desc":"PART OUT 145","equipe":[],"color":"#ffd060","ressources":{"technicien":6},"manHours":0}],"todos":[{"id":"x1779172433518eo3","text":"Congé intermin et personnel prod","priority":"high","due":"2026-05-22","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x177917245308580v","text":"cp Faatoa","priority":"medium","due":"2026-05-29","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x177917249362336y","text":"habilitation compétence reviews apres formation MOE","priority":"high","due":"2026-05-27","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x1779172529247m9j","text":"rentsch Formation TLB ODM","priority":"low","due":"2027-01-20","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x1779172556280ac9","text":"ACHAT MAGNET TABLEAU AVION","priority":"low","due":"2026-05-29","assign":"","done":false,"createdAt":"2026-05-19"}],"holidays":[{"date":"2026-01-01","name":"Jour de l'an"},{"date":"2026-04-06","name":"Lundi de Pâques"},{"date":"2026-05-01","name":"Fête du Travail"},{"date":"2026-05-08","name":"Victoire 1945"},{"date":"2026-05-14","name":"Ascension"},{"date":"2026-07-14","name":"Fête Nationale"},{"date":"2026-08-15","name":"Assomption"},{"date":"2026-11-01","name":"Toussaint"},{"date":"2026-11-11","name":"Armistice"},{"date":"2026-12-25","name":"Noël"}],"autorisations":[{"id":"x1779176322750ptn","empId":"x1779111740033ay3","type":"AMEC","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750ryo","empId":"x1779111740033ay3","type":"ASTO","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750zpl","empId":"x1779111740033ay3","type":"IMEC","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x17791763227506xl","empId":"x1779111740033ay3","type":"ISTO","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750u7k","empId":"x1779111740033ay3","type":"AELE","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x17791763227504gl","empId":"x1779111740033ay3","type":"IELE","dateObtention":"","dateExpiration":"2027-05-06","notes":""}],"stockage":{"avions":[],"mhHebdo":{"2026-S21":{"total":450}},"config":{"resp":"","chef":""}},"weekStart":"2026-05-24T22:00:00.000Z","masterMonth":4,"masterYear":2026,"gdrive":{"connected":true,"fileId":null,"clientId":"","userEmail":"","lastSync":"2026-05-21T14:19:02.677Z","gasUrl":"https://script.google.com/macros/s/AKfycbwemMQ54nLSJQgnlsAcTq213n9w95egLbNboKZLHb28AO3urHC62ftHAkHO3ntvQkH3mw/exec","lastPushOk":true}};
+      const prodData={"personnel":[{"id":"x1779111740033ay3","prenom":"Benoit","nom":"Couthouly","trigramme":"CTY","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111775911vvj","prenom":"Baher","nom":"Mikdart","trigramme":"BMI","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111821278bhq","prenom":"Antoine","nom":"WUITHIER","trigramme":"WTR","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111855385awf","prenom":"José","nom":"SANCHEZ","trigramme":"SLS","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791119039414wc","prenom":"Adrien","nom":"ABERT","trigramme":"ADA","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111948609b8t","prenom":"Yosmel","nom":"PEREZ ALVAREZ","trigramme":"PEY","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779111988073du0","prenom":"Zakariyae","nom":"N'HILI","trigramme":"ZAN","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112051314zlu","prenom":"Julien","nom":"GUILLOSSOU","trigramme":"GUJ","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112078441dy8","prenom":"Mohamed","nom":"BAOU","trigramme":"BOU","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112109325y54","prenom":"Gwendolynn","nom":"BESNARD","trigramme":"GWB","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112143277qtn","prenom":"Roberto","nom":"CASTANON","trigramme":"CST","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112179039hiz","prenom":"Christopher","nom":"CASTERS","trigramme":"CTS","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112241444xw2","prenom":"CAZEMAJOU","nom":"Pierre-Louis","trigramme":"PLC","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112287187ey1","prenom":"DELACRUZ","nom":"Cherrisma","trigramme":"CDC","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112351235t8e","prenom":"DAVID","nom":"Angélique","trigramme":"DVD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"2026-05-18","dateFin":""},{"id":"x17791123849106iz","prenom":"Corentin","nom":"DEMATONS","trigramme":"COD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112407290y2d","prenom":"Rami","nom":"DHIBI","trigramme":"RAD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791124458825r8","prenom":"Pouya","nom":"ENAYAT KHANI","trigramme":"POE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112478930t5h","prenom":"Faatoa","nom":"HAPAIRAI","trigramme":"HAF","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791125109519na","prenom":"Axel","nom":"KACI","trigramme":"KCI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791125770963b8","prenom":"El miloud","nom":"KADDOURI","trigramme":"KDI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112635277h6n","prenom":"Wassil","nom":"LATRECHE","trigramme":"LHE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791126635162ap","prenom":"Terence","nom":"NIRDE","trigramme":"TEN","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112689762gy9","prenom":"Raphaelle","nom":"NUX","trigramme":"NUX","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791127130759lc","prenom":"Enzo","nom":"PARDO","trigramme":"EPA","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791127397804yk","prenom":"Vincent","nom":"QUESSARD","trigramme":"QSD","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112767142iyw","prenom":"Pierre","nom":"RENTSCH","trigramme":"PRH","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791128000475fl","prenom":"Ronan","nom":"SCHOEMAECKER","trigramme":"SCR","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112818814st2","prenom":"Thomas","nom":"STYLES","trigramme":"THS","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779112841889aha","prenom":"Larbi","nom":"TAOUSSI","trigramme":"TSI","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791128645048di","prenom":"Martin","nom":"ZORDAN","trigramme":"ZDN","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779113006763sed","prenom":"Walid","nom":"RAHALI","trigramme":"RHI","categorie":"chef","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791210380280qc","prenom":"Florence","nom":"ANCILOTTI","trigramme":"NLT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121235298ry4","prenom":"Jésus","nom":"ALONZO","trigramme":"ANO","categorie":"expert","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121288854xrf","prenom":"Benjamin","nom":"CASTEROU","trigramme":"CTU","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121309706785","prenom":"Nicolas","nom":"COLLOT","trigramme":"NCO","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912134594823m","prenom":"Romain","nom":"MOULIES","trigramme":"MLS","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121372321f87","prenom":"Pascal","nom":"POIRIER","trigramme":"POP","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791214077486in","prenom":"Gregory","nom":"FAIX","trigramme":"GFX","categorie":"expert","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121890379jzt","prenom":"Slim","nom":"AGUILOU","trigramme":"AIU","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779121946946gkm","prenom":"Mustapha","nom":"BAHLOUL","trigramme":"BLM","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779122023746dod","prenom":"Antony","nom":"CATERINA","trigramme":"AHC","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779122203565yr9","prenom":"Fabien","nom":"DELHUMEAU","trigramme":"FDE","categorie":"technicien","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779125906826mru","prenom":"Jean-francois","nom":"CHASSONERIE","trigramme":"CAE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779125967766kof","prenom":"Abderhaman","nom":"CHAYADMI","trigramme":"CYI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791260214772te","prenom":"Patrice","nom":"BRANGER","trigramme":"BGR","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791264761015vd","prenom":"Lionel","nom":"KEROMNES","trigramme":"KRS","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126529492kgo","prenom":"Patrice","nom":"DUPONT","trigramme":"DPT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126559808k3y","prenom":"Adel","nom":"GHAZOUANI","trigramme":"AGH","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126590454yoa","prenom":"Hichem","nom":"GHAZOUANI","trigramme":"HGH","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791266317870as","prenom":"Mickael","nom":"GOHE","trigramme":"MGO","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126654329w10","prenom":"Alexis","nom":"GOULET","trigramme":"GUT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126694429l5w","prenom":"Erwan","nom":"HALUATR","trigramme":"HUR","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126733025vs6","prenom":"Pierre","nom":"Saint-criq","trigramme":"SAP","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791267959705uo","prenom":"Kamel","nom":"HATIF","trigramme":"MTF","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779126978468bn8","prenom":"Kevin","nom":"IVAHA","trigramme":"IAA","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127070180ua0","prenom":"HAYTEM","nom":"KALLALA","trigramme":"KLA","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127169376gl6","prenom":"Pierre-jean","nom":"POUSSARD","trigramme":"PJE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127200829upf","prenom":"Cedric","nom":"KOATAIBA","trigramme":"CKO","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127223453g2u","prenom":"Paul","nom":"KORNGUT","trigramme":"KNT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127243067j41","prenom":"Emmanuel","nom":"CONSEIL","trigramme":"COE","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127273023kjz","prenom":"Arnaud","nom":"LARIGALDIE","trigramme":"ARL","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127309629f25","prenom":"Lorenzo","nom":"MICCOLI","trigramme":"LMI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791273368217ms","prenom":"Dan","nom":"MIGUET","trigramme":"MUT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127377554ht1","prenom":"Willies","nom":"MORSI","trigramme":"WMI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791274043498r6","prenom":"Jean-pierre","nom":"NORMANT","trigramme":"NOP","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127439291fjr","prenom":"Jamel","nom":"OMRI","trigramme":"ORI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127462516e35","prenom":"Joel","nom":"RENAUD","trigramme":"RUD","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127487287985","prenom":"Stéphane","nom":"RDRIGUEZ","trigramme":"ROD","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127606561nit","prenom":"Youcef","nom":"HAMDANI","trigramme":"HAI","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127669428yxe","prenom":"Rodolphe","nom":"SIROUGNET","trigramme":"SGT","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791277226704zq","prenom":"Vincent","nom":"DRUJON","trigramme":"DRV","categorie":"interimaire","contrat":"Intérim","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127869002eiv","prenom":"Hugo","nom":"CALAIS","trigramme":"CIS","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779127904177hur","prenom":"Dimitri","nom":"GOYETTE","trigramme":"GYE","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791279485109bo","prenom":"Claire","nom":"GRATIEN","trigramme":"GIN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128002031hxo","prenom":"Jean-felix","nom":"KOCK AM BRINK","trigramme":"KAK","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912802348070p","prenom":"Jerome","nom":"RAYAPIN","trigramme":"RPN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791280580514dz","prenom":"Leo","nom":"SINGARIN","trigramme":"SGN","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128086363074","prenom":"Robin","nom":"TOZZATO","trigramme":"TZO","categorie":"alternant","contrat":"Alternance","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912815184724g","prenom":"Pierrre-jean","nom":"DE BORTOLI","trigramme":"PJD","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x177912817430191o","prenom":"Florent","nom":"LENIVET","trigramme":"FLN","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128212680o2j","prenom":"Céline","nom":"COLLADO","trigramme":"COL","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128253913gtf","prenom":"Christian","nom":"BANOS","trigramme":"BNS","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x17791282930388pi","prenom":"Jordan","nom":"JULIEN","trigramme":"JUJ","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""},{"id":"x1779128352588vhe","prenom":"Stephane","nom":"PERRIN","trigramme":"PRN","categorie":"responsable","contrat":"CDI","tel":"","email":"","dateEmbauche":"","dateFin":""}],"formations":[{"id":"x17791764048120e5","empId":"x1779111740033ay3","type":"CACES NACELLE","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176462717uod","empId":"x1779111740033ay3","type":"CACES CHARIOT","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176494567yw2","empId":"x1779111740033ay3","type":"CACES TRACMA","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176567562dkk","empId":"x1779111740033ay3","type":"CACES TELESCO","dateObtention":"","dateExpiration":"2027-03-14","notes":""},{"id":"x1779176604340mo7","empId":"x1779111740033ay3","type":"EWIS","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x17791766473471ps","empId":"x1779111740033ay3","type":"CDCCL","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176693123c7i","empId":"x1779111740033ay3","type":"SAFETY TRAINING","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176739863g3a","empId":"x1779111740033ay3","type":"SAFETY TRAINING","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x17791767804075q8","empId":"x1779111740033ay3","type":"English Test","dateObtention":"","dateExpiration":"2027-12-02","notes":""},{"id":"x1779176817593w0v","empId":"x1779111740033ay3","type":"MOE / PART 145","dateObtention":"","dateExpiration":"2027-12-04","notes":""},{"id":"x1779176902042xy4","empId":"x1779111740033ay3","type":"ACCUEIL HSE","dateObtention":"","dateExpiration":"2028-01-18","notes":""},{"id":"x1779176977750k2o","empId":"x1779111740033ay3","type":"Travail en hauteur","dateObtention":"","dateExpiration":"2027-03-23","notes":""},{"id":"x17791770395261h2","empId":"x1779111740033ay3","type":"Risque chimiques","dateObtention":"","dateExpiration":"2027-07-28","notes":""},{"id":"x1779177119420gp9","empId":"x1779111740033ay3","type":"Compétences","dateObtention":"","dateExpiration":"2027-02-24","notes":""},{"id":"x1779177154651vkz","empId":"x1779111740033ay3","type":"Licence Part 66","dateObtention":"","dateExpiration":"2029-12-11","notes":""}],"planning":{"x17791119039414wc_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x17791119039414wc_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172691615g6o"},"x1779111740033ay3_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111740033ay3_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172633021zsg"},"x1779111775911vvj_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111775911vvj_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172938321v2l"},"x1779111988073du0_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-25_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-26_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-27_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-28_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779111988073du0_2026-05-29_PM":{"type":"travail","note":"","chantierId":"x1779172805344iw0"},"x1779122203565yr9_2026-05-25_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-25_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-26_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-26_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-27_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-27_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-28_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-28_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-29_AM":{"type":"formation","note":"Module 13","chantierId":""},"x1779122203565yr9_2026-05-29_PM":{"type":"formation","note":"Module 13","chantierId":""},"x1779111855385awf_2026-05-25_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-26_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-27_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-28_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"},"x1779111855385awf_2026-05-29_AM":{"type":"travail","note":"","chantierId":"x1779185068237cmi"}},"chantiers":[{"id":"x1779172633021zsg","nom":"55275","client":"AIR FRANCE ","statut":"encours","resp":"x17791282930388pi","chef":"x1779111740033ay3","debut":"2026-05-11","fin":"2026-06-05","desc":"","equipe":[],"color":"#2979ff","ressources":{"technicien":12},"manHours":0},{"id":"x1779172691615g6o","nom":"STRU","client":"","statut":"encours","resp":"","chef":"x17791119039414wc","debut":"2026-01-01","fin":"2026-12-31","desc":"Activité structure sur les chantiers cours ","equipe":[],"color":"#c084fc","ressources":{},"manHours":0},{"id":"x1779172805344iw0","nom":"PART21","client":"AIRBUS","statut":"encours","resp":"","chef":"x1779111988073du0","debut":"2026-01-01","fin":"2026-12-31","desc":"Activité FRC pour Airbus PART21","equipe":[],"color":"#00e5b0","ressources":{},"manHours":0},{"id":"x1779172938321v2l","nom":"STO","client":"","statut":"futur","resp":"x1779128212680o2j","chef":"x1779111775911vvj","debut":"2026-01-01","fin":"2026-12-31","desc":"","equipe":[],"color":"#ff9a3c","ressources":{},"manHours":0},{"id":"x1779185068237cmi","nom":"3441","client":"AIR FRANCE ","statut":"encours","resp":"x1779128352588vhe","chef":"x1779111855385awf","debut":"2026-04-30","fin":"2026-05-29","desc":"Phase out + changement de train ","equipe":[],"color":"#ff6b9d","ressources":{"technicien":4},"manHours":0},{"id":"x177918528929642e","nom":"12142","client":"AIRBUS PART 145","statut":"encours","resp":"x1779128253913gtf","chef":"x1779111821278bhq","debut":"2025-12-18","fin":"2026-05-29","desc":"Modification Cabine ","equipe":[],"color":"#a78bfa","ressources":{"technicien":6},"manHours":0},{"id":"x1779185386713uz3","nom":"5598","client":"AIRBUS / JETSTAR","statut":"encours","resp":"x177912815184724g","chef":"x1779111948609b8t","debut":"2026-04-01","fin":"2026-05-29","desc":"","equipe":[],"color":"#84fab0","ressources":{"technicien":4},"manHours":0},{"id":"x1779185649466pv8","nom":"5796","client":"AIRBUS / JETSTAR ","statut":"futur","resp":"","chef":"x1779111948609b8t","debut":"2026-05-25","fin":"2026-08-14","desc":"","equipe":[],"color":"#84fab0","ressources":{"technicien":8},"manHours":0},{"id":"x1779185876045wtj","nom":"50017","client":"SWISS","statut":"termine","resp":"x177912817430191o","chef":"x1779111740033ay3","debut":"2026-05-04","fin":"2026-05-15","desc":"Engine removal ","equipe":[],"color":"#ffd060","ressources":{"technicien":4},"manHours":0},{"id":"x177918598417994l","nom":"9388","client":"CCB","statut":"futur","resp":"x177912815184724g","chef":"x1779113006763sed","debut":"2026-05-18","fin":"2026-05-22","desc":"Engine removal ","equipe":[],"color":"#ff6b9d","ressources":{"technicien":3},"manHours":0},{"id":"x1779186076962g7a","nom":"50013","client":"SWISS ","statut":"futur","resp":"x1779128352588vhe","chef":"x1779111855385awf","debut":"2026-05-18","fin":"2026-06-26","desc":"PART OUT 145","equipe":[],"color":"#ffd060","ressources":{"technicien":6},"manHours":0}],"todos":[{"id":"x1779172433518eo3","text":"Congé intermin et personnel prod","priority":"high","due":"2026-05-22","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x177917245308580v","text":"cp Faatoa","priority":"medium","due":"2026-05-29","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x177917249362336y","text":"habilitation compétence reviews apres formation MOE","priority":"high","due":"2026-05-27","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x1779172529247m9j","text":"rentsch Formation TLB ODM","priority":"low","due":"2027-01-20","assign":"","done":false,"createdAt":"2026-05-19"},{"id":"x1779172556280ac9","text":"ACHAT MAGNET TABLEAU AVION","priority":"low","due":"2026-05-29","assign":"","done":false,"createdAt":"2026-05-19"}],"holidays":[{"date":"2026-01-01","name":"Jour de l'an"},{"date":"2026-04-06","name":"Lundi de Pâques"},{"date":"2026-05-01","name":"Fête du Travail"},{"date":"2026-05-08","name":"Victoire 1945"},{"date":"2026-05-14","name":"Ascension"},{"date":"2026-07-14","name":"Fête Nationale"},{"date":"2026-08-15","name":"Assomption"},{"date":"2026-11-01","name":"Toussaint"},{"date":"2026-11-11","name":"Armistice"},{"date":"2026-12-25","name":"Noël"}],"autorisations":[{"id":"x1779176322750ptn","empId":"x1779111740033ay3","type":"AMEC","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750ryo","empId":"x1779111740033ay3","type":"ASTO","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750zpl","empId":"x1779111740033ay3","type":"IMEC","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x17791763227506xl","empId":"x1779111740033ay3","type":"ISTO","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x1779176322750u7k","empId":"x1779111740033ay3","type":"AELE","dateObtention":"","dateExpiration":"2027-05-06","notes":""},{"id":"x17791763227504gl","empId":"x1779111740033ay3","type":"IELE","dateObtention":"","dateExpiration":"2027-05-06","notes":""}],"stockage":{"avions":[],"mhHebdo":{"2026-S21":{"total":450}},"config":{"resp":"","chef":""}},"weekStart":"2026-05-24T22:00:00.000Z","masterMonth":4,"masterYear":2026,"gdrive":{"connected":true,"fileId":null,"clientId":"","userEmail":"","lastSync":"2026-05-21T14:19:02.677Z","gasUrl":"https://script.google.com/macros/s/AKfycbwemMQ54nLSJQgnlsAcTq213n9w95egLbNboKZLHb28AO3urHC62ftHAkHO3ntvQkH3mw/exec","lastPushOk":true}};
       // Ne jamais écraser des données déjà présentes (sécurité anti-perte)
       let _existing=null; try{ _existing=JSON.parse(_safeStorage.getItem('asp4')||'null'); }catch(e){}
       const _hasUserData=_existing && Array.isArray(_existing.personnel) && _existing.personnel.length>0;
@@ -4333,6 +4420,45 @@ function load(){
       if(!S.besoinOverrides) S.besoinOverrides={};
       // Migration : forcer pos en entier sur toutes les entrées existantes
       if(S.slot.entries) S.slot.entries=S.slot.entries.map(e=>({...e,pos:parseInt(e.pos)}));
+      // Migration : anciens intitulés d'accueil ("WELCOME MOE", "Welcome HSE") → "ACCUEIL HSE"
+      try{
+        const OLD_ACCUEIL=['WELCOME MOE','Welcome HSE'];
+        if(Array.isArray(S.formations)){
+          const accByEmp={};
+          S.formations.forEach(f=>{ if(f.type==='ACCUEIL HSE') accByEmp[f.empId]=f; });
+          const kept=[];
+          S.formations.forEach(f=>{
+            if(OLD_ACCUEIL.includes(f.type)){
+              const ex=accByEmp[f.empId];
+              if(ex){ // fusion : garder l'expiration la plus tardive
+                if((f.dateExpiration||'')>(ex.dateExpiration||'')) ex.dateExpiration=f.dateExpiration;
+                if(!ex.dateObtention && f.dateObtention) ex.dateObtention=f.dateObtention;
+                return; // on retire la ligne ancienne (fusionnée)
+              }
+              f.type='ACCUEIL HSE'; accByEmp[f.empId]=f;
+            }
+            kept.push(f);
+          });
+          S.formations=kept;
+        }
+        if(S.planning){ Object.keys(S.planning).forEach(k=>{ const e=S.planning[k]; if(e&&e.type==='formation_int'&&OLD_ACCUEIL.includes(e.formInt)) e.formInt='ACCUEIL HSE'; }); }
+        if(Array.isArray(S.formTracking)){ S.formTracking.forEach(t=>{ if(OLD_ACCUEIL.includes(t.formInt)) t.formInt='ACCUEIL HSE'; }); }
+      }catch(_){}
+      // Migration Autorisations : purge TAXI/WEIGHT, canonicalisation Push Back -> Tractage avion (grp)
+      try{
+        if(Array.isArray(S.autorisations)){
+          if(!S._taxiEmps) S._taxiEmps={};
+          S.autorisations=S.autorisations.filter(a=>{
+            if(_isTaxiCol(a.type)){ if(a.dateExpiration) S._taxiEmps[a.empId]=a.dateExpiration; return false; } // taxi récupéré puis retiré
+            if(_isWeightCol(a.type)) return false;                                                              // weight supprimé
+            return true;
+          });
+          S.autorisations.forEach(a=>{
+            if(_isPushback(a.type)){ a.type=TRACTAGE_LABEL; a.grp='tractage'; }
+            else if(!a.grp){ a.grp='conduite'; }
+          });
+        }
+      }catch(_){}
       return;
     }
   }catch(e){}
@@ -4352,7 +4478,7 @@ function loadDemo(){
   S.formations=[
     {id:'f1',empId:'p1',type:'CACES NACELLE',dateObtention:'2022-01-15',dateExpiration:fr(T,18),notes:'Nacelle élévatrice'},
     {id:'f2',empId:'p1',type:'EWIS',dateObtention:'2023-03-20',dateExpiration:fr(T,62),notes:''},
-    {id:'f3',empId:'p1',type:'Welcome HSE',dateObtention:'2024-01-10',dateExpiration:fr(T,250),notes:''},
+    {id:'f3',empId:'p1',type:'ACCUEIL HSE',dateObtention:'2024-01-10',dateExpiration:fr(T,250),notes:''},
     {id:'f4',empId:'p2',type:'Licence Part 66',dateObtention:'2020-06-01',dateExpiration:'',notes:'B1.1 — A320 family'},
     {id:'f5',empId:'p2',type:'CDCCL',dateObtention:'2023-04-05',dateExpiration:fr(T,22),notes:''},
     {id:'f5b',empId:'p2',type:'SAFETY TRAINING',dateObtention:'2023-04-05',dateExpiration:fr(T,180),notes:''},
@@ -4424,7 +4550,7 @@ function addHoliday(){
 function removeHol(i){S.holidays.splice(i,1);renderHolTags();save();}
 
 /* ═══ TABS ═══ */
-const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,autorisations:renderAutorisations,programme:renderProgramme,kpi:renderKPI,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
+const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,autorisations:renderAutorisations,certif:renderCertif,programme:renderProgramme,kpi:renderKPI,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
 
 /* ═══ SLOT HANGAR ═══ */
 const SLOT_POSITIONS=[
@@ -6254,10 +6380,10 @@ function buildLeg(elId){
 function renderDash(){
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const exp=S.formations.filter(f=>tSt(f.dateExpiration)==='expired').length;
-  const warn=S.formations.filter(f=>tSt(f.dateExpiration)==='warning').length;
-  const autoExp=S.autorisations.filter(a=>tSt(a.dateExpiration)==='expired').length;
-  const autoWarn=S.autorisations.filter(a=>tSt(a.dateExpiration)==='warning').length;
+  const exp=S.formations.filter(f=>!_empHorsEffectif(f.empId)&&tSt(f.dateExpiration)==='expired').length;
+  const warn=S.formations.filter(f=>!_empHorsEffectif(f.empId)&&tSt(f.dateExpiration)==='warning').length;
+  const autoExp=S.autorisations.filter(a=>!_empHorsEffectif(a.empId)&&tSt(a.dateExpiration)==='expired').length;
+  const autoWarn=S.autorisations.filter(a=>!_empHorsEffectif(a.empId)&&tSt(a.dateExpiration)==='warning').length;
   const actCh=S.chantiers.filter(c=>c.statut==='encours').length;
   const late=S.todos.filter(t=>!t.done&&(T-new Date(t.createdAt))>7*86400000).length;
 
@@ -6355,13 +6481,24 @@ function renderDash(){
   const alerts=[];
   S.formations.forEach(f=>{
     const st=tSt(f.dateExpiration); const emp=byId(f.empId); if(!emp)return;
+    if(_empHorsEffectif(f.empId))return; // plus dans les effectifs → pas de rappel
     if(st==='expired') alerts.push({cls:'red',ic:'🚨',t:`Formation expirée : ${f.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});
     else if(st==='warning'){const d=Math.ceil((new Date(f.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'⏰',t:`Formation expire dans ${d}j : ${f.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});}
   });
   S.autorisations.forEach(a=>{
     const st=tSt(a.dateExpiration); const emp=byId(a.empId); if(!emp)return;
+    if(_empHorsEffectif(a.empId))return; // plus dans les effectifs → pas de rappel
     if(st==='expired') alerts.push({cls:'red',ic:'🛡',t:`Autorisation expirée : ${a.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`});
     else if(st==='warning'){const d=Math.ceil((new Date(a.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'🛡',t:`Autorisation expire dans ${d}j : ${a.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`});}
+  });
+  // Licence Part 66 (Certifying Staff)
+  (S.certifiants||[]).forEach(c=>{
+    if(!c.licExp) return;
+    const emp=byId(c.empId); if(!emp) return;
+    if(_empHorsEffectif(c.empId)) return;
+    const st=tSt(c.licExp);
+    if(st==='expired') alerts.push({cls:'red',ic:'🛫',t:`Licence Part 66 expirée`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`});
+    else if(st==='warning'){const d=Math.ceil((new Date(c.licExp)-T)/86400000);alerts.push({cls:'gold',ic:'🛫',t:`Licence Part 66 expire dans ${d}j`,s:`${emp.prenom} ${emp.nom} · ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`});}
   });
   S.todos.filter(t=>!t.done).forEach(t=>{
     const dueVal=t.dueDate||t.due;
@@ -6392,6 +6529,8 @@ function renderDash(){
     formations_warn:  {ic:'⏰',title:'Formations à renouveler',    col:'#ffd060',bg:'rgba(255,208,96,0.08)',  items:[]},
     autorisations_exp: {ic:'🛡',title:'Autorisations expirées',    col:'#ff4d6d',bg:'rgba(255,77,109,0.08)', items:[]},
     autorisations_warn:{ic:'🛡',title:'Autorisations à renouveler',col:'#ffd060',bg:'rgba(255,208,96,0.08)',items:[]},
+    licence_exp:      {ic:'🛫',title:'Licences Part 66 expirées', col:'#ff4d6d',bg:'rgba(255,77,109,0.08)', items:[]},
+    licence_warn:     {ic:'🛫',title:'Licences Part 66 à renouveler',col:'#ffd060',bg:'rgba(255,208,96,0.08)',items:[]},
     todos_late:       {ic:'🔴',title:'Tâches en retard',          col:'#ff4d6d',bg:'rgba(255,77,109,0.08)', items:[]},
     todos_urgent:     {ic:'⚡',title:'Tâches urgentes (≤3j)',     col:'#ffd060',bg:'rgba(255,208,96,0.08)', items:[]},
     todos_pending:    {ic:'📋',title:'Tâches en attente (+7j)',   col:'#82b1ff',bg:'rgba(130,177,255,0.08)',items:[]},
@@ -6401,6 +6540,8 @@ function renderDash(){
     else if(a.ic==='⏰') groups.formations_warn.items.push(a);
     else if(a.ic==='🛡'&&a.cls==='red') groups.autorisations_exp.items.push(a);
     else if(a.ic==='🛡') groups.autorisations_warn.items.push(a);
+    else if(a.ic==='🛫'&&a.cls==='red') groups.licence_exp.items.push(a);
+    else if(a.ic==='🛫') groups.licence_warn.items.push(a);
     else if(a.ic==='📋'&&a.cls==='red') groups.todos_late.items.push(a);
     else if(a.ic==='📋'&&a.cls==='gold') groups.todos_urgent.items.push(a);
     else groups.todos_pending.items.push(a);
@@ -6416,14 +6557,18 @@ function renderDash(){
   if(!alerts.length){
     document.getElementById('alertsBox').innerHTML='<div class="empty"><div class="empty-ico">✅</div><p>Aucune alerte — tout est à jour !</p></div>';
   } else {
-    const sectionsHtml=Object.values(groups).filter(g=>g.items.length>0).map(g=>`
-      <div style="background:${g.bg};border:1px solid ${g.col}30;border-radius:12px;overflow:hidden;margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid ${g.col}20">
+    window._alertOpen = window._alertOpen || {}; // mémorise quels groupes sont ouverts entre deux rendus
+    const sectionsHtml=Object.entries(groups).filter(([k,g])=>g.items.length>0).map(([k,g])=>{
+      const open=!!window._alertOpen[k]; // fermé par défaut pour optimiser la place
+      return `
+      <div style="background:${g.bg};border:1px solid ${g.col}30;border-radius:12px;overflow:hidden;margin-bottom:8px">
+        <div onclick="_alertToggle('${k}')" style="display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;user-select:none;-webkit-user-select:none">
+          <span id="alertchv-${k}" style="display:inline-block;width:14px;color:${g.col};font-size:11px;transition:transform .15s;transform:rotate(${open?'90deg':'0deg'})">▸</span>
           <span style="font-size:14px">${g.ic}</span>
           <span style="font-size:11px;font-weight:800;color:${g.col};text-transform:uppercase;letter-spacing:.5px">${g.title}</span>
           <span style="margin-left:auto;background:${g.col}25;color:${g.col};font-size:10px;font-weight:800;border-radius:99px;padding:2px 8px">${g.items.length}</span>
         </div>
-        <div>${g.items.map(a=>`
+        <div id="alertgrp-${k}" style="display:${open?'block':'none'};border-top:1px solid ${g.col}20">${g.items.map(a=>`
           <div class="al" style="border-bottom:1px solid ${g.col}12;display:flex;align-items:center;gap:10px">
             <div class="al-body">
               <div class="al-title">${a.t}</div>
@@ -6432,12 +6577,13 @@ function renderDash(){
             ${a.action?`<button onclick="${a.action}" style="flex-shrink:0;background:${g.col}20;border:1px solid ${g.col}50;color:${g.col};border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap">✏️ Mettre à jour</button>`:''}
           </div>`).join('')}
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
     document.getElementById('alertsBox').innerHTML=`<div style="padding:4px 0">${sectionsHtml}</div>`;
   }
 
   // Matrix — noms triés alphabétiquement (NOM Prénom)
-  const rows=_sortByNom(S.personnel.filter(p=>!p.archived)).map(p=>{
+  const rows=_sortByNom(S.personnel.filter(p=>!_empHorsEffectif(p.id))).map(p=>{
     const mF={}; S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
     const cat=CATS[p.categorie]||{};
     const cells=TRAININGS.map(t=>{
@@ -6467,14 +6613,14 @@ function renderDash(){
         'SAFETY TRAINING':'SAFETY<br>TRAIN.',
         'English Test':   'English<br>Test',
         'MOE / PART 145': 'MOE<br>PART 145',
-        'Welcome HSE':    'Welcome<br>HSE',
+        'ACCUEIL HSE':    'ACCUEIL<br>HSE',
         'Travail en hauteur':'Travail<br>hauteur',
         'Risque chimiques':'Risque<br>chimiq.',
         'Compétences':    'Compét.',
         'Licence Part 66':'Licence<br>Part 66',
         'Pushback':       'Pushback',
       };
-      const display=MAP[t]||t;
+      const display=(MAP[t]||t).toUpperCase();
       return`<th class="rot" title="${t}">${display}</th>`;
     }).join('')}
   </tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -6483,7 +6629,17 @@ function renderDash(){
   try{renderAvancement();}catch(e){console.warn('renderAvancement:',e);}
 }
 
-/* ═══ FORMATIONS ═══ */
+// Ouvre / referme un groupe de rappels du tableau de bord (sans re-render complet)
+function _alertToggle(key){
+  window._alertOpen = window._alertOpen || {};
+  const box=document.getElementById('alertgrp-'+key);
+  const chv=document.getElementById('alertchv-'+key);
+  if(!box) return;
+  const willOpen = box.style.display==='none';
+  box.style.display = willOpen ? 'block' : 'none';
+  if(chv) chv.style.transform = 'rotate('+(willOpen?'90deg':'0deg')+')';
+  window._alertOpen[key] = willOpen;
+}
 function _matchStaff(emp,q){
   if(!q) return true;
   const p=(emp.prenom||'').toLowerCase(), n=(emp.nom||'').toLowerCase(), t=(emp.trigramme||'').toLowerCase();
@@ -6495,7 +6651,7 @@ function renderForms(){
   const sF=document.getElementById('flt-status')?.value||'';
   const _fq=(document.getElementById('form-search')?.value||'').toLowerCase().trim();
   const data=S.formations.filter(f=>{
-    if(byId(f.empId)?.archived) return false;
+    if(_empHorsEffectif(f.empId)) return false;
     if(eF&&f.empId!==eF)return false;
     if(tF&&f.type!==tF)return false;
     if(sF&&tSt(f.dateExpiration)!==sF)return false;
@@ -6536,7 +6692,7 @@ function renderForms(){
     const rows=list.map(f=>`<tr data-femp="${empId}" style="display:${open?'table-row':'none'}">
       <td></td><td></td>
       <td style="text-align:right;color:var(--t4);font-size:11px">↳</td>
-      <td style="font-weight:600">${f.type}</td>
+      <td style="font-weight:600;text-transform:uppercase">${f.type}</td>
       <td style="color:var(--t3)">${disp(f.dateObtention)}</td>
       <td style="font-weight:${tSt(f.dateExpiration)==='expired'?'700':'400'};color:${tSt(f.dateExpiration)==='expired'?'var(--rose)':'var(--t1)'}">${disp(f.dateExpiration)}</td>
       <td>${SBADGE[tSt(f.dateExpiration)]||''}</td>
@@ -6591,7 +6747,7 @@ function exportFormXls(){
     if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
     try{
       const rows=[['Employé','Trigramme','Catégorie','Formation','Obtention','Expiration','Statut','Notes']];
-      S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',emp?.trigramme||'—',CATS[emp?.categorie||'']?.lbl||'—',f.type,f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
+      S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',emp?.trigramme||'—',CATS[emp?.categorie||'']?.lbl||'—',(f.type||'').toUpperCase(),f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
       const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:26},{wch:14},{wch:14},{wch:14},{wch:30}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Formations');
       XLSX.writeFile(wb,'AeroStaff_Formations.xlsx');
@@ -6618,7 +6774,7 @@ function exportFormMatrixXls(){
       title:'Matrice des formations & certifications',
       sheetName:'Matrice formations',
       fileName:'AeroStaff_Matrice_Formations.xlsx',
-      staff, cols:TRAININGS, colLabel:t=>t,
+      staff, cols:TRAININGS, colLabel:t=>t.toUpperCase(),
       records:S.formations||[], recField:'type'
     }).then(()=>toast('✅ Matrice formations colorée ✓'))
       .catch(e=>{ console.error(e); toast('❌ Erreur export: '+e.message); });
@@ -6630,7 +6786,7 @@ function exportFormMatrixPDF(){
   if(!staff.length){ toast('Aucun personnel à exporter'); return; }
   const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'};
   const clr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
-  const th=TRAININGS.map(t=>`<th class="rot" title="${t}">${t}</th>`).join('');
+  const th=TRAININGS.map(t=>`<th class="rot" title="${t}">${t.toUpperCase()}</th>`).join('');
   const trs=staff.map(p=>{
     const mF={};
     S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
@@ -6670,7 +6826,7 @@ function handleXlsImport(e){
       const data=new Uint8Array(ev.target.result);
       const wb=XLSX.read(data,{type:'array',cellDates:true});
       const WANT=['trainings follow-up','qualifications sse follow-up','sse authorizations follow-up'];
-      const MAP={'PART 145 & MOE':'MOE / PART 145','SAFETY TRAINING':'SAFETY TRAINING','CDCCL':'CDCCL','EWIS':'EWIS','COMPETENCIES':'Comp\u00e9tences','ENGLISH':'English Test','RISQUES CHIMIQUES':'Risque chimiques','TRAVAIL EN HAUTEUR':'Travail en hauteur','WELCOME':'Welcome HSE'};
+      const MAP={'PART 145 & MOE':'MOE / PART 145','SAFETY TRAINING':'SAFETY TRAINING','CDCCL':'CDCCL','EWIS':'EWIS','COMPETENCIES':'Comp\u00e9tences','ENGLISH':'English Test','RISQUES CHIMIQUES':'Risque chimiques','TRAVAIL EN HAUTEUR':'Travail en hauteur','WELCOME':'ACCUEIL HSE'};
       const _d=v=>{
         if(v==null||v==='') return '';
         if(v instanceof Date && !isNaN(v)) return fmt(v);
@@ -6737,7 +6893,7 @@ function _importDrivingFromWb(wb){
   // Autorisations de conduite (feuille SSE) -> onglet AUTORISATIONS, détail conservé.
   // MEDICAL VISIT est exclu (reste "Visite Médicale" en Formations via Qualifications SSE).
   const SKIP=new Set(['MEDICAL VISIT']);
-  const EXCLUDE_CLEAN=new Set(['PUSHBACK']); // Pushback reste aussi une qualification en Formations
+  if(!S._taxiEmps) S._taxiEmps={}; // {empId: dateExp} récupéré des docs pour pré-remplir Certifying Staff
   const _d=v=>{
     if(v==null||v==='') return '';
     if(v instanceof Date && !isNaN(v)) return fmt(v);
@@ -6763,7 +6919,7 @@ function _importDrivingFromWb(wb){
   if(!dateCols.length||triCol<0) return {upd:0,cre:0,cleaned:0};
   // Migration : retirer les entrées de conduite mal placées dans Formations (ancien import)
   const cleanSet=new Set();
-  dateCols.forEach(({type})=>{ if(EXCLUDE_CLEAN.has(norm(type))) return; cleanSet.add(norm(type)); cleanSet.add(norm('Conduite — '+type)); });
+  dateCols.forEach(({type})=>{ if(_isPushback(type)||_isTaxiCol(type)||_isWeightCol(type)) return; cleanSet.add(norm(type)); cleanSet.add(norm('Conduite — '+type)); });
   let cleaned=0;
   if(S.formations&&S.formations.length){ const before=S.formations.length; S.formations=S.formations.filter(f=>!cleanSet.has(norm(f.type))); cleaned=before-S.formations.length; }
   if(!S.autorisations) S.autorisations=[];
@@ -6777,9 +6933,14 @@ function _importDrivingFromWb(wb){
     if(!emp) continue;
     dateCols.forEach(({i,type})=>{
       const dexp=_d(row[i]); if(!dexp) return;
-      const ex=S.autorisations.find(a=>a.empId===emp.id&&norm(a.type)===norm(type));
-      if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
-      else { S.autorisations.push({id:uid(),empId:emp.id,type,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
+      if(_isWeightCol(type)) return;                                   // Weight & Balance : supprimé, non importé
+      if(_isTaxiCol(type)){ S._taxiEmps[emp.id]=dexp; return; }        // Taxi : récupéré pour Certifying Staff, hors Autorisations
+      const isTract=_isPushback(type);
+      const canonType=isTract?TRACTAGE_LABEL:type;                     // toutes variantes push back -> libellé unique
+      const grp=isTract?'tractage':'conduite';
+      const ex=S.autorisations.find(a=>a.empId===emp.id&&norm(a.type)===norm(canonType));
+      if(ex){ ex.grp=grp; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
+      else { S.autorisations.push({id:uid(),empId:emp.id,type:canonType,grp,dateObtention:'',dateExpiration:dexp,notes:''}); cre++; }
     });
   }
   return {upd,cre,cleaned};
@@ -7695,6 +7856,12 @@ function openCell(empId,dateStr,half){
   const cc2=document.getElementById('cellChantier2'); if(cc2) cc2.value=ex.chantierId2||'';
   document.getElementById('cellNote').value=ex.note||'';
   document.getElementById('cellFormInt').value=ex.formInt||'';
+  // Réinitialise le sélecteur "Appliquer à" et masque les sous-blocs à chaque ouverture
+  const _ap=document.getElementById('cellApply');
+  if(_ap){ _ap.value='one'; }
+  const _rs=document.getElementById('cellRangeStart'), _re=document.getElementById('cellRangeEnd');
+  if(_rs) _rs.value=''; if(_re) _re.value='';
+  toggleCellApplyOptions('one');
   openM('m-cell');
 }
 function pickType(btn){
@@ -7733,6 +7900,16 @@ function getActiveDays(cls){
 function toggleCellApplyOptions(val){
   document.getElementById('cellCustomDays').style.display=val==='custom'?'block':'none';
   document.getElementById('cellMultiWeek').style.display=val==='multiweek'?'block':'none';
+  const rng=document.getElementById('cellDateRange');
+  if(rng){
+    rng.style.display=val==='range'?'block':'none';
+    if(val==='range'){
+      const s=document.getElementById('cellRangeStart'), e=document.getElementById('cellRangeEnd');
+      const base=cellCtx?cellCtx.dateStr:'';
+      if(s && !s.value && base) s.value=base;
+      if(e && !e.value && base) e.value=base;
+    }
+  }
 }
 
 function saveCellEdit(){
@@ -7796,9 +7973,27 @@ function saveCellEdit(){
       });
     }
   }
+  else if(apply==='range'){
+    let sd=document.getElementById('cellRangeStart').value;
+    let ed=document.getElementById('cellRangeEnd').value;
+    if(!sd || !ed){ toast('⚠️ Indiquez les dates de début et de fin'); return; }
+    if(sd>ed){ const t=sd; sd=ed; ed=t; } // inverse si dans le désordre
+    let cur=parseLocal(sd); const end=parseLocal(ed);
+    let guard=0;
+    while(cur<=end && guard<3660){
+      guard++;
+      const dow=cur.getDay(); // 0=dim, 6=sam
+      const d=fmt(cur);
+      if(dow!==0 && dow!==6 && !(cellType && isHol(d))){
+        setHD(empId,d,'AM');setHD(empId,d,'PM');trackIfFormInt(empId,d);
+      }
+      cur=addD(cur,1);
+    }
+  }
 
   // Enregistrer le suivi des formations internes planifiées
-  if(cellType==='formation_int'&&formInt&&formIntDates.size){
+  // (sauf les formations "présentation / accueil" qui n'ont pas de suivi)
+  if(cellType==='formation_int'&&formInt&&formIntDates.size&&!(typeof FORM_NO_TRACKING!=='undefined'&&FORM_NO_TRACKING.has(formInt))){
     if(!S.formTracking) S.formTracking=[];
     formIntDates.forEach(key=>{
       const [eid,ds]=key.split('|');
@@ -7811,6 +8006,7 @@ function saveCellEdit(){
   }
 
   save();closeM('m-cell');renderWeekly();renderMaster();cellCtx=null;
+  try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){}
 }
 
 /* ═══ PINCEAU : copier le contenu d'une case vers d'autres (tactile + souris, sans geste) ═══ */
@@ -12231,7 +12427,7 @@ function renderAutorisations(){
   const _aq=(document.getElementById('auto-search')?.value||'').toLowerCase().trim();
 
   const data=(S.autorisations||[]).filter(a=>{
-    if(byId(a.empId)?.archived) return false;
+    if(_empHorsEffectif(a.empId)) return false;
     if(eF&&a.empId!==eF)return false;
     if(tF&&a.type!==tF)return false;
     if(sF&&tSt(a.dateExpiration)!==sF)return false;
@@ -12275,10 +12471,15 @@ function renderAutorisations(){
       </tr>`;
       const rows=list.map(a=>{
         const s=tSt(a.dateExpiration);
+        const isT=_autoGroup(a)==='tractage';
+        const badgeStyle=isT
+          ? 'background:rgba(124,110,230,0.14);color:#b9aeff;border:1px solid rgba(124,110,230,0.35)'   // Tractage avion (violet)
+          : 'background:rgba(0,210,255,0.1);color:var(--cyan);border:1px solid rgba(0,210,255,0.25)';   // Conduite (cyan)
+        const badgeLbl=isT?('🛫 '+a.type):a.type;
         return `<tr data-aemp="${empId}" style="display:${open?'table-row':'none'}">
         <td></td><td></td>
         <td style="text-align:right;color:var(--t4);font-size:11px">↳</td>
-        <td><span class="badge" style="background:rgba(0,210,255,0.1);color:var(--cyan);border:1px solid rgba(0,210,255,0.25);font-family:'JetBrains Mono',monospace;font-size:11px">${a.type}</span></td>
+        <td><span class="badge" style="${badgeStyle};font-family:'JetBrains Mono',monospace;font-size:11px">${badgeLbl}</span></td>
         <td style="color:var(--t3)">${disp(a.dateObtention)}</td>
         <td style="font-weight:${s==='expired'?'700':'400'};color:${s==='expired'?'var(--rose)':'var(--t1)'}">${disp(a.dateExpiration)}</td>
         <td>${SBADGE[s]||''}</td>
@@ -12311,14 +12512,17 @@ function _autoColLabel(t){
 function _autoMatrixCols(){
   const base=[...AUTORISATIONS_LIST];
   const seen=new Set(base.map(c=>c.toUpperCase()));
-  const extra=[];
+  const conduite=[]; let hasTract=false;
   (S.autorisations||[]).forEach(a=>{
     const t=(a.type||'').trim(); if(!t) return;
+    if(_autoGroup(a)==='tractage'){ hasTract=true; return; }        // tractage traité à part (colonne unique en fin)
     const k=t.toUpperCase();
-    if(!seen.has(k)){ seen.add(k); extra.push(t); }
+    if(!seen.has(k)){ seen.add(k); conduite.push(t); }
   });
-  extra.sort((a,b)=>a.localeCompare(b,'fr'));
-  return base.concat(extra);
+  conduite.sort((a,b)=>a.localeCompare(b,'fr'));
+  const cols=base.concat(conduite);
+  if(hasTract) cols.push(TRACTAGE_LABEL);                            // Tractage avion toujours en dernière colonne
+  return cols;
 }
 // Personnel affiché dans la matrice = production active, hors archivés ET hors « hors production » — trié alphabétiquement (nom puis prénom)
 function _autoMatrixStaff(){
@@ -12332,13 +12536,14 @@ function renderAutoMatrix(){
     const mA={};
     (S.autorisations||[]).filter(a=>a.empId===p.id).forEach(a=>mA[a.type]=a);
     const cells=cols.map(t=>{
+      const sep=(t===TRACTAGE_LABEL)?';border-left:2px solid rgba(0,210,255,0.5)':'';
       const a=mA[t];
-      if(!a) return`<td style="text-align:center;vertical-align:middle"><span style="color:var(--t4);font-size:13px">—</span></td>`;
+      if(!a) return`<td style="text-align:center;vertical-align:middle${sep}"><span style="color:var(--t4);font-size:13px">—</span></td>`;
       const s=tSt(a.dateExpiration);
       const cl={valid:'bv',warning:'bw',expired:'be',na:'bn'}[s]||'bn';
       const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'}[s];
       const tip=a.dateExpiration?`${a.type} · Exp : ${disp(a.dateExpiration)}`:`${a.type} · Sans limite`;
-      return`<td style="text-align:center;vertical-align:middle" title="${tip}"><span class="badge ${cl}" style="font-size:9px;padding:3px 7px">${ic}</span></td>`;
+      return`<td style="text-align:center;vertical-align:middle${sep}" title="${tip}"><span class="badge ${cl}" style="font-size:9px;padding:3px 7px">${ic}</span></td>`;
     }).join('');
     return`<tr>
       <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px;border:1px solid rgba(255,255,255,0.05)">${p.prenom} ${p.nom}</td>
@@ -12350,7 +12555,7 @@ function renderAutoMatrix(){
   el.innerHTML=`<div class="mwrap" style="padding:6px 4px 4px;overflow:auto;max-height:70vh"><table class="mtable"><thead><tr>
     <th class="mx-sticky-name mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 12px;text-align:left;min-width:150px;font-size:11px">Employé</th>
     <th class="mx-sticky-tri mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 8px;text-align:center;min-width:44px;font-size:11px">TRI</th>
-    ${cols.map(t=>{const isC=/^conduite/i.test(t);const lbl=_autoColLabel(t).replace(/ /g,'<br>');return `<th class="rot" title="${t}">${isC?'🚜 ':''}${lbl}</th>`;}).join('')}
+    ${cols.map(t=>{const isT=(t===TRACTAGE_LABEL);const isC=/^conduite/i.test(t);const lbl=_autoColLabel(t).replace(/ /g,'<br>');const sep=isT?'border-left:2px solid rgba(0,210,255,0.5)':'';return `<th class="rot" title="${t}" style="${sep}">${isT?'🛫 ':(isC?'🚜 ':'')}${lbl}</th>`;}).join('')}
   </tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -12524,16 +12729,17 @@ function exportAutoMatrixPDF(){
   if(!staff.length){ toast('Aucun personnel en production à exporter'); return; }
   const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'};
   const clr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
-  const th=cols.map(t=>{const isC=/^conduite/i.test(t);return `<th class="rot" title="${t}">${isC?'🚜 ':''}${_autoColLabel(t)}</th>`;}).join('');
+  const th=cols.map(t=>{const isT=(t===TRACTAGE_LABEL);const isC=/^conduite/i.test(t);const sep=isT?'border-left:2px solid #7c6ee6;':'';return `<th class="rot" title="${t}" style="${sep}">${isT?'🛫 ':(isC?'🚜 ':'')}${_autoColLabel(t)}</th>`;}).join('');
   const trs=staff.map(p=>{
     const mA={};
     (S.autorisations||[]).filter(a=>a.empId===p.id).forEach(a=>mA[a.type]=a);
     const tds=cols.map(t=>{
+      const sep=(t===TRACTAGE_LABEL)?'border-left:2px solid #7c6ee6;':'';
       const a=mA[t];
-      if(!a) return `<td class="c muted">—</td>`;
+      if(!a) return `<td class="c muted" style="${sep}">—</td>`;
       const s=tSt(a.dateExpiration);
       const tip=a.dateExpiration?`${t} · Exp ${disp(a.dateExpiration)}`:`${t} · Sans limite`;
-      return `<td class="c" style="color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
+      return `<td class="c" style="${sep}color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
     }).join('');
     return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
   }).join('');
@@ -12549,10 +12755,283 @@ function exportAutoMatrixPDF(){
   <h1>Matrice des autorisations</h1>
   <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) en production · ${cols.length} autorisation(s)</div>
   <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}</tr></thead><tbody>${trs}</tbody></table>
-  <div class="legend"><b>Légende :</b> <span style="color:${clr.valid}">✓ valide</span> · <span style="color:${clr.warning}">⚠ expire bientôt</span> · <span style="color:${clr.expired}">✗ expiré</span> · <span style="color:${clr.na}">∞ sans limite</span> · — non détenue · 🚜 autorisation de conduite</div>
+  <div class="legend"><b>Légende :</b> <span style="color:${clr.valid}">✓ valide</span> · <span style="color:${clr.warning}">⚠ expire bientôt</span> · <span style="color:${clr.expired}">✗ expiré</span> · <span style="color:${clr.na}">∞ sans limite</span> · — non détenue · 🚜 conduite d'engins · 🛫 tractage avion (push back)</div>
   <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
   </body></html>`;
   openPrintView(html,'PDF — Matrice des autorisations');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CERTIFYING STAFF — habilitations avions (Part 66)
+   Modèle : S.certifiants = [{ id, empId, licNum, licExp,
+     types:[{ type, cats:[B1/B2/C], taxi:bool, pfIdle:bool, pfMax:bool, exp }] }]
+   ═══════════════════════════════════════════════════════════ */
+const CERTIF_CATS=['B1','B2','C'];
+
+function _certifStaff(){ return _sortByNom(S.personnel.filter(p=>p.actif!==false && !p.archived)); }
+function _certifByEmp(id){ return (S.certifiants||[]).find(c=>c.empId===id); }
+// Colonnes = tous les types avion présents dans les fiches, triés
+function _certifCols(){
+  const set=new Set();
+  (S.certifiants||[]).forEach(c=>(c.types||[]).forEach(t=>{ const x=(t.type||'').trim(); if(x) set.add(x); }));
+  return [...set].sort((a,b)=>a.localeCompare(b,'fr'));
+}
+// Pastille point fixe (Idle / Max, indépendants)
+function _pfChips(t){
+  let o='';
+  if(t.pfIdle) o+='<span style="display:inline-block;padding:0 5px;border-radius:3px;background:rgba(239,159,39,0.18);color:#ffbf5a;font-weight:700;font-size:9px">Idle</span> ';
+  if(t.pfMax)  o+='<span style="display:inline-block;padding:0 5px;border-radius:3px;background:rgba(216,90,48,0.2);color:#ff8a5c;font-weight:700;font-size:9px">Max</span>';
+  return o.trim();
+}
+function _certifCell(t){
+  const cats=(t.cats||[]).map(c=>`<span style="display:inline-block;padding:0 5px;border-radius:99px;background:rgba(124,110,230,0.18);color:#b9aeff;font-weight:700;font-size:9px">${c}</span>`).join(' ');
+  const chips=[];
+  if(t.taxi) chips.push('<span style="display:inline-block;width:16px;text-align:center;border-radius:3px;background:rgba(0,210,255,0.15);color:var(--cyan);font-weight:700;font-size:9px">T</span>');
+  const pf=_pfChips(t); if(pf) chips.push(pf);
+  const line2=chips.length?chips.join(' '):'<span style="color:var(--t4);font-size:10px">·</span>';
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">${cats?`<div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center">${cats}</div>`:''}<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center">${line2}</div></div>`;
+}
+
+function renderCertif(){
+  const box=document.getElementById('certifMatrixBox'); if(!box) return;
+  const q=(document.getElementById('certif-search')?.value||'').toLowerCase().trim();
+
+  // Uniquement les personnes AYANT une fiche certifiant (hors archivés / hors effectif)
+  let list=(S.certifiants||[]).map(c=>({c,emp:byId(c.empId)}))
+    .filter(x=>x.emp && !x.emp.archived && !_empHorsEffectif(x.c.empId));
+  if(q) list=list.filter(x=>_matchStaff(x.emp,q));
+
+  // Compteur licences à renouveler / expirées
+  const licRank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
+  const nRenew=list.filter(x=>x.c.licExp && (tSt(x.c.licExp)==='expired'||tSt(x.c.licExp)==='warning')).length;
+
+  // Tri : licences expirées/bientôt d'abord, puis alphabétique
+  list.sort((a,b)=>{
+    const ra=licRank(a.c.licExp?tSt(a.c.licExp):'na'), rb=licRank(b.c.licExp?tSt(b.c.licExp):'na');
+    if(ra!==rb) return ra-rb;
+    return `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr');
+  });
+
+  const sub=document.getElementById('certif-count');
+  if(sub) sub.textContent=`${list.length} certifiant${list.length>1?'s':''}${nRenew?` · ${nRenew} licence${nRenew>1?'s':''} à renouveler`:''}`;
+
+  if(!list.length){
+    box.innerHTML=`<div style="text-align:center;padding:56px 20px;color:var(--t3)">
+      <div style="font-size:38px;margin-bottom:10px">🛫</div>
+      <div style="font-size:15px;font-weight:600;color:var(--t2);margin-bottom:4px">${q?'Aucun certifiant trouvé':'Aucun certifiant enregistré'}</div>
+      <div style="font-size:13px;margin-bottom:16px">${q?'Modifiez votre recherche.':'Ajoutez votre premier certifiant pour commencer.'}</div>
+      ${q?'':'<button class="btn btn-cyan btn-sm" onclick="openCertifFiche(\'\')">➕ Nouvelle fiche</button>'}
+    </div>`;
+    return;
+  }
+
+  const licMeta={
+    valid:{c:'#6effc4',bg:'rgba(110,255,196,0.1)',bd:'rgba(110,255,196,0.25)',lbl:'Licence valide'},
+    warning:{c:'#ffc06a',bg:'rgba(255,192,106,0.1)',bd:'rgba(255,192,106,0.28)',lbl:'À renouveler'},
+    expired:{c:'#ff8a99',bg:'rgba(255,107,125,0.12)',bd:'rgba(255,107,125,0.3)',lbl:'Licence expirée'},
+    na:{c:'var(--t3)',bg:'rgba(255,255,255,0.03)',bd:'var(--glass-border)',lbl:'Licence non renseignée'}
+  };
+  const catPill=c=>`<span style="display:inline-block;padding:2px 9px;border-radius:99px;background:rgba(124,110,230,0.18);color:#c3baff;font-size:11px;font-weight:700">${c}</span>`;
+  const flag=(on,label,kind)=>{
+    const col=kind==='taxi'?{c:'var(--cyan)',bg:'rgba(0,210,255,0.12)'}
+      :kind==='idle'?{c:'#ffc888',bg:'rgba(239,159,39,0.16)'}
+      :{c:'#ff9e7a',bg:'rgba(216,90,48,0.18)'};
+    if(on) return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:${col.bg};color:${col.c};font-size:11px;font-weight:600">✓ ${label}</span>`;
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,0.03);color:var(--t4);font-size:11px">– ${label}</span>`;
+  };
+  const initials=e=>((e.prenom||' ')[0]+(e.nom||' ')[0]).toUpperCase();
+
+  const cards=list.map(({c,emp})=>{
+    const types=(c.types||[]).filter(t=>t.type);
+    const st=c.licExp?tSt(c.licExp):'na';
+    const lm=licMeta[st]||licMeta.na;
+    const typeRows=types.length?types.map(ty=>`
+      <div style="padding:11px 0;border-top:0.5px solid var(--glass-border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <span style="font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-0.01em">${ty.type}</span>
+          <span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${(ty.cats||[]).map(catPill).join('')||'<span style="color:var(--t4);font-size:11px">—</span>'}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${flag(ty.taxi,'Taxiing','taxi')}
+          ${flag(ty.pfIdle,'PF Idle','idle')}
+          ${flag(ty.pfMax,'PF Max','max')}
+        </div>
+        ${ty.exp?`<div style="margin-top:6px;font-size:11px;color:var(--t3)">Expire le ${disp(ty.exp)}</div>`:''}
+      </div>`).join(''):'<div style="padding:12px 0;border-top:0.5px solid var(--glass-border);color:var(--t3);font-size:12px">Aucun type avion renseigné</div>';
+
+    return `<div onclick="openCertifFiche('${emp.id}')" style="background:var(--glass-1);border:0.5px solid var(--glass-border);border-radius:16px;padding:16px 18px;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderColor='rgba(0,210,255,0.35)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,210,255,0.14);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--cyan);flex-shrink:0">${initials(emp)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${emp.prenom} ${emp.nom}</div>
+          <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace">${emp.trigramme||'—'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:10px;background:${lm.bg};border:0.5px solid ${lm.bd}">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:${lm.c}">🪪 ${lm.lbl}</span>
+        <span style="font-size:12px;color:${lm.c};font-family:'JetBrains Mono',monospace">${c.licExp?disp(c.licExp):(c.licNum||'—')}</span>
+      </div>
+      ${c.licNum&&c.licExp?`<div style="margin-top:5px;font-size:11px;color:var(--t3);text-align:right;font-family:'JetBrains Mono',monospace">N° ${c.licNum}</div>`:''}
+      <div style="margin-top:6px">${typeRows}</div>
+    </div>`;
+  }).join('');
+
+  box.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:2px">${cards}</div>`;
+}
+
+/* ── Fiche de saisie ── */
+let _certifEditId=null;   // empId en cours d'édition
+let _certifDraftTypes=[]; // types en cours de saisie (copie de travail)
+
+function openCertifFiche(empId){
+  _certifEditId=empId||'';
+  const sel=document.getElementById('cf-emp');
+  // Remplir la liste des employés (production active)
+  sel.innerHTML='<option value="">— choisir —</option>'+_certifStaff().map(p=>`<option value="${p.id}">${p.prenom} ${p.nom}${p.trigramme?' ('+p.trigramme+')':''}</option>`).join('');
+  const c=empId?_certifByEmp(empId):null;
+  sel.value=empId||'';
+  sel.disabled=!!empId; // en édition, employé figé
+  document.getElementById('cf-licnum').value=c?.licNum||'';
+  document.getElementById('cf-licexp').value=c?.licExp||'';
+  // Types : copie de travail (+ pré-remplissage taxi depuis les documents si dispo)
+  _certifDraftTypes=(c?.types||[]).map(t=>({type:t.type||'',cats:[...(t.cats||[])],taxi:!!t.taxi,pfIdle:!!t.pfIdle,pfMax:!!t.pfMax,exp:t.exp||''}));
+  const taxiDoc=empId&&S._taxiEmps&&S._taxiEmps[empId];
+  document.getElementById('cf-taxihint').style.display=taxiDoc?'block':'none';
+  if(taxiDoc) document.getElementById('cf-taxidate').textContent=disp(taxiDoc);
+  document.getElementById('cf-delbtn').style.display=(empId&&c)?'inline-block':'none';
+  renderCertifTypes();
+  openM('m-certif');
+}
+
+function certifAddType(){ _certifDraftTypes.push({type:'',cats:[],taxi:false,pfIdle:false,pfMax:false,exp:''}); renderCertifTypes(); }
+function certifDelType(i){ _certifDraftTypes.splice(i,1); renderCertifTypes(); }
+
+function renderCertifTypes(){
+  const wrap=document.getElementById('cf-types'); if(!wrap) return;
+  if(!_certifDraftTypes.length){ wrap.innerHTML='<div style="color:var(--t3);font-size:12px;padding:8px 0">Aucun type avion. Cliquez « Ajouter un type ».</div>'; return; }
+  wrap.innerHTML=_certifDraftTypes.map((t,i)=>{
+    const catBtns=CERTIF_CATS.map(c=>{ const on=(t.cats||[]).includes(c); return `<button type="button" onclick="certifToggleCat(${i},'${c}')" style="padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid ${on?'rgba(124,110,230,0.5)':'var(--glass-border)'};background:${on?'rgba(124,110,230,0.2)':'transparent'};color:${on?'#b9aeff':'var(--t3)'}">${c}</button>`; }).join(' ');
+    const chk=(field,label)=>{ const on=!!t[field]; return `<button type="button" onclick="certifToggleFlag(${i},'${field}')" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid ${on?'rgba(0,210,255,0.4)':'var(--glass-border)'};background:${on?'rgba(0,210,255,0.12)':'transparent'};color:${on?'var(--cyan)':'var(--t3)'}">${on?'☑':'☐'} ${label}</button>`; };
+    return `<div style="border:1px solid var(--glass-border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--glass-1)">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+        <input type="text" value="${(t.type||'').replace(/"/g,'&quot;')}" oninput="_certifDraftTypes[${i}].type=this.value" placeholder="Type avion (ex: A320)" style="width:150px;padding:6px 10px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t1);font-size:12px;font-weight:700">
+        <div style="display:flex;align-items:center;gap:5px">${catBtns}</div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:var(--t3)">exp.</span>
+          <input type="date" value="${t.exp||''}" oninput="_certifDraftTypes[${i}].exp=this.value" style="padding:5px 8px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t1);font-size:11px">
+          <button type="button" class="btn btn-rose btn-xs" onclick="certifDelType(${i})">🗑</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        ${chk('taxi','Taxiing')}
+        <span style="color:var(--t4);font-size:11px">Point fixe :</span>
+        ${chk('pfIdle','Idle')}
+        ${chk('pfMax','Max Power')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function certifToggleCat(i,c){ const t=_certifDraftTypes[i]; if(!t) return; t.cats=t.cats||[]; const k=t.cats.indexOf(c); if(k>=0)t.cats.splice(k,1); else t.cats.push(c); renderCertifTypes(); }
+function certifToggleFlag(i,f){ const t=_certifDraftTypes[i]; if(!t) return; t[f]=!t[f]; renderCertifTypes(); }
+
+function saveCertif(){
+  const empId=document.getElementById('cf-emp').value;
+  if(!empId){ toast('⚠️ Sélectionnez un employé'); return; }
+  // nettoyer les types sans nom
+  const types=_certifDraftTypes.filter(t=>(t.type||'').trim()).map(t=>({type:t.type.trim(),cats:[...(t.cats||[])],taxi:!!t.taxi,pfIdle:!!t.pfIdle,pfMax:!!t.pfMax,exp:t.exp||''}));
+  if(!S.certifiants) S.certifiants=[];
+  let c=S.certifiants.find(x=>x.empId===empId);
+  if(!c){ c={id:uid(),empId,licNum:'',licExp:'',types:[]}; S.certifiants.push(c); }
+  c.licNum=document.getElementById('cf-licnum').value.trim();
+  c.licExp=document.getElementById('cf-licexp').value||'';
+  c.types=types;
+  save(); closeM('m-certif'); renderCertif(); if(typeof renderDash==='function')renderDash();
+  toast('✅ Fiche certifiant enregistrée');
+}
+function delCertif(){
+  if(!_certifEditId) return;
+  if(!confirm('Supprimer la fiche certifiant de cette personne ?')) return;
+  S.certifiants=(S.certifiants||[]).filter(c=>c.empId!==_certifEditId);
+  save(); closeM('m-certif'); renderCertif(); if(typeof renderDash==='function')renderDash();
+  toast('🗑 Fiche supprimée');
+}
+
+/* ── Export Excel ── */
+function exportCertifXls(){
+  const cols=_certifCols();
+  const staff=_certifStaff();
+  if(!staff.length){ toast('Aucun personnel à exporter'); return; }
+  _loadExcelJS(async()=>{
+    try{
+      const wb=new ExcelJS.Workbook(); wb.creator='MARDAM AeroDesk Pro'; wb.created=new Date();
+      const ws=wb.addWorksheet('Certifying Staff',{views:[{state:'frozen',xSplit:2,ySplit:1}]});
+      const header=['Nom Prénom','TRI',...cols,'Lic. N°','Lic. Exp.'];
+      const hr=ws.addRow(header);
+      hr.eachCell(c=>{ c.font={bold:true,color:{argb:'FFFFFFFF'}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF16213E'}}; c.alignment={horizontal:'center',vertical:'middle'}; });
+      staff.forEach(p=>{
+        const c=_certifByEmp(p.id);
+        const mT={}; if(c)(c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
+        const cells=cols.map(col=>{
+          const t=mT[col]; if(!t) return '';
+          const parts=[];
+          if((t.cats||[]).length) parts.push(t.cats.join('/'));
+          if(t.taxi) parts.push('Taxi');
+          const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
+          if(pf.length) parts.push('PF:'+pf.join('+'));
+          return parts.join(' · ');
+        });
+        const row=ws.addRow([`${p.prenom} ${p.nom}`,p.trigramme||'',...cells,c?.licNum||'',c?.licExp?disp(c.licExp):'']);
+        // couleur licence
+        if(c&&c.licExp){ const s=tSt(c.licExp); const fg={valid:'FF1E8F4E',warning:'FFB8790A',expired:'FFC0392B'}[s]; if(fg){ const lc=row.getCell(header.length); lc.font={color:{argb:'FFFFFFFF'},bold:true}; lc.fill={type:'pattern',pattern:'solid',fgColor:{argb:fg}}; } }
+      });
+      ws.columns.forEach((col,i)=>{ col.width=i===0?22:(i===1?8:(i>=header.length-2?12:16)); });
+      const buf=await wb.xlsx.writeBuffer();
+      const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AeroStaff_Certifying_Staff.xlsx'; a.click();
+      toast('✅ Export Certifying Staff ✓');
+    }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
+
+/* ── Export PDF ── */
+function exportCertifPDF(){
+  const cols=_certifCols();
+  const staff=_certifStaff();
+  if(!staff.length){ toast('Aucun personnel à exporter'); return; }
+  const licClr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
+  const cellHtml=t=>{
+    if(!t) return '—';
+    const cats=(t.cats||[]).length?`<b style="color:#6a5acd">${t.cats.join('/')}</b>`:'';
+    const bits=[]; if(t.taxi)bits.push('<span style="color:#0a7ea4">T</span>');
+    const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
+    if(pf.length)bits.push('<span style="color:#c0562a">'+pf.join('+')+'</span>');
+    return `${cats}${cats&&bits.length?'<br>':''}${bits.join(' ')}`||'·';
+  };
+  const th=cols.map(c=>`<th class="rot" title="${c}">${c}</th>`).join('');
+  const trs=staff.map(p=>{
+    const c=_certifByEmp(p.id);
+    const mT={}; if(c)(c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
+    const tds=cols.map(col=>`<td class="c">${cellHtml(mT[col])}</td>`).join('');
+    const s=c&&c.licExp?tSt(c.licExp):'na';
+    const lic=c&&c.licExp?`<span style="color:${licClr[s]||'#333'};font-weight:700">${disp(c.licExp)}</span>`:'—';
+    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}<td class="c">${lic}</td></tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Certifying Staff</title>
+  <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
+  h1{font-size:17px;margin:0 0 4px}.sub{color:#666;font-size:11px;margin-bottom:14px}
+  table{border-collapse:collapse;margin-top:8px}th,td{border:1px solid #ccd;padding:5px 6px;font-size:10px}
+  th{background:#eef3fb;color:#1a2440}.emp{text-align:left;font-weight:700;white-space:nowrap;min-width:120px}
+  .c{text-align:center}.tri{font-family:monospace;font-weight:700}
+  th.rot{height:70px;white-space:nowrap;vertical-align:bottom}
+  th.rot>*{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto}
+  .legend{margin-top:14px;font-size:11px;color:#444}.foot{margin-top:20px;display:flex;align-items:center;gap:8px}</style></head><body>
+  <h1>Certifying Staff — habilitations avions</h1>
+  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${cols.length} type(s) avion</div>
+  <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}<th>Part 66</th></tr></thead><tbody>${trs}</tbody></table>
+  <div class="legend"><b>Légende :</b> <b style="color:#6a5acd">B1/B2/C</b> catégorie · <span style="color:#0a7ea4">T</span> taxiing · <span style="color:#c0562a">Idle / Max</span> point fixe · Part 66 = expiration licence</div>
+  <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Certifying Staff');
 }
 
 
@@ -12818,9 +13297,9 @@ function _computeKPI(){
   }catch(e){}
   // Qualifications
   try{
-    const active=(S.personnel||[]).filter(p=>p.actif!==false);
-    const allQ=[]; (S.formations||[]).forEach(f=>{ if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
-    (S.autorisations||[]).forEach(a=>{ if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
+    const active=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived);
+    const allQ=[]; (S.formations||[]).forEach(f=>{ if(_empHorsEffectif(f.empId))return; if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
+    (S.autorisations||[]).forEach(a=>{ if(_empHorsEffectif(a.empId))return; if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
     const days=(d)=>Math.round((parseLocal(d)-today)/86400000);
     let exp30=0,exp90=0,expired=0;
     allQ.forEach(q=>{ const dn=days(q.exp); if(dn<0)expired++; else { if(dn<=30)exp30++; if(dn<=90)exp90++; } });
@@ -13008,9 +13487,9 @@ function renderKPI(){
 
   // ── Qualifications ──
   try{
-    const active=(S.personnel||[]).filter(p=>p.actif!==false);
-    const allQ=[]; (S.formations||[]).forEach(f=>{ if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
-    (S.autorisations||[]).forEach(a=>{ if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
+    const active=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived);
+    const allQ=[]; (S.formations||[]).forEach(f=>{ if(_empHorsEffectif(f.empId))return; if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
+    (S.autorisations||[]).forEach(a=>{ if(_empHorsEffectif(a.empId))return; if(a.dateExpiration) allQ.push({empId:a.empId,type:a.type||a.nom,exp:a.dateExpiration}); });
     const days=(d)=>Math.round((parseLocal(d)-today)/86400000);
     let exp30=0,exp90=0,expired=0;
     allQ.forEach(q=>{ const dn=days(q.exp); if(dn<0)expired++; else { if(dn<=30)exp30++; if(dn<=90)exp90++; } });
@@ -14640,7 +15119,7 @@ function aiPlanningActionGuide(q){
     'competenc':'Competencies','compétenc':'Competencies',
     'english':'English','anglais':'English',
     'dismantling':'Aircraft Dismantling','aircraft dismantling':'Aircraft Dismantling','demantelement':'Aircraft Dismantling',
-    'welcome':'Welcome HSE',
+    'welcome':'ACCUEIL HSE',
     'travail en hauteur':'Travail en hauteur','hauteur':'Travail en hauteur',
     'risque chimi':'Risque chimiques','chimi':'Risque chimiques',
     'visite medicale':'Visite Médicale','visite médicale':'Visite Médicale','medical':'Visite Médicale',
@@ -16156,6 +16635,8 @@ function exportMasterPDF(){
       return{txt:_chMsnLabel(e.chantierId),col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
     }
     if(t==='travail') return{txt:'Travail',col:'#1565c0'};
+    if(t==='formation_int') return{txt:(e.formInt||'Formation interne'),col:COLS.formation_int};
+    if(t==='formation') return{txt:(e.note||'Formation'),col:COLS.formation};
     if(t) return{txt:LBL_FULL[t]||t,col:COLS[t]||'#666'};
     return{txt:'',col:'#999'};
   };
@@ -16191,7 +16672,7 @@ function exportMasterPDF(){
       const ds=fmt(d);const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
       const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
       const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
-      return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.02;overflow:hidden;padding:0 1px;white-space:nowrap">${la.txt}${am.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${am.vm}</span>`:''}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.02;overflow:hidden;padding:0 1px;white-space:nowrap">${lp.txt}${pm.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${pm.vm}</span>`:''}</div></div></td>`;
+      return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;min-height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${la.txt}${am.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${am.vm}</span>`:''}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${lp.txt}${pm.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${pm.vm}</span>`:''}</div></div></td>`;
     }).join('');
     const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
     bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
@@ -16234,6 +16715,8 @@ function exportWeekHtml(){
       return{txt:_chMsnLabel(e.chantierId),col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
     }
     if(t==='travail') return{txt:'Travail',col:'#1565c0'};
+    if(t==='formation_int') return{txt:(e.formInt||'Formation interne'),col:'#6a1b9a'};
+    if(t==='formation') return{txt:(e.note||'Formation'),col:COLS.formation};
     if(t) return{txt:LBL[t]||t,col:COLS[t]||'#666'};
     return{txt:'',col:'#999'};
   };
@@ -16338,6 +16821,8 @@ function exportDayHtml(){
       return{txt:ch?ch.nom:'Travail',col:ch?.color&&ch.color.startsWith('#')?ch.color:'#1565c0'};
     }
     if(t==='travail') return{txt:'Travail',col:'#1565c0'};
+    if(t==='formation_int') return{txt:(e.formInt||'Formation interne'),col:'#6a1b9a'};
+    if(t==='formation') return{txt:(e.note||'Formation'),col:COLS.formation};
     if(t) return{txt:LBL[t]||t,col:COLS[t]||'#666'};
     return{txt:'—',col:'#999'};
   };
@@ -16711,6 +17196,11 @@ function _ganttLegendHtml(){
 
 const GLOBAL_REFRESH_FORMS=['EWIS','CDCCL','Safety Training','MOE/PART 145'];
 
+// Formations "présentation / accueil" : planifiables et affichées dans le planning,
+// mais SANS suivi ni date d'expiration (aucune ligne créée dans l'onglet Formations,
+// aucune demande de confirmation "à confirmer"). Modifiable librement.
+const FORM_NO_TRACKING=new Set(['NEW ARRIVAL TRAINING']);
+
 // Validité par défaut (en années) pour chaque formation interne — modifiable au moment de la confirmation
 const FORM_VALIDITY_YEARS={
   'EWIS':2,
@@ -16744,6 +17234,22 @@ function _fmtExpPreview(dateObt, years){
 function getPendingFormConfirmations(){
   if(!S.formTracking) return [];
   const today=fmt(new Date());
+  // Un rappel n'est valide que si le planning contient TOUJOURS cette formation interne
+  // (même intitulé) sur cette date, matin OU après-midi. Si la case a été changée
+  // (autre intitulé, autre type) ou vidée, la formation n'est plus « à confirmer » :
+  // on retire l'entrée du suivi pour ne pas garder de rappel fantôme.
+  const stillPlanned=(t)=>{
+    const am=S.planning[`${t.empId}_${t.date}_AM`]||{};
+    const pm=S.planning[`${t.empId}_${t.date}_PM`]||{};
+    const match=e=>e && e.type==='formation_int' && (e.formInt||'')===t.formInt;
+    return match(am)||match(pm);
+  };
+  let pruned=false;
+  S.formTracking=S.formTracking.filter(t=>{
+    if(t.status==='planned' && (FORM_NO_TRACKING.has(t.formInt) || !stillPlanned(t))){ pruned=true; return false; }
+    return true;
+  });
+  if(pruned){ try{ save(); }catch(_){} }
   return S.formTracking.filter(t=>t.status==='planned' && t.date<today);
 }
 
@@ -16751,6 +17257,13 @@ function getPendingFormConfirmations(){
 function confirmFormDone(trackId,done,customYears){
   const t=(S.formTracking||[]).find(x=>x.id===trackId);
   if(!t) return;
+  // Formation "présentation / accueil" : aucune ligne de suivi, on referme simplement l'entrée
+  if(FORM_NO_TRACKING.has(t.formInt)){
+    t.status=done?'done':'skipped';
+    t.confirmedDate=fmt(new Date());
+    save();
+    return;
+  }
   if(done){
     // Date d'obtention = date PLANIFIÉE (jour réel de la formation), pas la date de confirmation
     const formDate=t.date;
