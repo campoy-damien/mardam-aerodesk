@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260722-CERTIF -->
+<!-- AeroStaff Pro v7 — Build 20260722-STRUCT -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -168,6 +168,7 @@ console.log('%c© 2025 Damien Campoy — MARDAM AeroDesk Pro','color:#00d2ff;fon
   --tech:      #a88c6a;
   --expert:    #2979ff;
   --workshop:  #00c2a8;
+  --sheetmetal: #6d8fb0;
   --alt:       #00e5b0;
   --stag:      #84fab0;
   --interim:   #c084fc;
@@ -432,6 +433,7 @@ body::before{
 .b-iq{background:rgba(0,160,255,0.12);color:#00a0ff;border:1px solid rgba(0,160,255,0.3)}
 .b-exp{background:rgba(41,121,255,0.12);color:#82b1ff;border:1px solid rgba(41,121,255,0.25)}
 .b-workshop{background:rgba(0,194,168,0.14);color:#4de3cd;border:1px solid rgba(0,194,168,0.3)}
+.b-sheetmetal{background:rgba(109,143,176,0.16);color:#a7c1de;border:1px solid rgba(109,143,176,0.35)}
 .b-alt{background:rgba(0,229,176,0.12);color:var(--alt);border:1px solid rgba(0,229,176,0.25)}
 .b-stag{background:rgba(132,250,176,0.12);color:var(--stag);border:1px solid rgba(132,250,176,0.25)}
 .b-int{background:rgba(192,132,252,0.12);color:var(--purple);border:1px solid rgba(192,132,252,0.25)}
@@ -744,6 +746,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .sc.technicien::before{background:linear-gradient(90deg,#a88c6a,#c9a87c)}
 .sc.expert::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
 .sc.workshop::before{background:linear-gradient(90deg,#00c2a8,#4de3cd)}
+.sc.sheetmetal::before{background:linear-gradient(90deg,#6d8fb0,#a7c1de)}
 .sc.alternant::before{background:linear-gradient(90deg,var(--mint),var(--lime))}
 .sc.stagiaire::before{background:linear-gradient(90deg,var(--stag),#b2fcc9)}
 .sc.interimaire::before{background:linear-gradient(90deg,var(--purple),#e8b4ff)}
@@ -1258,6 +1261,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <select id="mp-emp" onchange="renderMaster()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select>
       <select id="mp-year" onchange="renderMaster()" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select>
       <button class="btn btn-gold btn-sm" onclick="openM('m-hol')">🎉 Jours fériés</button>
+      <button class="btn btn-cyan btn-sm" onclick="openAffectPerm()">📌 Affectation permanente</button>
     </div>
   </div>
   <div class="legend" id="legMaster"></div>
@@ -1658,6 +1662,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="ftab" onclick="filterStaff('technicien',this)">Techniciens</button>
     <button class="ftab" onclick="filterStaff('expert',this)">Experts</button>
     <button class="ftab" onclick="filterStaff('workshop',this)" style="color:#00c2a8;border-color:rgba(0,194,168,0.3)">🛠 Workshop Manager</button>
+    <button class="ftab" onclick="filterStaff('sheetmetal',this)" style="color:#6d8fb0;border-color:rgba(109,143,176,0.4)">🔩 Sheet Metal Worker</button>
     <button class="ftab" onclick="filterStaff('recycling',this)" style="color:#ff9a3c;border-color:rgba(255,154,60,0.3)">♻️ A/C Recycling</button>
     <button class="ftab" onclick="filterStaff('part21',this)" style="color:#0064c8;border-color:rgba(0,160,255,0.3)">✈️ Tech Part 21</button>
     <button class="ftab" onclick="filterStaff('iq',this)" style="color:#00a0ff;border-color:rgba(0,160,255,0.3)">🔍 Insp. Qualité</button>
@@ -2348,7 +2353,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">📊 Export Excel coloré</strong> — fichier .xlsx avec les couleurs des chantiers, personnel regroupé par catégorie, nom de chantier + MSN dans chaque case, volets figés et légendes<br>
         • <strong style="color:#ffd060">📄 Export PDF</strong> — rendu coloré regroupé par catégorie, nom de chantier complet dans les cases + légende, idéal à envoyer aux collaborateurs<br>
         • <strong style="color:#ffd060">🖱 Sélection multiple (souris, ordinateur)</strong> — glisser pour sélectionner un bloc de cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V). Glisser sur une seule demi-journée (PM→PM ou AM→AM) ne sélectionne que celle-ci ; AM→PM prend les journées entières. Coller remplit toute la sélection sans toucher les demi-journées non sélectionnées<br>
-        • <strong style="color:#ffd060">🖌 Pinceau</strong> — dans l'éditeur d'une case, « Copier vers d'autres » puis taper les cases à remplir (fonctionne aussi sur iPad/iPhone)
+        • <strong style="color:#ffd060">🖌 Pinceau</strong> — dans l'éditeur d'une case, « Copier vers d'autres » puis taper les cases à remplir (fonctionne aussi sur iPad/iPhone)<br>
+        • <strong style="color:#00d2ff">📌 Affectation permanente sur l'année</strong> — bouton en haut de page : choisis une <strong>personne</strong>, une <strong>activité</strong> (chantier, 🔩 Structure, ✈️ Part 21, 📦 Stockage), une <strong>période</strong> (bouton « Année entière » pour 01/01→31/12) et la portée (journées / matins / après-midis). L'app remplit toutes les demi-journées ouvrées d'un coup — <strong style="color:#6effc4">sans jamais écraser</strong> les congés, formations, absences, déplacements, week-ends et fériés déjà saisis. Une estimation s'affiche avant validation. Idéal pour donner à un chef d'équipe (Structure, Part 21…) sa ligne sur toute l'année.<br>
+        • <strong style="color:#a7c1de">🔩 Activité Structure</strong> — entrée globale permanente dans le déroulant d'affectation, comme Stockage / Part 21, pour les travaux de structure atelier non rattachés à un avion précis
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Après avoir saisi une case, le planning <strong>reste à la position où tu étais</strong> — plus besoin de rescroller. Mêmes données que le Planning Hebdo.</div>
       </div>
     </div>
@@ -2427,7 +2434,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">Fiche</strong> — prénom, nom, trigramme, catégorie, poste, contrat, coordonnées<br>
-        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Workshop Manager, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager. <strong>Workshop Manager</strong> est un <strong>improductif</strong> (comme Expert et Responsable projet) : exclu de la capacité de production, classé en « Encadrement (improductif) »<br>
+        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Sheet Metal Worker, Chef d'équipe, Expert, Workshop Manager, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager. <strong>Workshop Manager</strong> est un <strong>improductif</strong> (comme Expert et Responsable projet) : exclu de la capacité de production, classé en « Encadrement (improductif) ». <strong style="color:#a7c1de">Sheet Metal Worker</strong> = personnel <strong>structure de l'atelier</strong> : catégorie <strong>productive</strong>, comptée dans la capacité de production au même titre que les Techniciens<br>
         • <strong style="color:#ffd060">Niveau</strong> — pour Technicien et Intérimaire, un menu (Meca Niveau 1/2/3, Tech Niveau 1/2/3/4) à côté du téléphone ; affiché sur la fiche profil<br>
         • <strong style="color:#ffd060">Actif/Inactif</strong> — les inactifs n'apparaissent pas dans les plannings<br>
         • <strong style="color:#ffd060">Trigramme</strong> — identifiant court dans les plannings (ex: DCA)<br>
@@ -2542,12 +2549,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         Tableau de bord stratégique — charge vs capacité sur toute l'année.<br>
         • <strong style="color:#ffd060">DISPO</strong> — techniciens réellement disponibles (capacité, absences déduites)<br>
-        • <strong style="color:#ffd060">BESOIN</strong> — 🔧 Chantiers + ✈️ Stockage + ✈️ Part 21 + ♻️ Recyclage cumulés<br>
-        • <strong style="color:#ffd060">Clic sur un besoin (ⓘ détail)</strong> — ouvre le détail de la semaine : chaque chantier, la ligne Stockage, la ligne Part 21, et <strong>une ligne par avion en recyclage</strong> (en cours / à venir)<br>
+        • <strong style="color:#ffd060">BESOIN</strong> — 🔧 Chantiers + ✈️ Stockage + ✈️ Part 21 + ♻️ Recyclage + 🔩 Structure cumulés<br>
+        • <strong style="color:#ffd060">Clic sur un besoin (ⓘ détail)</strong> — ouvre le détail de la semaine : chaque chantier, la ligne Stockage, la ligne Part 21, <strong>une ligne par avion en recyclage</strong> (en cours / à venir), et la <strong style="color:#a7c1de">ligne 🔩 Structure avec la liste des personnes affectées</strong> (nom + trigramme)<br>
         • <strong style="color:#ffd060">ÉCART</strong> — vert = suffisant, rouge = manque d'effectif<br>
         • <strong style="color:#ffd060">Gantt + sélecteur d'année</strong> — tous les chantiers visualisés sur l'année choisie (jusqu'à 2060)<br>
         • <strong style="color:#ffd060">Colonne 📍 rouge</strong> — repère la semaine en cours
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique. Les <strong style="color:#ff9a3c">avions en recyclage</strong> en cours / à venir y figurent aussi, dans une section <strong style="color:#ff9a3c">♻️ RECYCLAGE</strong> : chaque avion (Type — MSN) est une ligne éditable comme un chantier, avec son besoin théorique par défaut (techniciens recyclage affectés → nombre fixe → calcul par pièces). Le tableau intègre également une ligne <strong style="color:#82b1ff">📦 Stockage</strong> (MH ÷ 35) et une ligne <strong style="color:#00a0ff">✈️ Airbus Part 21</strong> (Part 21 + IQ), éditables sur toutes les semaines. Toute valeur saisie prime sur le calcul automatique dans le besoin total de la semaine. <strong>Tu pilotes ainsi 100 % des activités depuis ce seul tableau.</strong></div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique. Les <strong style="color:#ff9a3c">avions en recyclage</strong> en cours / à venir y figurent aussi, dans une section <strong style="color:#ff9a3c">♻️ RECYCLAGE</strong> : chaque avion (Type — MSN) est une ligne éditable comme un chantier, avec son besoin théorique par défaut (techniciens recyclage affectés → nombre fixe → calcul par pièces). Le tableau intègre également une ligne <strong style="color:#82b1ff">📦 Stockage</strong> (MH ÷ 35), une ligne <strong style="color:#00a0ff">✈️ Airbus Part 21</strong> (Part 21 + IQ) et une ligne <strong style="color:#a7c1de">🔩 Structure</strong> (Sheet Metal Workers affectés à l'activité Structure), éditables sur toutes les semaines. Toute valeur saisie prime sur le calcul automatique dans le besoin total de la semaine. <strong>Tu pilotes ainsi 100 % des activités depuis ce seul tableau.</strong></div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les semaines en rouge permettent d'anticiper les renforts avant qu'elles arrivent. Détail du calcul → section 🧮 Méthodes de calcul.</div>
       </div>
     </div>
@@ -2560,7 +2567,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 16px;font-size:13px;color:var(--t2);line-height:1.75;border-top:1px solid rgba(255,255,255,0.06)">
 
         <div style="margin:12px 0 6px;font-size:13px;font-weight:800;color:#82b1ff">1 · La CAPACITÉ (DISPO) — combien de personnes peuvent travailler</div>
-        L'app part de l'effectif <strong>réellement qualifié et productif</strong>, c'est-à-dire les personnes dont la catégorie est <strong style="color:#ffd060">Technicien</strong> ou <strong style="color:#ffd060">Intérimaire</strong>. Les responsables, chefs d'équipe, experts, fonctions support et <strong style="color:#ff8fa3">apprentis/alternants</strong> ne sont pas comptés dans la capacité de production — les apprentis ne sont pas (encore) qualifiés et n'apportent pas de main d'œuvre productive sur les chantiers.<br><br>
+        L'app part de l'effectif <strong>réellement qualifié et productif</strong>, c'est-à-dire les personnes dont la catégorie est <strong style="color:#ffd060">Technicien</strong>, <strong style="color:#ffd060">Intérimaire</strong> ou <strong style="color:#a7c1de">Sheet Metal Worker</strong>. Les responsables, chefs d'équipe, experts, workshop managers, fonctions support et <strong style="color:#ff8fa3">apprentis/alternants</strong> ne sont pas comptés dans la capacité de production — les apprentis ne sont pas (encore) qualifiés et n'apportent pas de main d'œuvre productive sur les chantiers.<br><br>
         Pour <strong>chaque semaine</strong>, l'app regarde le planning de chacun (lundi → vendredi, en demi-journées AM/PM) et calcule un taux de présence :<br>
         • Une demi-journée en <strong>Travail</strong> = présent &nbsp;·&nbsp; une demi-journée en Congé / Maladie / Formation / Absence / Déplacement / Férié = absent<br>
         • Une personne présente toute la semaine compte pour <strong>1,0</strong> &nbsp;·&nbsp; absente la moitié = <strong>0,5</strong><br>
@@ -2742,7 +2749,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260722-CERTIF · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260722-STRUCT · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -2990,6 +2997,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="technicien">Technicien / Mécanicien</option>
         <option value="expert">Expert</option>
         <option value="workshop">Workshop Manager</option>
+        <option value="sheetmetal">Sheet Metal Worker</option>
         <option value="alternant">Alternant</option>
         <option value="stagiaire">Stagiaire</option>
         <option value="interimaire">Intérimaire</option>
@@ -3319,7 +3327,35 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 </div>
 
-<!-- Sync Cloud — Google Apps Script -->
+<!-- Affectation permanente sur l'année -->
+<div class="mbg" id="m-affectperm">
+<div class="modal" style="max-width:480px">
+  <div class="modal-title">📌 Affectation permanente sur l'année</div>
+  <div class="fgrid">
+    <div class="field" style="grid-column:1/-1"><label>Personne *</label><select id="ap-emp"></select></div>
+    <div class="field" style="grid-column:1/-1"><label>Activité *</label><select id="ap-act"></select></div>
+    <div class="field"><label>Du</label><input type="date" id="ap-from"></div>
+    <div class="field"><label>Au</label><input type="date" id="ap-to"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin:10px 0">
+    <button type="button" class="btn btn-ghost btn-sm" onclick="apSetYear()" style="flex:1">📅 Année entière</button>
+    <select id="ap-scope" style="flex:1;height:34px;border-radius:8px;padding:0 10px;background:var(--glass-2);color:var(--t1);border:1px solid var(--glass-border);font-size:12px">
+      <option value="full">Journées complètes</option>
+      <option value="am">Matins seulement</option>
+      <option value="pm">Après-midis seulement</option>
+    </select>
+  </div>
+  <div style="padding:11px 13px;border-radius:10px;background:rgba(110,255,196,0.08);border:1px solid rgba(110,255,196,0.25);margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#6effc4;margin-bottom:5px">🛡 Priorité aux absences — jamais écrasées</div>
+    <div style="font-size:12px;color:var(--t3);line-height:1.6">Congés, formations, absences, déplacements, week-ends et jours fériés déjà présents sont <b>conservés</b>. Seules les demi-journées <b>libres</b> sont remplies avec l'activité.</div>
+  </div>
+  <div id="ap-estim" style="font-size:12px;color:var(--t3);padding:8px 12px;background:var(--glass-1);border-radius:9px;margin-bottom:6px">Choisissez une personne, une activité et une période.</div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-affectperm')">Annuler</button>
+    <button class="btn btn-cyan" onclick="applyAffectPerm()">Affecter sur la période</button>
+  </div>
+</div>
+</div>
 <div class="mbg" id="m-drive">
 <div class="modal" style="max-width:580px;max-height:92vh">
   <div class="modal-title">☁️ Sync Google Drive</div>
@@ -3630,6 +3666,7 @@ const CATS = {
   technicien: {lbl:'Technicien/Mécan.',   col:'var(--tech)',   b:'b-tech'},
   expert:     {lbl:'Expert',              col:'var(--expert)', b:'b-exp'},
   workshop:   {lbl:'Workshop Manager',    col:'var(--workshop)', b:'b-workshop'},
+  sheetmetal: {lbl:'Sheet Metal Worker',  col:'var(--sheetmetal)', b:'b-sheetmetal'},
   alternant:  {lbl:'Alternant',           col:'var(--alt)',    b:'b-alt'},
   stagiaire:  {lbl:'Stagiaire',           col:'var(--stag)',   b:'b-stag'},
   interimaire:{lbl:'Intérimaire',         col:'var(--interim)',      b:'b-int'},
@@ -5837,7 +5874,7 @@ function aiSimInternalAnalysis(params){
 
 function buildSimContext(p){
   const today=new Date();
-  const techs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire')&&x.actif!==false);
+  const techs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&x.actif!==false);
   const chantiers=S.chantiers.filter(c=>['encours','futur'].includes(c.statut));
   const recap=chantiers.map(c=>`- ${c.nom} (${c.debut||'?'}→${c.fin||'?'}) | ${c.ressources?.technicien||0} techs | ${c.manHours||0}MH`).join('\n');
   const teamLine=techs.map(t=>`${t.prenom} ${t.nom} (${t.trigramme||'—'})`).join(', ');
@@ -5897,7 +5934,7 @@ function renderSimCapaTable(p){
   while(w<=end){weeks.push(new Date(w));w=addD(w,7);}
 
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const allTechs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire')&&x.actif!==false);
+  const allTechs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&x.actif!==false);
 
   let html=`<table style="width:100%;border-collapse:collapse;font-size:12px">
   <thead><tr>
@@ -6079,6 +6116,18 @@ function showBesoinsDetail(el, dataJson){
       <div style="font-size:16px;font-weight:900;color:#00a0ff">${d.airbusT}T</div>
     </div>`;
   }
+  if(d.structT>0){
+    const noms=(d.detailStruct||[]).map(p=>p.nom+(p.tri?` (${p.tri})`:'')).join(', ');
+    rows+=`<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="width:3px;height:32px;border-radius:2px;background:#6d8fb0;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:#a7c1de">🔩 Structure</div>
+        <div style="font-size:10px;color:#607090">Atelier · Sheet Metal Workers</div>
+        ${noms?`<div style="font-size:10px;color:#9fb3cc;margin-top:3px;line-height:1.5">${noms}</div>`:''}
+      </div>
+      <div style="font-size:16px;font-weight:900;color:#a7c1de;flex-shrink:0">${d.structT}T</div>
+    </div>`;
+  }
 
   pop.style.cssText=`position:fixed;z-index:9999;background:#141b2d;border:1px solid rgba(0,210,255,0.25);border-radius:14px;padding:14px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.6);`;
   pop.innerHTML=`
@@ -6087,10 +6136,11 @@ function showBesoinsDetail(el, dataJson){
       <button onclick="document.getElementById('pop-besoins').remove()" style="background:none;border:none;color:#8090a8;font-size:16px;cursor:pointer;padding:0;line-height:1">✕</button>
     </div>
     <div>${rows||'<span style="color:#8090a8;font-size:12px">Aucun détail disponible</span>'}</div>
-    <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;font-size:11px;color:#607090">
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px;color:#607090">
       <span>🔧 Chantiers: <strong style="color:#82b1ff">${d.chantierT}</strong></span>
       <span>✈️ Stock: <strong style="color:#a0b8d8">${d.stockT||0}</strong></span>
       <span>♻️ Rec: <strong style="color:#ff9a3c">${d.recT||0}</strong></span>
+      <span>🔩 Struct: <strong style="color:#a7c1de">${d.structT||0}</strong></span>
     </div>`;
 
   // Positionner près de l'élément cliqué
@@ -6211,7 +6261,7 @@ function _sortByNom(list){
 function _catColArgb(cat){
   const hard={recycling:'ff9a3c',part21:'0064c8',iq:'00a0ff'};
   if(hard[cat]) return 'FF'+hard[cat];
-  const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+  const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',sheetmetal:'--sheetmetal',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
   const v=getComputedStyle(document.documentElement).getPropertyValue(map[cat]||'').trim();
   return 'FF'+(v?v.replace('#','').slice(0,6):'cccccc');
 }
@@ -6391,6 +6441,13 @@ function popSelects(){
       o.textContent='✈️ Airbus — Activité Part 21';
       cc.appendChild(o);
     }
+    // Entrée Structure atelier — toujours visible
+    {
+      const o=document.createElement('option');
+      o.value='STRUCT';
+      o.textContent='🔩 Structure — atelier';
+      cc.appendChild(o);
+    }
     // Recopier les mêmes options dans le 2ᵉ chantier
     const cc2=document.getElementById('cellChantier2');
     if(cc2){ cc2.innerHTML='<option value="">— Aucun —</option>'+cc.innerHTML.replace(/^<option value="">[^<]*<\/option>/,''); }
@@ -6472,7 +6529,7 @@ function renderDash(){
   const _mon=getMon(new Date());
   const _wEnd=addD(_mon,6);
   const _ABSENT=new Set(['conge','maladie','formation','formation_int','absence','deplacement','ferie','we']);
-  const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
   // Dispo de la semaine
   let _dispo=0;
   _techs.forEach(p=>{
@@ -7101,6 +7158,7 @@ function _chColor(cid){
   if(!cid) return '#2979ff';
   if(cid==='STO') return '#ff9a3c';
   if(cid==='AIRBUS') return '#00a0ff';
+  if(cid==='STRUCT') return '#6d8fb0';
   if(cid==='REC'||cid.startsWith('REC_')) return '#6effc4';
   const ch=S.chantiers.find(c=>c.id===cid); return ch?.color||'#2979ff';
 }
@@ -7110,6 +7168,7 @@ function _chMsnLabel(cid){
   if(!cid) return '';
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
+  if(cid==='STRUCT') return '\ud83d\udd29 STRU';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(t?t+' - ':'')+(av.msn||'?'); }
   const ch=S.chantiers.find(c=>c.id===cid);
@@ -7123,6 +7182,7 @@ function _chMsnShort(cid){
   if(!cid) return '';
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
+  if(cid==='STRUCT') return '\ud83d\udd29 STRU';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(av.msn||'?')+(t?' \u00b7 '+t:''); }
   const ch=S.chantiers.find(c=>c.id===cid);
@@ -7198,6 +7258,10 @@ function buildGrid(emps,dates,containerId){
           color='#00a0ff';
           label='Airbus — Activité Part 21';
           icon='✈️';
+        } else if(cId==='STRUCT'){
+          color='#6d8fb0';
+          label='Structure — atelier';
+          icon='🔩';
         } else if(cId==='REC'){
           color='#6effc4';
           label='Recyclage';
@@ -7222,7 +7286,7 @@ function buildGrid(emps,dates,containerId){
       if(groupKey !== lastGroupKey){
         lastGroupKey = groupKey;
         const catInfo = CATS[groupKey] || {lbl: groupKey, col:'rgba(255,255,255,0.3)'};
-        const catIcons = {chef:'👷', responsable:'🎯', expert:'🔬', workshop:'🛠',  technicien:'🔧', recycling:'♻️', interimaire:'⏱', prestataire:'🤝', alternant:'📚', stagiaire:'🎓', part21:'✈️', iq:'🔍'};
+        const catIcons = {chef:'👷', responsable:'🎯', expert:'🔬', workshop:'🛠', sheetmetal:'🔩',  technicien:'🔧', recycling:'♻️', interimaire:'⏱', prestataire:'🤝', alternant:'📚', stagiaire:'🎓', part21:'✈️', iq:'🔍'};
         separator = `<tr>
           <td colspan="${numCols}" style="padding:5px 14px 4px;background:rgba(16,23,38,0.90);border-top:2px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.06)">
             <span style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:${catInfo.col||'rgba(255,255,255,0.35)'}">
@@ -7253,12 +7317,14 @@ function buildGrid(emps,dates,containerId){
         if(am.chantierId==='STO'){amStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
         else if(amRecAv||am.chantierId==='REC'){amStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(am.chantierId==='AIRBUS'){amStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
+        else if(am.chantierId==='STRUCT'){amStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
         else{const ch=S.chantiers.find(c=>c.id===am.chantierId);if(ch?.color){amStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`;}}
       }
       if(pt==='travail'&&pm.chantierId){
         if(pm.chantierId==='STO'){pmStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
         else if(pmRecAv||pm.chantierId==='REC'){pmStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(pm.chantierId==='AIRBUS'){pmStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
+        else if(pm.chantierId==='STRUCT'){pmStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
         else{const ch=S.chantiers.find(c=>c.id===pm.chantierId);if(ch?.color){pmStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color}`;}}
       }
 
@@ -7691,8 +7757,100 @@ function _plKey(e){
 /* ═══ MASTER ═══ */
 function chMonth(dir){S.masterMonth+=dir;if(S.masterMonth>11){S.masterMonth=0;S.masterYear++;}if(S.masterMonth<0){S.masterMonth=11;S.masterYear--;}renderMaster();}
 function goToday(){S.masterMonth=new Date().getMonth();S.masterYear=new Date().getFullYear();renderMaster();}
+
+/* ═══ AFFECTATION PERMANENTE SUR L'ANNÉE ═══ */
+// Liste des activités affectables (chantiers actifs + activités globales)
+function _affectActivities(){
+  const acts=[];
+  (S.chantiers||[]).filter(c=>c.statut!=='termine').forEach(c=>acts.push({v:c.id,l:c.nom}));
+  acts.push({v:'STRUCT',l:'🔩 Structure — atelier'});
+  acts.push({v:'AIRBUS',l:'✈️ Airbus — Part 21'});
+  acts.push({v:'STO',l:'📦 Stockage'});
+  return acts;
+}
+function openAffectPerm(){
+  const emps=_sortByNom((S.personnel||[]).filter(p=>p.actif!==false && !p.archived))
+    .sort((a,b)=>`${a.nom} ${a.prenom}`.localeCompare(`${b.nom} ${b.prenom}`,'fr',{sensitivity:'base'}));
+  const es=document.getElementById('ap-emp');
+  es.innerHTML='<option value="">— choisir —</option>'+emps.map(p=>`<option value="${p.id}">${(p.nom||'').toUpperCase()} ${p.prenom||''}${p.trigramme?' ('+p.trigramme+')':''}</option>`).join('');
+  const as=document.getElementById('ap-act');
+  as.innerHTML='<option value="">— choisir —</option>'+_affectActivities().map(a=>`<option value="${a.v}">${a.l}</option>`).join('');
+  // pré-remplir année en cours
+  apSetYear();
+  ['ap-emp','ap-act','ap-from','ap-to','ap-scope'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.onchange=_apEstim; el.oninput=_apEstim; } });
+  document.getElementById('ap-estim').textContent='Choisissez une personne, une activité et une période.';
+  openM('m-affectperm');
+}
+function apSetYear(){
+  const y=(S.masterYear)||new Date().getFullYear();
+  document.getElementById('ap-from').value=`${y}-01-01`;
+  document.getElementById('ap-to').value=`${y}-12-31`;
+  _apEstim();
+}
+// Calcule les demi-journées LIBRES qui seraient remplies (sans écraser absences/WE/férié/existant)
+function _apScan(empId,fromISO,toISO,scope){
+  const res={fill:0, skipAbs:0, skipWE:0, skipHol:0, skipTaken:0};
+  if(!empId||!fromISO||!toISO) return res;
+  let d=parseLocal(fromISO), end=parseLocal(toISO);
+  const slots = scope==='am'?['AM']: scope==='pm'?['PM']:['AM','PM'];
+  while(d<=end){
+    const ds=fmt(d), wd=d.getDay(), we=(wd===0||wd===6), hol=isHol(ds);
+    slots.forEach(sl=>{
+      if(we){ res.skipWE++; return; }
+      if(hol){ res.skipHol++; return; }
+      const ex=S.planning[`${empId}_${ds}_${sl}`];
+      if(ex&&ex.type){ if(ex.type==='travail') res.skipTaken++; else res.skipAbs++; return; }
+      res.fill++;
+    });
+    d=addD(d,1);
+  }
+  return res;
+}
+function _apEstim(){
+  const empId=document.getElementById('ap-emp').value;
+  const act=document.getElementById('ap-act').value;
+  const from=document.getElementById('ap-from').value;
+  const to=document.getElementById('ap-to').value;
+  const scope=document.getElementById('ap-scope').value;
+  const box=document.getElementById('ap-estim');
+  if(!empId||!act||!from||!to){ box.textContent='Choisissez une personne, une activité et une période.'; return; }
+  const r=_apScan(empId,from,to,scope);
+  box.innerHTML=`ℹ️ Estimation : <b>${r.fill}</b> demi-journée(s) libre(s) seront remplies. Conservées : ${r.skipAbs} absence(s)/formation(s), ${r.skipTaken} déjà affectée(s), ${r.skipWE} week-end, ${r.skipHol} férié(s).`;
+}
+function applyAffectPerm(){
+  const empId=document.getElementById('ap-emp').value;
+  const act=document.getElementById('ap-act').value;
+  const from=document.getElementById('ap-from').value;
+  const to=document.getElementById('ap-to').value;
+  const scope=document.getElementById('ap-scope').value;
+  if(!empId){ toast('⚠️ Sélectionnez une personne'); return; }
+  if(!act){ toast('⚠️ Sélectionnez une activité'); return; }
+  if(!from||!to){ toast('⚠️ Renseignez la période'); return; }
+  let d=parseLocal(from), end=parseLocal(to);
+  if(d>end){ toast('⚠️ La date de début est après la fin'); return; }
+  const slots = scope==='am'?['AM']: scope==='pm'?['PM']:['AM','PM'];
+  let n=0;
+  while(d<=end){
+    const ds=fmt(d), wd=d.getDay(), we=(wd===0||wd===6), hol=isHol(ds);
+    if(!we&&!hol){
+      slots.forEach(sl=>{
+        const k=`${empId}_${ds}_${sl}`, ex=S.planning[k];
+        if(ex&&ex.type) return;                       // ne jamais écraser (absence, formation, ou déjà affecté)
+        S.planning[k]={type:'travail',note:'',chantierId:act};
+        n++;
+      });
+    }
+    d=addD(d,1);
+  }
+  save();
+  closeM('m-affectperm');
+  if(typeof renderMaster==='function') renderMaster();
+  if(typeof renderWeekly==='function') renderWeekly();
+  if(typeof renderProgramme==='function') renderProgramme();
+  toast(`✅ ${n} demi-journée(s) affectée(s)`);
+}
 /* ═══ TRI PERSONNEL ═══ */
-const CAT_ORDER = {chef:1, responsable:2, expert:3, workshop:3.5, technicien:4, recycling:5, interimaire:6, prestataire:7, alternant:8, stagiaire:9, part21:10, iq:11};
+const CAT_ORDER = {chef:1, responsable:2, expert:3, workshop:3.5, technicien:4, sheetmetal:4.5, recycling:5, interimaire:6, prestataire:7, alternant:8, stagiaire:9, part21:10, iq:11};
 function sortPersonnel(list){
   return [...list].sort((a,b)=>{
     const oa = CAT_ORDER[a.categorie] || 99;
@@ -8513,7 +8671,7 @@ function renderAvancement(){
   const MH_PAR_TECH_JOUR=7;
   // Uniquement techniciens + intérimaires dans les MH chantier
   const allTechs=S.personnel.filter(p=>
-    (p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false
+    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false
   );
   const techIds=new Set(allTechs.map(p=>p.id));
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
@@ -9243,14 +9401,14 @@ function applyPointage(){
 }
 const REX_H_JOUR=7;            // 7 h par jour ⇒ 3,5 h par demi-journée (même règle que l'avancement)
 const REX_GROUPS=[
-  {k:'prod',   lbl:'Production',            cats:['technicien','interimaire'],        col:'#2979ff'},
+  {k:'prod',   lbl:'Production',            cats:['technicien','interimaire','sheetmetal'], col:'#2979ff'},
   {k:'soust',  lbl:'Sous-traitance',        cats:['prestataire'],                     col:'#7c5cff'},
   {k:'improd', lbl:'Encadrement (improd.)', cats:['chef','expert','responsable','workshop'],     col:'#ff9a3c'},
   {k:'autres', lbl:'Autres',                cats:['alternant','stagiaire','iq','part21','recycling'], col:'#8e8e93'}
 ];
 const _rexGroupOf=cat=>{ const g=REX_GROUPS.find(g=>g.cats.includes(cat)); return g?g.k:'autres'; };
 // Couleurs réelles des catégories de personnel (mêmes que les variables CSS de l'app)
-const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',workshop:'#00c2a8',
+const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',workshop:'#00c2a8',sheetmetal:'#6d8fb0',
   alternant:'#00e5b0',stagiaire:'#84fab0',interimaire:'#c084fc',prestataire:'#ffdd00',
   recycling:'#ff9a3c',part21:'#0064c8',iq:'#00a0ff'};
 const _catHex=cat=>CAT_HEX[cat]||'#8e8e93';
@@ -10530,7 +10688,7 @@ function renderRecyclingAvancement(){
   // Suivi avancement : toutes les personnes physiques qui démontent des pièces
   // (recycling, technicien, interimaire, alternant, prestataire, chef, expert)
   // Le filtre Charge/Capa reste lui sur recycling uniquement
-  const CATS_AVANCEMENT=new Set(['recycling','technicien','interimaire','alternant','prestataire','chef','expert']);
+  const CATS_AVANCEMENT=new Set(['recycling','technicien','interimaire','sheetmetal','alternant','prestataire','chef','expert']);
   const recTechs=S.personnel.filter(function(p){return CATS_AVANCEMENT.has(p.categorie)&&p.actif!==false;});
 
   function calcTheo(av){
@@ -11270,7 +11428,7 @@ function renderStockageCharge(){
   const weeks=[];
   for(let w=0;w<12;w++) weeks.push(getMon(addD(baseWeek,w*7)));
 
-  const techPersonnel=S.personnel.filter(p=>['technicien','interimaire'].includes(p.categorie)&&p.actif!==false);
+  const techPersonnel=S.personnel.filter(p=>['technicien','interimaire','sheetmetal'].includes(p.categorie)&&p.actif!==false);
   const ABSENT_TYPES=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
 
   const getCapaWeek=mon=>{
@@ -12224,7 +12382,7 @@ function toggleMoteurAutre(val){
 }
 
 function togglePrestFields(cat){
-  const CDI_CATS=['technicien','chef','expert','workshop','responsable','recycling','part21','iq'];
+  const CDI_CATS=['technicien','sheetmetal','chef','expert','workshop','responsable','recycling','part21','iq'];
   const isPrest=cat==='prestataire';
   const isInt=cat==='interimaire';
 
@@ -13547,7 +13705,7 @@ function _computeKPI(){
     const eff=dd.nbTechs;
     const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
     const ecart=Math.round((dd.dispo-bb.total)*10)/10;
-    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
     let absH=0,totH=0,formH=0;
     prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
     const tauxAbs=totH>0?Math.round(absH/totH*100):0;
@@ -13565,7 +13723,7 @@ function _computeKPI(){
   }catch(e){}
   // Chantiers en cours
   try{
-    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
     const todayStr=fmt(today);
     const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
     const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
@@ -13733,7 +13891,7 @@ function renderKPI(){
     const eff=dd.nbTechs;
     const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
     const ecart=Math.round((dd.dispo-bb.total)*10)/10;
-    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
     let absH=0,totH=0,formH=0;
     prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
     const tauxAbs=totH>0?Math.round(absH/totH*100):0;
@@ -13752,7 +13910,7 @@ function renderKPI(){
 
   // ── Chantiers ──
   try{
-    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
     const todayStr=fmt(today);
     const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
     const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
@@ -13978,7 +14136,7 @@ function aiGetContext(){
 
   // Compute MH consumed per chantier (techniciens + intérimaires uniquement)
   const EXCLURE_MH_AI=new Set(['chef','expert','manager','workshop','responsable']);
-  const techOnlyIds=new Set(S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false).map(p=>p.id));
+  const techOnlyIds=new Set(S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
   const mhInfo=chantiersActifs.map(c=>{
     let mhCons=0;
     Object.entries(S.planning||{}).forEach(([key,entry])=>{
@@ -14481,7 +14639,7 @@ function aiListCategory(n){
 }
 
 function _catLabel(c){
-  return {responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant',expert:'Expert',workshop:'Workshop Manager'}[c]||c;
+  return {responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant',expert:'Expert',workshop:'Workshop Manager',sheetmetal:'Sheet Metal Worker'}[c]||c;
 }
 
 // ── Navigation depuis les réponses de l'assistant (réponses cliquables) ──
@@ -14753,7 +14911,7 @@ function aiAnswerExpirations(n){
 // ── Dispo (capacité) complète d'une semaine ──
 function _aiDispoSemaine(mon){
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
   let dispo=0; const absents=[];
   techs.forEach(p=>{
     let present=0,total=0;
@@ -14944,7 +15102,7 @@ function aiEffectif(){
   const act=(S.personnel||[]).filter(p=>p.actif!==false);
   const byCat={};
   act.forEach(p=>{byCat[p.categorie]=(byCat[p.categorie]||0)+1;});
-  const order=['responsable','chef','expert','workshop','technicien','part21','iq','recycling','interimaire','prestataire','alternant','stagiaire'];
+  const order=['responsable','chef','expert','workshop','technicien','sheetmetal','part21','iq','recycling','interimaire','prestataire','alternant','stagiaire'];
   const prod=(byCat['technicien']||0)+(byCat['interimaire']||0);
   let html=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">👥 Effectif total : ${act.length} personne(s)</div>`;
   html+=order.filter(c=>byCat[c]).map(c=>`<div style="margin-bottom:2px">• <strong>${byCat[c]}</strong> ${_catLabel(c)}</div>`).join('');
@@ -15033,7 +15191,7 @@ function aiAnswerMois(moisIdx,n){
 
 // ── Infos d'une personne ──
 function aiAnswerPerson(p){
-  const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert',workshop:'Workshop Manager'}[p.categorie]||p.categorie;
+  const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert',workshop:'Workshop Manager',sheetmetal:'Sheet Metal Worker'}[p.categorie]||p.categorie;
   let html=`<div style="font-weight:800;color:#c0e0ff;font-size:15px">${p.nom} ${p.prenom}</div>
   <div style="font-size:11px;color:#8090a8;margin-bottom:8px">${p.trigramme||''} · ${cat} · ${p.contrat||''}</div>`;
   const forms=(S.formations||[]).filter(f=>f.empId===p.id);
@@ -15116,7 +15274,7 @@ function aiSimulationGuide(q){
 function aiRunSimulationWeeks(nbTech,weekNums){
   if(!weekNums||!weekNums.length) return '⚠ Précisez les semaines, par exemple « semaine 32 et 33 ».';
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
   const rows=[];
   weekNums.forEach(wk=>{
     const mon=_weekMon(wk);
@@ -15782,7 +15940,7 @@ function renderChargeCapaTable(year){
 
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
   const allTechs=S.personnel.filter(p=>
-    (p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false
+    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false
   );
   const totalTechs=allTechs.length;
 
@@ -15852,6 +16010,23 @@ function renderChargeCapaTable(year){
     const airbusCharge=S.airbus?.charge?.[airbusWk]||{};
     const airbusTechs=hasAirbusOv?(parseInt(airbusOv)||0):((airbusCharge.part21||0)+(airbusCharge.iq||0));
     besoinActifs+=airbusTechs;
+
+    // Ajouter le besoin Structure (Sheet Metal Workers affectés STRUCT) — override prioritaire
+    const structWk=`${mon.getFullYear()}-S${wNum}`;
+    const structOv=S.besoinOverrides?.[`STRUCT_${structWk}`];
+    const hasStructOv=structOv!==undefined&&structOv!==null&&structOv!=='';
+    const structTechs=hasStructOv?(parseInt(structOv)||0):_structBesoinSemaine(mon);
+    besoinActifs+=structTechs;
+    // Liste des personnes affectées à Structure cette semaine (pour le détail)
+    const detailStruct=[];
+    { const seen=new Set();
+      for(let i=0;i<7;i++){ const ds=fmt(addD(mon,i));
+        (S.personnel||[]).forEach(p=>{ if(p.actif===false||seen.has(p.id)) return;
+          const am=S.planning[`${p.id}_${ds}_AM`], pm=S.planning[`${p.id}_${ds}_PM`];
+          if((am&&am.type==='travail'&&am.chantierId==='STRUCT')||(pm&&pm.type==='travail'&&pm.chantierId==='STRUCT')){ seen.add(p.id); detailStruct.push({nom:`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim(), tri:p.trigramme||''}); }
+        });
+      }
+    }
     const recAvions=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine');
     let recTechs=0;
     const detailRecAvions=[];
@@ -15924,7 +16099,7 @@ function renderChargeCapaTable(year){
     const ecartActifs=besoinActifs>0 ? Math.round((capaTechs-besoinActifs)*10)/10 : null;
     const ecartTotal=besoinTotal>0  ? Math.round((capaTechs-besoinTotal)*10)/10  : null;
     const isCurrent=mon<=today&&today<=addD(mon,6);
-    return{wNum,mon,capaTechs,besoinActifs,besoinTotal,ecartActifs,ecartTotal,isCurrent,stockTechs,recTechs,airbusTechs,detailChantiers,detailRecAvions};
+    return{wNum,mon,capaTechs,besoinActifs,besoinTotal,ecartActifs,ecartTotal,isCurrent,stockTechs,recTechs,airbusTechs,structTechs,detailChantiers,detailRecAvions,detailStruct};
   });
 
   // Synthèse mensuelle
@@ -15947,15 +16122,16 @@ function renderChargeCapaTable(year){
     </div>`;
   };
 
-  const badgeBesoin=(besoin,stockT,recT,airbusT,wNum,detailChantiers,detailRecAvions)=>{
+  const badgeBesoin=(besoin,stockT,recT,airbusT,structT,wNum,detailChantiers,detailRecAvions,detailStruct)=>{
     if(!besoin) return `<span style="color:#8090a8;font-size:11px">—</span>`;
-    const chantierT=besoin-(stockT||0)-(recT||0)-(airbusT||0);
+    const chantierT=besoin-(stockT||0)-(recT||0)-(airbusT||0)-(structT||0);
     let detail='';
     if(chantierT>0) detail+=`<span style="color:#82b1ff">🔧${chantierT}</span> `;
     if(stockT>0)    detail+=`<span style="color:#a0b8d8">✈${stockT}</span> `;
     if(recT>0)      detail+=`<span style="color:#ff9a3c">♻${recT}</span> `;
-    if(airbusT>0)   detail+=`<span style="color:#0064c8">✈️${airbusT}</span>`;
-    const dataJson=encodeURIComponent(JSON.stringify({besoin,stockT,recT,airbusT,chantierT,wNum,detailChantiers,detailRecAvions}));
+    if(airbusT>0)   detail+=`<span style="color:#0064c8">✈️${airbusT}</span> `;
+    if(structT>0)   detail+=`<span style="color:#a7c1de">🔩${structT}</span>`;
+    const dataJson=encodeURIComponent(JSON.stringify({besoin,stockT,recT,airbusT,structT,chantierT,wNum,detailChantiers,detailRecAvions,detailStruct}));
     return `<div style="text-align:center;cursor:pointer" onclick="showBesoinsDetail(this,'${dataJson}')" title="Voir le détail">
       <span style="font-size:18px;font-weight:900;color:#c0d0e8">${besoin}</span>
       <div style="font-size:9px;color:#8090a8;font-weight:600">tech. requis</div>
@@ -15977,7 +16153,7 @@ function renderChargeCapaTable(year){
       <td style="padding:7px 10px;text-align:center">
         <span style="font-size:16px;font-weight:900;color:#60e0a8">${d.capaTechs}</span>
       </td>
-      <td style="padding:7px 10px">${badgeBesoin(d.besoinActifs,d.stockTechs,d.recTechs,d.airbusTechs,d.wNum,d.detailChantiers,d.detailRecAvions)}</td>
+      <td style="padding:7px 10px">${badgeBesoin(d.besoinActifs,d.stockTechs,d.recTechs,d.airbusTechs,d.structTechs,d.wNum,d.detailChantiers,d.detailRecAvions,d.detailStruct)}</td>
       <td style="padding:7px 10px">${badgeEcart(d.ecartTotal,d.besoinTotal)}</td>
     </tr>`;
   }).join('');
@@ -16115,6 +16291,19 @@ function _airbusBesoinSemaine(mon){
   const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
   const c=S.airbus?.charge?.[wk]||{};
   return (parseInt(c.part21)||0)+(parseInt(c.iq)||0);
+}
+// Besoin structure = nb de personnes distinctes affectées à STRUCT sur la semaine (demi-journées travail)
+function _structBesoinSemaine(mon){
+  const ids=new Set();
+  for(let i=0;i<7;i++){
+    const ds=fmt(addD(mon,i));
+    (S.personnel||[]).forEach(p=>{
+      if(p.actif===false) return;
+      const am=S.planning[`${p.id}_${ds}_AM`], pm=S.planning[`${p.id}_${ds}_PM`];
+      if((am&&am.type==='travail'&&am.chantierId==='STRUCT')||(pm&&pm.type==='travail'&&pm.chantierId==='STRUCT')) ids.add(p.id);
+    });
+  }
+  return ids.size;
 }
 function _besoinEditCell(ovKey,theo,d,f,mon,isCur){
   const wEnd=addD(mon,6);
@@ -16289,6 +16478,25 @@ function buildBesoinEditTable(year,weeks){
     </td>${airbusCells}
   </tr>`;
 
+  // Ligne : activité Structure atelier (Sheet Metal Workers), éditable sur toutes les semaines
+  const structCells=relevantWeeks.map(mon=>{
+    const isCur=isCurrentWeek(mon);
+    const ovKey=`STRUCT_${mon.getFullYear()}-S${wkN(mon)}`;
+    return _besoinEditCell(ovKey,_structBesoinSemaine(mon),null,null,mon,isCur);
+  }).join('');
+  const structSep=`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(109,143,176,0.3);font-size:10px;font-weight:800;color:#a7c1de;letter-spacing:.5px">🔩 STRUCTURE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(109,143,176,0.3)"></td>').join('')}</tr>`;
+  const structRow=`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(109,143,176,0.05)">
+    <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="width:3px;height:24px;border-radius:2px;background:#6d8fb0;display:inline-block"></span>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#c4d6e8">🔩 Structure</div>
+          <div style="font-size:9px;color:#8090a8">Atelier · Sheet Metal Workers</div>
+        </div>
+      </div>
+    </td>${structCells}
+  </tr>`;
+
   return`
   <div style="margin-top:8px;border-top:2px solid rgba(255,208,96,0.2)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;cursor:pointer" onclick="document.getElementById('besoinEditBody').style.display=document.getElementById('besoinEditBody').style.display==='none'?'block':'none';this.querySelector('.chev').textContent=document.getElementById('besoinEditBody').style.display==='none'?'▸':'▾'">
@@ -16307,7 +16515,7 @@ function buildBesoinEditTable(year,weeks){
             <th style="${thS};text-align:left;position:sticky;left:0;background:#141d33;z-index:3">Chantier</th>
             ${headWeeks}
           </tr></thead>
-          <tbody>${rows}${recSep}${recRows}${stockSep}${stockRow}${airbusSep}${airbusRow}</tbody>
+          <tbody>${rows}${recSep}${recRows}${stockSep}${stockRow}${airbusSep}${airbusRow}${structSep}${structRow}</tbody>
         </table>
       </div>
       <div style="padding:4px 14px 12px">
@@ -16614,7 +16822,7 @@ function _ppBesoin(c,mon){
 // Capacité technicien réelle d'une semaine (depuis le planning), même règle qu'à l'écran
 function _ppCapa(mon){
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire')&&p.actif!==false);
+  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
   let j=0;
   techs.forEach(emp=>{
     [0,1,2,3,4].forEach(i=>{
@@ -16961,7 +17169,7 @@ function exportMasterPDF(){
 
   let lastGroup=undefined;let bodyRows='';
   const numCols=dates.length+1;
-  const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',workshop:'🛠',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
+  const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',workshop:'🛠',sheetmetal:'🔩',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
   emps.forEach(emp=>{
     const gKey=emp.categorie||'autre';
     if(gKey!==lastGroup){
@@ -17224,7 +17432,7 @@ async function _buildColoredWeekXls(){
   // Couleurs catégories (résolues)
   const cs=getComputedStyle(document.documentElement);
   const catCol=c=>{
-    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',sheetmetal:'--sheetmetal',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
     const v=cs.getPropertyValue(map[c]||'').trim();
     return v?v.replace('#',''):'cccccc';
   };
@@ -17349,7 +17557,7 @@ async function _buildColoredMasterXls(){
 
   const cs=getComputedStyle(document.documentElement);
   const catCol=c=>{
-    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
+    const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',sheetmetal:'--sheetmetal',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
     let v=cs.getPropertyValue(map[c]||'').trim();
     if(!v){const cc=CATS[c]?.col||'';if(cc.startsWith('#'))v=cc;else if(cc.startsWith('var(')){v=cs.getPropertyValue(cc.slice(4,-1).trim()).trim();}}
     return v?v.replace('#',''):'cccccc';
