@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260717-WPSPLIT -->
+<!-- AeroStaff Pro v7 — Build 20260722-CERTIF -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2285,6 +2285,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button onclick="scrollNotice('n-personnel')" class="btn btn-ghost btn-sm">👥 Personnel</button>
     <button onclick="scrollNotice('n-todo')" class="btn btn-ghost btn-sm">✅ To-Do</button>
     <button onclick="scrollNotice('n-autorisations')" class="btn btn-ghost btn-sm">🛡 Autorisations</button>
+    <button onclick="scrollNotice('n-certif')" class="btn btn-ghost btn-sm" style="border-color:rgba(0,210,255,0.4);color:var(--cyan)">🛫 Certifying Staff</button>
     <button onclick="scrollNotice('n-programme')" class="btn btn-ghost btn-sm">📊 Programme</button>
     <button onclick="scrollNotice('n-calculs')" class="btn btn-ghost btn-sm" style="border-color:rgba(255,208,96,0.4);color:#ffd060">🧮 Méthodes de calcul</button>
     <button onclick="scrollNotice('n-ai')" class="btn btn-ghost btn-sm">✦ Assistant interne</button>
@@ -2298,7 +2299,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div><div style="font-size:17px;font-weight:900;color:var(--cyan)">MARDAM AeroDesk Pro</div>
         <div style="font-size:11px;color:var(--t3)">Gestion du personnel aéronautique — by Damien Campoy</div></div>
       </div>
-      <div style="font-size:13px;color:var(--t2);line-height:1.7">Application tout-en-un centralisant plannings, formations, chantiers, certifications et recyclage d'aéronefs. Données sauvegardées localement (<strong style="color:#ffd060">localStorage</strong>) et synchronisables via <strong style="color:#ffd060">Google Drive</strong>.</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.7">Application tout-en-un centralisant plannings, formations, chantiers, autorisations, certifications avions (Certifying Staff Part 66) et recyclage d'aéronefs. Données sauvegardées localement (<strong style="color:#ffd060">localStorage</strong>) et synchronisables via <strong style="color:#ffd060">Google Drive</strong>.</div>
     </div>
     <div class="notice-section" id="n-dashboard" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
@@ -2426,7 +2427,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">Fiche</strong> — prénom, nom, trigramme, catégorie, poste, contrat, coordonnées<br>
-        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Workshop Manager, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager<br>
+        • <strong style="color:#ffd060">Catégories</strong> — Technicien, Chef d'équipe, Expert, Workshop Manager, Mécanicien, Apprenti, Stagiaire, Intérimaire, Manager. <strong>Workshop Manager</strong> est un <strong>improductif</strong> (comme Expert et Responsable projet) : exclu de la capacité de production, classé en « Encadrement (improductif) »<br>
         • <strong style="color:#ffd060">Niveau</strong> — pour Technicien et Intérimaire, un menu (Meca Niveau 1/2/3, Tech Niveau 1/2/3/4) à côté du téléphone ; affiché sur la fiche profil<br>
         • <strong style="color:#ffd060">Actif/Inactif</strong> — les inactifs n'apparaissent pas dans les plannings<br>
         • <strong style="color:#ffd060">Trigramme</strong> — identifiant court dans les plannings (ex: DCA)<br>
@@ -2456,12 +2457,35 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         • <strong style="color:#ffd060">+ Autorisation</strong> — type (AMEC, ASTO, IMEC, ISTO, IPNT, RUN…), technicien, dates<br>
         • <strong style="color:#ffd060">Autorisations de conduite</strong> — les engins (chariot élévateur par tonnage, plateforme verticale/multidirectionnelle, tracteur de piste, gerbeur, pont roulant, portiques…) apparaissent ici, préfixés « <strong>Conduite —</strong> » pour les distinguer des CACES passés en centre (qui restent en Formations)<br>
+        • <strong style="color:#7c6ee6">🛫 Tractage avion (push back)</strong> — segrégué dans une <strong>section/colonne dédiée</strong> (badge violet, séparateur), distinct des engins de conduite. Habilitation <strong>par personne avec date d'expiration</strong>. À ne pas confondre avec la <strong>formation Push Back</strong> qui, elle, reste en Formations — l'autorisation (feuille SSE) et la formation (feuille Qualifications SSE) coexistent<br>
+        • <strong style="color:#ff5c7a">TAXI et WEIGHT retirés</strong> — ces colonnes ne figurent plus dans les autorisations. Le <strong>taxi est récupéré</strong> pour pré-remplir les fiches Certifying Staff<br>
         • <strong style="color:#ffd060">Recherche</strong> — barre 🔍 par nom, prénom ou trigramme<br>
         • <strong style="color:#ffd060">Alertes auto</strong> — expirations proches ou passées signalées<br>
         • <strong style="color:#ffd060">Filtres</strong> — par personne ou par type<br>
-        • <strong style="color:#ffd060">Matrice des autorisations</strong> — tableau récapitulatif en bas de page (une colonne par code, ✓ / — par personne)<br>
+        • <strong style="color:#ffd060">Matrice des autorisations</strong> — tableau récapitulatif en bas de page (une colonne par code + colonne Tractage en fin, ✓ / — par personne). Export PDF et Excel avec la même segmentation conduite / tractage<br>
         • <strong style="color:#ffd060">Badge</strong> — compteur sur l'onglet si expirations imminentes
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « Import suivi RH (2 fichiers) » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code) et les <strong>autorisations de conduite</strong> du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « Import suivi RH (2 fichiers) » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code), les <strong>autorisations de conduite</strong> et le <strong>tractage avion</strong> (toutes variantes PUSHBACK / PUSH BACK / PUSH-BACK reconnues) du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
+      </div>
+    </div>
+    <div class="notice-section" id="n-certif" style="background:rgba(16,23,38,0.90);border:1px solid rgba(0,210,255,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">🛫</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Certifying Staff</div><div style="font-size:11px;color:var(--t4)">Habilitations avions Part 66 · présence hebdomadaire · extraits</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        Onglet dédié aux <strong>certifiants</strong> (une infime partie de la production). Vue en <strong>cartes</strong> : seuls les certifiants ayant une fiche apparaissent, triés par nom de famille.<br><br>
+        <strong style="color:var(--cyan)">La fiche d'un certifiant</strong><br>
+        • <strong style="color:#ffd060">Licence Part 66</strong> — numéro + date d'expiration, <strong>par personne</strong>. L'échéance remonte dans les <strong>alertes du tableau de bord</strong> (colorée : verte / orange &lt; 60 j / rouge expirée)<br>
+        • <strong style="color:#ffd060">Types avion</strong> — choisis dans un <strong>menu déroulant</strong> groupé par constructeur (Airbus, Boeing, ATR, Airbus A220). Par type : <strong>catégories B1 / B2 / C</strong> (cumulables sur une même machine, toujours affichées dans l'ordre B1→B2→C), <strong>taxiing</strong>, et <strong>point fixe Idle et Max</strong> (deux cases indépendantes)<br>
+        • Les habilitations sont repliées dans un <strong>accordéon</strong> pour désencombrer ; le bouton ✏️ ouvre la fiche<br><br>
+        <strong style="color:var(--cyan)">📅 Présence par semaine</strong><br>
+        • Un <strong>navigateur de semaine</strong> (← Préc. / Suiv. → / Cette semaine) calcule la présence de chaque certifiant depuis le <strong>Master Planning</strong><br>
+        • Chaque carte affiche <strong style="color:#6effc4">Sur site</strong>, <strong style="color:#ffc06a">Partiel</strong> (dès <strong>1,5 jour d'absence</strong>, avec la note des jours et motifs) ou <strong style="color:#ff8a99">Absent</strong><br>
+        • Le compteur d'en-tête résume : X sur site · Y partiels · Z absents<br><br>
+        <strong style="color:var(--cyan)">📄 Exports</strong><br>
+        • <strong>Export Excel</strong> et <strong>Export PDF</strong> — le <strong>tableau complet</strong> de tous les certifiants (matrice par constructeur : catégories, point fixe, taxiing, tractage, licence)<br>
+        • <strong>Extrait semaine (Excel et PDF)</strong> — le <strong>même tableau, filtré</strong> sur les certifiants présents la semaine choisie (absents toute la semaine exclus), avec une colonne <strong>Présence</strong> et la note pour les partiels
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,154,60,0.06);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠ Un intérimaire passé <strong>hors production</strong> ou un CDI <strong>archivé</strong> est automatiquement <strong>retiré</strong> de la liste Certifying Staff (suppression de la fiche). S'il revient, la fiche est à recréer.</div>
       </div>
     </div>
     <div class="notice-section" id="n-rex" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2718,7 +2742,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260717-WPSPLIT · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260722-CERTIF · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -12783,6 +12807,8 @@ function exportAutoMatrixPDF(){
      types:[{ type, cats:[B1/B2/C], taxi:bool, pfIdle:bool, pfMax:bool, exp }] }]
    ═══════════════════════════════════════════════════════════ */
 const CERTIF_CATS=['B1','B2','C'];
+// Toujours ordonner les catégories B1 → B2 → C (indépendamment de l'ordre de saisie)
+const _certifSortCats=arr=>(arr||[]).slice().sort((a,b)=>CERTIF_CATS.indexOf(a)-CERTIF_CATS.indexOf(b));
 // Catalogue officiel des types avion, groupés par constructeur (couleur de bandeau)
 const CERTIF_AC_GROUPS=[
   {maker:'Airbus', color:'#F2D024', tint:'#FCF7E0', head:'#FBF3CF', txt:'#4A3A00', types:[
@@ -12807,6 +12833,22 @@ const CERTIF_AC_GROUPS=[
   ]}
 ];
 const CERTIF_AC_ALL=CERTIF_AC_GROUPS.reduce((a,g)=>a.concat(g.types),[]);
+// Libellés courts pour les en-têtes d'export (intitulé complet conservé en légende)
+const CERTIF_AC_SHORT={
+  'AIRBUS A319/A320/A321 (IAE V2500)':'A320 CEO · V2500',
+  'AIRBUS A318/A319/A320/A321 (CFM56)':'A320 CEO · CFM56',
+  'AIRBUS A319/A320/A321 (IAE PW1100G)':'A320 NEO · PW1100G',
+  'AIRBUS A319/A320/A321 (CFM LEAP-1A)':'A320 NEO · LEAP-1A',
+  'BOEING 737-300/400/500 (CFM56)':'B737 Classic · CFM56',
+  'BOEING 737-600/700/800/900 (CFM56)':'B737 NG · CFM56',
+  'BOEING 737-7/8/9 (CFM LEAP-1B)':'B737 MAX · LEAP-1B',
+  'ATR 42-200/300 series (PW PWC120)':'ATR 42-200/300',
+  'ATR 42-400/500 / 72-212A (PW PWC120)':'ATR 42-500 / 72-212A',
+  'ATR 72-100/200 series (PW PWC120)':'ATR 72-100/200',
+  'ATR DELTA 600':'ATR DELTA 600',
+  'AIRBUS A220 / BD-500 SERIES (PW1500G)':'A220 · PW1500G'
+};
+const _acShort=t=>CERTIF_AC_SHORT[t]||t;
 // Constructeur / couleurs d'un type donné (pour matrice & export)
 function _acMeta(type){ for(const g of CERTIF_AC_GROUPS){ if(g.types.includes(type)) return g; } return {maker:'Autre',color:'#9aa0a6',tint:'#f1f1f1',head:'#e8e8e8',txt:'#333'}; }
 
@@ -12882,6 +12924,14 @@ function _certifCell(t){
   return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">${cats?`<div style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center">${cats}</div>`:''}<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center">${line2}</div></div>`;
 }
 
+function certifToggleAcc(empId){
+  const box=document.getElementById('cf-acc-'+empId), chev=document.getElementById('cf-chev-'+empId);
+  if(!box) return;
+  const open=box.style.display!=='none';
+  box.style.display=open?'none':'block';
+  if(chev) chev.style.transform=open?'rotate(0deg)':'rotate(180deg)';
+}
+
 function renderCertif(){
   const box=document.getElementById('certifMatrixBox'); if(!box) return;
   const q=(document.getElementById('certif-search')?.value||'').toLowerCase().trim();
@@ -12954,7 +13004,7 @@ function renderCertif(){
       <div style="padding:11px 0;border-top:0.5px solid var(--glass-border)">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
           <span style="font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-0.01em">${ty.type}</span>
-          <span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${(ty.cats||[]).map(catPill).join('')||'<span style="color:var(--t4);font-size:11px">—</span>'}</span>
+          <span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${_certifSortCats(ty.cats).map(catPill).join('')||'<span style="color:var(--t4);font-size:11px">—</span>'}</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           ${flag(ty.taxi,'Taxiing','taxi')}
@@ -12964,13 +13014,14 @@ function renderCertif(){
         ${ty.exp?`<div style="margin-top:6px;font-size:11px;color:var(--t3)">Expire le ${disp(ty.exp)}</div>`:''}
       </div>`).join(''):'<div style="padding:12px 0;border-top:0.5px solid var(--glass-border);color:var(--t3);font-size:12px">Aucun type avion renseigné</div>';
 
-    return `<div onclick="openCertifFiche('${emp.id}')" style="background:var(--glass-1);border:0.5px solid var(--glass-border);border-radius:16px;padding:16px 18px;cursor:pointer;transition:border-color .15s,transform .15s" onmouseover="this.style.borderColor='rgba(0,210,255,0.35)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+    return `<div style="background:var(--glass-1);border:0.5px solid var(--glass-border);border-radius:16px;padding:16px 18px;transition:border-color .15s">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,210,255,0.14);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--cyan);flex-shrink:0">${initials(emp)}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(emp.nom||'').toUpperCase()} <span style="font-weight:500;color:var(--t2)">${emp.prenom||''}</span></div>
           <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace">${emp.trigramme||'—'}</div>
         </div>
+        <button title="Modifier la fiche" onclick="openCertifFiche('${emp.id}')" style="flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t2);cursor:pointer;font-size:14px">✏️</button>
       </div>
       ${presBanner}
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:10px;background:${lm.bg};border:0.5px solid ${lm.bd}">
@@ -12978,7 +13029,11 @@ function renderCertif(){
         <span style="font-size:12px;color:${lm.c};font-family:'JetBrains Mono',monospace">${c.licExp?disp(c.licExp):(c.licNum||'—')}</span>
       </div>
       ${c.licNum&&c.licExp?`<div style="margin-top:5px;font-size:11px;color:var(--t3);text-align:right;font-family:'JetBrains Mono',monospace">N° ${c.licNum}</div>`:''}
-      <div style="margin-top:6px">${typeRows}</div>
+      <button onclick="certifToggleAcc('${emp.id}')" style="width:100%;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:10px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t2);cursor:pointer;font-size:12px;font-weight:700">
+        <span>🛩 Habilitations avion <span style="color:var(--t3);font-weight:500">· ${types.length} type${types.length>1?'s':''}</span></span>
+        <span id="cf-chev-${emp.id}" style="transition:transform .18s;color:var(--t3)">▼</span>
+      </button>
+      <div id="cf-acc-${emp.id}" style="display:none;margin-top:2px">${typeRows}</div>
     </div>`;
   }).join('');
 
@@ -13048,7 +13103,7 @@ function saveCertif(){
   const empId=document.getElementById('cf-emp').value;
   if(!empId){ toast('⚠️ Sélectionnez un employé'); return; }
   // nettoyer les types sans nom
-  const types=_certifDraftTypes.filter(t=>(t.type||'').trim()).map(t=>({type:t.type.trim(),cats:[...(t.cats||[])],taxi:!!t.taxi,pfIdle:!!t.pfIdle,pfMax:!!t.pfMax,exp:t.exp||''}));
+  const types=_certifDraftTypes.filter(t=>(t.type||'').trim()).map(t=>({type:t.type.trim(),cats:_certifSortCats(t.cats),taxi:!!t.taxi,pfIdle:!!t.pfIdle,pfMax:!!t.pfMax,exp:t.exp||''}));
   if(!S.certifiants) S.certifiants=[];
   let c=S.certifiants.find(x=>x.empId===empId);
   if(!c){ c={id:uid(),empId,licNum:'',licExp:'',types:[]}; S.certifiants.push(c); }
@@ -13117,7 +13172,7 @@ function exportCertifXls(opts){
           const t=mT[type];
           if(!t){ vals.push(''); return; }
           const parts=[];
-          if((t.cats||[]).length) parts.push(t.cats.join('/'));
+          if((t.cats||[]).length) parts.push(_certifSortCats(t.cats).join('/'));
           const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
           if(pf.length) parts.push('Point fixe : '+pf.join(' + '));
           if(t.taxi) parts.push('Taxiing');
@@ -13126,8 +13181,8 @@ function exportCertifXls(opts){
         if(tractUsed){ const a=(S.autorisations||[]).find(z=>z.empId===c.empId&&_autoGroup(z)==='tractage'); vals.push(a?(a.dateExpiration?'✓ '+disp(a.dateExpiration):'✓'):''); }
         vals.push(c.licExp?disp(c.licExp):(c.licNum||''));
         const row=ws.addRow(vals);
-        row.eachCell(cell=>{ cell.alignment={vertical:'top',wrapText:true}; });
-        row.getCell(1).font={bold:true};
+        row.eachCell(cell=>{ cell.alignment={horizontal:'center',vertical:'middle',wrapText:true}; });
+        row.getCell(1).font={bold:true}; row.getCell(1).alignment={horizontal:'left',vertical:'middle',wrapText:true};
         // présence colorée
         if(presCol){ const part=pres&&pres.status==='partial'; const cell=ws.getCell(row.number,2); cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:part?'FFB8790A':'FF1E8F4E'}}; cell.font={color:{argb:'FFFFFFFF'},bold:true}; cell.alignment={vertical:'middle',wrapText:true}; }
         // teinte constructeur sur les cellules de type
@@ -13168,16 +13223,16 @@ function exportCertifPDF(opts){
   const shortType=t=>t.replace(/^(AIRBUS|BOEING|ATR)\s*/i,'').replace(/ series/i,'');
   const cellHtml=t=>{
     if(!t) return '<span style="color:#bbb">—</span>';
-    const cats=(t.cats||[]).length?`<b style="font-size:11px">${t.cats.join('/')}</b>`:'<span style="color:#bbb">—</span>';
+    const cats=(t.cats||[]).length?`<div style="font-size:10px;font-weight:700;line-height:1.2">${_certifSortCats(t.cats).join('/')}</div>`:'<span style="color:#bbb">—</span>';
     const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
-    const pfl=pf.length?`<div style="font-size:8px;color:#555">Point fixe : ${pf.join(' + ')}</div>`:'';
-    const tx=t.taxi?'<div style="font-size:8px;color:#0a6a8a">Taxiing</div>':'';
+    const pfl=pf.length?`<div style="font-size:7.5px;color:#555;line-height:1.15;margin-top:1px">${pf.join('+')}</div>`:'';
+    const tx=t.taxi?'<div style="font-size:7.5px;color:#0a6a8a;line-height:1.15">Taxi</div>':'';
     return `${cats}${pfl}${tx}`;
   };
 
   // En-têtes : bandeau constructeur + type
   const gh=groups.map(g=>`<th colspan="${g.cols.length}" style="background:${g.color};color:${g.txt};border:1px solid #fff">${g.maker}</th>`).join('');
-  const th2=groups.map(g=>g.cols.map(t=>`<th class="typ" style="background:${g.head};color:${g.txt}" title="${t}">${shortType(t)}</th>`).join('')).join('');
+  const th2=groups.map(g=>g.cols.map(t=>`<th class="typ" style="background:${g.head};color:${g.txt}" title="${t}">${_acShort(t)}</th>`).join('')).join('');
   const extraTop=`${presCol?'<th rowspan="2" class="side">Présence</th>':''}${tractUsed?'<th rowspan="2" class="side">Tractage avion<br><span style="font-weight:400">(push back)</span></th>':''}<th rowspan="2" class="side">Licence<br>Part 66</th>`;
 
   const trs=list.map(({c,emp,pres})=>{
@@ -13198,27 +13253,37 @@ function exportCertifPDF(opts){
   const title=opts.title||'Certifying Staff — habilitations avions';
   const sub=opts.sub||`Site LFBF · Établi le ${disp(fmt(new Date()))} · ${list.length} certifiant(s) · ${flatCols.length} type(s) avion`;
   const presLeg=presCol?' · <b>Présence</b> sur la semaine (partiels notés)':'';
+  // Largeurs en % qui somment à 100 : Nom + colonnes 'side' fixes, le reste réparti sur les types
+  const nSide=(presCol?1:0)+(tractUsed?1:0)+1;
+  const nameW = flatCols.length>8 ? 15 : 20;
+  const sideW = flatCols.length>8 ? 7 : 8;
+  const typeW = Math.max(4, (100 - nameW - nSide*sideW) / Math.max(1,flatCols.length));
+  const colg=`<colgroup><col style="width:${nameW}%">${flatCols.map(()=>`<col style="width:${typeW.toFixed(2)}%">`).join('')}${Array.from({length:nSide}).map(()=>`<col style="width:${sideW}%">`).join('')}</colgroup>`;
+  // Légende des intitulés complets (court = complet)
+  const fullLeg=flatCols.map(t=>`<b>${_acShort(t)}</b> = ${t}`).join(' · ');
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
-  <style>@page{size:A4 landscape;margin:10mm}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:6px;font-size:11px}
+  <style>@page{size:A4 landscape;margin:8mm}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:6px;font-size:11px}
   h1{font-size:16px;margin:0 0 3px}.sub{color:#666;font-size:10px;margin-bottom:10px}
-  table{border-collapse:collapse;width:100%}
-  th,td{border:1px solid #cfd6e4;padding:4px 5px}
-  th{font-weight:700;font-size:9px;text-align:center}
-  .typ{font-weight:400;font-size:8px;line-height:1.25;vertical-align:bottom;min-width:64px}
-  .side{background:#eef3fb;color:#1a2440;vertical-align:middle;min-width:70px}
-  .emp{text-align:left;white-space:nowrap;background:#fafbfd}
-  .c{text-align:center;vertical-align:top}
-  .legend{margin-top:12px;font-size:10px;color:#444}.foot{margin-top:16px;display:flex;align-items:center;gap:8px}</style></head><body>
+  table{border-collapse:collapse;width:100%;table-layout:fixed}
+  th,td{border:1px solid #cfd6e4;padding:4px 3px;text-align:center;vertical-align:middle;overflow:hidden;word-break:keep-all;overflow-wrap:normal;hyphens:none}
+  th{font-weight:700;font-size:9px}
+  .typ{font-weight:700;font-size:8px;line-height:1.3}
+  .side{background:#eef3fb;color:#1a2440;font-size:9px}
+  .emp{text-align:left;font-size:10.5px;background:#fafbfd;line-height:1.3}
+  .c{line-height:1.3}
+  .legend{margin-top:10px;font-size:9px;color:#444;line-height:1.5}.full{margin-top:6px;font-size:8px;color:#777;line-height:1.5}.foot{margin-top:14px;display:flex;align-items:center;gap:8px}</style></head><body>
   <h1>${title}</h1>
   <div class="sub">${sub}</div>
   <table>
+    ${colg}
     <thead>
-      <tr><th rowspan="2" class="emp" style="vertical-align:middle">Nom Prénom</th>${gh}${extraTop}</tr>
+      <tr><th rowspan="2" class="emp" style="text-align:center">Nom Prénom</th>${gh}${extraTop}</tr>
       <tr>${th2}</tr>
     </thead>
     <tbody>${trs}</tbody>
   </table>
-  <div class="legend"><b>Légende :</b> <b>B1 / B2 / C</b> catégorie de certification · <b>Point fixe</b> Idle (ralenti) / Max (plein régime) · <b>Taxiing</b> autorisation de roulage · <b>Tractage avion</b> push back (par personne) · <b>Licence Part 66</b> échéance en couleur${presLeg}</div>
+  <div class="legend"><b>Légende :</b> <b>B1 / B2 / C</b> catégorie de certification · <b>PF</b> point fixe Idle (ralenti) / Max (plein régime) · <b>Taxi</b> autorisation de roulage · <b>Tractage avion</b> push back (par personne) · <b>Licence Part 66</b> échéance en couleur${presLeg}</div>
+  <div class="full"><b>Types avion :</b> ${fullLeg}</div>
   <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
   </body></html>`;
   openPrintView(html,opts.printTitle||'PDF — Certifying Staff');
@@ -13228,7 +13293,7 @@ function exportCertifPDF(opts){
 // Résumé habilitations condensé (texte) d'un certifiant
 function _certifHabSummary(c){
   return (c.types||[]).filter(t=>t.type).map(t=>{
-    const parts=[]; if((t.cats||[]).length) parts.push(t.cats.join('/'));
+    const parts=[]; if((t.cats||[]).length) parts.push(_certifSortCats(t.cats).join('/'));
     const pf=[]; if(t.pfIdle)pf.push('Idle'); if(t.pfMax)pf.push('Max');
     if(pf.length) parts.push('PF '+pf.join('+'));
     if(t.taxi) parts.push('Taxi');
