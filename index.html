@@ -1213,7 +1213,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="form-search" placeholder="Nom, prénom ou trigramme…" oninput="renderForms()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()">📥 Import suivi RH (2 fichiers)</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()" title="Formations · Autorisations · Tractage · Certifying Staff — 1 à 4 fichiers, format détecté automatiquement">📡 Import mise à jour</button>
       <button class="btn btn-mint btn-sm" onclick="exportFormXls()">📤 Export Excel</button>
     </div>
   </div>
@@ -2335,7 +2335,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Alertes auto</strong> — orange si expiration proche (moins de 60j), rouge si expirée<br>
         • <strong style="color:#ffd060">Filtres</strong> — par personne, type ou statut<br>
         • <strong style="color:#ffd060">Badge onglet</strong> — compteur rouge si formations à renouveler
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Import suivi RH (2 fichiers)</strong> — met à jour les formations depuis les fichiers Excel Qualité + SSE (Trainings + Qualifications SSE), avec aperçu avant application. Les <strong>CACES passés en centre</strong> restent ici ; les autorisations de conduite partent dans l'onglet Autorisations.</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔄 <strong>Import mise à jour</strong> — charge de 1 à 4 fichiers RH (format détecté automatiquement) et actualise <strong>formations, autorisations, tractage et Certifying Staff</strong> en une fois, avec rapport détaillé en fin d'import. Les <strong>CACES passés en centre</strong> restent ici ; les autorisations de conduite partent dans l'onglet Autorisations.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(255,154,60,0.05);border-left:3px solid #ff9a3c;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">⚠️ Renseigne toujours les dates d'expiration pour activer les alertes.</div>
       </div>
     </div>
@@ -2471,7 +2471,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Filtres</strong> — par personne ou par type<br>
         • <strong style="color:#ffd060">Matrice des autorisations</strong> — tableau récapitulatif en bas de page (une colonne par code + colonne Tractage en fin, ✓ / — par personne). Export PDF et Excel avec la même segmentation conduite / tractage<br>
         • <strong style="color:#ffd060">Badge</strong> — compteur sur l'onglet si expirations imminentes
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « Import suivi RH (2 fichiers) » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code), les <strong>autorisations de conduite</strong> et le <strong>tractage avion</strong> (toutes variantes PUSHBACK / PUSH BACK / PUSH-BACK reconnues) du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📥 <strong>Mise à jour par l'import RH</strong> — le bouton « 📡 Import mise à jour » (onglet Formations) actualise aussi les autorisations : la <strong>matrice OPS</strong> du fichier Qualité (dates par code), les <strong>autorisations de conduite</strong> et le <strong>tractage avion</strong> (toutes variantes PUSHBACK / PUSH BACK / PUSH-BACK reconnues) du fichier SSE, sans créer de doublon (les lignes existantes sont mises à jour par trigramme).</div>
       </div>
     </div>
     <div class="notice-section" id="n-certif" style="background:rgba(16,23,38,0.90);border:1px solid rgba(0,210,255,0.15);border-radius:14px;overflow:hidden">
@@ -2719,11 +2719,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
     <div class="notice-section" id="n-import-rh" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
-        <span style="font-size:20px">📥</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Import suivi RH</div><div style="font-size:11px;color:var(--t4)">Mise à jour des formations depuis les fichiers RH</div></div>
+        <span style="font-size:20px">📡</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--t1)">Import mise à jour</div><div style="font-size:11px;color:var(--t4)">Formations · Autorisations · Tractage · Certifying Staff</div></div>
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
-        Dans l'onglet Formations, le bouton <strong style="color:#ffd060">📥 Import suivi RH (2 fichiers)</strong> permet de charger les deux fichiers Excel envoyés chaque mois par le service RH (Qualité + SSE).<br>
+        Dans l'onglet Formations, le bouton <strong style="color:#ffd060">📡 Import mise à jour</strong> permet de charger jusqu'à 4 fichiers RH. Le format est <strong>détecté automatiquement</strong> : fichier plat (feuille <code>raw_data</code>) ou anciens fichiers matriciels Qualité + SSE.<br>
         • <strong style="color:#ffd060">Site filtré</strong> — seules les lignes du site LFBF sont prises en compte<br>
         • <strong style="color:#ffd060">Correspondance</strong> — par trigramme, avec vérification du nom (anomalies signalées)<br>
         • <strong style="color:#ffd060">Mapping automatique</strong> — les intitulés RH sont traduits vers les formations de l'app (EWIS, CDCCL, CACES…), les colonnes Forklift sont mutualisées<br>
@@ -6280,6 +6280,13 @@ function gotoMasterAbsence(empId, dateStr){
 }
 
 /* ═══ SELECTS ═══ */
+// Affichage normalisé du nom : NOM (majuscules) + Prénom (capitalisé), quelle que soit la saisie
+function _dispNom(p){
+  if(!p) return '';
+  const nom=(p.nom||'').trim().toUpperCase();
+  const pre=(p.prenom||'').trim().toLowerCase().replace(/(^|[\s\-'])(\S)/g,(m,a,b)=>a+b.toUpperCase());
+  return (nom+' '+pre).trim();
+}
 function _sortByNom(list){
   return [...list].sort((a,b)=>(a.nom+' '+a.prenom).localeCompare(b.nom+' '+b.prenom,'fr',{sensitivity:'base'}));
 }
@@ -6352,7 +6359,7 @@ async function _buildColoredMatrixXls(opts){
       if(s==='na') return '∞';
       return `${st.ic} ${r.dateExpiration?disp(r.dateExpiration):''}`.trim();
     });
-    const row=ws.addRow([`${p.nom} ${p.prenom}`, p.trigramme||'—', ...vals]);
+    const row=ws.addRow([_dispNom(p), p.trigramme||'—', ...vals]);
     row.height=19;
     // Colonne Employé colorée par catégorie
     const c0=row.getCell(1);
@@ -6720,7 +6727,7 @@ function renderDash(){
       return`<td style="text-align:center;vertical-align:middle" title="${tip}"><span class="badge ${cl}" style="font-size:9px;padding:3px 7px">${ic}</span></td>`;
     }).join('');
     return`<tr>
-      <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px">${p.nom} ${p.prenom}</td>
+      <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px">${_dispNom(p)}</td>
       <td class="mx-sticky-tri" style="padding:9px 8px;text-align:center"><span class="badge ${cat.b||'bn'}" style="font-size:9px;font-family:'JetBrains Mono',monospace">${p.trigramme}</span></td>
       ${cells}
     </tr>`;
@@ -6922,7 +6929,7 @@ function exportFormMatrixPDF(){
       const tip=f.dateExpiration?`${t} · Exp ${disp(f.dateExpiration)}`:`${t} · Sans limite`;
       return `<td class="c" style="color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
     }).join('');
-    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
+    return `<tr><td class="emp">${_dispNom(p)}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
   }).join('');
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Matrice des formations</title>
   <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
@@ -13043,7 +13050,7 @@ function renderAutoMatrix(){
       return`<td style="text-align:center;vertical-align:middle${sep}" title="${tip}"><span class="badge ${cl}" style="font-size:9px;padding:3px 7px">${ic}</span></td>`;
     }).join('');
     return`<tr>
-      <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px;border:1px solid rgba(255,255,255,0.05)">${p.prenom} ${p.nom}</td>
+      <td class="mx-sticky-name" style="font-size:12px;font-weight:700;white-space:nowrap;padding:9px 12px;min-width:150px;border:1px solid rgba(255,255,255,0.05)">${_dispNom(p)}</td>
       <td class="mx-sticky-tri" style="padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,0.05)"><span class="badge ${cat.b||'bn'}" style="font-size:9px;font-family:'JetBrains Mono',monospace">${p.trigramme}</span></td>
       ${cells}
     </tr>`;
@@ -13238,7 +13245,7 @@ function exportAutoMatrixPDF(){
       const tip=a.dateExpiration?`${t} · Exp ${disp(a.dateExpiration)}`:`${t} · Sans limite`;
       return `<td class="c" style="${sep}color:${clr[s]||'#333'};font-weight:700" title="${tip}">${ic[s]||''}</td>`;
     }).join('');
-    return `<tr><td class="emp">${p.nom} ${p.prenom}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
+    return `<tr><td class="emp">${_dispNom(p)}</td><td class="c tri">${p.trigramme||'—'}</td>${tds}</tr>`;
   }).join('');
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Matrice des autorisations</title>
   <style>@page{size:A4 landscape}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2440;padding:22px;font-size:12px}
@@ -13475,7 +13482,7 @@ function renderCertif(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="width:42px;height:42px;border-radius:50%;background:rgba(0,210,255,0.14);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--cyan);flex-shrink:0">${initials(emp)}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(emp.nom||'').toUpperCase()} <span style="font-weight:500;color:var(--t2)">${emp.prenom||''}</span></div>
+          <div style="font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(emp.nom||'').toUpperCase()} <span style="font-weight:500;color:var(--t2)">${((emp.prenom||'').trim().toLowerCase().replace(/(^|[\s\-'])(\S)/g,(m,a,b)=>a+b.toUpperCase()))}</span></div>
           <div style="font-size:12px;color:var(--t3);font-family:'JetBrains Mono',monospace">${emp.trigramme||'—'}</div>
         </div>
         <button title="Modifier la fiche" onclick="openCertifFiche('${emp.id}')" style="flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1px solid var(--glass-border);background:var(--glass-2);color:var(--t2);cursor:pointer;font-size:14px">✏️</button>
@@ -13623,7 +13630,7 @@ function exportCertifXls(opts){
       // Lignes de données
       list.forEach(({c,emp,pres})=>{
         const mT={}; (c.types||[]).forEach(t=>{ if(t.type)mT[t.type]=t; });
-        const vals=[`${(emp.nom||'').toUpperCase()} ${emp.prenom||''}`];
+        const vals=[_dispNom(emp)];
         if(presCol){ const part=pres&&pres.status==='partial'; vals.push((part?'Partiel':'Sur site')+(pres&&pres.note?' — '+pres.note:'')); }
         flatCols.forEach(({type})=>{
           const t=mT[type];
@@ -13704,7 +13711,7 @@ function exportCertifPDF(opts){
     if(tractUsed){ const a=(S.autorisations||[]).find(z=>z.empId===c.empId&&_autoGroup(z)==='tractage'); tract=`<td class="c">${a?(a.dateExpiration?`✓<br><span style="font-size:8px">${disp(a.dateExpiration)}</span>`:'✓'):'<span style="color:#bbb">—</span>'}</td>`; }
     const s=c.licExp?tSt(c.licExp):'na';
     const lic=c.licExp?`<span style="color:${licClr[s]||'#333'};font-weight:700">${disp(c.licExp)}</span>`:(c.licNum?c.licNum:'<span style="color:#bbb">—</span>');
-    return `<tr><td class="emp"><b>${(emp.nom||'').toUpperCase()}</b> ${emp.prenom||''}</td>${tds}${presTd}${tract}<td class="c">${lic}</td></tr>`;
+    return `<tr><td class="emp"><b>${_dispNom(emp)}</b></td>${tds}${presTd}${tract}<td class="c">${lic}</td></tr>`;
   }).join('');
 
   const title=opts.title||'Certifying Staff — habilitations avions';
