@@ -3582,6 +3582,17 @@ function saveToFile(data) {
 </div>
 </div>
 
+<!-- Rapport d'import RH -->
+<div class="mbg" id="m-hr-report">
+<div class="modal" style="max-width:640px">
+  <div class="modal-title">📥 Rapport d'import RH</div>
+  <div id="hrRepBody" style="max-height:60vh;overflow:auto;padding-right:4px"></div>
+  <div class="mfooter">
+    <button class="btn btn-cyan" onclick="closeM('m-hr-report')">Fermer</button>
+  </div>
+</div>
+</div>
+
 <!-- Modal Fiche Certifying Staff -->
 <div class="mbg" id="m-certif">
 <div class="modal" style="max-width:720px">
@@ -3648,7 +3659,7 @@ function saveToFile(data) {
 /* ═══════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════ */
-const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','ACCUEIL HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback','Aircraft Dismantling','Visite Médicale'];
+const TRAININGS = ['CACES NACELLE','CACES CHARIOT','CACES TRACMA','CACES TELESCO','CACES GERBEUR','Pont roulant','EWIS','CDCCL','SAFETY TRAINING','English Test','MOE / PART 145','ACCUEIL HSE','Travail en hauteur','Risque chimiques','Compétences','Licence Part 66','Pushback','Aircraft Dismantling','Visite Médicale','Permis aire de trafic','Permis aire de manœuvre','Manipulation extincteurs','Sensibilisation cybersécurité','SST'];
 const AUTORISATIONS_LIST = ['AMEC','ASTO','IMEC','ISTO','AELE','IELE','ASTR','ISTR','ACOM','ICOM','AENB','IENB','ABAT','IBAT','RUN','PART21','IPNT'];
 // ── Segrégation Autorisations : Tractage avion (push back) vs Conduite d'engins ──
 const TRACTAGE_LABEL='Tractage avion';
@@ -3851,25 +3862,42 @@ let _rhImportData=null; // données préparées en attente de confirmation
 function handleRhImport(ev){
   const files=Array.from(ev.target.files||[]);
   if(!files.length){return;}
-  if(files.length>2){ toast('⚠️ Sélectionnez au maximum 2 fichiers (Qualité + SSE)'); ev.target.value=''; return; }
+  if(files.length>4){ toast('⚠️ Sélectionnez au maximum 4 fichiers'); ev.target.value=''; return; }
   toast('⏳ Lecture des fichiers…');
   _loadSheetJS(()=>{
-    // Formations : flux existant (avec aperçu)
-    Promise.all(files.map(readRhFile))
-      .then(results=>{
-        const merged=mergeRhResults(results);
-        prepareRhPreview(merged);
-      })
-      .catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
-    // Autorisations : matrice OPS -> mise à jour directe (sans doublon)
-    Promise.all(files.map(_readWbCellDates))
-      .then(wbs=>{
+    Promise.all(files.map(_readWbCellDates)).then(wbs=>{
+      const flats=wbs.filter(_isHrFlatWb);
+      const legacy=wbs.filter(wb=>!_isHrFlatWb(wb));
+
+      // ── Nouveau format « fichier plat » (feuille raw_data) ──
+      if(flats.length){
+        const tot={train:0,qualif:0,auth:0,formCre:0,formUpd:0,autoCre:0,autoUpd:0,certifCre:0,certifUpd:0,
+                   unknownPeople:{},unknownLabels:{},nameDiffs:[],skipped:0,rows:0,acCount:{}};
+        flats.forEach(wb=>{
+          try{
+            const r=_importHrFlat(wb);
+            ['train','qualif','auth','formCre','formUpd','autoCre','autoUpd','certifCre','certifUpd','skipped','rows'].forEach(k=>tot[k]+=r[k]||0);
+            Object.assign(tot.unknownPeople,r.unknownPeople); Object.assign(tot.acCount,r.acCount||{});
+            Object.entries(r.unknownLabels).forEach(([k,v])=>tot.unknownLabels[k]=(tot.unknownLabels[k]||0)+v);
+            r.nameDiffs.forEach(d=>{ if(!tot.nameDiffs.some(x=>x.k===d.k)) tot.nameDiffs.push(d); });
+          }catch(err){ console.error('hr flat',err); toast('❌ Erreur import: '+err.message); }
+        });
+        save();
+        ['renderForms','renderAutorisations','renderCertif','renderDash','renderPersonnel'].forEach(fn=>{ if(typeof window[fn]==='function') try{window[fn]();}catch(_){} });
+        _showHrReport(tot);
+      }
+
+      // ── Anciens fichiers matriciels (Qualité / SSE) : flux historique conservé ──
+      if(legacy.length){
+        Promise.all(files.filter((f,i)=>!_isHrFlatWb(wbs[i])).map(readRhFile))
+          .then(results=>{ const merged=mergeRhResults(results); prepareRhPreview(merged); })
+          .catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
         let aUpd=0,aCre=0,dUpd=0,dCre=0;
-        wbs.forEach(wb=>{ try{ const r=_importAutoFromWb(wb); aUpd+=r.upd; aCre+=r.cre; const d=_importDrivingFromWb(wb); dUpd+=d.upd; dCre+=d.cre; }catch(err){console.error('wb direct',err);} });
+        legacy.forEach(wb=>{ try{ const r=_importAutoFromWb(wb); aUpd+=r.upd; aCre+=r.cre; const d=_importDrivingFromWb(wb); dUpd+=d.upd; dCre+=d.cre; }catch(err){console.error('wb direct',err);} });
         if(aUpd||aCre||dUpd||dCre){ save(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderForms==='function')renderForms(); if(typeof renderDash==='function')renderDash();
-          const t=[]; if(aUpd||aCre) t.push(`🛡 Autos : ${aUpd} maj · ${aCre} créées`); if(dUpd||dCre) t.push(`🚜 Conduite (autorisations) : ${dUpd} maj · ${dCre} créées`); toast(t.join('   |   ')); }
-      })
-      .catch(e=>console.error('auth import',e));
+          const t=[]; if(aUpd||aCre) t.push(`🛡 Autos : ${aUpd} maj · ${aCre} créées`); if(dUpd||dCre) t.push(`🚜 Conduite : ${dUpd} maj · ${dCre} créées`); toast(t.join('   |   ')); }
+      }
+    }).catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
   });
   ev.target.value='';
 }
@@ -6986,6 +7014,277 @@ function _readWbCellDates(file){
     r.readAsArrayBuffer(file);
   });
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   IMPORT RH « FICHIER PLAT » (feuille raw_data) — site LFBF
+   Une ligne = une personne × une formation/autorisation.
+   T_TYPE : TRAIN (formations Qualité) · QUALIF (formations SSE/CACES) · AUTH (autorisations)
+   Alimente : Formations · Autorisations (OPS/conduite/tractage/global) · Certifying Staff
+   ═══════════════════════════════════════════════════════════════════ */
+
+// Normalisation robuste : accents, apostrophes, casse, espaces
+function _hrNorm(s){
+  return (s==null?'':s).toString()
+    .replace(/[\u2018\u2019\u02BC\u00B4`]/g,"'")     // apostrophes typographiques
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // accents
+    .replace(/\s+/g,' ')
+    .trim().toUpperCase();
+}
+// Date -> YYYY-MM-DD (accepte Date, ISO, jj/mm/aaaa)
+function _hrDate(v){
+  if(v==null||v==='') return '';
+  if(v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+  const s=v.toString().trim();
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+  return '';
+}
+
+// ── Correspondance intitulé fichier → formation de l'application ──
+const HR_FORM_MAP={
+  'EWIS':'EWIS',
+  'CDCCL':'CDCCL',
+  'SAFETY TRAINING':'SAFETY TRAINING',
+  'EASA PART 145 & MOE':'MOE / PART 145',
+  'PART 145 & MOE':'MOE / PART 145',
+  'ENGLISH':'English Test',
+  'WELCOME':'ACCUEIL HSE',
+  'COMPETENCIES':'Compétences',
+  'MEDICAL VISIT':'Visite Médicale',
+  'MEDICAL VISIT EMBAUCHE':'Visite Médicale',
+  'RISQUES CHIMIQUES CMR':'Risque chimiques',
+  'RISQUES CHIMIQUES':'Risque chimiques',
+  'TRAVAIL EN HAUTEUR':'Travail en hauteur',
+  'AC MANLIFT / PLATFORM':'CACES NACELLE',
+  'MANLIFT':'CACES NACELLE',
+  'PLATFORM':'CACES NACELLE',
+  'AC FORKLIFT 6 TONS MAX':'CACES CHARIOT',
+  'AC FORKLIFT UPPER 6 TONS':'CACES CHARIOT',
+  'FORKLIFT 6 TONS MAX':'CACES CHARIOT',
+  'FORKLIFT UPPER 6 TONS':'CACES CHARIOT',
+  'AC TELESCOPIC FORKLIFT':'CACES TELESCO',
+  'TELESCOPIC FORKLIFT':'CACES TELESCO',
+  'AC TRACMA':'CACES TRACMA',
+  'TRACMA':'CACES TRACMA',
+  'SELF PROPELLED STACKERS':'CACES GERBEUR',
+  'SELF PROPOLLED STACKERS':'CACES GERBEUR',
+  'OVERHEAD CRANE':'Pont roulant',
+  'PUSHBACK':'Pushback',
+  'AIRCRAFT DISMANTLING PROCESS':'Aircraft Dismantling',
+  'LICENCE PART 66':'Licence Part 66',
+  'PERMIS AIRE DE TRAFIC':'Permis aire de trafic',
+  "PERMIS AIRE DE TRAFIC/MANOEUVRE FRANCAZAL":'Permis aire de trafic',
+  'PERMIS AIRE DE MANOEUVRE':'Permis aire de manœuvre',
+  'MANIPULATION EXTINCTEURS':'Manipulation extincteurs',
+  'SENSIBILISATION CYBERSECURITE':'Sensibilisation cybersécurité',
+  'SST':'SST'
+};
+// Formations volontairement ignorées (validé avec le site)
+const HR_FORM_SKIP=new Set(['GLOBAL REFRESH','HF & SMS','HUMAN FACTORS','DELTA SAFETY TRAINING',
+  'ETHIQUE & CONFORMITE','MASQUE ARI','GUIDE FILE/SERRE FILE','BATTERY MAINTENANCE TRAINING SAFT',
+  'P-014 EASA FORM-1','P-050 BATTERY SHOP MANAGEMENT']);
+
+// ── Correspondance autorisations (préfixe AUTHOR. retiré) ──
+const HR_AUTH_OPS={
+  'AUTHORIZED MECHANIC':'AMEC','INSPECTOR MECHANIC':'IMEC',
+  'AUTHORIZED STORAGE':'ASTO','INSPECTOR STORAGE':'ISTO',
+  'AUTHORIZED ELECTRONIC':'AELE','INSPECTOR ELECTRONIC':'IELE',
+  'AUTHORIZED STRUCTURE':'ASTR','INSPECTOR STRUCTURE':'ISTR',
+  'AUTHORIZED COMPOSITE':'ACOM','INSPECTOR COMPOSITE':'ICOM',
+  'AUTHORIZED BATTERY C5':'ABAT','INSPECTOR BATTERY C5':'IBAT',
+  'AIRCRAFT PAINT INSPECTION':'IPNT',
+  'ENGINE RUN-UP AUTHORIZATION':'RUN','ENGINE RUN UP AUTHORIZATION':'RUN'
+};
+const HR_AUTH_CONDUITE={
+  'PLATEFORME VERTICALE':'Conduite — Plateforme verticale',
+  'PLATEFORME MULTIDIRECTIONNELLE':'Conduite — Plateforme multidirectionnelle',
+  'TRACTEUR DE PISTE':'Conduite — Tracteur de piste',
+  "CHARIOT ELEVATEUR JUSQU'A 6T":'Conduite — Chariot élévateur ≤ 6T',
+  'CHARIOT ELEVATEUR 10T':'Conduite — Chariot élévateur 10T',
+  'CHARIOT ELEVATEUR 12T':'Conduite — Chariot élévateur 12T',
+  'CHARIOT DE MANUTENTION TOUT TERRAIN':'Conduite — Chariot tout terrain'
+};
+// Autorisations globales par personne (hors conduite)
+const HR_AUTH_GLOBAL={
+  'TAXIING AUTHORIZATION':'Taxiing',
+  'PERMIS AIRE DE TRAFIC':'Permis aire de trafic',
+  'PERMIS AIRE DE MANOEUVRE':'Permis aire de manœuvre'
+};
+// Types avion : libellé fichier → type du catalogue Certifying Staff
+const HR_AC_MAP={
+  'A318/A319/A320/A321 (CFM56)':'AIRBUS A318/A319/A320/A321 (CFM56)',
+  'A319/A320/A321 (IAE V2500)':'AIRBUS A319/A320/A321 (IAE V2500)',
+  'A319/A320/A321 (IAEV2500)':'AIRBUS A319/A320/A321 (IAE V2500)',
+  'A319/A320/A321 (IAE PW1100G)':'AIRBUS A319/A320/A321 (IAE PW1100G)',
+  'A319/A320/A321 (CFM LEAP-1A)':'AIRBUS A319/A320/A321 (CFM LEAP-1A)',
+  'B737-300/400/500 (CFM56)':'BOEING 737-300/400/500 (CFM56)',
+  'B737-600/700/800/900 (CFM56)':'BOEING 737-600/700/800/900 (CFM56)',
+  'B737-7/8/9 (CFM LEAP-1B)':'BOEING 737-7/8/9 (CFM LEAP-1B)',
+  'ATR 42-200/300 SERIES (PWC PW120)':'ATR 42-200/300 series (PW PWC120)',
+  'ATR 42-400/500/72-212A (PWC PW120)':'ATR 42-400/500 / 72-212A (PW PWC120)',
+  'ATR 72-100/200 SERIES (PWC PW120)':'ATR 72-100/200 series (PW PWC120)',
+  'ATR DELTA 600':'ATR DELTA 600',
+  'BOMBARDIER BD-500 SERIES (PW PW1500G)':'AIRBUS A220 / BD-500 SERIES (PW1500G)'
+};
+const _hrIsBadge=n=>/^B[AD]{1,2}E?\s*AEROPORT|^BADGE AEROPORT/.test(n);       // badge aéroport FCZ (toutes casses + faute « bade »)
+const _hrIsIgnoredAc=n=>/^A330|^A340|^B777/.test(n);                          // types hors catalogue (validé)
+
+// Alias de trigrammes RH → interne : { 'HTF':'MTF' }
+function _hrAlias(){ if(!S.hrAliases) S.hrAliases={}; return S.hrAliases; }
+
+// Détection du fichier plat
+function _isHrFlatWb(wb){
+  return (wb.SheetNames||[]).some(n=>_hrNorm(n)==='RAW_DATA');
+}
+
+/* ── Import principal ── */
+function _importHrFlat(wb){
+  const rep={train:0,qualif:0,auth:0, formCre:0,formUpd:0, autoCre:0,autoUpd:0, certifCre:0,certifUpd:0,
+             unknownPeople:{}, unknownLabels:{}, nameDiffs:[], skipped:0, rows:0};
+  const sheetName=(wb.SheetNames||[]).find(n=>_hrNorm(n)==='RAW_DATA');
+  if(!sheetName) return rep;
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{raw:true,defval:null});
+  if(!rows.length) return rep;
+
+  // Index du personnel par trigramme (+ alias)
+  const alias=_hrAlias();
+  const byTri={};
+  (S.personnel||[]).forEach(p=>{ const t=_hrNorm(p.trigramme); if(t) byTri[t]=p; });
+
+  const today=fmt(new Date());
+  const noteImp='Import RH '+disp(today);
+
+  // Regroupe les lignes types-avion par (personne, type) pour compter les catégories
+  const acCount={};
+
+  rows.forEach(r=>{
+    rep.rows++;
+    const base=_hrNorm(r.MAINBASECODE);
+    if(base && base!=='LFBF') return;                       // site LFBF uniquement
+    let tri=_hrNorm(r.EMPCODE);
+    if(alias[tri]) tri=_hrNorm(alias[tri]);
+    const emp=byTri[tri];
+    const label=(r.TRAININGNAME==null?'':r.TRAININGNAME).toString().trim();
+    if(!emp){ if(tri){ rep.unknownPeople[tri]=`${(r.EMPLNAME||'').toString().trim()} ${(r.EMPFNAME||'').toString().trim()}`.trim(); } return; }
+
+    // Contrôle nom/prénom (signalement seulement)
+    const fNom=_hrNorm(r.EMPLNAME), aNom=_hrNorm(emp.nom), aPre=_hrNorm(emp.prenom);
+    if(fNom && fNom!==aNom && fNom!==aPre){
+      const k=`${emp.trigramme}|${fNom}`;
+      if(!rep.nameDiffs.some(d=>d.k===k)) rep.nameDiffs.push({k, tri:emp.trigramme,
+        app:`${emp.nom} ${emp.prenom}`, rh:`${(r.EMPLNAME||'').toString().trim()} ${(r.EMPFNAME||'').toString().trim()}`});
+    }
+
+    const type=_hrNorm(r.T_TYPE);                            // gère l'espace final « TRAIN »
+    const dexp=_hrDate(r.NEXTDUE);
+    const dobt=_hrDate(r.LASTPERF);
+    const n=_hrNorm(label);
+    if(!dexp) return;
+
+    // ── FORMATIONS (TRAIN + QUALIF) ──
+    if(type==='TRAIN'||type==='QUALIF'){
+      if(type==='TRAIN') rep.train++; else rep.qualif++;
+      if(HR_FORM_SKIP.has(n) || /^PART 21/.test(n) || /^HAB ELEC/.test(n)){ rep.skipped++; return; }
+      const appType=HR_FORM_MAP[n];
+      if(!appType){ rep.unknownLabels[label]=(rep.unknownLabels[label]||0)+1; return; }
+      // Licence Part 66 : formation ET fiche Certifying Staff
+      if(appType==='Licence Part 66'){
+        if(!S.certifiants) S.certifiants=[];
+        let c=S.certifiants.find(x=>x.empId===emp.id);
+        if(!c){ c={id:uid(),empId:emp.id,licNum:'',licExp:'',types:[]}; S.certifiants.push(c); rep.certifCre++; }
+        if(c.licExp!==dexp){ c.licExp=dexp; rep.certifUpd++; }
+      }
+      const ex=(S.formations||[]).find(f=>f.empId===emp.id && _hrNorm(f.type)===_hrNorm(appType));
+      if(ex){ if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; if(dobt&&!ex.dateObtention) ex.dateObtention=dobt; rep.formUpd++; } }
+      else { S.formations.push({id:uid(),empId:emp.id,type:appType,dateObtention:dobt||'',dateExpiration:dexp,notes:noteImp}); rep.formCre++; }
+      return;
+    }
+
+    // ── AUTORISATIONS ──
+    if(type!=='AUTH') return;
+    rep.auth++;
+    const a=n.replace(/^AUTHOR\.?\s*/,'').trim();            // retire le préfixe AUTHOR.
+    const raw=label.replace(/^AUTHOR\.?\s*/i,'').trim();
+
+    const upsertAuto=(t,grp)=>{
+      const ex=(S.autorisations||[]).find(z=>z.empId===emp.id && _hrNorm(z.type)===_hrNorm(t));
+      if(ex){ ex.grp=grp; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; rep.autoUpd++; } }
+      else { S.autorisations.push({id:uid(),empId:emp.id,type:t,grp,dateObtention:dobt||'',dateExpiration:dexp,notes:noteImp}); rep.autoCre++; }
+    };
+
+    if(HR_AUTH_OPS[a]){ upsertAuto(HR_AUTH_OPS[a],'conduite'); return; }
+    if(HR_AUTH_CONDUITE[a]){ upsertAuto(HR_AUTH_CONDUITE[a],'conduite'); return; }
+    if(HR_AUTH_GLOBAL[a]){ upsertAuto(HR_AUTH_GLOBAL[a],'conduite'); return; }
+    if(_hrIsBadge(a)){ upsertAuto('Badge aéroport FCZ','conduite'); return; }
+    if(/^REPOUSSAGE|PUSH[\s-]*BACK/.test(a)){ upsertAuto(TRACTAGE_LABEL,'tractage'); return; }
+    if(_hrIsIgnoredAc(a)){ rep.skipped++; return; }           // A330/A340/B777 : hors catalogue
+
+    // Types avion du catalogue → Certifying Staff
+    const acType=HR_AC_MAP[a];
+    if(acType){
+      const key=emp.id+'||'+acType;
+      acCount[key]=(acCount[key]||0)+1;                        // nb de lignes = nb de catégories (info)
+      if(!S.certifiants) S.certifiants=[];
+      let c=S.certifiants.find(x=>x.empId===emp.id);
+      if(!c){ c={id:uid(),empId:emp.id,licNum:'',licExp:'',types:[]}; S.certifiants.push(c); rep.certifCre++; }
+      if(!Array.isArray(c.types)) c.types=[];
+      let t=c.types.find(x=>x.type===acType);
+      if(!t){ c.types.push({type:acType,cats:[],taxi:false,pfIdle:false,pfMax:false,exp:dexp}); rep.certifUpd++; }
+      else if(t.exp!==dexp){ t.exp=dexp; rep.certifUpd++; }     // catégories / taxi / point fixe JAMAIS touchés
+      return;
+    }
+    // Reste : engine rating (supprimé), habilitations électriques, weight & balance, prevention plan…
+    if(/ENGINE|RATING|WEIGHT|PREVENTION|^B0|^B1V|^HAB/.test(a)){ rep.skipped++; return; }
+    rep.unknownLabels[raw]=(rep.unknownLabels[raw]||0)+1;
+  });
+
+  rep.acCount=acCount;
+  return rep;
+}
+
+/* ── Rapport d'import ── */
+function _showHrReport(rep){
+  const uP=Object.entries(rep.unknownPeople).sort((a,b)=>a[0].localeCompare(b[0]));
+  const uL=Object.entries(rep.unknownLabels).sort((a,b)=>b[1]-a[1]);
+  // Incohérences catégories : nb de lignes RH ≠ nb de catégories saisies
+  const incoh=[];
+  Object.entries(rep.acCount||{}).forEach(([k,nbRh])=>{
+    const [empId,acType]=k.split('||');
+    const c=(S.certifiants||[]).find(x=>x.empId===empId); if(!c) return;
+    const t=(c.types||[]).find(x=>x.type===acType); if(!t) return;
+    const nbApp=(t.cats||[]).length;
+    if(nbApp && nbApp!==nbRh){ const e=byId(empId); incoh.push(`${e?e.nom+' '+e.prenom:empId} · ${acType} : ${nbRh} ligne(s) RH vs ${nbApp} catégorie(s)`); }
+  });
+  const box=document.getElementById('hrRepBody');
+  const sec=(t,html)=>`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:var(--cyan);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">${t}</div>${html}</div>`;
+  const li=arr=>`<div style="font-size:12px;color:var(--t2);line-height:1.7">${arr.join('<br>')}</div>`;
+  let h='';
+  h+=sec('Résultat',li([
+    `📚 Formations : <b style="color:#6effc4">${rep.formCre}</b> créée(s) · <b style="color:#ffc06a">${rep.formUpd}</b> mise(s) à jour`,
+    `🛡 Autorisations : <b style="color:#6effc4">${rep.autoCre}</b> créée(s) · <b style="color:#ffc06a">${rep.autoUpd}</b> mise(s) à jour`,
+    `🛫 Certifying Staff : <b style="color:#6effc4">${rep.certifCre}</b> fiche(s) créée(s) · <b style="color:#ffc06a">${rep.certifUpd}</b> mise(s) à jour`,
+    `<span style="color:var(--t3)">${rep.rows} ligne(s) lues · ${rep.skipped} ignorée(s) volontairement</span>`
+  ]));
+  if(rep.nameDiffs.length) h+=sec('⚠️ Noms divergents (à vérifier de votre côté)',
+    li(rep.nameDiffs.map(d=>`<b>${d.tri}</b> — app : ${d.app} · RH : ${d.rh}`)));
+  if(incoh.length) h+=sec('⚠️ Catégories à contrôler',li(incoh));
+  if(uP.length) h+=sec('❌ Trigrammes RH inconnus dans l\'app',
+    li(uP.map(([t,n])=>`<b>${t}</b> ${n} <button class="btn btn-ghost btn-xs" onclick="_hrAddAlias('${t}')">Associer…</button>`)));
+  if(uL.length) h+=sec('❓ Intitulés non reconnus',li(uL.map(([l,c])=>`${l} <span style="color:var(--t4)">(${c})</span>`)));
+  if(box){ box.innerHTML=h; openM('m-hr-report'); }
+}
+// Associer un trigramme RH à une personne de l'app
+function _hrAddAlias(rhTri){
+  const list=_sortByNom((S.personnel||[]).filter(p=>!p.archived));
+  const nom=prompt(`Trigramme RH « ${rhTri} » : saisissez le trigramme interne correspondant\n(${list.map(p=>p.trigramme).filter(Boolean).join(', ')})`);
+  if(!nom) return;
+  const t=_hrNorm(nom);
+  if(!list.some(p=>_hrNorm(p.trigramme)===t)){ toast('⚠️ Trigramme interne inconnu'); return; }
+  _hrAlias()[_hrNorm(rhTri)]=t; save();
+  toast(`✅ ${rhTri} → ${t} mémorisé. Relancez l'import.`);
+}
+
+
 function _importDrivingFromWb(wb){
   // Autorisations de conduite (feuille SSE) -> onglet AUTORISATIONS, détail conservé.
   // MEDICAL VISIT est exclu (reste "Visite Médicale" en Formations via Qualifications SSE).
