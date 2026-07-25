@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260722-STRUCT -->
+<!-- AeroStaff Pro v7 — Build 20260724-VIVIERS -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -1293,7 +1293,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="btn btn-ghost btn-sm" onclick="thisWeek()">Cette semaine</button>
   </div>
   <div class="exprow">
-    <button class="btn btn-sm" onclick="copyPrevWeek()" style="background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;border:none;font-weight:800" title="Remplit uniquement les cases vides à partir de la semaine précédente (ne touche pas aux formations/congés déjà saisis)">📋 Recopier la semaine précédente</button>
+    <button class="btn btn-sm" onclick="copyPrevWeek()" style="background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;border:none;font-weight:800" title="Recopie uniquement les affectations de travail dans les cases vides. Formations, congés et absences ne sont jamais recopiés.">📋 Recopier la semaine précédente</button>
     <button class="btn btn-mint btn-sm" onclick="exportWeekXls()">📊 Export Excel</button>
     <button class="btn btn-cyan btn-sm" onclick="exportWeekHtml()">📄 PDF / Imprimer</button>
     <button class="btn btn-rose btn-sm" onclick="openDayExtract()">📧 Extrait du jour</button>
@@ -2370,7 +2370,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Clic sur une case</strong> — Travail, Congé, Formation, Maladie, Déplacement…<br>
         • <strong style="color:#ffd060">Affectation chantier</strong> — Travail → choisir le chantier associé (y compris Stockage, Part 21, ou un avion en recyclage)<br>
         • <strong style="color:#ffd060">2 chantiers par demi-journée</strong> — une demi-journée peut porter un 2ᵉ chantier optionnel (jusqu'à 4 chantiers/jour). Les 3,5 h sont alors divisées à parts égales (1,75 h chacun). La case s'affiche en 2 bandes de couleur avec le MSN de chaque avion.<br>
-        • <strong style="color:#ffd060">📋 Recopier la semaine précédente</strong> — bouton violet : remplit uniquement les cases <strong>vides</strong> de la semaine affichée à partir de la précédente. Formations, congés et absences déjà saisis sont conservés. Une bannière « Annuler » apparaît après coup<br>
+        • <strong style="color:#ffd060">📋 Recopier la semaine précédente</strong> — bouton violet : remplit uniquement les cases <strong>vides</strong> de la semaine affichée à partir de la précédente, et <strong>seulement les affectations de travail</strong>. Formations, congés, maladies, absences et déplacements sont des événements ponctuels : ils ne sont <strong style="color:#6effc4">jamais recopiés</strong>, ce qui évite de créer de fausses entrées. Une bannière « Annuler » apparaît après coup<br>
         • <strong style="color:#ffd060">🖌 Copier vers d'autres (pinceau)</strong> — depuis l'éditeur d'une case, arme son contenu (ex. une formation) puis tape les cases des autres personnes pour l'y appliquer, sans tout retaper. Compteur, Annuler et Terminer dans la barre du bas. <em>Marche sur iPad/iPhone et sur ordinateur.</em><br>
         • <strong style="color:#ffd060">🖱 Sélection multiple à la souris (ordinateur)</strong> — glisser pour sélectionner plusieurs cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V, Échap pour quitter). Glisser sur les seuls après-midis (PM→PM) ne prend que les demi-journées PM ; AM→PM prend les journées entières. Coller remplit toute la sélection<br>
         • <strong style="color:#ffd060">📊 Export Excel coloré & 📄 PDF</strong> — rendu identique à l'app, avec couleurs, MSN des chantiers et légendes (cases scindées pour les demi-journées à 2 chantiers)<br>
@@ -2439,6 +2439,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Actif/Inactif</strong> — les inactifs n'apparaissent pas dans les plannings<br>
         • <strong style="color:#ffd060">Trigramme</strong> — identifiant court dans les plannings (ex: DCA)<br>
         • <strong style="color:#ffd060">Import Excel</strong> — importer une liste depuis un .xlsx
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🎯 <strong>Activité principale des intérimaires</strong> — à la sélection de la catégorie Intérimaire, choisis son rattachement : <strong>🔧 Chantier</strong>, <strong>🅿️ Stockage</strong>, <strong>♻️ Recyclage</strong>, <strong>✈️ Part 21</strong>, <strong>🔍 IQ</strong> ou <strong>🔩 Sheet Metal</strong>. Ce rattachement pilote les calculs :<br>
+        &nbsp;&nbsp;— <strong>Recyclage / Part 21 / IQ</strong> : hors Part 145 → l'intérimaire <strong>sort</strong> du ratio et de la capacité chantiers, et <strong>alimente</strong> la dispo correspondante (Recyclage, ou DISPO&nbsp;P21 / DISPO&nbsp;IQ de la table Capacité Part 21).<br>
+        &nbsp;&nbsp;— <strong>Chantier / Stockage / Sheet Metal</strong> : production Part 145 → l'intérimaire <strong>reste</strong> compté dans le ratio et la capacité chantiers.</div>
+        <div style="margin-top:8px;padding:8px 12px;background:rgba(109,143,176,0.08);border-left:3px solid #6d8fb0;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🏷️ <strong>Marqueurs d'appartenance dans les plannings</strong> — un pictogramme après le nom rappelle le rattachement stable d'une personne, dans le Master, le Hebdo, les Gantt <strong>et les exports PDF/Excel</strong> : <strong>✈️ Part 21</strong> · <strong>🔍 IQ</strong> · <strong>♻️ Recyclage</strong> · <strong>🅿️ Stockage</strong> · <strong>🔩 Sheet Metal</strong>. Il s'applique aux CDI de ces catégories et aux intérimaires selon leur activité. Les CDI des autres catégories (chef, expert, responsable…) sont déjà distingués par leur <strong>couleur</strong> et n'ont pas de marqueur.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">👷 <strong>Suivi des intérimaires en production</strong> (tableau en bas de l'onglet Personnel) — colonnes Nom, Agence, Niveau, Début, Taux, Fin de contrat, Statut. <strong>Barre de recherche</strong>, <strong>filtre « 🟡 En attente »</strong> (uniquement les demandes de prolongation non validées) et <strong>tri</strong> (Nom A→Z ou Statut urgent d'abord). Seuil de rappel paramétrable, exports <strong>Excel</strong> et <strong>PDF récap RH</strong> (ce dernier ne liste que les demandes en attente, sans le taux, avec logo MARDAM).</div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">📝 <strong>Prolongations de contrat</strong> — bouton « + Prolong. » : saisis une nouvelle date de début et de fin (+ motif). La fin de contrat ne change qu'une fois la demande <strong>validée</strong> (bouton ✓ Valider sur la ligne ou dans la fenêtre). Plusieurs périodes <strong>s'enchaînent</strong> (la suivante part de la fin de la précédente, interruption/congé calculé automatiquement). Chaque ligne d'historique est <strong>modifiable (✎)</strong> ou <strong>supprimable (✕)</strong> en cas d'erreur ou de changement de dernière minute.</div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Commence toujours par créer ton équipe ici avant d'utiliser les plannings.</div>
@@ -2749,7 +2753,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260722-STRUCT · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260724-VIVIERS · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3017,11 +3021,23 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         </button>
         <button type="button" class="activite-btn" data-v="stockage" onclick="selectActivite('stockage')"
           style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(255,154,60,0.3);background:rgba(255,154,60,0.06);color:#ff9a3c;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s">
-          ✈️<br>Stockage
+          🅿️<br>Stockage
         </button>
         <button type="button" class="activite-btn" data-v="recycling" onclick="selectActivite('recycling')"
           style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(110,255,196,0.3);background:rgba(110,255,196,0.06);color:#6effc4;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s">
           ♻️<br>Recyclage
+        </button>
+        <button type="button" class="activite-btn" data-v="part21" onclick="selectActivite('part21')"
+          style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(0,160,255,0.3);background:rgba(0,160,255,0.06);color:#00a0ff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s">
+          ✈️<br>Part 21
+        </button>
+        <button type="button" class="activite-btn" data-v="iq" onclick="selectActivite('iq')"
+          style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(0,200,255,0.3);background:rgba(0,200,255,0.06);color:#00c8ff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s">
+          🔍<br>IQ
+        </button>
+        <button type="button" class="activite-btn" data-v="sheetmetal" onclick="selectActivite('sheetmetal')"
+          style="padding:10px 6px;border-radius:10px;border:1.5px solid rgba(109,143,176,0.35);background:rgba(109,143,176,0.08);color:#a7c1de;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s">
+          🔩<br>Sheet Metal
         </button>
       </div>
       <input type="hidden" id="p-activite" value="">
@@ -5248,7 +5264,7 @@ function getAirbusWeekStart(offset){
 
 function getAirbusAbsences(mon){
   const ABSENT_LABELS={conge:'CP',maladie:'Maladie',formation:'Formation',deplacement:'Déplacement',absence:'Absence'};
-  const staff=S.personnel.filter(p=>(p.categorie==='part21'||p.categorie==='iq')&&p.actif!==false);
+  const staff=S.personnel.filter(p=>(_isPart21Staff(p)||_isIqStaff(p))&&p.actif!==false);
   const absents=[];
   staff.forEach(emp=>{
     const absTypes=new Set();
@@ -5273,7 +5289,7 @@ function getAirbusAbsences(mon){
 }
 
 function getAirbusDispoWeek(mon){
-  const staff=S.personnel.filter(p=>(p.categorie==='part21'||p.categorie==='iq')&&p.actif!==false);
+  const staff=S.personnel.filter(p=>(_isPart21Staff(p)||_isIqStaff(p))&&p.actif!==false);
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
   let dispoPart21=0, dispoIQ=0;
   staff.forEach(emp=>{
@@ -5293,8 +5309,8 @@ function getAirbusDispoWeek(mon){
     }
     // Présent si plus de la moitié des demi-journées sont non-absentes
     if(joursTotal>0 && joursPresents/joursTotal > 0.5){
-      if(emp.categorie==='part21') dispoPart21++;
-      else dispoIQ++;
+      if(_isIqStaff(emp)) dispoIQ++;         // IQ (CDI ou intérimaire fléché IQ)
+      else dispoPart21++;                    // Part 21 (CDI ou intérimaire fléché Part 21)
     }
   });
   return {part21:dispoPart21, iq:dispoIQ};
@@ -5666,7 +5682,7 @@ function renderAirbusPresence(){
     const gridCols=[0,1,2,3,4,5,6,7,8,9,10,11].map(()=>`<div style="flex:1;border-right:1px solid rgba(255,255,255,0.04)"></div>`).join('');
     return`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.05);min-height:42px">
       <div style="width:160px;flex-shrink:0;padding:8px 14px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center">
-        <div style="font-size:13px;font-weight:800;color:${catCol}">${emp.nom} ${emp.prenom}</div>
+        <div style="font-size:13px;font-weight:800;color:${catCol}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}</div>
         <div style="font-size:10px;color:#8090a8">${role}</div>
       </div>
       <div style="flex:1;position:relative">
@@ -5902,7 +5918,7 @@ function aiSimInternalAnalysis(params){
 
 function buildSimContext(p){
   const today=new Date();
-  const techs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&x.actif!==false);
+  const techs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&!_isHorsP145(x)&&x.actif!==false);
   const chantiers=S.chantiers.filter(c=>['encours','futur'].includes(c.statut));
   const recap=chantiers.map(c=>`- ${c.nom} (${c.debut||'?'}→${c.fin||'?'}) | ${c.ressources?.technicien||0} techs | ${c.manHours||0}MH`).join('\n');
   const teamLine=techs.map(t=>`${t.prenom} ${t.nom} (${t.trigramme||'—'})`).join(', ');
@@ -5962,7 +5978,7 @@ function renderSimCapaTable(p){
   while(w<=end){weeks.push(new Date(w));w=addD(w,7);}
 
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const allTechs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&x.actif!==false);
+  const allTechs=S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&!_isHorsP145(x)&&x.actif!==false);
 
   let html=`<table style="width:100%;border-collapse:collapse;font-size:12px">
   <thead><tr>
@@ -6287,6 +6303,26 @@ function _dispNom(p){
   const pre=(p.prenom||'').trim().toLowerCase().replace(/(^|[\s\-'])(\S)/g,(m,a,b)=>a+b.toUpperCase());
   return (nom+' '+pre).trim();
 }
+// Marqueur d'appartenance stable après le nom (planning + gantt + exports).
+// CDI par catégorie · intérimaire par activité. Les CDI des autres catégories sont
+// déjà distingués par leur couleur → aucun marqueur.
+function _persMarker(p){
+  if(!p) return '';
+  if(p.categorie==='recycling') return '♻️';
+  if(p.categorie==='part21')    return '✈️';
+  if(p.categorie==='iq')        return '🔍';
+  if(p.categorie==='sheetmetal')return '🔩';
+  if(p.categorie==='interimaire'){
+    switch(p.activite){
+      case 'recycling':  return '♻️';
+      case 'part21':     return '✈️';
+      case 'iq':         return '🔍';
+      case 'stockage':   return '🅿️';
+      case 'sheetmetal': return '🔩';
+    }
+  }
+  return '';
+}
 function _sortByNom(list){
   return [...list].sort((a,b)=>(a.nom+' '+a.prenom).localeCompare(b.nom+' '+b.prenom,'fr',{sensitivity:'base'}));
 }
@@ -6509,6 +6545,16 @@ function buildLeg(elId){
 }
 
 /* ═══ DASHBOARD ═══ */
+// Un intérimaire fléché « Recyclage » est un mécanicien hors Part 145 :
+// il ne compte PAS dans le ratio/capacité chantiers, mais dans la capacité Recyclage.
+function _isRecyMecano(p){ return p && (p.categorie==='recycling' || (p.categorie==='interimaire' && p.activite==='recycling')); }
+// Intérimaires fléchés Part 21 / IQ : hors Part 145 → alimentent la capacité Part 21, pas les chantiers
+function _isPart21Staff(p){ return p && (p.categorie==='part21' || (p.categorie==='interimaire' && p.activite==='part21')); }
+function _isIqStaff(p){ return p && (p.categorie==='iq' || (p.categorie==='interimaire' && p.activite==='iq')); }
+// Hors production Part 145 = recyclage OU part21 OU iq (que ce soit CDI ou intérimaire fléché)
+function _isHorsP145(p){ return _isRecyMecano(p) || _isPart21Staff(p) || _isIqStaff(p); }
+// Intérimaire réellement en production chantiers Part 145 (chantier/stockage/sheetmetal/sans activité)
+function _isInterimP145(p){ return p && p.categorie==='interimaire' && p.activite!=='recycling' && p.activite!=='part21' && p.activite!=='iq'; }
 function renderDash(){
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -6521,7 +6567,7 @@ function renderDash(){
 
   // Ratio techniciens / intérimaires — uniquement le personnel EN PRODUCTION
   const nTech  = S.personnel.filter(p=>p.categorie==='technicien'&&p.actif!==false).length;
-  const nInt   = S.personnel.filter(p=>p.categorie==='interimaire'&&p.actif!==false).length;
+  const nInt   = S.personnel.filter(p=>_isInterimP145(p)&&p.actif!==false).length;
   const nPrest = S.personnel.filter(p=>p.categorie==='prestataire'&&p.actif!==false).length;
   const total  = nTech + nInt;
   const pctTech  = total > 0 ? Math.round(nTech / total * 100) : 0;
@@ -6564,7 +6610,7 @@ function renderDash(){
   const _mon=getMon(new Date());
   const _wEnd=addD(_mon,6);
   const _ABSENT=new Set(['conge','maladie','formation','formation_int','absence','deplacement','ferie','we']);
-  const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+  const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
   // Dispo de la semaine
   let _dispo=0;
   _techs.forEach(p=>{
@@ -7695,7 +7741,7 @@ function buildGrid(emps,dates,containerId){
       <td class="ncol" style="background:linear-gradient(${cat.col||'#2979ff'}14,${cat.col||'#2979ff'}14),#000000;border-left:3px solid ${inactive?'#ff9a3c':(cat.col||'var(--glass-border)')}">
         <div class="ncol-inner">
           <div class="emp-tri" style="color:${cat.col||'var(--t3)'}">${emp.trigramme}</div>
-          <div class="emp-name">${emp.nom} ${emp.prenom}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
+          <div class="emp-name">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
         </div>
       </td>
       ${cells}
@@ -8198,15 +8244,17 @@ function renderMaster(){
 function chWeek(dir){S.weekStart=addD(S.weekStart,dir*7);renderWeekly();}
 function thisWeek(){S.weekStart=getMon(new Date());renderWeekly();}
 
-// Recopie la semaine précédente vers la semaine courante — NON DESTRUCTIF : ne remplit que les cases vides,
-// ne touche jamais aux formations/congés/absences déjà saisis.
+// Recopie la semaine précédente vers la semaine courante — NON DESTRUCTIF : ne remplit que les cases vides.
+// Ne recopie QUE les affectations de travail : formations, congés, maladies, absences et déplacements sont
+// des événements ponctuels, les dupliquer créerait de fausses entrées impossibles à distinguer des vraies.
+const COPY_WEEK_TYPES=new Set(['travail']);
 function copyPrevWeek(){
   if(!S.weekStart) S.weekStart=getMon(new Date());
   const mon=getMon(S.weekStart instanceof Date?S.weekStart:new Date(S.weekStart));
   const prevMon=addD(mon,-7);
   const only=(document.getElementById('wk-emp')||{}).value||'';   // si un employé est filtré, ne traiter que lui
   const list=only?S.personnel.filter(p=>p.id===only):S.personnel.filter(p=>p.actif!==false && !p.archived);
-  const undo=[]; let filled=0;
+  const undo=[]; let filled=0, skipped=0;
   list.forEach(p=>{
     for(let i=0;i<7;i++){
       const curD=fmt(addD(mon,i)), prevD=fmt(addD(prevMon,i));
@@ -8215,17 +8263,17 @@ function copyPrevWeek(){
         const curK=`${p.id}_${curD}_${h}`;
         if(S.planning[curK]) return;                               // NON destructif : case déjà remplie => on garde
         const src=S.planning[`${p.id}_${prevD}_${h}`];
-        if(src&&src.type){
-          S.planning[curK]=JSON.parse(JSON.stringify(src));
-          undo.push({key:curK});
-          filled++;
-        }
+        if(!src||!src.type) return;
+        if(!COPY_WEEK_TYPES.has(src.type)){ skipped++; return; }    // événement ponctuel : jamais recopié
+        S.planning[curK]=JSON.parse(JSON.stringify(src));
+        undo.push({key:curK});
+        filled++;
       });
     }
   });
-  if(!filled){ try{toast('Rien à recopier (semaine précédente vide, ou tout est déjà rempli)');}catch(_){} return; }
+  if(!filled){ try{toast(skipped?`Rien à recopier — ${skipped} événement(s) ponctuel(s) (formations, congés, absences) volontairement ignoré(s)`:'Rien à recopier (semaine précédente vide, ou tout est déjà rempli)');}catch(_){} return; }
   save(); renderWeekly(); renderMaster();
-  _bulkBanner(`${filled} demi-journée${filled>1?'s':''} recopiée${filled>1?'s':''} depuis S‑1 · cases déjà remplies conservées`, undo);
+  _bulkBanner(`${filled} affectation${filled>1?'s':''} recopiée${filled>1?'s':''} depuis S‑1${skipped?` · ${skipped} formation/congé/absence non recopié${skipped>1?'s':''}`:''}`, undo);
 }
 // Petite bannière d'annulation pour les actions groupées (réutilise le style .pl-bar)
 function _bulkBanner(msg, undoItems){
@@ -8977,7 +9025,7 @@ function renderAvancement(){
   const MH_PAR_TECH_JOUR=7;
   // Uniquement techniciens + intérimaires dans les MH chantier
   const allTechs=S.personnel.filter(p=>
-    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false
+    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false
   );
   const techIds=new Set(allTechs.map(p=>p.id));
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
@@ -10890,7 +10938,7 @@ function renderRecyclingGantt(){
     const gridCols=[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<div style="flex:1;border-right:1px solid rgba(255,255,255,0.04)"></div>`).join('');
     return`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.05);min-height:42px">
       <div style="width:160px;flex-shrink:0;padding:8px 14px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center">
-        <div style="font-size:13px;font-weight:800;color:${cat.col||'#fff'}">${emp.nom} ${emp.prenom}</div>
+        <div style="font-size:13px;font-weight:800;color:${cat.col||'#fff'}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}</div>
         <div style="font-size:10px;color:#8090a8">${role}</div>
       </div>
       <div style="flex:1;position:relative">
@@ -11162,7 +11210,7 @@ function renderRecyclingCapa(){
   if(!el) return;
   const avions=(S.recycling.avions||[]).filter(a=>a.statut!=='termine');
   const today=new Date();
-  const recTechs=S.personnel.filter(p=>p.categorie==='recycling'&&p.actif!==false);
+  const recTechs=S.personnel.filter(p=>_isRecyMecano(p)&&p.actif!==false);
   const ABSENT_TYPES=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
   const weeks=[]; for(let w=0;w<12;w++) weeks.push(getMon(addD(getMon(today),w*7)));
   const getWKey=mon=>`${mon.getFullYear()}-S${wkN(mon)}`;
@@ -11664,7 +11712,7 @@ function renderStockageGantt(){
 
     return`<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.05);min-height:42px">
       <div style="width:160px;flex-shrink:0;padding:8px 14px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;justify-content:center">
-        <div style="font-size:13px;font-weight:800;color:${cat.col||'#fff'}">${emp.nom} ${emp.prenom}</div>
+        <div style="font-size:13px;font-weight:800;color:${cat.col||'#fff'}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}</div>
         <div style="font-size:10px;color:#8090a8;margin-top:1px">${role}</div>
       </div>
       <div style="flex:1;position:relative">
@@ -14011,7 +14059,7 @@ function _computeKPI(){
     const eff=dd.nbTechs;
     const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
     const ecart=Math.round((dd.dispo-bb.total)*10)/10;
-    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
     let absH=0,totH=0,formH=0;
     prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
     const tauxAbs=totH>0?Math.round(absH/totH*100):0;
@@ -14029,7 +14077,7 @@ function _computeKPI(){
   }catch(e){}
   // Chantiers en cours
   try{
-    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false).map(p=>p.id));
     const todayStr=fmt(today);
     const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
     const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
@@ -14197,7 +14245,7 @@ function renderKPI(){
     const eff=dd.nbTechs;
     const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
     const ecart=Math.round((dd.dispo-bb.total)*10)/10;
-    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
     let absH=0,totH=0,formH=0;
     prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
     const tauxAbs=totH>0?Math.round(absH/totH*100):0;
@@ -14216,7 +14264,7 @@ function renderKPI(){
 
   // ── Chantiers ──
   try{
-    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
+    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false).map(p=>p.id));
     const todayStr=fmt(today);
     const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
     const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
@@ -14442,7 +14490,7 @@ function aiGetContext(){
 
   // Compute MH consumed per chantier (techniciens + intérimaires uniquement)
   const EXCLURE_MH_AI=new Set(['chef','expert','manager','workshop','responsable']);
-  const techOnlyIds=new Set(S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false).map(p=>p.id));
+  const techOnlyIds=new Set(S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false).map(p=>p.id));
   const mhInfo=chantiersActifs.map(c=>{
     let mhCons=0;
     Object.entries(S.planning||{}).forEach(([key,entry])=>{
@@ -15217,7 +15265,7 @@ function aiAnswerExpirations(n){
 // ── Dispo (capacité) complète d'une semaine ──
 function _aiDispoSemaine(mon){
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
   let dispo=0; const absents=[];
   techs.forEach(p=>{
     let present=0,total=0;
@@ -15257,7 +15305,7 @@ function _aiBesoinSemaine(mon){
   const ac=S.airbus?.charge?.[wk]||{};
   airbusT=(ac.part21||0)+(ac.iq||0);
   const ABSENTR=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const recPers=(S.personnel||[]).filter(p=>p.categorie==='recycling'&&p.actif!==false);
+  const recPers=(S.personnel||[]).filter(p=>_isRecyMecano(p)&&p.actif!==false);
   const techsAff=(avId)=>{let c=0;recPers.forEach(emp=>{let pr=false,af=false;for(let i=0;i<5;i++){const ds=fmt(addD(mon,i));if(isHol(ds))continue;const am=S.planning[`${emp.id}_${ds}_AM`]||{},pm=S.planning[`${emp.id}_${ds}_PM`]||{};if(!ABSENTR.has(am.type||'')||!ABSENTR.has(pm.type||''))pr=true;if(am.chantierId===`REC_${avId}`||pm.chantierId===`REC_${avId}`||am.chantierId==='REC'||pm.chantierId==='REC')af=true;}if(pr&&af)c++;});return c;};
   (S.recycling?.avions||[]).filter(a=>a.statut!=='termine').forEach(av=>{
     const d=av.debutChantier||av.entree,f=av.finChantier||av.finPrev;
@@ -15580,7 +15628,7 @@ function aiSimulationGuide(q){
 function aiRunSimulationWeeks(nbTech,weekNums){
   if(!weekNums||!weekNums.length) return '⚠ Précisez les semaines, par exemple « semaine 32 et 33 ».';
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
   const rows=[];
   weekNums.forEach(wk=>{
     const mon=_weekMon(wk);
@@ -16246,7 +16294,7 @@ function renderChargeCapaTable(year){
 
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
   const allTechs=S.personnel.filter(p=>
-    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false
+    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false
   );
   const totalTechs=allTechs.length;
 
@@ -16337,7 +16385,7 @@ function renderChargeCapaTable(year){
     let recTechs=0;
     const detailRecAvions=[];
     const wEnd2=addD(mon,6);
-    const recPers=S.personnel.filter(p=>p.categorie==='recycling'&&p.actif!==false);
+    const recPers=S.personnel.filter(p=>_isRecyMecano(p)&&p.actif!==false);
     // Priorité 1 : techniciens recyclage réellement affectés à un avion (REC_id) dans le planning
     const techsAffectesAvion=(avId)=>{
       let count=0;
@@ -16566,7 +16614,7 @@ function setBesoinEditYear(y){
 // Besoin calculé (hors override) d'un avion recyclage pour une semaine (mêmes priorités que Programme)
 function _recBesoinAvionSemaine(av,mon){
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const recPers=S.personnel.filter(p=>p.categorie==='recycling'&&p.actif!==false);
+  const recPers=S.personnel.filter(p=>_isRecyMecano(p)&&p.actif!==false);
   let affectes=0;
   recPers.forEach(emp=>{
     let present=false,affecte=false;
@@ -17128,7 +17176,7 @@ function _ppBesoin(c,mon){
 // Capacité technicien réelle d'une semaine (depuis le planning), même règle qu'à l'écran
 function _ppCapa(mon){
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
-  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&p.actif!==false);
+  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
   let j=0;
   techs.forEach(emp=>{
     [0,1,2,3,4].forEach(i=>{
@@ -17491,7 +17539,7 @@ function exportMasterPDF(){
       return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;min-height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${la.txt}${am.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${am.vm}</span>`:''}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${lp.txt}${pm.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${pm.vm}</span>`:''}</div></div></td>`;
     }).join('');
     const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
-    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
+    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
   });
 
   // Légende : chantiers réellement utilisés ce mois + types d'absence
@@ -17572,7 +17620,7 @@ function exportWeekHtml(){
         <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:8px;font-weight:800;margin-top:1px">🩺 VM ${pm.vm}</div>`:''}</div>
       </div></td>`;
     }).join('');
-    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>${cells}</tr>`;
+    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>${cells}</tr>`;
   });
 
   const thCells=dates.map((d,i)=>{const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));return`<th style="min-width:78px;padding:6px;background:${isH?'#fff3cd':isW?'#f8f9fa':'#1e3a5f'};color:${isH?'#856404':isW?'#6c757d':'#fff'};border:1px solid #ddd;font-size:10px">${JOURS[wd===0?6:wd-1]}<br><small>${d.getDate()}/${d.getMonth()+1}</small></th>`;}).join('');
@@ -17771,7 +17819,7 @@ async function _buildColoredWeekXls(){
       if(vms.length){ base={txt:(base.txt?base.txt+'\n':'')+vms.join(' · '), color:base.color}; }
       return base;
     });
-    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
+    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
     row.height=26;
     // Nom coloré par catégorie
     const c0=row.getCell(1);
