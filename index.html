@@ -298,6 +298,21 @@ body::before{
 .tabbar::-webkit-scrollbar{display:none}
 .tab-scroll{display:flex;max-width:1700px;margin:0 auto;padding:0 16px;position:relative}
 
+/* Ligne des familles */
+.fam-row{display:flex;align-items:center;gap:4px;max-width:1700px;margin:0 auto;padding:7px 16px 0;flex-wrap:wrap}
+.fam-btn{
+  background:none;border:1px solid transparent;border-radius:9px;
+  padding:7px 13px;cursor:pointer;color:var(--t3);
+  font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;
+  letter-spacing:0.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all .15s;
+}
+.fam-btn:hover{color:var(--t1);background:rgba(255,255,255,0.05)}
+.fam-btn.active{color:var(--cyan);background:rgba(0,210,255,0.1);border-color:rgba(0,210,255,0.3)}
+.fam-sep{width:1px;height:20px;background:var(--glass-border);margin:0 4px;flex-shrink:0}
+/* Les sous-onglets masqués par défaut : seuls ceux de la famille active s'affichent */
+.tab[data-fam]{display:none}
+.tab[data-fam].fam-visible{display:flex}
+
 .tab{
   background:none;border:none;border-bottom:2px solid transparent;
   padding:13px 18px;cursor:pointer;color:var(--t3);
@@ -1133,6 +1148,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
   <div class="hspacer"></div>
   <div class="header-right">
+    <button id="undoBtn" onclick="undoLast()" title="Rien à annuler" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:var(--t1);width:38px;height:34px;cursor:pointer;font-size:16px;opacity:0.35;pointer-events:none;transition:all .15s;display:inline-flex;align-items:center;justify-content:center" onmouseover="if(this.style.opacity==='1')this.style.background='rgba(0,210,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">↩️</button>
     <div class="alert-pill" id="alertPill">⚠ <span id="alertN">0</span></div>
     <div class="drive-pill" id="drivePill" onclick="openM('m-drive');if(typeof refreshGdriveUI==='function')refreshGdriveUI()">
       <div class="drive-dot" id="driveDot"></div>
@@ -1154,25 +1170,39 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 <!-- ═══════════ TABS ═══════════ -->
 <nav class="tabbar">
-<div class="tab-scroll">
-  <button class="tab active" id="tb-dashboard" onclick="goTab('dashboard')">🏠 Tableau de bord</button>
-  <button class="tab" id="tb-formations" onclick="goTab('formations')">📋 Formations<span class="tab-notif" id="nt-form"></span></button>
-  <button class="tab" id="tb-master"    onclick="goTab('master')">📅 Master Planning</button>
-  <button class="tab" id="tb-weekly"    onclick="goTab('weekly')">🗓 Planning Hebdo</button>
-  <button class="tab" id="tb-chantiers" onclick="goTab('chantiers')">🔧 Chantiers</button>
-  <button class="tab" id="tb-stockage" onclick="goTab('stockage')">✈️ Stockage</button>
-  <button class="tab" id="tb-recycling" onclick="goTab('recycling')">♻️ A/C Recyclage</button>
-  <button class="tab" id="tb-slot" onclick="goTab('slot')">🏭 Slot Hangar</button>
-  <button class="tab" id="tb-personnel" onclick="goTab('personnel')">👥 Personnel</button>
-  <button class="tab" id="tb-todo"      onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
-  <button class="tab" id="tb-autorisations" onclick="goTab('autorisations')">🛡 Autorisations<span class="tab-notif" id="nt-auto"></span></button>
-  <button class="tab" id="tb-certif" onclick="goTab('certif')">🛫 Certifying Staff<span class="tab-notif" id="nt-certif"></span></button>
-  <button class="tab" id="tb-programme" onclick="goTab('programme')">📊 Programme Activité</button>
-  <button class="tab" id="tb-kpi" onclick="goTab('kpi')">📈 Tableau KPI</button>
-  <button class="tab" id="tb-airbus" onclick="goTab('airbus')">🛩 Airbus Activité</button>
-  <button class="tab" id="tb-ai" onclick="goTab('ai')">✦ Assistant IA</button>
-  <button class="tab" id="tb-simulation" onclick="goTab('simulation')">🧪 Simulation</button>
-  <button class="tab" id="tb-notice" onclick="goTab('notice')">📖 Notice</button>
+<div class="fam-row" id="famRow">
+  <button class="fam-btn active" id="fam-home" onclick="goTab('dashboard')">🏠 Tableau de bord</button>
+  <span class="fam-sep"></span>
+  <button class="fam-btn" id="fam-pilotage" onclick="selectFamily('pilotage')">📊 Pilotage</button>
+  <button class="fam-btn" id="fam-planning" onclick="selectFamily('planning')">📅 Planning</button>
+  <button class="fam-btn" id="fam-avions" onclick="selectFamily('avions')">✈️ Activité avions</button>
+  <button class="fam-btn" id="fam-personnel" onclick="selectFamily('personnel')">👥 Personnel</button>
+  <button class="fam-btn" id="fam-outils" onclick="selectFamily('outils')">🔧 Outils</button>
+</div>
+<div class="tab-scroll" id="tabScroll">
+  <button class="tab active" id="tb-dashboard" data-fam="home" onclick="goTab('dashboard')">🏠 Tableau de bord</button>
+
+  <button class="tab" id="tb-programme" data-fam="pilotage" onclick="goTab('programme')">📊 Programme Activité</button>
+  <button class="tab" id="tb-chantiers" data-fam="pilotage" onclick="goTab('chantiers')">🔧 Chantiers</button>
+  <button class="tab" id="tb-kpi" data-fam="pilotage" onclick="goTab('kpi')">📈 Tableau KPI</button>
+
+  <button class="tab" id="tb-master"    data-fam="planning" onclick="goTab('master')">📅 Master Planning</button>
+  <button class="tab" id="tb-weekly"    data-fam="planning" onclick="goTab('weekly')">🗓 Planning Hebdo</button>
+  <button class="tab" id="tb-slot" data-fam="planning" onclick="goTab('slot')">🏭 Slot Hangar</button>
+
+  <button class="tab" id="tb-stockage" data-fam="avions" onclick="goTab('stockage')">🅿️ Stockage</button>
+  <button class="tab" id="tb-recycling" data-fam="avions" onclick="goTab('recycling')">♻️ A/C Recyclage</button>
+  <button class="tab" id="tb-airbus" data-fam="avions" onclick="goTab('airbus')">🛩 Airbus Activité</button>
+
+  <button class="tab" id="tb-personnel" data-fam="personnel" onclick="goTab('personnel')">👥 Personnel</button>
+  <button class="tab" id="tb-certif" data-fam="personnel" onclick="goTab('certif')">🛫 Certifying Staff<span class="tab-notif" id="nt-certif"></span></button>
+  <button class="tab" id="tb-formations" data-fam="personnel" onclick="goTab('formations')">📋 Formations<span class="tab-notif" id="nt-form"></span></button>
+  <button class="tab" id="tb-autorisations" data-fam="personnel" onclick="goTab('autorisations')">🛡 Autorisations<span class="tab-notif" id="nt-auto"></span></button>
+
+  <button class="tab" id="tb-todo"      data-fam="outils" onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
+  <button class="tab" id="tb-ai" data-fam="outils" onclick="goTab('ai')">✦ Assistant IA</button>
+  <button class="tab" id="tb-simulation" data-fam="outils" onclick="goTab('simulation')">🧪 Simulation</button>
+  <button class="tab" id="tb-notice" data-fam="outils" onclick="goTab('notice')">📖 Notice</button>
 </div>
 </nav>
 
@@ -3215,6 +3245,18 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 </div>
 
+<!-- Confirmation transfert direct vers recyclage -->
+<div class="mbg" id="m-stock-recy">
+<div class="modal" style="max-width:420px">
+  <div class="modal-title">♻️ Envoyer au recyclage</div>
+  <div id="stock-recy-body" style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeM('m-stock-recy')">Annuler</button>
+    <button class="btn btn-cyan" onclick="_confirmStockRecy()">♻️ Confirmer le transfert</button>
+  </div>
+</div>
+</div>
+
 <!-- Todo -->
 <div class="mbg" id="m-todo">
 <div class="modal">
@@ -4469,9 +4511,51 @@ function schedDriveSync(){
   },2000);
 }
 
+// ── Annulation (undo) d'un cran : mémorise l'état AVANT chaque sauvegarde ──
+let _undoSnapshot=null;   // état précédent (chaîne JSON) restaurable par la flèche ↩️
+let _undoLabel='';        // libellé indicatif de la dernière action
+let _undoInProgress=false;
+function _captureUndo(){
+  if(_undoInProgress) return;                 // ne pas snapshoter pendant une restauration
+  if(window._archiveMode) return;
+  try{
+    const prev=_safeStorage.getItem('asp4');  // ce qui est en base = l'état d'AVANT la modif en cours
+    if(prev){ _undoSnapshot=prev; }
+  }catch(_){}
+  try{ _refreshUndoBtn(); }catch(_){}
+}
+function _refreshUndoBtn(){
+  const b=document.getElementById('undoBtn'); if(!b) return;
+  const on=!!_undoSnapshot;
+  b.style.opacity=on?'1':'0.35';
+  b.style.pointerEvents=on?'auto':'none';
+  b.title=on?'Annuler la dernière action':'Rien à annuler';
+}
+function undoLast(){
+  if(!_undoSnapshot){ toast('Rien à annuler'); return; }
+  const snap=_undoSnapshot;
+  _undoInProgress=true;
+  try{
+    const restored=JSON.parse(snap);
+    S=restored;
+    _safeStorage.setItem('asp4', snap);       // réécrit l'état restauré
+    if(S.gdrive){ S.gdrive.lastModified=new Date().toISOString(); }
+    if(S.gdrive?.connected && S.gdrive?.gasUrl){ try{ schedDriveSync(); }catch(_){} }
+    _undoSnapshot=null;                        // undo d'un seul cran
+    _rerenderAll();
+    toast('↩️ Dernière action annulée');
+  }catch(e){ toast('⚠️ Annulation impossible'); }
+  _undoInProgress=false;
+  try{ _refreshUndoBtn(); }catch(_){}
+}
+// Re-rend toutes les vues après une restauration
+function _rerenderAll(){
+  ['renderDash','renderPersonnel','renderForms','renderAutorisations','renderCertif','renderChantiers','renderMaster','renderWeekly','renderStockage','renderRecycling','renderProgramme','renderKPI','popSelects','refreshStoragePill'].forEach(fn=>{ if(typeof window[fn]==='function'){ try{ window[fn](); }catch(_){} } });
+}
 function save(){
   // Mode consultation d'archive : lecture seule stricte — on n'écrit RIEN.
   if(window._archiveMode){ try{toast('📁 Lecture seule — archive non modifiable');}catch(_){} return; }
+  _captureUndo();                // photo de l'état précédent AVANT d'écraser
   // Horodater la sauvegarde locale : sans ça, le pull Drive considère le distant
   // comme "plus récent" et écrase les modifications locales (perte de données).
   if(S.gdrive){ S.gdrive.lastModified=new Date().toISOString(); }
@@ -6289,12 +6373,44 @@ function setWallpaper(key){
   _applyWallpaperPref(); save(); renderWallpaperPicker();
   toast(key==="off"?"Fond d\u00e9sactiv\u00e9":"\ud83c\udfa8 Fond appliqu\u00e9");
 }
+// Correspondance onglet → famille (pour synchroniser la barre à deux niveaux)
+var TAB_FAMILY={
+  dashboard:'home',
+  programme:'pilotage', chantiers:'pilotage', kpi:'pilotage',
+  master:'planning', weekly:'planning', slot:'planning',
+  stockage:'avions', recycling:'avions', airbus:'avions',
+  personnel:'personnel', certif:'personnel', formations:'personnel', autorisations:'personnel',
+  todo:'outils', ai:'outils', simulation:'outils', notice:'outils'
+};
+// Affiche les sous-onglets d'une famille et ouvre son premier onglet
+function _showFamilyTabs(fam){
+  document.querySelectorAll('.tab[data-fam]').forEach(t=>{
+    t.classList.toggle('fam-visible', t.dataset.fam===fam);
+  });
+  document.querySelectorAll('.fam-btn').forEach(b=>b.classList.remove('active'));
+  const fb=document.getElementById('fam-'+fam); if(fb) fb.classList.add('active');
+}
+// Clic sur une famille : afficher ses onglets et ouvrir le premier
+function selectFamily(fam){
+  _showFamilyTabs(fam);
+  const first=document.querySelector('.tab[data-fam="'+fam+'"]');
+  if(first){ const id=first.id.replace('tb-',''); goTab(id); }
+}
 function goTab(name){
   document.querySelectorAll('.mbg.on').forEach(m=>m.classList.remove('on'));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   [...document.body.classList].filter(c=>c.startsWith('tab-')).forEach(c=>document.body.classList.remove(c));
   document.body.classList.add('tab-'+name);
+  // Synchroniser la famille active et l'affichage des sous-onglets
+  const fam=TAB_FAMILY[name]||'home';
+  if(fam==='home'){
+    document.querySelectorAll('.fam-btn').forEach(b=>b.classList.remove('active'));
+    const fb=document.getElementById('fam-home'); if(fb) fb.classList.add('active');
+    document.querySelectorAll('.tab[data-fam]').forEach(t=>t.classList.remove('fam-visible'));
+  } else {
+    _showFamilyTabs(fam);
+  }
   _applyWallpaperPref();
   const pg=document.getElementById('pg-'+name);
   const tb=document.getElementById('tb-'+name);
@@ -11956,12 +12072,33 @@ function renderStockageGantt(){
 }
 
 /* ── Parc avions ── */
+let _stockSearch='';
+function _onStockSearch(v){ _stockSearch=(v||'').toLowerCase().trim(); renderStockageAvions(); }
 function renderStockageAvions(){
   const el=document.getElementById('stockage-avions');
   if(!el) return;
-  const avions=(S.stockage.avions||[]);
-  if(!avions.length){
+  let avions=(S.stockage.avions||[]);
+  const total=avions.length;
+  if(_stockSearch){
+    const q=_stockSearch;
+    avions=avions.filter(a=>[a.msn,a.type,a.moteur,a.client].some(x=>(x||'').toString().toLowerCase().includes(q)));
+  }
+  const searchBar=`<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+    <div style="position:relative">
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t4)">🔍</span>
+      <input type="text" id="stock-search" value="${_stockSearch.replace(/"/g,'&quot;')}" oninput="_onStockSearch(this.value)" placeholder="Rechercher un avion — MSN, type, moteur ou client…"
+        style="width:100%;box-sizing:border-box;padding:9px 12px 9px 34px;background:var(--glass-2);border:1px solid var(--glass-border);border-radius:9px;color:var(--t1);font-size:12px;font-family:'Outfit',sans-serif">
+      ${_stockSearch?`<span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--t4);cursor:pointer" onclick="_onStockSearch('')">✕ effacer</span>`:''}
+    </div>
+    ${_stockSearch?`<div style="font-size:10px;color:var(--t4);margin-top:5px">${avions.length} / ${total} avion${total>1?'s':''}</div>`:''}
+  </div>`;
+
+  if(!total){
     el.innerHTML='<div style="padding:20px;text-align:center;color:var(--t4);font-size:13px">Aucun avion en stockage — cliquez "+ Avion" pour en ajouter</div>';
+    return;
+  }
+  if(!avions.length){
+    el.innerHTML=searchBar+'<div style="padding:20px;text-align:center;color:var(--t4);font-size:13px">Aucun avion ne correspond à « '+_stockSearch+' »</div>';
     return;
   }
 
@@ -12000,7 +12137,10 @@ function renderStockageAvions(){
     ${['Type / MSN','Entrée site','Statut','Notes','Actions'].map(h=>`<div style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.5px">${h}</div>`).join('')}
   </div>`;
 
-  el.innerHTML=header+rows;
+  el.innerHTML=searchBar+header+rows;
+  // Conserver le focus et la position du curseur après re-render
+  const inp=document.getElementById('stock-search');
+  if(inp && _stockSearch){ inp.focus(); const l=inp.value.length; inp.setSelectionRange(l,l); }
 }
 
 /* ── Charge hebdomadaire ── */
@@ -12173,19 +12313,30 @@ function delAvion(id){
 }
 
 /* ── Transfert direct Stockage → Recyclage (par MSN, sans doublon) ── */
+let _stockRecyId=null;
 function stockageToRecyclage(id){
   const av=(S.stockage?.avions||[]).find(a=>a.id===id); if(!av) return;
-  if(!confirm(`Envoyer l'avion MSN ${av.msn||'?'} (${av.type||''}) directement au recyclage ?`)) return;
+  const msn=av.msn||'';
+  if(msn && (S.recycling?.avions||[]).find(a=>a.msn===msn)){ toast(`⚠️ MSN ${msn} déjà au recyclage`); return; }
+  _stockRecyId=id;
+  document.getElementById('stock-recy-body').innerHTML=`Envoyer l'avion <b style="color:var(--cyan)">MSN ${msn||'?'}</b>${av.type?' · '+av.type:''}${av.client?' · '+av.client:''} directement au recyclage ?<br><span style="font-size:11px;color:var(--t4)">Il quittera le stockage et sera ajouté à l'onglet Recyclage (statut « en attente »).</span>`;
+  openM('m-stock-recy');
+}
+function _confirmStockRecy(){
+  const id=_stockRecyId; if(!id){ closeM('m-stock-recy'); return; }
+  const av=(S.stockage?.avions||[]).find(a=>a.id===id);
+  if(!av){ closeM('m-stock-recy'); return; }
   if(!S.recycling) S.recycling={avions:[],piecesHebdo:{},config:{resp:'',chef:''}};
   const msn=av.msn||'';
-  if(msn && S.recycling.avions.find(a=>a.msn===msn)){ toast(`⚠️ MSN ${msn} déjà au recyclage`); return; }
   S.recycling.avions.push({
     id:uid(), type:av.type||'', msn, client:av.client||'', moteur:av.moteur||'',
     entree:fmt(new Date()), finPrev:'', finChantier:'', debutChantier:fmt(new Date()),
     statut:'attente', piecesParHeure:6, notes:av.notes||''
   });
   S.stockage.avions=S.stockage.avions.filter(a=>a.id!==id);   // sort du stockage
+  _stockRecyId=null;
   save();
+  closeM('m-stock-recy');
   if(typeof renderStockage==='function') renderStockage();
   if(typeof renderRecycling==='function') renderRecycling();
   if(typeof renderDash==='function') renderDash();
@@ -18501,6 +18652,7 @@ function _initApp(){
     const gy=document.getElementById('gantt-year');
     if(gy&&!gy.options.length){const cy=new Date().getFullYear();for(let y=cy-1;y<=2060;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===cy)o.selected=true;gy.appendChild(o);}}
     goTab('dashboard');
+    try{ _refreshUndoBtn(); }catch(_){}
     try{ refreshStoragePill(); }catch(e){console.warn('storagePill:',e);}
     // Rappel AVANT : proposer d'archiver une année révolue
     try{ setTimeout(()=>{ try{archiveReminder();}catch(_){} }, 2500); }catch(e){}
