@@ -12,7 +12,7 @@
 ║  Unauthorized copying, distribution or use is prohibited.       ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
-<!-- AeroStaff Pro v7 — Build 20260724-VIVIERS -->
+<!-- AeroStaff Pro v7 — Build 20260724-AVIONS -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2395,6 +2395,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">🔧 Heures ajoutées</strong> — sur chaque chantier en cours, ajoutez des heures de rectification/défaut (motif + heures, autant que nécessaire). L'app affiche alors les <strong>deux avancements</strong> (périmètre initial vs révisé) et calcule l'<strong>impact</strong> : combien de techniciens ajouter pour tenir la date, ou la nouvelle date de livraison à effectif constant.
         <div style="margin-top:10px;padding:8px 12px;background:rgba(52,199,89,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">👥 <strong>Équipe assignée</strong> — sélection par <strong>cases à cocher</strong> (avec recherche par nom et récap des personnes choisies). À l'enregistrement, l'équipe est <strong>automatiquement affectée au planning hebdo et master</strong> sur les jours ouvrés du chantier (matin + après-midi). Les absences déjà posées et les autres chantiers ne sont pas écrasés ; retirer une personne la désaffecte de ce chantier. Un <strong>encart d'alerte</strong> signale, avant validation, les membres <strong>en absence</strong> sur la période (congé, maladie, formation…).</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 "En cours" et "Futur" alimentent le tableau de charge dans Programme Activité. Seuls les techniciens et intérimaires comptent dans les Man Hours consommées (pas les apprentis ni l'encadrement).</div>
+        <div style="margin-top:10px;padding:10px 13px;background:rgba(110,255,196,0.06);border-left:3px solid #6effc4;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✈️ <strong style="color:#6effc4">Cycle de vie de l'avion (suivi par MSN)</strong> — le MSN est l'identité unique de l'avion ; il permet de le suivre à travers tous ses états <strong>sans jamais créer de doublon</strong> :<br>
+        &nbsp;&nbsp;— <strong>Prévision</strong> = prospect commercial (démarchage). L'avion <strong>n'est pas sur site</strong> et ne compte nulle part.<br>
+        &nbsp;&nbsp;— <strong>Prévision → En cours</strong> = l'avion <strong>arrive sur site</strong> et entre en maintenance (une date d'arrivée vous est demandée).<br>
+        &nbsp;&nbsp;— <strong>Prévision → Stockage</strong> = l'avion arrive et est garé au stockage ; les infos du chantier sont <strong>conservées</strong> et restituées si vous le repassez plus tard en chantier.<br>
+        &nbsp;&nbsp;— <strong>Stockage → En cours</strong> = l'avion sort du stockage pour entrer en maintenance (il n'en sort qu'à ce moment, pas avant).<br>
+        &nbsp;&nbsp;— <strong>Clôture (Terminé)</strong> = l'app demande le devenir : <strong>🛫 avion parti</strong> (quitte le site, archivé) ou <strong>🅿️ retour stockage</strong> (sa fiche MSN est réactivée, sans doublon).</div>
       </div>
     </div>
     <div class="notice-section" id="n-stockage" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
@@ -2407,6 +2413,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Calcul auto</strong> — MH → nombre de techniciens (base 35h/semaine)<br>
         • <strong style="color:#ffd060">Charge hebdo</strong> — tableau navigation ← →<br>
         • <strong style="color:#ffd060">Intégration</strong> — besoins remontent dans Programme Activité (✈️)
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(110,255,196,0.06);border-left:3px solid #6effc4;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔀 <strong>Transferts directs</strong> depuis la fiche d'un avion en stockage : <strong>🔧 → Chantier</strong> (les infos déjà saisies sont pré-remplies) ou <strong>♻️ → Recyclage</strong> (transfert direct sans passer par un chantier). Le suivi par MSN évite tout doublon.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🏗 <strong>Occupation Slot Hangar</strong> — la grille annuelle affiche une <strong>bande « Mois »</strong> en haut, qui reste visible au défilement. L'<strong>historique d'occupation</strong> est regroupé par MSN (périodes contiguës fusionnées) ; les exports PDF/Excel suivent ce regroupement — Excel sur 2 feuilles : mois courant + historique complet.</div>
       </div>
     </div>
@@ -2753,7 +2760,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,160,255,0.06);border-left:3px solid #00a0ff;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Sur iPhone/iPad, l'aperçu reste <strong>dans l'application</strong> : le bouton ✕ Fermer te ramène directement au planning, sans devoir fermer puis rouvrir l'app. L'export Excel nécessite une connexion internet au moment de l'export (chargement de la librairie).</div>
       </div>
     </div>
-    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260724-VIVIERS · © 2025 Damien Campoy · Tous droits réservés</div>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--t4)">MARDAM AeroDesk Pro v7 · Build 20260724-AVIONS · © 2025 Damien Campoy · Tous droits réservés</div>
   </div>
 </div><!-- /pg-notice -->
 
@@ -3184,7 +3191,26 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="btn btn-ghost" onclick="closeM('m-chantier')">Annuler</button>
     <button class="btn btn-rose btn-sm" id="c-delbtn" onclick="deleteChantier()" style="display:none">🗑 Supprimer</button>
     <button class="btn btn-ghost btn-sm" id="c-rexbtn" onclick="openRex(document.getElementById('ci').value)" style="display:none">📋 Fiche REX</button>
-    <button class="btn btn-cyan" onclick="saveChantier()">Sauvegarder</button>
+    <button class="btn btn-cyan" onclick="saveChantier()">Sauvegarder</button>  </div>
+</div>
+</div>
+
+<!-- Clôture chantier : devenir de l'avion -->
+<div class="mbg" id="m-cloture">
+<div class="modal" style="max-width:440px">
+  <div class="modal-title">🏁 Clôture du chantier</div>
+  <div id="cloture-msn" style="font-size:12px;color:var(--t3);margin-bottom:12px"></div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Que devient l'avion à la fin de la maintenance ?</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <button type="button" class="btn btn-cyan" style="justify-content:flex-start;padding:14px 16px;text-align:left" onclick="_clotureChoix('stockage')">
+      🅿️ <b>Retour en stockage</b><br><span style="font-size:11px;font-weight:400;opacity:.8">L'avion reste sur site — sa fiche stockage est créée ou réactivée (même MSN)</span>
+    </button>
+    <button type="button" class="btn btn-ghost" style="justify-content:flex-start;padding:14px 16px;text-align:left" onclick="_clotureChoix('parti')">
+      🛫 <b>Avion parti / livré</b><br><span style="font-size:11px;font-weight:400;opacity:.7">L'avion quitte le site — il ne compte plus dans les avions sur site</span>
+    </button>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeM('m-cloture')">Annuler</button>
   </div>
 </div>
 </div>
@@ -6519,6 +6545,13 @@ function popSelects(){
       o.textContent='🔩 Structure — atelier';
       cc.appendChild(o);
     }
+    // Entrée Production générique — toujours visible (ex. Workshop Manager)
+    {
+      const o=document.createElement('option');
+      o.value='PROD';
+      o.textContent='🏭 Production';
+      cc.appendChild(o);
+    }
     // Recopier les mêmes options dans le 2ᵉ chantier
     const cc2=document.getElementById('cellChantier2');
     if(cc2){ cc2.innerHTML='<option value="">— Aucun —</option>'+cc.innerHTML.replace(/^<option value="">[^<]*<\/option>/,''); }
@@ -6555,6 +6588,26 @@ function _isIqStaff(p){ return p && (p.categorie==='iq' || (p.categorie==='inter
 function _isHorsP145(p){ return _isRecyMecano(p) || _isPart21Staff(p) || _isIqStaff(p); }
 // Intérimaire réellement en production chantiers Part 145 (chantier/stockage/sheetmetal/sans activité)
 function _isInterimP145(p){ return p && p.categorie==='interimaire' && p.activite!=='recycling' && p.activite!=='part21' && p.activite!=='iq'; }
+// Ouvre/ferme un cadran de détail du ratio (referme au clic extérieur)
+function _togglePop(id,ev){
+  if(ev) ev.stopPropagation();
+  const pop=document.getElementById(id); if(!pop) return;
+  const open=pop.style.display!=='none';
+  // Referme tous les cadrans et remet leur tuile à plat
+  ['hp145-pop','improd-pop','eff-pop','abs-pop','ac-pop'].forEach(x=>{const e=document.getElementById(x); if(e){ e.style.display='none'; const host=e.closest('.st'); if(host) host.style.zIndex=''; }});
+  pop.style.display=open?'none':'block';
+  const host=pop.closest('.st');
+  if(!open){
+    if(host) host.style.zIndex='200';            // la tuile active passe au premier plan
+    const close=(e)=>{ if(!pop.contains(e.target)){ pop.style.display='none'; if(host) host.style.zIndex=''; document.removeEventListener('click',close); } };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  } else if(host){ host.style.zIndex=''; }
+}
+function _toggleHP145(ev){ _togglePop('hp145-pop',ev); }
+function _toggleImprod(ev){ _togglePop('improd-pop',ev); }
+function _toggleEff(ev){ _togglePop('eff-pop',ev); }
+function _toggleAbs(ev){ _togglePop('abs-pop',ev); }
+function _toggleAc(ev){ _togglePop('ac-pop',ev); }
 function renderDash(){
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -6569,6 +6622,19 @@ function renderDash(){
   const nTech  = S.personnel.filter(p=>p.categorie==='technicien'&&p.actif!==false).length;
   const nInt   = S.personnel.filter(p=>_isInterimP145(p)&&p.actif!==false).length;
   const nPrest = S.personnel.filter(p=>p.categorie==='prestataire'&&p.actif!==false).length;
+  // Intérimaires sortis du Part 145 (recyclage / Part 21 / IQ) — comptés à part, hors ratio
+  const horsP145=S.personnel.filter(p=>p.categorie==='interimaire'&&p.actif!==false&&['recycling','part21','iq'].includes(p.activite));
+  const nHP=horsP145.length;
+  const nHPrec=horsP145.filter(p=>p.activite==='recycling').length;
+  const nHPp21=horsP145.filter(p=>p.activite==='part21').length;
+  const nHPiq =horsP145.filter(p=>p.activite==='iq').length;
+  // Encadrement improductif (chef / expert / responsable / workshop) — hors ratio production
+  const IMPROD_CATS=['responsable','chef','expert','workshop'];
+  const improds=S.personnel.filter(p=>p.actif!==false&&IMPROD_CATS.includes(p.categorie));
+  const nIP=improds.length;
+  const _ipLbl={responsable:'👔 Responsable projet',chef:'🎖️ Chef d\'équipe',expert:'🔬 Expert',workshop:'🛠 Workshop Manager'};
+  const _ipCol={responsable:'#ff6b9d',chef:'#ffb347',expert:'#a78bfa',workshop:'#00c2a8'};
+  const ipRows=IMPROD_CATS.map(c=>{const n=improds.filter(p=>p.categorie===c).length;return n>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>${_ipLbl[c]}</span><strong style="color:${_ipCol[c]}">${n}</strong></div>`:'';}).join('');
   const total  = nTech + nInt;
   const pctTech  = total > 0 ? Math.round(nTech / total * 100) : 0;
   const pctInt   = total > 0 ? 100 - pctTech : 0;
@@ -6600,6 +6666,28 @@ function renderDash(){
           </div>
           ${nPrest > 0 ? `<div class="ratio-leg"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#f5c518,#ffdd00)"></div>
             Prestataires : <strong style="color:var(--prestataire)">${nPrest}</strong> (hors calcul)
+          </div>` : ''}
+          ${nHP > 0 ? `<div class="ratio-leg" style="position:relative;cursor:pointer" onclick="_toggleHP145(event)" title="Voir le détail par activité">
+            <div class="ratio-leg-dot" style="background:linear-gradient(90deg,#6effc4,#00a0ff)"></div>
+            Intérim. hors Part 145 : <strong style="color:#6effc4">${nHP}</strong> <span style="color:var(--t4);font-size:10px">▾</span>
+            <div id="hp145-pop" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(110,255,196,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:200px;cursor:default" onclick="event.stopPropagation()">
+              <div style="font-size:10px;font-weight:800;color:#6effc4;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Hors Part 145 — détail</div>
+              ${nHPrec>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>♻️ Recyclage</span><strong style="color:#6effc4">${nHPrec}</strong></div>`:''}
+              ${nHPp21>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>✈️ Part 21</span><strong style="color:#00a0ff">${nHPp21}</strong></div>`:''}
+              ${nHPiq>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>🔍 IQ</span><strong style="color:#00c8ff">${nHPiq}</strong></div>`:''}
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:#6effc4">${nHP}</strong></div>
+              <div style="font-size:10px;color:var(--t4);margin-top:7px;line-height:1.5">Sortis du ratio car hors production Part 145. Comptés dans les dispos Recyclage / Part 21 / IQ.</div>
+            </div>
+          </div>` : ''}
+          ${nIP > 0 ? `<div class="ratio-leg" style="position:relative;cursor:pointer" onclick="_toggleImprod(event)" title="Voir le détail par catégorie">
+            <div class="ratio-leg-dot" style="background:linear-gradient(90deg,#ff9a3c,#ff6b9d)"></div>
+            Improductifs : <strong style="color:#ff9a3c">${nIP}</strong> <span style="color:var(--t4);font-size:10px">▾</span>
+            <div id="improd-pop" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(255,154,60,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:210px;cursor:default" onclick="event.stopPropagation()">
+              <div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Encadrement improductif — détail</div>
+              ${ipRows}
+              <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:#ff9a3c">${nIP}</strong></div>
+              <div style="font-size:10px;color:var(--t4);margin-top:7px;line-height:1.5">Encadrement et experts : exclus de la capacité de production et du ratio technicien/intérimaire.</div>
+            </div>
           </div>` : ''}
         </div>
         <div style="margin-top:10px;font-size:12px;color:${ratioColor};font-weight:600;display:flex;align-items:center;gap:6px">
@@ -6633,28 +6721,92 @@ function renderDash(){
     else if(hasOv)_besoin+=parseInt(ov);
   });
   const _ecart=Math.round((_dispo-_besoin)*10)/10;
-  // Personnes absentes cette semaine (congé ou maladie, au moins une demi-journée)
+  // Personnes absentes cette semaine (au moins une demi-journée non travaillée)
+  const _ABS_LBL={conge:'🏖️ Congé',maladie:'🤒 Maladie',formation:'📚 Formation',formation_int:'📚 Formation',absence:'🚫 Absence',deplacement:'✈️ Déplacement'};
+  const _absDetail=[];
   const _absentSet=new Set();
-  S.personnel.filter(p=>p.actif!==false).forEach(p=>{
+  S.personnel.filter(p=>p.actif!==false && !p.archived).forEach(p=>{
+    const motifs=new Set(); let demiJours=0;
     for(let d=0;d<7;d++){const ds=fmt(addD(_mon,d));
       const am=S.planning[`${p.id}_${ds}_AM`]||{},pm=S.planning[`${p.id}_${ds}_PM`]||{};
-      if(['conge','maladie'].includes(am.type)||['conge','maladie'].includes(pm.type)){_absentSet.add(p.id);break;}}
+      [am.type,pm.type].forEach(t=>{ if(t&&_ABS_LBL[t]){ motifs.add(t); demiJours++; } });
+    }
+    if(motifs.size){
+      _absentSet.add(p.id);
+      _absDetail.push({nom:_dispNom(p), motifs:[...motifs], dj:demiJours});
+    }
   });
   const _absents=_absentSet.size;
-  // Avions stockage + recyclage en cours (ces modules listent les avions actifs)
-  const _nStockage=(S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').length;
-  const _nRecyclage=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;
-  const _avions=_nStockage+_nRecyclage;
+  _absDetail.sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+  // Regroupement par motif pour le compteur du cadran
+  const _absParMotif={};
+  _absDetail.forEach(a=>a.motifs.forEach(m=>{_absParMotif[m]=(_absParMotif[m]||0)+1;}));
+  // Avions sur site — état réel du parc (un avion = un état à la fois)
+  const _acMaint=S.chantiers.filter(c=>c.statut==='encours').length;                    // chantier en cours = avion en maintenance
+  const _acStock=(S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').length;
+  const _acRecy =(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;        // recyclage terminé = détruit
+  const _avions=_acMaint+_acStock+_acRecy;
+  // Sortis du site (traçabilité, hors total)
+  const _acParti=S.chantiers.filter(c=>c.statut==='termine'&&c.sortie==='parti').length;
+  const _acDetruit=(S.recycling?.avions||[]).filter(a=>a.statut==='termine').length;
 
+  // Cadran des absents de la semaine
+  const _djTxt=(dj)=>{
+    if(dj<=1) return '½ journée';
+    if(dj===2) return '1 jour';
+    if(dj%2===0) return (dj/2)+' jours';
+    return (Math.floor(dj/2))+'j½';
+  };
+  const _absLignes=_absDetail.map(a=>{
+    const badges=a.motifs.map(m=>`<span style="font-size:9px;color:#ffb37a;background:rgba(255,154,60,0.12);border:1px solid rgba(255,154,60,0.25);border-radius:5px;padding:1px 5px;white-space:nowrap">${(_ABS_LBL[m]||m)}</span>`).join(' ');
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:12px;color:var(--t1);font-weight:600">${a.nom}</span><span style="font-size:10px;color:var(--t4)">${_djTxt(a.dj)} sur la semaine</span></span>
+      <span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${badges}</span></div>`;
+  }).join('');
+  const _absPop=`<div id="abs-pop" style="display:none;position:absolute;top:calc(100% + 8px);left:0;right:auto;z-index:100;background:#0d1628;border:1px solid rgba(255,154,60,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:280px;max-width:340px;max-height:340px;overflow:auto;cursor:default;text-align:left" onclick="event.stopPropagation()">
+      <div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Absences cette semaine — ${_absents} personne${_absents>1?'s':''} concernée${_absents>1?'s':''}</div>
+      ${_absDetail.length?_absLignes:'<div style="font-size:12px;color:var(--t3);padding:6px 0">Aucune absence planifiée cette semaine 🎉</div>'}
+      ${_absDetail.length?`<div style="font-size:10px;color:var(--t4);margin-top:9px;line-height:1.6">${Object.entries(_absParMotif).map(([m,n])=>`${(_ABS_LBL[m]||m)} : ${n}`).join(' · ')}</div>`:''}
+    </div>`;
   const ecartColor=_ecart>=0?'c-mint':'c-rose';
+  // Cadran « Avions sur site »
+  const _acRow=(ic,lbl,n,col)=>n>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>${ic} ${lbl}</span><strong style="color:${col}">${n}</strong></div>`:'';
+  const _acPop=`<div id="ac-pop" style="display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(110,255,196,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:240px;cursor:default;text-align:left" onclick="event.stopPropagation()">
+      <div style="font-size:10px;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Avions sur site — détail</div>
+      ${_acRow('🔧','En maintenance',_acMaint,'#82b1ff')}
+      ${_acRow('🅿️','En stockage',_acStock,'#ff9a3c')}
+      ${_acRow('♻️','En recyclage',_acRecy,'#6effc4')}
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total sur site</span><strong style="color:var(--mint)">${_avions}</strong></div>
+      ${(_acParti||_acDetruit)?`<div style="margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1)">
+        ${_acParti?`<div style="display:flex;justify-content:space-between;gap:16px;padding:2px 0;font-size:11px;color:var(--t4)"><span>🛫 Partis / livrés</span><span>${_acParti}</span></div>`:''}
+        ${_acDetruit?`<div style="display:flex;justify-content:space-between;gap:16px;padding:2px 0;font-size:11px;color:var(--t4)"><span>💥 Détruits (recyclage terminé)</span><span>${_acDetruit}</span></div>`:''}
+      </div>`:''}
+      <div style="font-size:10px;color:var(--t4);margin-top:8px;line-height:1.5">Un chantier en cours = 1 avion en maintenance. Les chantiers en prévision (avion pas encore arrivé) ne sont pas comptés.</div>
+    </div>`;
+  // Ventilation de l'effectif actif par catégorie (pour le cadran détaillé)
+  const _eff=S.personnel.filter(p=>p.actif!==false && !p.archived);
+  const _effOrder=['responsable','chef','expert','workshop','technicien','sheetmetal','part21','iq','recycling','interimaire','prestataire','alternant','stagiaire','manager'];
+  const _effLbl={responsable:'👔 Responsable projet',chef:'🎖️ Chef d\'équipe',expert:'🔬 Expert',workshop:'🛠 Workshop Manager',technicien:'🔧 Technicien',sheetmetal:'🔩 Sheet Metal Worker',part21:'✈️ Tech Part 21',iq:'🔍 Insp. Qualité',recycling:'♻️ A/C Recycling',interimaire:'👷 Intérimaire',prestataire:'🤝 Prestataire',alternant:'🎓 Alternant',stagiaire:'📘 Stagiaire',manager:'📊 Manager'};
+  const _effCnt={}; _eff.forEach(p=>{_effCnt[p.categorie]=(_effCnt[p.categorie]||0)+1;});
+  const _effRows=_effOrder.filter(c=>_effCnt[c]).map(c=>`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>${_effLbl[c]||c}</span><strong style="color:var(--cyan)">${_effCnt[c]}</strong></div>`).join('');
+  // catégories hors liste éventuelles
+  Object.keys(_effCnt).filter(c=>!_effOrder.includes(c)).forEach(c=>{});
+  const _effPop=`<div id="eff-pop" style="display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(0,210,255,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:230px;cursor:default;text-align:left" onclick="event.stopPropagation()">
+      <div style="font-size:10px;font-weight:800;color:var(--cyan);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Effectif actif — détail</div>
+      ${_effRows}
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:var(--cyan)">${_eff.length}</strong></div>
+      <div style="font-size:10px;color:var(--t4);margin-top:7px;line-height:1.5">Personnes actives et non archivées. Les archivés et les inactifs (hors production) ne sont pas comptés.</div>
+    </div>`;
   document.getElementById('statsGrid').innerHTML=[
-    {v:S.personnel.length,l:'Effectif total',c:'c-cyan'},
+    {v:_eff.length,l:'Effectif total',c:'c-cyan',pop:_effPop},
     {v:(_ecart>=0?'+':'')+_ecart,l:'Écart capacité/besoin (sem.)',c:ecartColor},
-    {v:_absents,l:'Absents cette semaine',c:'c-orange'},
+    {v:_absents,l:'Absences de la semaine',c:'c-orange',pop:_absPop,tog:'_toggleAbs'},
     {v:exp+autoExp,l:'Formations/Auto. exp.',c:'c-rose'},
-    {v:_avions,l:'Avions stockage + recyclage',c:'c-mint'},
+    {v:_avions,l:'Avions sur site',c:'c-mint',pop:_acPop,tog:'_toggleAc'},
     {v:late,l:'Tâches en retard',c:'c-purple'},
-  ].map(s=>`<div class="st ${s.c}"><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
+  ].map(s=>s.pop
+    ? `<div class="st ${s.c}" style="position:relative;cursor:pointer;overflow:visible" onclick="${s.tog||'_toggleEff'}(event)" title="Voir le détail"><div class="st-val">${s.v} <span style="font-size:11px;color:var(--t4)">▾</span></div><div class="st-lbl">${s.l}</div>${s.pop}</div>`
+    : `<div class="st ${s.c}"><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
 
   const alerts=[];
   S.formations.forEach(f=>{
@@ -7511,6 +7663,7 @@ function _chColor(cid){
   if(cid==='STO') return '#ff9a3c';
   if(cid==='AIRBUS') return '#00a0ff';
   if(cid==='STRUCT') return '#6d8fb0';
+  if(cid==='PROD') return '#2979ff';
   if(cid==='REC'||cid.startsWith('REC_')) return '#6effc4';
   const ch=S.chantiers.find(c=>c.id===cid); return ch?.color||'#2979ff';
 }
@@ -7521,6 +7674,7 @@ function _chMsnLabel(cid){
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
   if(cid==='STRUCT') return '\ud83d\udd29 STRU';
+  if(cid==='PROD') return '\ud83c\udfed PROD';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(t?t+' - ':'')+(av.msn||'?'); }
   const ch=S.chantiers.find(c=>c.id===cid);
@@ -7535,6 +7689,7 @@ function _chMsnShort(cid){
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
   if(cid==='STRUCT') return '\ud83d\udd29 STRU';
+  if(cid==='PROD') return '\ud83c\udfed PROD';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(av.msn||'?')+(t?' \u00b7 '+t:''); }
   const ch=S.chantiers.find(c=>c.id===cid);
@@ -7614,6 +7769,10 @@ function buildGrid(emps,dates,containerId){
           color='#6d8fb0';
           label='Structure — atelier';
           icon='🔩';
+        } else if(cId==='PROD'){
+          color='#2979ff';
+          label='Production';
+          icon='🏭';
         } else if(cId==='REC'){
           color='#6effc4';
           label='Recyclage';
@@ -7670,6 +7829,7 @@ function buildGrid(emps,dates,containerId){
         else if(amRecAv||am.chantierId==='REC'){amStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(am.chantierId==='AIRBUS'){amStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(am.chantierId==='STRUCT'){amStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
+        else if(am.chantierId==='PROD'){amStyle='background:rgba(41,121,255,0.18);color:#82b1ff;';}
         else{const ch=S.chantiers.find(c=>c.id===am.chantierId);if(ch?.color){amStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`;}}
       }
       if(pt==='travail'&&pm.chantierId){
@@ -7677,6 +7837,7 @@ function buildGrid(emps,dates,containerId){
         else if(pmRecAv||pm.chantierId==='REC'){pmStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(pm.chantierId==='AIRBUS'){pmStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(pm.chantierId==='STRUCT'){pmStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
+        else if(pm.chantierId==='PROD'){pmStyle='background:rgba(41,121,255,0.18);color:#82b1ff;';}
         else{const ch=S.chantiers.find(c=>c.id===pm.chantierId);if(ch?.color){pmStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color}`;}}
       }
 
@@ -8115,6 +8276,7 @@ function goToday(){S.masterMonth=new Date().getMonth();S.masterYear=new Date().g
 function _affectActivities(){
   const acts=[];
   (S.chantiers||[]).filter(c=>c.statut!=='termine').forEach(c=>acts.push({v:c.id,l:c.nom}));
+  acts.push({v:'PROD',l:'🏭 Production'});
   acts.push({v:'STRUCT',l:'🔩 Structure — atelier'});
   acts.push({v:'AIRBUS',l:'✈️ Airbus — Part 21'});
   acts.push({v:'STO',l:'📦 Stockage'});
@@ -8896,6 +9058,33 @@ function _syncChantierPlanning(cid,debut,fin,equipe,prevEquipe){
   _syncChantierPlanning._conflits=conflits;
   return count;
 }
+let _clotureCtx=null;
+// Devenir de l'avion à la clôture : retour stockage (réactive/crée par MSN) ou parti
+function _clotureChoix(dest){
+  if(!_clotureCtx){ closeM('m-cloture'); return; }
+  const {editId, msn, data}=_clotureCtx;
+  if(!S.stockage) S.stockage={avions:[],mhHebdo:{},config:{resp:'',chef:''}};
+  const ch=S.chantiers.find(x=>x.id===editId);
+
+  if(dest==='stockage'){
+    // Anti-doublon : chercher une fiche stockage existante avec ce MSN
+    const idx=(S.stockage.avions||[]).findIndex(a=>a.msn===msn && msn);
+    const entry={type:data.avion||data.nom||'',msn,client:(data.client||'').trim(),moteur:data.moteur||'',
+                 entree:fmt(new Date()),statut:'parking',notes:data.desc||''};
+    if(idx>=0){ S.stockage.avions[idx]={...S.stockage.avions[idx],...entry, retourMaint:true}; toast(`🅿️ MSN ${msn} réactivé en stockage (fiche existante)`); }
+    else { S.stockage.avions.push({id:uid(),...entry, retourMaint:true}); toast(`🅿️ MSN ${msn} placé en stockage`); }
+    // Le chantier est clôturé : on le retire des chantiers actifs (l'avion vit désormais en stockage)
+    S.chantiers=S.chantiers.filter(x=>x.id!==editId);
+    if(typeof renderStockage==='function') renderStockage();
+  } else {
+    // Avion parti : on marque le chantier terminé + sortie, on le laisse dans l'historique
+    if(ch){ ch.sortie='parti'; ch.dateSortie=fmt(new Date()); }
+    toast(`🛫 MSN ${msn} — avion parti, chantier clôturé`);
+  }
+  _clotureCtx=null;
+  save(); closeM('m-cloture'); renderChantiers();
+  if(typeof renderDash==='function') renderDash();
+}
 function saveChantier(){
   // Générer nom automatiquement depuis Client + Type + MSN
   const avionSel2=document.getElementById('c-avion').value;
@@ -8932,7 +9121,7 @@ function saveChantier(){
       // Supprimer du recyclage si existait
       if(msnNew) S.recycling.avions=S.recycling.avions.filter(a=>a.msn!==msnNew);
       const existing=S.stockage.avions.findIndex(a=>a.msn===msnNew&&msnNew);
-      const entry={id:existing>=0?S.stockage.avions[existing].id:uid(),type:data.avion||data.nom,msn:msnNew,client:data.client||'',moteur:data.moteur||'',entree:data.debut||fmt(new Date()),statut:'parking',notes:data.desc||''};
+      const entry={id:existing>=0?S.stockage.avions[existing].id:uid(),type:data.avion||data.nom,msn:msnNew,client:data.client||'',moteur:data.moteur||'',entree:data.debut||fmt(new Date()),arrivee:data.arrivee||'',statut:'parking',notes:data.desc||'',chantierInfo:{...data}};
       if(existing>=0) S.stockage.avions[existing]={...S.stockage.avions[existing],...entry};
       else S.stockage.avions.push(entry);
     } else {
@@ -8954,8 +9143,33 @@ function saveChantier(){
     popSelects(); return true;
   }
 
+  // Arrivée sur site : un prospect (prévision) qui se concrétise (en cours OU stockage) → saisir la date d'arrivée
+  const _wasChantierPre=editId&&S.chantiers.some(x=>x.id===editId);
+  const _prevStatutPre=_wasChantierPre?(S.chantiers.find(x=>x.id===editId)||{}).statut:null;
+  if(_prevStatutPre==='prevision' && (data.statut==='encours'||data.statut==='stockage')){
+    const def=data.debut||fmt(new Date());
+    const rep=prompt(`✈️ Arrivée de l'avion sur site (MSN ${data.msn||'?'})\nDate d'arrivée (AAAA-MM-JJ) :`, def);
+    if(rep===null){ return; }                 // annulation : on ne change rien
+    data.arrivee=(rep||'').trim()||def;
+  }
+
   if(data.statut==='stockage') { transfererVers('stockage'); return; }
   if(data.statut==='recyclage') { transfererVers('recyclage'); return; }
+
+  // Clôture d'un chantier de maintenance : demander le devenir de l'avion (retour stockage / parti)
+  const wasChantier=editId&&S.chantiers.some(x=>x.id===editId);
+  const prevStatut=wasChantier?(S.chantiers.find(x=>x.id===editId)||{}).statut:null;
+  if(data.statut==='termine' && wasChantier && prevStatut!=='termine' && (data.msn||'').trim()){
+    // Enregistrer d'abord la mise à jour du chantier, puis proposer le choix
+    const i=S.chantiers.findIndex(x=>x.id===editId);
+    if(i>-1) S.chantiers[i]={...S.chantiers[i],...data};
+    save();
+    _clotureCtx={editId, msn:(data.msn||'').trim(), data:{...data}};
+    document.getElementById('cloture-msn').innerHTML=`✈️ <b style="color:var(--cyan)">MSN ${_clotureCtx.msn}</b>${data.avion?' · '+data.avion:''}${data.client?' · '+data.client.trim():''}`;
+    closeM('m-chantier'); openM('m-cloture');
+    renderChantiers();
+    return;
+  }
 
   // Statut normal (encours, futur, prevision, termine)
   // Vérifier si cet editId est un avion stockage ou recyclage (pas dans S.chantiers)
@@ -8986,12 +9200,27 @@ function saveChantier(){
   } else {
     // Nouveau chantier
     const newId=uid(); S.chantiers.push({id:newId,...data}); chantierId=newId;
-    // Cas fromStockage (bouton "Créer chantier" depuis stockage)
+    // Cas fromStockage : NE PAS retirer l'avion du stockage maintenant.
+    // L'avion reste garé au stockage tant que le chantier n'est pas passé « en cours ».
+    // On conserve seulement le lien (par MSN) + les infos chantier dans la fiche stockage.
     const fromStockage=document.getElementById('c-nom').dataset.fromStockage;
     if(fromStockage){
-      S.stockage.avions=(S.stockage.avions||[]).filter(a=>a.id!==fromStockage);
+      const av=(S.stockage.avions||[]).find(a=>a.id===fromStockage);
+      if(av){ av.chantierId=newId; av.chantierInfo={...data}; }   // infos conservées pour restitution
       delete document.getElementById('c-nom').dataset.fromStockage;
       if(typeof renderStockage==='function') renderStockage();
+    }
+  }
+  // Sortie du stockage UNIQUEMENT au passage « en cours » (l'avion entre réellement en maintenance)
+  if(data.statut==='encours' && (data.msn||'').trim()){
+    const mi=(S.stockage?.avions||[]).findIndex(a=>a.msn===(data.msn||'').trim());
+    if(mi>=0){
+      const av=S.stockage.avions[mi];
+      // conserver la date d'arrivée déjà saisie (entrée stockage) comme arrivée sur site
+      if(av.arrivee && !data.arrivee){ const c=S.chantiers.find(x=>x.id===chantierId); if(c) c.arrivee=av.arrivee; }
+      S.stockage.avions.splice(mi,1);
+      if(typeof renderStockage==='function') renderStockage();
+      toast(`🔧 MSN ${data.msn} sorti du stockage → en maintenance`);
     }
   }
   // Affecter l'équipe assignée sur le planning (hebdo + master) selon les dates du chantier
@@ -11761,6 +11990,7 @@ function renderStockageAvions(){
       <div style="display:flex;gap:6px">
         <button onclick="openAvionEdit('${av.id}')" title="Modifier" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:5px 10px;cursor:pointer;font-size:12px">✏️</button>
         <button onclick="openAvionToChantier('${av.id}')" title="Convertir en chantier" style="background:rgba(41,121,255,0.15);border:1px solid rgba(41,121,255,0.3);border-radius:8px;color:#82b1ff;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700">🔧 → Chantier</button>
+        <button onclick="stockageToRecyclage('${av.id}')" title="Envoyer directement au recyclage" style="background:rgba(110,255,196,0.14);border:1px solid rgba(110,255,196,0.3);border-radius:8px;color:#6effc4;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700">♻️ → Recyclage</button>
         <button onclick="delAvion('${av.id}')" title="Supprimer" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:#ff4d6d;padding:5px 8px;cursor:pointer;font-size:12px">🗑</button>
       </div>
     </div>`;
@@ -11942,6 +12172,26 @@ function delAvion(id){
   });
 }
 
+/* ── Transfert direct Stockage → Recyclage (par MSN, sans doublon) ── */
+function stockageToRecyclage(id){
+  const av=(S.stockage?.avions||[]).find(a=>a.id===id); if(!av) return;
+  if(!confirm(`Envoyer l'avion MSN ${av.msn||'?'} (${av.type||''}) directement au recyclage ?`)) return;
+  if(!S.recycling) S.recycling={avions:[],piecesHebdo:{},config:{resp:'',chef:''}};
+  const msn=av.msn||'';
+  if(msn && S.recycling.avions.find(a=>a.msn===msn)){ toast(`⚠️ MSN ${msn} déjà au recyclage`); return; }
+  S.recycling.avions.push({
+    id:uid(), type:av.type||'', msn, client:av.client||'', moteur:av.moteur||'',
+    entree:fmt(new Date()), finPrev:'', finChantier:'', debutChantier:fmt(new Date()),
+    statut:'attente', piecesParHeure:6, notes:av.notes||''
+  });
+  S.stockage.avions=S.stockage.avions.filter(a=>a.id!==id);   // sort du stockage
+  save();
+  if(typeof renderStockage==='function') renderStockage();
+  if(typeof renderRecycling==='function') renderRecycling();
+  if(typeof renderDash==='function') renderDash();
+  toast(`♻️ MSN ${msn} transféré au recyclage`);
+}
+
 /* ── Conversion → Chantier ── */
 function openAvionToChantier(id){
   const av=S.stockage.avions.find(a=>a.id===id);if(!av)return;
@@ -11970,6 +12220,16 @@ function openAvionToChantier(id){
   const cfg=S.stockage.config||{};
   if(cfg.resp) document.getElementById('c-resp').value=cfg.resp;
   if(cfg.chef) document.getElementById('c-chef').value=cfg.chef;
+  // Restitution des infos chantier conservées (avion passé par un chantier avant le stockage)
+  if(av.chantierInfo){
+    const ci=av.chantierInfo;
+    if(ci.debut) document.getElementById('c-debut').value=ci.debut;
+    if(ci.fin) document.getElementById('c-fin').value=ci.fin;
+    if(ci.desc) document.getElementById('c-desc').value=ci.desc;
+    if(ci.color) document.getElementById('c-color').value=ci.color;
+    if(ci.manHours!=null) document.getElementById('c-manhours').value=ci.manHours;
+    if(ci.ressources&&ci.ressources.technicien) document.getElementById('r-technicien').value=ci.ressources.technicien;
+  }
   // Stocker id avion pour suppression après sauvegarde
   document.getElementById('c-nom').dataset.fromStockage=id;
 }
@@ -12066,7 +12326,7 @@ function renderPersonnel(){
     const isInt=emp.categorie==='interimaire';
 
     const toggleBtn=isInt?`<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
-      ${emp.activite?`<div style="font-size:10px;font-weight:700;color:${emp.activite==='recycling'?'#6effc4':emp.activite==='stockage'?'#ff9a3c':'#82b1ff'};background:${emp.activite==='recycling'?'rgba(110,255,196,0.08)':emp.activite==='stockage'?'rgba(255,154,60,0.08)':'rgba(130,177,255,0.08)'};border:1px solid ${emp.activite==='recycling'?'rgba(110,255,196,0.25)':emp.activite==='stockage'?'rgba(255,154,60,0.25)':'rgba(130,177,255,0.25)'};border-radius:6px;padding:3px 8px;display:inline-block">${emp.activite==='recycling'?'♻️ Recyclage':emp.activite==='stockage'?'✈️ Stockage':'🔧 Chantier'}</div>`:''}
+      ${emp.activite?(()=>{const A={chantier:{c:'#82b1ff',l:'🔧 Chantier'},stockage:{c:'#ff9a3c',l:'🅿️ Stockage'},recycling:{c:'#6effc4',l:'♻️ Recyclage'},part21:{c:'#00a0ff',l:'✈️ Part 21'},iq:{c:'#00c8ff',l:'🔍 IQ'},sheetmetal:{c:'#a7c1de',l:'🔩 Sheet Metal'}}[emp.activite]||{c:'#82b1ff',l:emp.activite};const rgb=A.c.replace('#','').match(/../g).map(h=>parseInt(h,16)).join(',');return `<div style="font-size:10px;font-weight:700;color:${A.c};background:rgba(${rgb},0.08);border:1px solid rgba(${rgb},0.28);border-radius:6px;padding:3px 8px;display:inline-block">${A.l}</div>`;})():''}
       <button class="toggle-actif on" onclick="toggleInterimaire('${emp.id}')">✅ En production</button>
     </div>`:'';
 
