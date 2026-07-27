@@ -299,16 +299,22 @@ body::before{
 .tab-scroll{display:flex;max-width:1700px;margin:0 auto;padding:0 16px;position:relative}
 
 /* Ligne des familles */
-.fam-row{display:flex;align-items:center;gap:4px;max-width:1700px;margin:0 auto;padding:7px 16px 0;flex-wrap:wrap}
+.fam-row{display:flex;align-items:center;gap:4px;max-width:1700px;margin:0 auto;padding:7px 12px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fam-row::-webkit-scrollbar{display:none}
 .fam-btn{
   background:none;border:1px solid transparent;border-radius:9px;
-  padding:7px 13px;cursor:pointer;color:var(--t3);
+  padding:7px 12px;cursor:pointer;color:var(--t3);
   font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;
-  letter-spacing:0.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all .15s;
+  letter-spacing:0.3px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:all .15s;flex-shrink:0;
 }
 .fam-btn:hover{color:var(--t1);background:rgba(255,255,255,0.05)}
 .fam-btn.active{color:var(--cyan);background:rgba(0,210,255,0.1);border-color:rgba(0,210,255,0.3)}
 .fam-sep{width:1px;height:20px;background:var(--glass-border);margin:0 4px;flex-shrink:0}
+@media(max-width:768px){
+  .fam-row{gap:2px;padding:7px 10px 0}
+  .fam-btn{padding:7px 10px;font-size:12px;gap:4px}
+  .fam-sep{margin:0 2px}
+}
 /* Les sous-onglets masqués par défaut : seuls ceux de la famille active s'affichent */
 .tab[data-fam]{display:none}
 .tab[data-fam].fam-visible{display:flex}
@@ -1225,15 +1231,6 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     </div>
     <div id="alertsBox"><div class="empty"><div class="empty-ico">✅</div><p>Aucune alerte — tout est à jour !</p></div></div>
   </div>
-  <div class="gc">
-    <div class="gc-head"><div class="gc-title">📊 Matrice formations</div>
-      <div class="btn-row">
-        <button class="btn btn-cyan btn-sm" onclick="exportFormMatrixXls()">📊 Export Excel</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportFormMatrixPDF()">📄 Export PDF</button>
-      </div>
-    </div>
-    <div id="matrixBox"></div>
-  </div>
 </div>
 
 <!-- FORMATIONS -->
@@ -1279,6 +1276,15 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <th>Obtention</th><th>Expiration</th><th>Statut</th><th>Notes</th><th></th>
       </tr></thead><tbody id="formTbody"></tbody></table>
     </div>
+  </div>
+  <div class="gc">
+    <div class="gc-head"><div class="gc-title">📊 Matrice des formations & compétences</div>
+      <div class="btn-row">
+        <button class="btn btn-cyan btn-sm" onclick="exportFormMatrixXls()">📊 Export Excel</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportFormMatrixPDF()">📄 Export PDF</button>
+      </div>
+    </div>
+    <div id="matrixBox"></div>
   </div>
 </div>
 
@@ -2384,7 +2390,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">📄 Export PDF</strong> — rendu coloré regroupé par catégorie, nom de chantier complet dans les cases + légende, idéal à envoyer aux collaborateurs<br>
         • <strong style="color:#ffd060">🖱 Sélection multiple (souris, ordinateur)</strong> — glisser pour sélectionner un bloc de cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V). Glisser sur une seule demi-journée (PM→PM ou AM→AM) ne sélectionne que celle-ci ; AM→PM prend les journées entières. Coller remplit toute la sélection sans toucher les demi-journées non sélectionnées<br>
         • <strong style="color:#ffd060">🖌 Pinceau</strong> — dans l'éditeur d'une case, « Copier vers d'autres » puis taper les cases à remplir (fonctionne aussi sur iPad/iPhone)<br>
-        • <strong style="color:#00d2ff">📌 Affectation permanente sur l'année</strong> — bouton en haut de page : choisis une <strong>personne</strong>, une <strong>activité</strong> (chantier, 🔩 Structure, ✈️ Part 21, 📦 Stockage), une <strong>période</strong> (bouton « Année entière » pour 01/01→31/12) et la portée (journées / matins / après-midis). L'app remplit toutes les demi-journées ouvrées d'un coup — <strong style="color:#6effc4">sans jamais écraser</strong> les congés, formations, absences, déplacements, week-ends et fériés déjà saisis. Une estimation s'affiche avant validation. Idéal pour donner à un chef d'équipe (Structure, Part 21…) sa ligne sur toute l'année.<br>
+        • <strong style="color:#00d2ff">📌 Affectation permanente sur l'année</strong> — bouton en haut de page : choisis une <strong>personne</strong>, une <strong>activité</strong> (chantier, 🔩 Structure, ✈️ Part 21, 🅿️ Stockage), une <strong>période</strong> (bouton « Année entière » pour 01/01→31/12) et la portée (journées / matins / après-midis). L'app remplit toutes les demi-journées ouvrées d'un coup — <strong style="color:#6effc4">sans jamais écraser</strong> les congés, formations, absences, déplacements, week-ends et fériés déjà saisis. Une estimation s'affiche avant validation. Idéal pour donner à un chef d'équipe (Structure, Part 21…) sa ligne sur toute l'année.<br>
         • <strong style="color:#a7c1de">🔩 Activité Structure</strong> — entrée globale permanente dans le déroulant d'affectation, comme Stockage / Part 21, pour les travaux de structure atelier non rattachés à un avion précis
         <div style="margin-top:10px;padding:8px 12px;background:rgba(0,210,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💡 Après avoir saisi une case, le planning <strong>reste à la position où tu étais</strong> — plus besoin de rescroller. Mêmes données que le Planning Hebdo.</div>
       </div>
@@ -2595,7 +2601,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">ÉCART</strong> — vert = suffisant, rouge = manque d'effectif<br>
         • <strong style="color:#ffd060">Gantt + sélecteur d'année</strong> — tous les chantiers visualisés sur l'année choisie (jusqu'à 2060)<br>
         • <strong style="color:#ffd060">Colonne 📍 rouge</strong> — repère la semaine en cours
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique. Les <strong style="color:#ff9a3c">avions en recyclage</strong> en cours / à venir y figurent aussi, dans une section <strong style="color:#ff9a3c">♻️ RECYCLAGE</strong> : chaque avion (Type — MSN) est une ligne éditable comme un chantier, avec son besoin théorique par défaut (techniciens recyclage affectés → nombre fixe → calcul par pièces). Le tableau intègre également une ligne <strong style="color:#82b1ff">📦 Stockage</strong> (MH ÷ 35), une ligne <strong style="color:#00a0ff">✈️ Airbus Part 21</strong> (Part 21 + IQ) et une ligne <strong style="color:#a7c1de">🔩 Structure</strong> (Sheet Metal Workers affectés à l'activité Structure), éditables sur toutes les semaines. Toute valeur saisie prime sur le calcul automatique dans le besoin total de la semaine. <strong>Tu pilotes ainsi 100 % des activités depuis ce seul tableau.</strong></div>
+        <div style="margin-top:10px;padding:8px 12px;background:rgba(255,208,96,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✏️ <strong>Tableau d'ajustement des besoins</strong> (en bas) — désormais sur toute l'année (janvier → décembre, scrollable) avec son propre sélecteur d'année (jusqu'à 2060, indépendant du Gantt). Modifie le besoin d'un chantier semaine par semaine sans toucher au besoin théorique. Les <strong style="color:#ff9a3c">avions en recyclage</strong> en cours / à venir y figurent aussi, dans une section <strong style="color:#ff9a3c">♻️ RECYCLAGE</strong> : chaque avion (Type — MSN) est une ligne éditable comme un chantier, avec son besoin théorique par défaut (techniciens recyclage affectés → nombre fixe → calcul par pièces). Le tableau intègre également une ligne <strong style="color:#82b1ff">🅿️ Stockage</strong> (MH ÷ 35), une ligne <strong style="color:#00a0ff">✈️ Airbus Part 21</strong> (techniciens P21 uniquement — l'IQ est un improductif, hors besoin productif) et une ligne <strong style="color:#a7c1de">🔩 Structure</strong> (Sheet Metal Workers affectés à l'activité Structure), éditables sur toutes les semaines. Toute valeur saisie prime sur le calcul automatique dans le besoin total de la semaine. <strong>Tu pilotes ainsi 100 % des activités depuis ce seul tableau.</strong></div>
         <div style="margin-top:8px;padding:8px 12px;background:rgba(52,199,89,0.05);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">✅ Les semaines en rouge permettent d'anticiper les renforts avant qu'elles arrivent. Détail du calcul → section 🧮 Méthodes de calcul.</div>
       </div>
     </div>
@@ -2621,7 +2627,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         Le besoin est la somme, semaine par semaine, de quatre sources :<br>
         • <strong style="color:#ffd060">🔧 Chantiers</strong> — chaque chantier a un besoin théorique en techniciens (champ <em>Ressources</em> de la fiche chantier). Ce besoin est compté pour toutes les semaines où le chantier est actif (entre sa date de début et de fin).<br>
         • <strong style="color:#ffd060">✈️ Stockage</strong> — calculé à partir des heures (man-hours) saisies par semaine, converties en techniciens : <strong>1 technicien ≈ 35 h/semaine</strong>. Soit besoin = heures ÷ 35, arrondi au supérieur.<br>
-        • <strong style="color:#ffd060">✈️ Airbus Part 21</strong> — techniciens P21 + Inspection Qualité saisis par semaine dans l'onglet dédié.<br>
+        • <strong style="color:#ffd060">✈️ Airbus Part 21</strong> — techniciens P21 saisis par semaine dans l'onglet dédié. L'Inspection Qualité (IQ) reste visible en information mais compte comme improductif (hors besoin/capacité productive).<br>
         • <strong style="color:#ffd060">♻️ Recyclage</strong> — pour chaque avion en cours/à venir, dans cet ordre de priorité : <strong>1.</strong> les techniciens « recyclage » réellement affectés à l'avion dans le planning ; <strong>2.</strong> sinon le nombre fixe saisi sur la fiche avion ; <strong>3.</strong> sinon le calcul par pièces (pièces de la semaine ÷ (pièces/heure × 5 jours), arrondi au supérieur).
         <div style="margin:8px 0;padding:8px 12px;background:rgba(255,77,109,0.06);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:12px">
           <strong>BESOIN de la semaine</strong> = Σ besoins chantiers actifs + besoin stockage + besoin Part 21 + besoin recyclage.<br>
@@ -3342,11 +3348,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="modal-title">📤 Export data — Programme Activité</div>
   <div style="background:rgba(0,210,255,0.05);border:1px solid rgba(0,210,255,0.15);border-radius:var(--r12);padding:12px;margin-bottom:14px">
     <p style="font-size:12px;color:var(--t2);line-height:1.6">
-      Choisis la <strong style="color:#fff">période</strong> à extraire, puis le format. L'export contiendra deux tableaux sur cette période :
-      le <strong style="color:var(--cyan)">besoin en personnel</strong> (par chantier × semaine) et le
-      <strong style="color:var(--cyan)">programme des chantiers</strong>.<br>
-      Les chantiers <strong>sans besoin</strong> sur la période et les chantiers <strong>terminés</strong> sont masqués.
-      L'<strong style="color:var(--mint)">Excel</strong> est dynamique : totaux et écarts recalculés à la saisie.
+      Choisis la <strong style="color:#fff">période</strong> et le <strong style="color:#fff">périmètre</strong>, puis le format. L'export contient, pour chaque périmètre étanche (Part 145 / Part 21 / Recyclage) : le <strong style="color:var(--cyan)">besoin détaillé</strong>, la dispo, l'écart et le <strong style="color:var(--cyan)">taux de charge %</strong> (vert/orange/rouge). Le programme des chantiers (Gantt) apparaît si Part 145 est inclus.<br>
+      L'<strong style="color:var(--mint)">Excel</strong> est dynamique : totaux, écarts et taux se recalculent à la saisie.
     </p>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -3360,6 +3363,13 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="btn btn-ghost btn-sm" onclick="setProgPdfRange(52)">1 an</button>
   </div>
   <div id="pp-info" style="font-size:11px;color:var(--t4);margin-bottom:4px"></div>
+  <div style="margin:6px 0 4px;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Périmètre à exporter</div>
+  <div id="pp-perim" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <button class="pp-perim-btn" data-p="all" onclick="_setPpPerim('all')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;border:1px solid rgba(0,210,255,0.4);background:rgba(0,210,255,0.12);color:var(--cyan);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">⚙️ Tous</button>
+    <button class="pp-perim-btn" data-p="p145" onclick="_setPpPerim('p145')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">🔧 Part 145</button>
+    <button class="pp-perim-btn" data-p="p21" onclick="_setPpPerim('p21')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">✈️ Part 21</button>
+    <button class="pp-perim-btn" data-p="recy" onclick="_setPpPerim('recy')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">♻️ Recyclage</button>
+  </div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-progpdf')">Annuler</button>
     <button class="btn btn-mint" onclick="runProgXls()">📊 Excel</button>
@@ -5401,8 +5411,10 @@ function getAirbusAbsences(mon){
 function getAirbusDispoWeek(mon){
   const staff=S.personnel.filter(p=>(_isPart21Staff(p)||_isIqStaff(p))&&p.actif!==false);
   const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
+  const _wEnd=addD(mon,4);
   let dispoPart21=0, dispoIQ=0;
   staff.forEach(emp=>{
+    if(typeof _presentSemaine==='function' && !_presentSemaine(emp, mon, _wEnd)) return;   // hors effectif cette semaine
     // Présent = au moins une demi-journée affectée à AIRBUS ET non absente
     // OU au moins une demi-journée non-absente (case vide = présent sur le site)
     let joursPresents=0, joursTotal=0;
@@ -5425,6 +5437,26 @@ function getAirbusDispoWeek(mon){
   });
   return {part21:dispoPart21, iq:dispoIQ};
 }
+// Dispo hebdo des mécanos recyclage (CDI + intérimaires fléchés) — même logique que Part 21
+function getRecyDispoWeek(mon){
+  const staff=S.personnel.filter(p=>_isRecyMecano(p)&&p.actif!==false);
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
+  const _wEnd=addD(mon,4);
+  let dispo=0;
+  staff.forEach(emp=>{
+    if(typeof _presentSemaine==='function' && !_presentSemaine(emp, mon, _wEnd)) return;   // hors effectif cette semaine
+    let pres=0,tot=0;
+    for(let d=0;d<5;d++){
+      const ds=fmt(addD(mon,d)); if(isHol(ds)) continue;
+      tot+=2;
+      const am=S.planning[`${emp.id}_${ds}_AM`]||{}, pm=S.planning[`${emp.id}_${ds}_PM`]||{};
+      if(!ABSENT.has(am.type||'')) pres++;
+      if(!ABSENT.has(pm.type||'')) pres++;
+    }
+    if(tot>0 && pres/tot>0.5) dispo++;
+  });
+  return dispo;
+}
 
 function renderAirbusCapaTable(){
   const el=document.getElementById('airbus-capa-table');
@@ -5441,9 +5473,9 @@ function renderAirbusCapaTable(){
   <thead><tr>
     <th style="background:#0d1628;color:#6080a0;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:left">SEMAINE</th>
     <th style="background:#1a2a4a;color:#82b1ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center">RESSOURCES<br><span style="font-size:9px;font-weight:400;color:#6090c0">Tech P21</span></th>
-    <th style="background:#1a2a4a;color:#00a0ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center">RESSOURCES<br><span style="font-size:9px;font-weight:400;color:#6090c0">IQ</span></th>
+    <th style="background:#1a2a4a;color:#00a0ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center" title="Inspecteurs Qualité — improductifs (comme les experts en Part 145). Affichés pour information, mais NON comptés dans le besoin ni la capacité productive Part 21.">RESSOURCES<br><span style="font-size:9px;font-weight:400;color:#6090c0">IQ ⓘ</span><br><span style="font-size:8px;font-weight:400;color:#c89000">improductif</span></th>
     <th style="background:#0d2a3d;color:#00d2ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center">DISPO P21</th>
-    <th style="background:#0d2a3d;color:#00d2ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center">DISPO IQ</th>
+    <th style="background:#0d2a3d;color:#00d2ff;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center" title="Inspecteurs Qualité présents — improductifs. Affichés pour information (suivi RH), hors calcul de l'écart productif.">DISPO IQ<br><span style="font-size:8px;font-weight:400;color:#c89000">improductif</span></th>
     <th style="background:#0d1628;color:#6080a0;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:center">ÉCART</th>
     <th style="background:#1a1500;color:#ffc800;padding:8px 14px;font-size:10px;font-weight:700;border:1px solid rgba(255,255,255,0.08);text-align:left">ABSENCES</th>
   </tr></thead><tbody>`;
@@ -5454,10 +5486,10 @@ function renderAirbusCapaTable(){
     const c=charge[wk]||{};
     const besoinP21=c.part21||0;
     const besoinIQ=c.iq||0;
-    const besoinTotal=besoinP21+besoinIQ;
     const dispo=getAirbusDispoWeek(mon);
-    const dispoTotal=dispo.part21+dispo.iq;
-    const ecart=besoinTotal>0?dispoTotal-besoinTotal:null;
+    // Écart productif : Part 21 seul. L'IQ (inspecteurs qualité) est un improductif,
+    // affiché pour information mais hors calcul de capacité productive.
+    const ecart=besoinP21>0?dispo.part21-besoinP21:null;
     const ecartCol=ecart===null?'var(--t4)':ecart>=0?'#34c759':'#ff4d6d';
     const absences=getAirbusAbsences(mon);
 
@@ -6693,6 +6725,35 @@ function buildLeg(elId){
   el.innerHTML=items.map(i=>`<div class="leg"><div class="leg-dot" style="background:${i.bg};border:1px solid ${i.fg}44"></div><span style="color:${i.fg}">${i.l}</span></div>`).join("");
 }
 
+// ── Parc avions réellement sur site — source unique, dédupliquée par MSN ──
+// Un avion physique = un MSN. Priorité d'état si un même MSN apparaît à plusieurs endroits :
+// maintenance (chantier en cours) > recyclage > Part 21 > stockage.
+function _avionsSurSite(){
+  const byMsn={};                                   // msn → {etat}
+  const today=fmt(new Date());
+  const put=(msn,etat)=>{
+    const key=(msn||'').toString().trim().toUpperCase();
+    const k=key||('_anon'+Object.keys(byMsn).length);   // avion sans MSN = compté à part
+    if(byMsn[k]) return;                             // déjà vu (priorité au premier = plus fort)
+    byMsn[k]=etat;
+  };
+  // 1. Maintenance — chantiers EN COURS uniquement (futur = avion pas encore arrivé)
+  S.chantiers.filter(c=>c.statut==='encours').forEach(c=>put(c.msn,'maintenance'));
+  // 2. Recyclage (non terminé = non détruit)
+  (S.recycling?.avions||[]).filter(a=>a.statut!=='termine').forEach(a=>put(a.msn,'recyclage'));
+  // 3. Airbus Part 21 — physiquement présents (entré et pas encore sorti)
+  (S.airbus?.msns||[]).filter(m=>(!m.entree||m.entree<=today)&&(!m.sortie||m.sortie>=today)).forEach(m=>put(m.msn,'part21'));
+  // 4. Stockage (ni terminé ni sorti)
+  (S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').forEach(a=>put(a.msn,'stockage'));
+  const vals=Object.values(byMsn);
+  return {
+    total:vals.length,
+    maintenance:vals.filter(v=>v==='maintenance').length,
+    recyclage:vals.filter(v=>v==='recyclage').length,
+    part21:vals.filter(v=>v==='part21').length,
+    stockage:vals.filter(v=>v==='stockage').length
+  };
+}
 /* ═══ DASHBOARD ═══ */
 // Un intérimaire fléché « Recyclage » est un mécanicien hors Part 145 :
 // il ne compte PAS dans le ratio/capacité chantiers, mais dans la capacité Recyclage.
@@ -6857,11 +6918,13 @@ function renderDash(){
   // Regroupement par motif pour le compteur du cadran
   const _absParMotif={};
   _absDetail.forEach(a=>a.motifs.forEach(m=>{_absParMotif[m]=(_absParMotif[m]||0)+1;}));
-  // Avions sur site — état réel du parc (un avion = un état à la fois)
-  const _acMaint=S.chantiers.filter(c=>c.statut==='encours').length;                    // chantier en cours = avion en maintenance
-  const _acStock=(S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').length;
-  const _acRecy =(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;        // recyclage terminé = détruit
-  const _avions=_acMaint+_acStock+_acRecy;
+  // Avions sur site — source unique dédupliquée par MSN (maintenance + stockage + recyclage + Part 21)
+  const _site=_avionsSurSite();
+  const _acMaint=_site.maintenance;
+  const _acStock=_site.stockage;
+  const _acRecy =_site.recyclage;
+  const _acP21  =_site.part21;
+  const _avions=_site.total;
   // Sortis du site (traçabilité, hors total)
   const _acParti=S.chantiers.filter(c=>c.statut==='termine'&&c.sortie==='parti').length;
   const _acDetruit=(S.recycling?.avions||[]).filter(a=>a.statut==='termine').length;
@@ -6892,6 +6955,7 @@ function renderDash(){
       ${_acRow('🔧','En maintenance',_acMaint,'#82b1ff')}
       ${_acRow('🅿️','En stockage',_acStock,'#ff9a3c')}
       ${_acRow('♻️','En recyclage',_acRecy,'#6effc4')}
+      ${_acRow('✈️','Airbus Part 21',_acP21,'#00a0ff')}
       <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total sur site</span><strong style="color:var(--mint)">${_avions}</strong></div>
       ${(_acParti||_acDetruit)?`<div style="margin-top:9px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1)">
         ${_acParti?`<div style="display:flex;justify-content:space-between;gap:16px;padding:2px 0;font-size:11px;color:var(--t4)"><span>🛫 Partis / livrés</span><span>${_acParti}</span></div>`:''}
@@ -7028,7 +7092,14 @@ function renderDash(){
     document.getElementById('alertsBox').innerHTML=`<div style="padding:4px 0">${sectionsHtml}</div>`;
   }
 
-  // Matrix — noms triés alphabétiquement (NOM Prénom)
+  // Widget avancement chantiers
+  try{renderAvancement();}catch(e){console.warn('renderAvancement:',e);}
+}
+
+// Matrice des formations & compétences — désormais en bas de l'onglet Formations
+function renderFormMatrix(){
+  const box=document.getElementById('matrixBox');
+  if(!box) return;                       // pas sur l'onglet Formations
   const rows=_sortByNom(S.personnel.filter(p=>!_empHorsEffectif(p.id))).map(p=>{
     const mF={}; S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
     const cat=CATS[p.categorie]||{};
@@ -7046,7 +7117,7 @@ function renderDash(){
       ${cells}
     </tr>`;
   }).join('');
-  document.getElementById('matrixBox').innerHTML=`<div class="mwrap" style="padding:6px 4px 4px;overflow:auto;max-height:70vh"><table class="mtable"><thead><tr>
+  box.innerHTML=`<div class="mwrap" style="padding:6px 4px 4px;overflow:auto;max-height:70vh"><table class="mtable"><thead><tr>
     <th class="mx-sticky-name mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 12px;text-align:left;min-width:150px;font-size:11px">Employé</th>
     <th class="mx-sticky-tri mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 8px;text-align:center;min-width:44px;font-size:11px">TRI</th>
     ${TRAININGS.map(t=>{
@@ -7065,14 +7136,17 @@ function renderDash(){
         'Compétences':    'Compét.',
         'Licence Part 66':'Licence<br>Part 66',
         'Pushback':       'Pushback',
+        'Pont roulant':   'Pont<br>roulant',
+        'Permis aire de trafic':'Permis<br>trafic',
+        'Permis aire de manœuvre':'Permis<br>manœuvre',
+        'Manipulation extincteurs':'Manip.<br>extinct.',
+        'Sensibilisation cybersécurité':'Sensib.<br>cyber',
+        'SST':            'SST',
       };
       const display=(MAP[t]||t).toUpperCase();
       return`<th class="rot" title="${t}">${display}</th>`;
     }).join('')}
   </tr></thead><tbody>${rows}</tbody></table></div>`;
-
-  // Widget avancement chantiers
-  try{renderAvancement();}catch(e){console.warn('renderAvancement:',e);}
 }
 
 // Ouvre / referme un groupe de rappels du tableau de bord (sans re-render complet)
@@ -7150,6 +7224,7 @@ function renderForms(){
     </tr>`).join('');
     return hdr+rows;
   }).join('');
+  try{ renderFormMatrix(); }catch(e){ console.warn('renderFormMatrix:',e); }
 }
 function _formToggleEmp(key){
   const rows=document.querySelectorAll('tr[data-femp="'+key+'"]');
@@ -8395,7 +8470,7 @@ function _affectActivities(){
   acts.push({v:'PROD',l:'🏭 Production'});
   acts.push({v:'STRUCT',l:'🔩 Structure — atelier'});
   acts.push({v:'AIRBUS',l:'✈️ Airbus — Part 21'});
-  acts.push({v:'STO',l:'📦 Stockage'});
+  acts.push({v:'STO',l:'🅿️ Stockage'});
   return acts;
 }
 function openAffectPerm(){
@@ -14270,32 +14345,35 @@ function renderAvionsKpi(){
   const nbParking=avionsStock.filter(a=>a.statut==='parking').length;
   const nbStorage=avionsStock.filter(a=>a.statut==='storage').length;
   const nbWorking=avionsStock.filter(a=>a.statut==='working').length;
-  const chantiersActifs=S.chantiers.filter(c=>['encours','futur'].includes(c.statut));
+  const chantiersActifs=S.chantiers.filter(c=>c.statut==='encours');   // chantier actif = en cours uniquement
   const nbChantiers=chantiersActifs.length;
   const today=fmt(new Date());
   const msnAirbus=(S.airbus?.msns||[]).filter(m=>(!m.entree||m.entree<=today)&&(!m.sortie||m.sortie>=today));
   const nbAirbus=msnAirbus.length;
   const nbPeinture=msnAirbus.filter(m=>m.activite==='peinture').length;
   const nbFRC=msnAirbus.filter(m=>m.activite==='stockage_frc').length;
-  const total=nbStock+nbChantiers+nbAirbus;
+  // Total = parc réel sur site, dédupliqué par MSN (même source que le tableau de bord)
+  const _site=_avionsSurSite();
+  const total=_site.total;
+  const _detStock=_site.stockage, _detMaint=_site.maintenance, _detP21=_site.part21;
   el.innerHTML=`<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;margin-bottom:4px">
     <div style="background:linear-gradient(135deg,rgba(41,121,255,0.15),rgba(0,210,255,0.1));border:1px solid rgba(0,210,255,0.25);border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;justify-content:center;min-width:140px">
       <div style="font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">✈️ Avions sur site</div>
       <div style="font-size:40px;font-weight:900;color:#fff;line-height:1">${total}</div>
-      <div style="font-size:10px;color:var(--t4);margin-top:3px">${nbStock} stockage · ${nbChantiers} chantier${nbChantiers>1?'s':''}${nbAirbus?' · '+nbAirbus+' Part 21':''}</div>
+      <div style="font-size:10px;color:var(--t4);margin-top:3px">${_detStock} stockage · ${_detMaint} maintenance${_detP21?' · '+_detP21+' Part 21':''}${_site.recyclage?' · '+_site.recyclage+' recyclage':''}</div>
     </div>
     <div style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 20px;flex:1;min-width:200px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📦 Stockage (${nbStock})</div>
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🅿️ Stockage (${nbStock})</div>
       <div style="display:flex;gap:20px;flex-wrap:wrap">
         <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#a0b0c8">${nbParking}</div><div style="font-size:10px;color:var(--t4)">Parking</div></div>
         <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#ffd060">${nbStorage}</div><div style="font-size:10px;color:var(--t4)">Storage</div></div>
         <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#00d2ff">${nbWorking}</div><div style="font-size:10px;color:var(--t4)">Working Party</div></div>
       </div>
     </div>
-    <div style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 20px;flex:1;min-width:200px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔧 Chantiers actifs (${nbChantiers})</div>
-      <div style="display:flex;flex-direction:column;gap:5px;max-height:80px;overflow-y:auto">
-        ${chantiersActifs.length?chantiersActifs.map(c=>`<div style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:${c.color||'#2979ff'};flex-shrink:0"></div><span style="font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}${c.avion?' · '+c.avion:''}</span></div>`).join(''):'<span style="font-size:11px;color:var(--t4)">Aucun chantier actif</span>'}
+    <div style="background:rgba(16,23,38,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px 20px;flex:1;min-width:200px;backdrop-filter:blur(6px)">
+      <div style="font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔧 Chantiers actifs (${nbChantiers})</div>
+      <div style="display:flex;flex-direction:column;gap:7px;max-height:100px;overflow-y:auto">
+        ${chantiersActifs.length?chantiersActifs.map(c=>`<div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${c.color||'#2979ff'};flex-shrink:0;box-shadow:0 0 6px ${c.color||'#2979ff'}"></div><span style="font-size:13px;font-weight:700;color:#eaf2ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}${c.avion?' · '+c.avion:''}</span></div>`).join(''):'<span style="font-size:12px;color:var(--t4)">Aucun chantier actif</span>'}
       </div>
     </div>
     ${nbAirbus>0?`<div style="background:linear-gradient(135deg,rgba(0,100,200,0.1),rgba(0,160,255,0.06));border:1px solid rgba(0,160,255,0.2);border-radius:16px;padding:14px 20px;flex:1;min-width:180px">
@@ -14549,7 +14627,7 @@ function _computeKPI(){
     const prevMon=addD(curMon,-7); const prevKey=`${prevMon.getFullYear()}-S${wkN(prevMon)}`;
     const stPrev=S.stockage?.mhHebdo?.[prevKey]?.total||0;
     const stTrend=stPrev>0?Math.round((stMH-stPrev)/stPrev*100):0;
-    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0)+(ac.iq||0);
+    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0);  /* IQ = improductif, hors besoin productif */
     sections.push({title:'Recyclage · Stockage · Airbus',cards:[
       {val:String(recActifs),label:'Avions en recyclage',sub:`besoin ${bb.recT} tech.`,status:'neutral'},
       {val:stMH+' h',label:'Charge stockage (sem.)',sub:stPrev>0?`${stTrend>=0?'+':''}${stTrend}% vs S-1`:'pas de référence S-1',status:'neutral'},
@@ -14740,7 +14818,7 @@ function renderKPI(){
     const prevMon=addD(curMon,-7); const prevKey=`${prevMon.getFullYear()}-S${wkN(prevMon)}`;
     const stPrev=S.stockage?.mhHebdo?.[prevKey]?.total||0;
     const stTrend=stPrev>0?Math.round((stMH-stPrev)/stPrev*100):0;
-    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0)+(ac.iq||0);
+    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0);  /* IQ = improductif, hors besoin productif */
     html+=section('♻️ Recyclage · Stockage · Airbus',
       card(recActifs,'Avions en recyclage','#6effc4',`besoin ${bb.recT} tech.`)+
       card(stMH+' h','Charge stockage (sem.)',stMH>0?'#ff9a3c':'#8090a8',stPrev>0?`${stTrend>=0?'+':''}${stTrend}% vs S-1`:'pas de référence S-1')+
@@ -15714,7 +15792,7 @@ function _aiBesoinSemaine(mon){
   const stMH=S.stockage?.mhHebdo?.[wk]?.total||0;
   if(stMH>0) stockT=Math.ceil(stMH/35);
   const ac=S.airbus?.charge?.[wk]||{};
-  airbusT=(ac.part21||0)+(ac.iq||0);
+  airbusT=(ac.part21||0);  /* IQ improductif, hors besoin */
   const ABSENTR=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
   const recPers=(S.personnel||[]).filter(p=>_isRecyMecano(p)&&p.actif!==false);
   const techsAff=(avId)=>{let c=0;recPers.forEach(emp=>{let pr=false,af=false;for(let i=0;i<5;i++){const ds=fmt(addD(mon,i));if(isHol(ds))continue;const am=S.planning[`${emp.id}_${ds}_AM`]||{},pm=S.planning[`${emp.id}_${ds}_PM`]||{};if(!ABSENTR.has(am.type||'')||!ABSENTR.has(pm.type||''))pr=true;if(am.chantierId===`REC_${avId}`||pm.chantierId===`REC_${avId}`||am.chantierId==='REC'||pm.chantierId==='REC')af=true;}if(pr&&af)c++;});return c;};
@@ -16699,6 +16777,140 @@ function aiVoice(){
 /* ═══ FIN ASSISTANT IA ═══ */
 
 /* ═══ CHARGE / CAPACITÉ ═══ */
+function _toggleHorsCapa(ev){
+  if(ev) ev.stopPropagation();
+  const pop=document.getElementById('hors-capa-pop'); if(!pop) return;
+  const open=pop.style.display!=='none';
+  ['hors-capa-pop','p145-capa-pop','manque-pop'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none';});
+  pop.style.display=open?'none':'block';
+  if(!open){
+    const close=(e)=>{ if(!pop.contains(e.target)){ pop.style.display='none'; document.removeEventListener('click',close); } };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+function _toggleP145Capa(ev){
+  if(ev) ev.stopPropagation();
+  const pop=document.getElementById('p145-capa-pop'); if(!pop) return;
+  const open=pop.style.display!=='none';
+  ['hors-capa-pop','p145-capa-pop','manque-pop'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none';});
+  pop.style.display=open?'none':'block';
+  if(!open){
+    const close=(e)=>{ if(!pop.contains(e.target)){ pop.style.display='none'; document.removeEventListener('click',close); } };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+function _toggleManque(ev){
+  if(ev) ev.stopPropagation();
+  const pop=document.getElementById('manque-pop'); if(!pop) return;
+  const open=pop.style.display!=='none';
+  ['hors-capa-pop','p145-capa-pop','manque-pop'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none';});
+  pop.style.display=open?'none':'block';
+  if(!open){
+    const close=(e)=>{ if(!pop.contains(e.target)){ pop.style.display='none'; document.removeEventListener('click',close); } };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+// Semaine affichée dans la synthèse par périmètre (null = semaine en cours par défaut)
+let _synthWeekIdx=null;
+let _synthPendingDir=0;
+let _synthDetailData=null;   // détails de la semaine sélectionnée (par périmètre)
+// Bulle de détail d'un périmètre (p145 / p21 / recy) pour la semaine sélectionnée
+function _synthDetail(perim, ev){
+  if(ev) ev.stopPropagation();
+  const old=document.getElementById('pop-synth-detail');
+  const wasPerim=old?old._perim:null;
+  if(old) old.remove();
+  if(wasPerim===perim) return;                 // reclic sur la même carte = fermer
+  const d=_synthDetailData; if(!d) return;
+  const anchor=ev?ev.currentTarget:null;
+
+  let title, rows='', total=0, accent;
+  if(perim==='p145'){
+    title='🔧 Part 145'; accent='#6effc4';
+    (d.detailChantiers||[]).forEach(c=>{
+      const stat=c.statut==='encours'?'En cours':c.statut==='futur'?'À venir':'Terminé';
+      const tag=c.retard?'<span style="font-size:9px;color:#ff8fa3;font-weight:700"> · ⚠ Prolong.</span>':'';
+      let bd = c.ajuste&&!c.retard
+        ? `<div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:900;color:#ffd060">${c.nb}T</div><div style="font-size:9px;color:#8090a8;text-decoration:line-through">théo ${c.theo}T</div></div>`
+        : c.retard
+        ? `<div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:900;color:#ff8fa3">${c.nb}T</div><div style="font-size:9px;color:#8090a8">prolong.</div></div>`
+        : `<div style="font-size:15px;font-weight:900;color:#82b1ff;flex-shrink:0">${c.nb}T</div>`;
+      total+=c.nb||0;
+      rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="width:3px;height:30px;border-radius:2px;background:${c.color};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#e0e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}${tag}</div>${c.client?`<div style="font-size:10px;color:#8090a8">${c.client}</div>`:''}<div style="font-size:10px;color:#607090">${stat}</div></div>
+        ${bd}
+      </div>`;
+    });
+    if(d.stockT>0){ total+=d.stockT; rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><div style="width:3px;height:30px;border-radius:2px;background:#a0b8d8;flex-shrink:0"></div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#a0b8d8">🅿️ Stockage</div><div style="font-size:10px;color:#607090">Man Hours → techs</div></div><div style="font-size:15px;font-weight:900;color:#a0b8d8">${d.stockT}T</div></div>`; }
+    if(d.structT>0){ total+=d.structT; const noms=(d.detailStruct||[]).map(p=>p.nom+(p.tri?` (${p.tri})`:'')).join(', '); rows+=`<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0"><div style="width:3px;height:30px;border-radius:2px;background:#6d8fb0;flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#a7c1de">🔩 Structure</div><div style="font-size:10px;color:#607090">Atelier · Sheet Metal Workers</div>${noms?`<div style="font-size:10px;color:#9fb3cc;margin-top:3px;line-height:1.5">${noms}</div>`:''}</div><div style="font-size:15px;font-weight:900;color:#a7c1de;flex-shrink:0">${d.structT}T</div></div>`; }
+  } else if(perim==='p21'){
+    title='✈️ Part 21'; accent='#00a0ff';
+    total=d.airbusT||0;
+    if(total>0){
+      rows=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:3px;height:30px;border-radius:2px;background:#0064c8;flex-shrink:0"></div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#00a0ff">Techniciens Part 21</div><div style="font-size:10px;color:#607090">Hors IQ (improductif)</div></div><div style="font-size:15px;font-weight:900;color:#00a0ff">${total}T</div></div>`;
+    }
+  } else if(perim==='recy'){
+    title='♻️ Recyclage'; accent='#ff9a3c';
+    (d.detailRecAvions||[]).forEach(a=>{
+      const stat=a.statut==='futur'?'À venir':'En cours'; total+=a.nb||0;
+      rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><div style="width:3px;height:30px;border-radius:2px;background:${a.color||'#ff9a3c'};flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#ffcaa0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">♻️ ${a.type} MSN ${a.msn}</div><div style="font-size:10px;color:#607090">Recyclage · ${stat}</div></div><div style="font-size:15px;font-weight:900;color:#ff9a3c;flex-shrink:0">${a.nb}T</div></div>`;
+    });
+    if(!rows && d.recT>0){ total=d.recT; rows=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:3px;height:30px;border-radius:2px;background:#ff9a3c;flex-shrink:0"></div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#ff9a3c">Recyclage</div><div style="font-size:10px;color:#607090">Avions en démantèlement</div></div><div style="font-size:15px;font-weight:900;color:#ff9a3c">${d.recT}T</div></div>`; }
+  }
+
+  const pop=document.createElement('div');
+  pop.id='pop-synth-detail'; pop._perim=perim;
+  pop.style.cssText=`position:fixed;z-index:9999;background:#141b2d;border:1px solid ${accent}55;border-radius:14px;padding:14px;width:270px;max-height:70vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.6)`;
+  pop.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:800;color:${accent}">${title} — S${d.wNum} · ${total} tech${total>1?'s':''}</div>
+      <button onclick="document.getElementById('pop-synth-detail').remove()" style="background:none;border:none;color:#8090a8;font-size:16px;cursor:pointer;padding:0;line-height:1">✕</button>
+    </div>
+    <div>${rows||'<span style="color:#8090a8;font-size:12px">Aucun besoin sur cette semaine.</span>'}</div>`;
+  document.body.appendChild(pop);
+  // Positionner près de la carte cliquée
+  if(anchor){
+    const r=anchor.getBoundingClientRect();
+    let top=r.bottom+6, left=r.left;
+    const pw=270, ph=pop.offsetHeight;
+    if(left+pw>window.innerWidth-10) left=window.innerWidth-pw-10;
+    if(top+ph>window.innerHeight-10) top=Math.max(10,r.top-ph-6);
+    pop.style.top=top+'px'; pop.style.left=Math.max(10,left)+'px';
+  } else { pop.style.top='50%'; pop.style.left='50%'; pop.style.transform='translate(-50%,-50%)'; }
+  const close=(e)=>{ if(!pop.contains(e.target)&&e.target!==anchor&&!(anchor&&anchor.contains(e.target))){ pop.remove(); document.removeEventListener('click',close); } };
+  setTimeout(()=>document.addEventListener('click',close),0);
+}
+function _synthNav(dir){
+  if(dir===0){ _synthWeekIdx=null; _synthPendingDir=0; }   // retour à la semaine actuelle
+  else if(_synthWeekIdx!==null){ _synthWeekIdx+=dir; }
+  else { _synthPendingDir=dir; }                            // décalage depuis la semaine courante
+  const y=parseInt(document.getElementById('gantt-year')?.value)||new Date().getFullYear();
+  renderChargeCapaTable(y);
+}
+// Aller directement à une semaine via le menu déroulant
+function _synthGoto(idx){
+  _synthWeekIdx=parseInt(idx)||0;
+  _synthPendingDir=0;
+  const y=parseInt(document.getElementById('gantt-year')?.value)||new Date().getFullYear();
+  renderChargeCapaTable(y);
+}
+// Présence d'une personne sur une semaine donnée (bornes incluses).
+// Règle validée : CDI sans date = toujours présent (historique) ; date d'embauche
+// renseignée = présent dès qu'elle est atteinte (y compris semaines futures) ;
+// intérimaire avec date de fin = présent seulement dans sa période de contrat.
+function _presentSemaine(p, wStart, wEnd){
+  // Embauche : si renseignée, la personne n'existe pas avant
+  if(p.dateEmbauche){
+    const emb=parseLocal(p.dateEmbauche);
+    if(emb && emb>wEnd) return false;          // arrive après cette semaine
+  }
+  // Fin de contrat : si renseignée (surtout intérimaires), plus présent après
+  if(p.dateFin){
+    const fin=parseLocal(p.dateFin);
+    if(fin && fin<wStart) return false;        // contrat terminé avant cette semaine
+  }
+  return true;
+}
 function renderChargeCapaTable(year){
   const el=document.getElementById('chargeCapaTable');
   if(!el) return;
@@ -16729,6 +16941,7 @@ function renderChargeCapaTable(year){
     // Si aucune case remplie → technicien dispo par défaut
     let capaJours=0;
     allTechs.forEach(emp=>{
+      if(!_presentSemaine(emp, mon, wEnd)) return;   // pas dans l'effectif cette semaine (embauche/fin de contrat)
       [0,1,2,3,4].forEach(i=>{
         const d=addD(mon,i);
         const ds=fmt(d);
@@ -16768,13 +16981,14 @@ function renderChargeCapaTable(year){
     const stockTechs=hasStockOv?(parseInt(stockOv)||0):(stockMH>0?Math.ceil(stockMH/35):0);
     besoinActifs+=stockTechs;
 
-    // Ajouter le besoin Airbus Part21+IQ pour cette semaine — override prioritaire
+    // Besoin Airbus Part21+IQ — calculé pour la SYNTHÈSE, mais PAS ajouté au besoin Part 145
+    // (Part 21 est un périmètre étanche avec sa propre table de capacité)
     const airbusWk=`${mon.getFullYear()}-S${wNum}`;
     const airbusOv=S.besoinOverrides?.[`AIR_${airbusWk}`];
     const hasAirbusOv=airbusOv!==undefined&&airbusOv!==null&&airbusOv!=='';
     const airbusCharge=S.airbus?.charge?.[airbusWk]||{};
-    const airbusTechs=hasAirbusOv?(parseInt(airbusOv)||0):((airbusCharge.part21||0)+(airbusCharge.iq||0));
-    besoinActifs+=airbusTechs;
+    const airbusTechs=hasAirbusOv?(parseInt(airbusOv)||0):((airbusCharge.part21||0));  /* IQ improductif */
+    // (pas de besoinActifs += airbusTechs)
 
     // Ajouter le besoin Structure (Sheet Metal Workers affectés STRUCT) — override prioritaire
     const structWk=`${mon.getFullYear()}-S${wNum}`;
@@ -16832,7 +17046,8 @@ function renderChargeCapaTable(year){
         detailRecAvions.push({type:av.type||'A/C',msn:av.msn||'?',nb,statut:enCours?'encours':'futur',color:av.color||'#ff9a3c'});
       }
     });
-    besoinActifs+=recTechs;
+    // recTechs calculé pour la SYNTHÈSE, mais PAS ajouté au besoin Part 145
+    // (le recyclage est un périmètre étanche avec sa propre table de capacité)
 
     // Besoin avec prévisionnels
     let besoinTotal=besoinActifs;
@@ -16877,6 +17092,87 @@ function renderChargeCapaTable(year){
     return{m:parseInt(m),capaAvg,besoinMax,ecart};
   });
 
+  // ── Synthèse des 3 périmètres étanches (semaine sélectionnable) ──
+  // Index par défaut = semaine en cours ; navigable via _synthWeekIdx
+  let _curIdx=weekData.findIndex(d=>d.isCurrent);
+  if(_curIdx<0){
+    // Année affichée sans "semaine actuelle" (autre année) → semaine la plus proche d'aujourd'hui
+    const _tMon=getMon(new Date()).getTime();
+    let best=0,bestD=Infinity;
+    weekData.forEach((d,i)=>{ const diff=Math.abs(d.mon.getTime()-_tMon); if(diff<bestD){bestD=diff;best=i;} });
+    _curIdx=best;
+  }
+  if(_synthWeekIdx===null){
+    _synthWeekIdx=_curIdx+(_synthPendingDir||0);
+    _synthPendingDir=0;
+  }
+  if(_synthWeekIdx<0) _synthWeekIdx=0;
+  if(_synthWeekIdx>=weekData.length) _synthWeekIdx=weekData.length-1;
+  const _synthWeek=weekData[_synthWeekIdx]||weekData[0];
+  const _synthMon=_synthWeek?_synthWeek.mon:getMon(new Date());
+  const _isCurW=_synthWeek&&_synthWeek.isCurrent;
+  // Mémoriser les détails de la semaine sélectionnée pour les bulles par périmètre
+  _synthDetailData=_synthWeek?{
+    wNum:_synthWeek.wNum,
+    detailChantiers:_synthWeek.detailChantiers||[],
+    stockT:_synthWeek.stockTechs||0,
+    structT:_synthWeek.structTechs||0,
+    detailStruct:_synthWeek.detailStruct||[],
+    detailRecAvions:_synthWeek.detailRecAvions||[],
+    recT:_synthWeek.recTechs||0,
+    airbusT:_synthWeek.airbusTechs||0
+  }:null;
+  // Part 145 : capacité vs besoin (déjà calculés, hors Part 21 et recyclage)
+  const p145Capa=_synthWeek?_synthWeek.capaTechs:0;
+  const p145Bes =_synthWeek?_synthWeek.besoinActifs:0;
+  const p145Ecart=Math.round((p145Capa-p145Bes)*10)/10;
+  // Part 21 : dispo productive (techniciens P21, hors IQ improductif) vs besoin
+  const _p21d=getAirbusDispoWeek(_synthMon);
+  const p21Dispo=_p21d.part21;   // IQ = improductif, non compté dans la capacité productive
+  const _p21wk=`${_synthMon.getFullYear()}-S${wkN(_synthMon)}`;
+  const _p21c=S.airbus?.charge?.[_p21wk]||{};
+  // L'override du tableau d'ajustement prime sur la charge de l'onglet dédié
+  const _p21ov=S.besoinOverrides?.[`AIR_${_p21wk}`];
+  const _p21hasOv=_p21ov!==undefined&&_p21ov!==null&&_p21ov!=='';
+  const p21Bes=_p21hasOv?(parseInt(_p21ov)||0):(_p21c.part21||0);  /* IQ improductif, hors besoin productif */
+  const p21Ecart=Math.round((p21Dispo-p21Bes)*10)/10;
+  // Recyclage : dispo vs besoin
+  const recDispo=getRecyDispoWeek(_synthMon);
+  const recBes=_synthWeek?_synthWeek.recTechs:0;
+  const recEcart=Math.round((recDispo-recBes)*10)/10;
+  const _synCard=(perim,lbl,dispo,bes,ecart,col)=>{
+    const ok=ecart>=0;
+    const hasDetail=bes>0;
+    return `<div ${hasDetail?`onclick="_synthDetail('${perim}',event)" style="cursor:pointer;`:'style="'}flex:1;min-width:130px;background:${ok?'rgba(52,199,89,0.06)':'rgba(255,77,109,0.06)'};border:1px solid ${ok?'rgba(52,199,89,0.2)':'rgba(255,77,109,0.2)'};border-radius:12px;padding:10px 14px">
+      <div style="font-size:10px;font-weight:800;color:${col};text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">${lbl}${hasDetail?' <span style="color:var(--t4);font-size:9px">▾ détail</span>':''}</div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span style="font-size:22px;font-weight:900;color:${ok?'#34c759':'#ff4d6d'}">${ecart>=0?'+':''}${ecart}</span>
+        <span style="font-size:10px;color:var(--t4)">dispo ${dispo} · besoin ${bes}</span>
+      </div>
+    </div>`;
+  };
+  const _synthDate=_synthMon?`${String(_synthMon.getDate()).padStart(2,'0')}/${String(_synthMon.getMonth()+1).padStart(2,'0')}`:'';
+  const _synthWnum=_synthWeek?_synthWeek.wNum:'';
+  const synthLine=`<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">⚖️ Synthèse par périmètre étanche</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="_synthNav(-1)" title="Semaine précédente" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);width:30px;height:28px;cursor:pointer;font-size:13px">◀</button>
+        <select onchange="_synthGoto(this.value)" style="height:28px;border-radius:8px;padding:0 8px;background:var(--glass-2);color:${_isCurW?'#ffd060':'var(--t1)'};border:1px solid var(--glass-border);font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;max-width:180px">
+          ${weekData.map((d,i)=>{const dd=`${String(d.mon.getDate()).padStart(2,'0')}/${String(d.mon.getMonth()+1).padStart(2,'0')}`;return `<option value="${i}" ${i===_synthWeekIdx?'selected':''}>S${d.wNum} · ${dd}${d.isCurrent?' ●':''}</option>`;}).join('')}
+        </select>
+        <button onclick="_synthNav(1)" title="Semaine suivante" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);width:30px;height:28px;cursor:pointer;font-size:13px">▶</button>
+        ${!_isCurW?`<button onclick="_synthNav(0)" title="Revenir à la semaine actuelle" style="background:rgba(255,208,96,0.12);border:1px solid rgba(255,208,96,0.3);border-radius:8px;color:#ffd060;padding:0 10px;height:28px;cursor:pointer;font-size:11px;font-weight:700">Aujourd'hui</button>`:''}
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${_synCard('p145','🔧 Part 145',p145Capa,p145Bes,p145Ecart,'#6effc4')}
+      ${_synCard('p21','✈️ Part 21',p21Dispo,p21Bes,p21Ecart,'#00a0ff')}
+      ${_synCard('recy','♻️ Recyclage',recDispo,recBes,recEcart,'#ff9a3c')}
+    </div>
+    <div style="font-size:9.5px;color:var(--t4);margin-top:7px;line-height:1.5">Chaque périmètre a sa propre balance : les techniciens Part 145 ne couvrent que les chantiers, stockage et structure. Part 21 et recyclage ont leurs équipes dédiées (voir leurs onglets).</div>
+  </div>`;
+
   const badgeEcart=(ecart,besoin)=>{
     if(ecart===null) return `<span style="color:#8090a8;font-size:11px">—</span>`;
     const col=ecart>=0?'#34c759':'#ff4d6d';
@@ -16889,31 +17185,31 @@ function renderChargeCapaTable(year){
 
   const badgeBesoin=(besoin,stockT,recT,airbusT,structT,wNum,detailChantiers,detailRecAvions,detailStruct)=>{
     if(!besoin) return `<span style="color:#8090a8;font-size:11px">—</span>`;
-    const chantierT=besoin-(stockT||0)-(recT||0)-(airbusT||0)-(structT||0);
+    // Besoin Part 145 uniquement (chantiers + stockage + structure). Le détail par
+    // périmètre est accessible via les cartes de synthèse (clic sur une semaine).
+    const chantierT=besoin-(stockT||0)-(structT||0);
     let detail='';
     if(chantierT>0) detail+=`<span style="color:#82b1ff">🔧${chantierT}</span> `;
-    if(stockT>0)    detail+=`<span style="color:#a0b8d8">✈${stockT}</span> `;
-    if(recT>0)      detail+=`<span style="color:#ff9a3c">♻${recT}</span> `;
-    if(airbusT>0)   detail+=`<span style="color:#0064c8">✈️${airbusT}</span> `;
+    if(stockT>0)    detail+=`<span style="color:#a0b8d8">🅿️${stockT}</span> `;
     if(structT>0)   detail+=`<span style="color:#a7c1de">🔩${structT}</span>`;
-    const dataJson=encodeURIComponent(JSON.stringify({besoin,stockT,recT,airbusT,structT,chantierT,wNum,detailChantiers,detailRecAvions,detailStruct}));
-    return `<div style="text-align:center;cursor:pointer" onclick="showBesoinsDetail(this,'${dataJson}')" title="Voir le détail">
+    return `<div style="text-align:center">
       <span style="font-size:18px;font-weight:900;color:#c0d0e8">${besoin}</span>
       <div style="font-size:9px;color:#8090a8;font-weight:600">tech. requis</div>
       ${detail?`<div style="font-size:9px;margin-top:2px;display:flex;gap:3px;justify-content:center;flex-wrap:wrap">${detail}</div>`:''}
-      <div style="font-size:9px;color:rgba(0,210,255,0.5);margin-top:3px">ⓘ détail</div>
     </div>`;
   };
 
   const thS='padding:8px 10px;background:#141d2e;font-size:10px;font-weight:700;color:#a0b8d8;text-transform:uppercase;letter-spacing:.5px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);position:sticky;top:0;z-index:2';
 
-  const weekRows=weekData.map(d=>{
-    const bg=d.isCurrent?'rgba(0,210,255,0.07)':'';
-    const wc=d.isCurrent?'var(--cyan)':'#c0d0e8';
-    return`<tr ${d.isCurrent?'id="cc-curweek"':''} style="background:${bg};border-bottom:1px solid rgba(255,255,255,0.05)">
+  const weekRows=weekData.map((d,idx)=>{
+    const isSel=idx===_synthWeekIdx;
+    const bg=isSel?'rgba(0,210,255,0.18)':d.isCurrent?'rgba(255,208,96,0.07)':'';
+    const wc=d.isCurrent?'#ffd060':isSel?'var(--cyan)':'#c0d0e8';
+    return`<tr ${d.isCurrent?'id="cc-curweek"':''}${isSel?' data-selrow="1"':''} onclick="_synthGoto(${idx})" title="Voir cette semaine dans la synthèse" style="background:${bg};border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer${isSel?';box-shadow:inset 3px 0 0 var(--cyan)':''}">
       <td style="padding:7px 10px;font-weight:700;color:${wc};font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap">
         S${d.wNum} <span style="font-size:9px;color:#8090a8;font-weight:400">${d.mon.getDate()}/${d.mon.getMonth()+1}</span>
-        ${d.isCurrent?'<br><span style="font-size:8px;color:var(--cyan)">← Auj.</span>':''}
+        ${d.isCurrent?'<br><span style="font-size:8px;color:#ffd060;font-weight:800">● SEMAINE ACTUELLE</span>':''}
+        ${isSel&&!d.isCurrent?'<br><span style="font-size:8px;color:var(--cyan)">▸ affichée</span>':''}
       </td>
       <td style="padding:7px 10px;text-align:center">
         <span style="font-size:16px;font-weight:900;color:#60e0a8">${d.capaTechs}</span>
@@ -16939,24 +17235,85 @@ function renderChargeCapaTable(year){
     </tr>`;
   }).join('');
 
-  const semManque=weekData.filter(d=>d.ecartActifs!==null&&d.ecartActifs<0).length;
+  const manqueList=weekData.filter(d=>d.ecartActifs!==null&&d.ecartActifs<0)
+    .map(d=>({wNum:d.wNum, mon:d.mon, ecart:d.ecartActifs}))
+    .sort((a,b)=>a.mon-b.mon);
+  const semManque=manqueList.length;
   const semOK=weekData.filter(d=>d.ecartActifs!==null&&d.ecartActifs>=0).length;
+  const _mqRows=manqueList.map(m=>{
+    const dstr=`${String(m.mon.getDate()).padStart(2,'0')}/${String(m.mon.getMonth()+1).padStart(2,'0')}`;
+    return `<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:11px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,0.04)"><span>S${m.wNum} <span style="color:var(--t4)">· ${dstr}</span></span><strong style="color:#ff4d6d">${m.ecart}</strong></div>`;
+  }).join('');
+
+  // Personnel hors Part 145 (CDI + intérimaires fléchés) — recyclage / Part 21 / IQ
+  const horsList=S.personnel.filter(p=>p.actif!==false && !p.archived && _isHorsP145(p));
+  const nHors=horsList.length;
+  const nH_recyCDI=horsList.filter(p=>p.categorie==='recycling').length;
+  const nH_p21CDI =horsList.filter(p=>p.categorie==='part21').length;
+  const nH_iqCDI  =horsList.filter(p=>p.categorie==='iq').length;
+  const nH_recyInt=horsList.filter(p=>p.categorie==='interimaire'&&p.activite==='recycling').length;
+  const nH_p21Int =horsList.filter(p=>p.categorie==='interimaire'&&p.activite==='part21').length;
+  const nH_iqInt  =horsList.filter(p=>p.categorie==='interimaire'&&p.activite==='iq').length;
+  const _hRow=(lbl,n)=>n>0?`<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-size:11px;color:var(--t2)"><span>${lbl}</span><strong style="color:#7fd4ff">${n}</strong></div>`:'';
+
+  // Ventilation de l'effectif Part 145 (le « 52 ») par catégorie
+  const _pRow=(lbl,n)=>n>0?`<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-size:11px;color:var(--t2)"><span>${lbl}</span><strong style="color:#6effc4">${n}</strong></div>`:'';
+  const p145_techCDI = allTechs.filter(p=>p.categorie==='technicien').length;
+  const p145_sheet   = allTechs.filter(p=>p.categorie==='sheetmetal').length;
+  const p145_intCh   = allTechs.filter(p=>p.categorie==='interimaire'&&(!p.activite||p.activite==='chantier')).length;
+  const p145_intSto  = allTechs.filter(p=>p.categorie==='interimaire'&&p.activite==='stockage').length;
+  const p145_intSM   = allTechs.filter(p=>p.categorie==='interimaire'&&p.activite==='sheetmetal').length;
 
   el.innerHTML=`
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-    <div style="background:rgba(16,23,38,0.90);border-radius:12px;padding:12px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:var(--mint)">${totalTechs}</div>
-      <div style="font-size:10px;color:var(--t4);margin-top:2px">Techs + Intérimaires</div>
+    <div style="background:rgba(16,23,38,0.90);border-radius:12px;padding:12px;text-align:center;position:relative;cursor:${totalTechs?'pointer':'default'}" ${totalTechs?'onclick="_toggleP145Capa(event)"':''}>
+      <div style="font-size:28px;font-weight:900;color:var(--mint)">${totalTechs}${totalTechs?' <span style="font-size:11px;color:var(--t4)">▾</span>':''}</div>
+      <div style="font-size:10px;color:var(--t4);margin-top:2px">Effectif Part 145</div>
+      <div style="font-size:8.5px;color:var(--t4);margin-top:3px;line-height:1.3;opacity:.85">Techs + Intérim. + 🔩 Sheet Metal<br><span style="opacity:.7">Part 145 uniquement</span></div>
+      ${totalTechs?`<div id="p145-capa-pop" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(110,255,196,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:200px;max-width:min(280px,86vw);cursor:default;text-align:left" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Effectif Part 145 — détail</div>
+        ${_pRow('🔧 Technicien (CDI)',p145_techCDI)}
+        ${_pRow('🔩 Sheet Metal Worker',p145_sheet)}
+        ${_pRow('👷 Intérim. chantier',p145_intCh)}
+        ${_pRow('🅿️ Intérim. stockage',p145_intSto)}
+        ${_pRow('🔩 Intérim. sheet metal',p145_intSM)}
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total Part 145</span><strong style="color:var(--mint)">${totalTechs}</strong></div>
+        <div style="font-size:9.5px;color:var(--t4);margin-top:7px;line-height:1.5">Personnel productif Part 145 : compté dans le ratio et la capacité chantiers. Les CDI et intérimaires hors Part 145 sont dans la case voisine.</div>
+      </div>`:''}
+    </div>
+    <div style="background:rgba(0,160,255,0.06);border:1px solid rgba(0,160,255,0.2);border-radius:12px;padding:12px;text-align:center;position:relative;cursor:${nHors?'pointer':'default'}" ${nHors?'onclick="_toggleHorsCapa(event)"':''}>
+      <div style="font-size:28px;font-weight:900;color:#00a0ff">${nHors}${nHors?' <span style="font-size:11px;color:var(--t4)">▾</span>':''}</div>
+      <div style="font-size:10px;color:var(--t4);margin-top:2px">Hors Part 145</div>
+      <div style="font-size:8.5px;color:var(--t4);margin-top:3px;line-height:1.3;opacity:.85">CDI + intérim.<br><span style="opacity:.7">Recyclage · Part 21 · IQ</span></div>
+      ${nHors?`<div id="hors-capa-pop" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:100;background:#0d1628;border:1px solid rgba(0,160,255,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:200px;max-width:min(280px,86vw);cursor:default;text-align:left" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:800;color:#00a0ff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Hors Part 145 — détail</div>
+        <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">CDI</div>
+        ${_hRow('♻️ Tech A/C Recycling',nH_recyCDI)}
+        ${_hRow('✈️ Tech Part 21',nH_p21CDI)}
+        ${_hRow('🔍 Inspecteur Qualité',nH_iqCDI)}
+        <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:7px 0 3px">Intérimaires</div>
+        ${_hRow('♻️ Intérim. recyclage',nH_recyInt)}
+        ${_hRow('✈️ Intérim. Part 21',nH_p21Int)}
+        ${_hRow('🔍 Intérim. IQ',nH_iqInt)}
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:#00a0ff">${nHors}</strong></div>
+        <div style="font-size:9.5px;color:var(--t4);margin-top:7px;line-height:1.5">Personnel hors production Part 145. Ils alimentent les dispos Recyclage / Part 21 / IQ, pas le ratio ni la capacité chantiers.</div>
+      </div>`:''}
     </div>
     <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.2);border-radius:12px;padding:12px;text-align:center">
       <div style="font-size:28px;font-weight:900;color:#34c759">${semOK}</div>
       <div style="font-size:10px;color:var(--t4);margin-top:2px">Semaines OK</div>
     </div>
-    <div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.2);border-radius:12px;padding:12px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:#ff4d6d">${semManque}</div>
+    <div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.2);border-radius:12px;padding:12px;text-align:center;position:relative;cursor:${semManque?'pointer':'default'}" ${semManque?'onclick="_toggleManque(event)"':''}>
+      <div style="font-size:28px;font-weight:900;color:#ff4d6d">${semManque}${semManque?' <span style="font-size:11px;color:var(--t4)">▾</span>':''}</div>
       <div style="font-size:10px;color:var(--t4);margin-top:2px">Semaines en manque</div>
+      ${semManque?`<div id="manque-pop" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:100;background:#0d1628;border:1px solid rgba(255,77,109,0.3);border-radius:12px;padding:12px 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);min-width:200px;max-width:min(280px,86vw);max-height:300px;overflow:auto;cursor:default;text-align:left" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:800;color:#ff4d6d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Semaines en manque (${semManque})</div>
+        ${_mqRows}
+        <div style="font-size:9.5px;color:var(--t4);margin-top:8px;line-height:1.5">Numéro de semaine · date du lundi · écart (dispo − besoin). Écart négatif = techniciens manquants.</div>
+      </div>`:''}
     </div>
   </div>
+  ${synthLine}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;overflow-x:auto">
     <div style="border-right:1px solid rgba(255,255,255,0.06)">
       <div style="padding:9px 12px;font-size:11px;font-weight:700;color:#60c8ff;border-bottom:1px solid rgba(255,255,255,0.06)">📅 Semaine par semaine</div>
@@ -16995,9 +17352,10 @@ function renderChargeCapaTable(year){
   ${buildBesoinEditTable(year,weeks)}`;
   // Positionner la barre rouge "aujourd'hui" et restaurer le scroll mémorisé
   setTimeout(_positionBesoinTodayBar,30);
-  // Centrer automatiquement les tableaux sur la semaine / le mois en cours
+  // Centrer automatiquement les tableaux sur la semaine sélectionnée (ou en cours)
   setTimeout(()=>{
-    const sw=document.getElementById('cc-week-scroll'), rw=document.getElementById('cc-curweek');
+    const sw=document.getElementById('cc-week-scroll');
+    const rw=sw?(sw.querySelector('[data-selrow]')||document.getElementById('cc-curweek')):null;
     if(sw&&rw) sw.scrollTop=Math.max(0,rw.offsetTop-90);
     const sm=document.getElementById('cc-month-scroll'), rm=document.getElementById('cc-curmonth');
     if(sm&&rm) sm.scrollTop=Math.max(0,rm.offsetTop-90);
@@ -17055,7 +17413,7 @@ function _stockBesoinSemaine(mon){
 function _airbusBesoinSemaine(mon){
   const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
   const c=S.airbus?.charge?.[wk]||{};
-  return (parseInt(c.part21)||0)+(parseInt(c.iq)||0);
+  return (parseInt(c.part21)||0);  /* IQ improductif, hors besoin productif Part 21 */
 }
 // Besoin structure = nb de personnes distinctes affectées à STRUCT sur la semaine (demi-journées travail)
 function _structBesoinSemaine(mon){
@@ -17106,6 +17464,69 @@ function _besoinEditCell(ovKey,theo,d,f,mon,isCur){
       style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:${bgColor};border:1px solid ${brdColor};color:${txtColor}">
   </td>`;
 }
+// ── Helpers pour la ligne TOTAL + taux de charge par périmètre ──
+// Couleur du taux : vert <96%, orange 96-105%, rouge >105%
+function _tauxColor(pct){
+  if(pct<=96) return {bg:'rgba(52,199,89,0.18)',bd:'rgba(52,199,89,0.5)',txt:'#4ade80'};
+  if(pct<=105) return {bg:'rgba(255,159,64,0.18)',bd:'rgba(255,159,64,0.55)',txt:'#ffb45c'};
+  return {bg:'rgba(255,77,109,0.20)',bd:'rgba(255,77,109,0.6)',txt:'#ff6b85'};
+}
+// Besoin Part 145 d'une semaine (chantiers + stockage + structure), overrides prioritaires
+function _besoinP145Semaine(mon){
+  const wEnd=addD(mon,6);
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  let tot=0;
+  S.chantiers.filter(c=>['encours','futur'].includes(c.statut)).forEach(c=>{
+    const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;
+    const ov=S.besoinOverrides?.[`${c.id}_${wk}`];
+    const hasOv=ov!==undefined&&ov!==null&&ov!=='';
+    const dansP=(!d||d<=wEnd)&&(!f||f>=mon);
+    if(dansP) tot+=hasOv?(parseInt(ov)||0):(c.ressources?.technicien||0);
+    else if(hasOv) tot+=parseInt(ov)||0;   // démarrage anticipé / prolongation
+  });
+  tot+=_stockBesoinSemaine(mon);
+  tot+=_structBesoinSemaine(mon);
+  return tot;
+}
+// Besoin recyclage d'une semaine (somme des avions), overrides prioritaires
+function _besoinRecySemaine(mon){
+  const wEnd=addD(mon,6);
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`;
+  let tot=0;
+  (S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn).forEach(av=>{
+    const ov=S.besoinOverrides?.[`REC_${av.id}_${wk}`];
+    const hasOv=ov!==undefined&&ov!==null&&ov!=='';
+    const d=(av.debutChantier||av.entree)?parseLocal(av.debutChantier||av.entree):null;
+    const f=(av.finChantier||av.finPrev)?parseLocal(av.finChantier||av.finPrev):null;
+    const dansP=(!d||d<=wEnd)&&(!f||f>=mon);
+    if(dansP) tot+=hasOv?(parseInt(ov)||0):_recBesoinAvionSemaine(av,mon);
+    else if(hasOv) tot+=parseInt(ov)||0;
+  });
+  return tot;
+}
+// Construit la ligne TOTAL + taux d'un périmètre pour toutes les semaines
+function _buildTotalRow(label,color,weeks,isCurrentWeek,besoinFn,dispoFn){
+  const cells=weeks.map(mon=>{
+    const isCur=isCurrentWeek(mon);
+    const bes=besoinFn(mon);
+    const disp=dispoFn(mon);
+    const curB=isCur?'border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d':'';
+    if(bes<=0 && disp<=0) return `<td style="padding:3px;text-align:center;${curB}"><span style="color:#3a4560;font-size:11px">—</span></td>`;
+    const pct=disp>0?Math.round((bes/disp)*100):(bes>0?999:0);
+    const c=_tauxColor(pct);
+    const pctTxt=disp>0?pct+'%':'∞';
+    return `<td style="padding:3px;text-align:center;${curB}" title="Besoin ${bes} · Dispo ${disp} → charge ${pctTxt}">
+      <div style="font-size:13px;font-weight:900;color:#e6eefc;line-height:1.1">${bes}</div>
+      <div style="margin-top:2px;font-size:9px;font-weight:800;color:${c.txt};background:${c.bg};border:1px solid ${c.bd};border-radius:5px;padding:1px 3px">${pctTxt}</div>
+    </td>`;
+  }).join('');
+  return `<tr style="background:rgba(255,255,255,0.03);border-top:1px solid ${color}55;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:linear-gradient(0deg,${color}1f,${color}1f),#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-left:3px solid ${color}">
+      <div style="font-size:11px;font-weight:900;color:${color}">Σ ${label}</div>
+      <div style="font-size:8.5px;color:#8090a8">besoin · taux de charge</div>
+    </td>${cells}
+  </tr>`;
+}
 function buildBesoinEditTable(year,weeks){
   const today=new Date(); today.setHours(12,0,0,0);
   const todayMon=getMon(today);
@@ -17134,7 +17555,7 @@ function buildBesoinEditTable(year,weeks){
   years.sort((a,b)=>a-b);
   const yearOptions=years.map(y=>`<option value="${y}"${y===besoinYear?' selected':''}>${y}</option>`).join('');
 
-  const thS='padding:6px 8px;background:rgba(255,255,255,0.06);font-size:9px;font-weight:700;color:#a0b8d8;text-transform:uppercase;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap';
+  const thS='padding:8px 8px;background:#0a1120;font-size:9px;font-weight:800;color:#bcd0ea;text-transform:uppercase;text-align:center;border-bottom:2px solid rgba(0,210,255,0.45);box-shadow:0 4px 10px rgba(0,0,0,0.55);white-space:nowrap';
 
   // En-tête : semaines (semaine en cours fortement surlignée)
   let todayColIndex=-1;
@@ -17142,9 +17563,9 @@ function buildBesoinEditTable(year,weeks){
     const isCur=isCurrentWeek(mon);
     if(isCur) todayColIndex=idx;
     const curStyle=isCur
-      ? 'color:#fff;background:rgba(255,77,109,0.30);font-size:13px;font-weight:900;border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d'
+      ? 'color:#fff;background:#5a1524;font-size:13px;font-weight:900;border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d;box-shadow:0 4px 12px rgba(255,77,109,0.4)'
       : '';
-    return`<th data-today="${isCur?'1':'0'}" style="${thS};${curStyle}">${isCur?'📍 ':''}S${wkN(mon)}<br><span style="font-weight:${isCur?'700':'400'};font-size:${isCur?'9px':'8px'};color:${isCur?'#ffccd5':'inherit'}">${mon.getDate()}/${mon.getMonth()+1}</span></th>`;
+    return`<th data-today="${isCur?'1':'0'}" style="${thS};position:sticky;top:0;z-index:4;${curStyle}">${isCur?'📍 ':''}S${wkN(mon)}<br><span style="font-weight:${isCur?'700':'400'};font-size:${isCur?'9px':'8px'};color:${isCur?'#ffccd5':'inherit'}">${mon.getDate()}/${mon.getMonth()+1}</span></th>`;
   }).join('');
 
   // Lignes : un chantier par ligne
@@ -17211,13 +17632,13 @@ function buildBesoinEditTable(year,weeks){
     const ovKey=`STO_${mon.getFullYear()}-S${wkN(mon)}`;
     return _besoinEditCell(ovKey,_stockBesoinSemaine(mon),null,null,mon,isCur);
   }).join('');
-  const stockSep=`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(130,177,255,0.25);font-size:10px;font-weight:800;color:#82b1ff;letter-spacing:.5px">📦 STOCKAGE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(130,177,255,0.25)"></td>').join('')}</tr>`;
+  const stockSep=`<tr><td style="padding:5px 10px;position:sticky;left:0;background:#10182c;z-index:2;border-right:1px solid rgba(255,255,255,0.08);border-top:2px solid rgba(130,177,255,0.25);font-size:10px;font-weight:800;color:#82b1ff;letter-spacing:.5px">🅿️ STOCKAGE</td>${relevantWeeks.map(()=>'<td style="background:#10182c;border-top:2px solid rgba(130,177,255,0.25)"></td>').join('')}</tr>`;
   const stockRow=`<tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(130,177,255,0.04)">
     <td style="padding:6px 10px;white-space:nowrap;position:sticky;left:0;background:#0d1628;z-index:2;border-right:1px solid rgba(255,255,255,0.08)">
       <div style="display:flex;align-items:center;gap:6px">
         <span style="width:3px;height:24px;border-radius:2px;background:#82b1ff;display:inline-block"></span>
         <div>
-          <div style="font-size:12px;font-weight:800;color:#bcd4ff">📦 Stockage</div>
+          <div style="font-size:12px;font-weight:800;color:#bcd4ff">🅿️ Stockage</div>
           <div style="font-size:9px;color:#8090a8">Activité stockage · MH → tech.</div>
         </div>
       </div>
@@ -17237,7 +17658,7 @@ function buildBesoinEditTable(year,weeks){
         <span style="width:3px;height:24px;border-radius:2px;background:#00a0ff;display:inline-block"></span>
         <div>
           <div style="font-size:12px;font-weight:800;color:#a0d8ff">✈️ Airbus Part 21</div>
-          <div style="font-size:9px;color:#8090a8">Part 21 + IQ · techniciens</div>
+          <div style="font-size:9px;color:#8090a8">Techniciens P21 · hors IQ (improductif)</div>
         </div>
       </div>
     </td>${airbusCells}
@@ -17262,6 +17683,42 @@ function buildBesoinEditTable(year,weeks){
     </td>${structCells}
   </tr>`;
 
+  // ── Bandeaux de SECTION par périmètre étanche + lignes TOTAL ──
+  const _secBanner=(icon,txt,color)=>`<tr><td colspan="${relevantWeeks.length+1}" style="padding:8px 12px;position:sticky;left:0;background:linear-gradient(90deg,${color}22,transparent);border-top:2px solid ${color};border-bottom:1px solid ${color}44;font-size:11px;font-weight:900;color:${color};letter-spacing:1px;text-transform:uppercase">${icon} ${txt}</td></tr>`;
+
+  const dispoP145Fn=mon=>{
+    const wEnd=addD(mon,4);
+    let cap=0;
+    S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&!_isHorsP145(x)&&x.actif!==false).forEach(emp=>{
+      if(!_presentSemaine(emp,mon,wEnd)) return;
+      let j=0;
+      for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ const e=S.planning[`${emp.id}_${ds}_${h}`]; const t=e?e.type:'travail'; if(!['conge','maladie','formation','absence','deplacement','ferie'].includes(t)) j+=0.5; }); }
+      cap+=j/5;
+    });
+    return Math.round(cap);
+  };
+  const dispoP21Fn=mon=>getAirbusDispoWeek(mon).part21;
+  const dispoRecyFn=mon=>getRecyDispoWeek(mon);
+
+  const secP145=_secBanner('🔧','Part 145 — Production','#6effc4');
+  const totP145=_buildTotalRow('Part 145','#6effc4',relevantWeeks,isCurrentWeek,_besoinP145Semaine,dispoP145Fn);
+  const secP21=_secBanner('✈️','Part 21','#00a0ff');
+  const totP21=_buildTotalRow('Part 21','#00a0ff',relevantWeeks,isCurrentWeek,_airbusBesoinSemaine,dispoP21Fn);
+  const secRecy=_secBanner('♻️','Recyclage','#ff9a3c');
+  const totRecy=_buildTotalRow('Recyclage','#ff9a3c',relevantWeeks,isCurrentWeek,_besoinRecySemaine,dispoRecyFn);
+
+  let peakWk='',peakPct=0;
+  relevantWeeks.forEach(mon=>{
+    [[_besoinP145Semaine,dispoP145Fn],[_airbusBesoinSemaine,dispoP21Fn],[_besoinRecySemaine,dispoRecyFn]].forEach(([bf,df])=>{
+      const b=bf(mon),d=df(mon); if(d>0){ const p=Math.round((b/d)*100); if(p>peakPct){peakPct=p;peakWk='S'+wkN(mon);} }
+    });
+  });
+  const recapHtml=peakWk?`<span style="color:#8090a8">Pic de charge : </span><strong style="color:${_tauxColor(peakPct).txt}">${peakWk} à ${peakPct}%</strong>`:'';
+
+  // Sélecteur de mois pour navigation rapide
+  const MOS_SHORT=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const monthBtns=MOS_SHORT.map((m,i)=>`<button onclick="_besoinGotoMonth(${i})" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#a0b0c8;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">${m}</button>`).join('');
+
   return`
   <div style="margin-top:8px;border-top:2px solid rgba(255,208,96,0.2)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;cursor:pointer" onclick="document.getElementById('besoinEditBody').style.display=document.getElementById('besoinEditBody').style.display==='none'?'block':'none';this.querySelector('.chev').textContent=document.getElementById('besoinEditBody').style.display==='none'?'▸':'▾'">
@@ -17273,14 +17730,25 @@ function buildBesoinEditTable(year,weeks){
       </div>
     </div>
     <div id="besoinEditBody" style="display:block">
-      <div style="padding:0 14px 10px;font-size:10px;color:#8090a8;line-height:1.7">Modifie une valeur pour ajuster le besoin d'un chantier sur une semaine précise. Cases <span style="color:#ffd060;font-weight:700">jaunes</span> = ajustées manuellement · bouton <span style="color:#a0b0c8;font-weight:700">+</span> = ajouter une semaine hors période théorique (<span style="color:#8fd0ff;font-weight:700">⏪ démarrage anticipé</span> avant le début, <span style="color:#ff8fa3;font-weight:700">⏩ prolongation</span> après la fin) · colonne <span style="color:#ff4d6d;font-weight:700">📍 surlignée rouge</span> = semaine en cours. Vider une case hors période la retire. Le besoin théorique reste inchangé.</div>
-      <div id="besoinEditScroll" style="overflow-x:auto;padding:0 6px 8px;position:relative" onscroll="window._besoinScrollX=this.scrollLeft">
-        <table id="besoinEditTable" style="border-collapse:collapse;min-width:max-content;position:relative">
+      <div style="padding:0 14px 6px;font-size:10px;color:#8090a8;line-height:1.7">Modifie une valeur pour ajuster le besoin d'un chantier sur une semaine précise. Cases <span style="color:#ffd060;font-weight:700">jaunes</span> = ajustées manuellement · bouton <span style="color:#a0b0c8;font-weight:700">+</span> = ajouter une semaine hors période théorique (<span style="color:#8fd0ff;font-weight:700">⏪ démarrage anticipé</span>, <span style="color:#ff8fa3;font-weight:700">⏩ prolongation</span>) · colonne <span style="color:#ff4d6d;font-weight:700">📍 rouge</span> = semaine en cours.</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 14px 8px">
+        <button onclick="_besoinGotoToday()" style="background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.35);color:#ff8fa3;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📍 Aujourd'hui</button>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">${monthBtns}</div>
+        ${recapHtml?`<div style="margin-left:auto;font-size:11px;font-weight:700">${recapHtml}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:0 14px 8px;font-size:10px;color:#8090a8">
+        <span style="font-weight:700;color:#a0b0c8">Taux de charge :</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:12px;border-radius:3px;background:rgba(52,199,89,0.18);border:1px solid rgba(52,199,89,0.5);display:inline-block"></span>≤ 96 % — OK</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:12px;border-radius:3px;background:rgba(255,159,64,0.18);border:1px solid rgba(255,159,64,0.55);display:inline-block"></span>96–105 % — au taquet</span>
+        <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:12px;border-radius:3px;background:rgba(255,77,109,0.20);border:1px solid rgba(255,77,109,0.6);display:inline-block"></span>&gt; 105 % — surcharge</span>
+      </div>
+      <div id="besoinEditScroll" style="overflow:auto;max-height:65vh;padding:0 6px 8px;position:relative" onscroll="window._besoinScrollX=this.scrollLeft">
+        <table id="besoinEditTable" style="border-collapse:separate;border-spacing:0;min-width:max-content;position:relative">
           <thead><tr>
-            <th style="${thS};text-align:left;position:sticky;left:0;background:#141d33;z-index:3">Chantier</th>
+            <th style="${thS};text-align:left;position:sticky;left:0;top:0;background:#0a1120;z-index:6;min-width:230px">Activité / Chantier</th>
             ${headWeeks}
           </tr></thead>
-          <tbody>${rows}${recSep}${recRows}${stockSep}${stockRow}${airbusSep}${airbusRow}${structSep}${structRow}</tbody>
+          <tbody>${secP145}${rows}${stockRow}${structRow}${totP145}${secP21}${airbusRow}${totP21}${secRecy}${recRows||'<tr><td style="padding:6px 12px;position:sticky;left:0;background:#0d1628;color:#8090a8;font-size:10px;font-style:italic">Aucun avion en recyclage</td>'+relevantWeeks.map(()=>'<td style="background:#0d1628"></td>').join('')+'</tr>'}${totRecy}</tbody>
         </table>
       </div>
       <div style="padding:4px 14px 12px">
@@ -17288,6 +17756,26 @@ function buildBesoinEditTable(year,weeks){
       </div>
     </div>
   </div>`;
+}
+
+// Navigation du tableau d'ajustement : aller à aujourd'hui / à un mois
+function _besoinGotoToday(){
+  const sc=document.getElementById('besoinEditScroll'); if(!sc) return;
+  const th=sc.querySelector('th[data-today="1"]');
+  if(th) sc.scrollLeft=Math.max(0,th.offsetLeft-240);
+}
+function _besoinGotoMonth(m){
+  const sc=document.getElementById('besoinEditScroll'); if(!sc) return;
+  const y=window._besoinEditYear||new Date().getFullYear();
+  const target=getMon(new Date(y,m,1));
+  const ths=[...sc.querySelectorAll('thead th')];
+  // colonne 0 = libellé ; les semaines commencent à l'index 1
+  let best=null,bestD=Infinity;
+  const weeks=[];
+  let w=getMon(new Date(y,0,1)); const dec=new Date(y,11,31);
+  while(w<=dec){ weeks.push(new Date(w)); w=addD(w,7); }
+  weeks.forEach((wk,i)=>{ const diff=Math.abs(wk.getTime()-target.getTime()); if(diff<bestD){bestD=diff;best=i;} });
+  if(best!==null && ths[best+1]) sc.scrollLeft=Math.max(0,ths[best+1].offsetLeft-240);
 }
 
 // Enregistrer un ajustement (override). Si = théorique → on supprime l'override.
@@ -17548,6 +18036,7 @@ function pdfBase(title,subtitle,orientation,content){
 function exportGanttPDF(){
   const d=document.getElementById('pp-debut'), f=document.getElementById('pp-fin');
   if(d&&!d.value){ setProgPdfRange(13); }
+  if(typeof _setPpPerim==='function') _setPpPerim('all');   // défaut : tous les périmètres
   openM('m-progpdf');
 }
 function setProgPdfRange(nbWeeks){
@@ -17604,6 +18093,74 @@ function _ppCapa(mon){
 }
 
 // Données communes aux exports (PDF/Excel) : semaines, chantiers retenus, capacité
+// Capacité Part 145 avec filtre de présence (dates embauche/fin) — cohérent avec l'écran
+function _ppCapaP145(mon){
+  const wEnd=addD(mon,4);
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
+  let j=0;
+  techs.forEach(emp=>{
+    if(typeof _presentSemaine==='function' && !_presentSemaine(emp,mon,wEnd)) return;
+    [0,1,2,3,4].forEach(i=>{
+      const ds=fmt(addD(mon,i)); if(isHol(ds)) return;
+      ['AM','PM'].forEach(h=>{ const e=S.planning[`${emp.id}_${ds}_${h}`]; const t=e?e.type:'travail'; if(!ABSENT.has(t)) j+=0.5; });
+    });
+  });
+  return Math.round(j/5*10)/10;
+}
+
+// Prépare les données d'un périmètre pour l'export (lignes détaillées + dispo par semaine)
+// perim : 'p145' | 'p21' | 'recy'
+function _ppPerimData(perim, weeks){
+  const rows=[];   // {label, color, vals:[...]}
+  let dispoFn, besoinTotalFn, title, accent;
+  if(perim==='p145'){
+    title='Part 145 — Production'; accent='#6effc4';
+    // Chantiers
+    S.chantiers.filter(c=>['encours','futur','prevision'].includes(c.statut)).forEach(c=>{
+      const vals=weeks.map(m=>_ppBesoin(c,m));
+      if(vals.some(v=>v>0)) rows.push({label:c.nom+(c.statut==='prevision'?' (prév.)':''),color:c.color||'#2979ff',vals});
+    });
+    // Stockage
+    const stoVals=weeks.map(m=>{ const wk=`${m.getFullYear()}-S${wkN(m)}`; const ov=S.besoinOverrides?.[`STO_${wk}`]; return (ov!=null&&ov!=='')?(parseInt(ov)||0):_stockBesoinSemaine(m); });
+    if(stoVals.some(v=>v>0)) rows.push({label:'🅿️ Stockage',color:'#82b1ff',vals:stoVals});
+    // Structure
+    const strVals=weeks.map(m=>{ const wk=`${m.getFullYear()}-S${wkN(m)}`; const ov=S.besoinOverrides?.[`STRUCT_${wk}`]; return (ov!=null&&ov!=='')?(parseInt(ov)||0):_structBesoinSemaine(m); });
+    if(strVals.some(v=>v>0)) rows.push({label:'🔩 Structure',color:'#6d8fb0',vals:strVals});
+    dispoFn=_ppCapaP145;
+  } else if(perim==='p21'){
+    title='Part 21'; accent='#00a0ff';
+    const vals=weeks.map(m=>_airbusBesoinSemaine(m));
+    if(vals.some(v=>v>0)) rows.push({label:'✈️ Techniciens Part 21',color:'#00a0ff',vals});
+    dispoFn=m=>getAirbusDispoWeek(m).part21;
+  } else if(perim==='recy'){
+    title='Recyclage'; accent='#ff9a3c';
+    (S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn).forEach(av=>{
+      const vals=weeks.map(m=>{ const wk=`${m.getFullYear()}-S${wkN(m)}`; const ov=S.besoinOverrides?.[`REC_${av.id}_${wk}`]; const wEnd=addD(m,6); const d=(av.debutChantier||av.entree)?parseLocal(av.debutChantier||av.entree):null; const f=(av.finChantier||av.finPrev)?parseLocal(av.finChantier||av.finPrev):null; const dansP=(!d||d<=wEnd)&&(!f||f>=m); if(ov!=null&&ov!=='') return parseInt(ov)||0; return dansP?_recBesoinAvionSemaine(av,m):0; });
+      if(vals.some(v=>v>0)) rows.push({label:`♻️ ${av.type||'A/C'} — MSN ${av.msn}`,color:av.color||'#ff9a3c',vals});
+    });
+    dispoFn=getRecyDispoWeek;
+  }
+  const dispo=weeks.map(m=>dispoFn(m));
+  const besoinTot=weeks.map((m,i)=>rows.reduce((s,r)=>s+(r.vals[i]||0),0));
+  return {perim,title,accent,rows,dispo,besoinTot};
+}
+
+// Sélecteur : quels périmètres exporter selon le choix utilisateur
+function _ppPerimList(){
+  const sel=window._ppPerimSel||'all';
+  if(sel==='all') return ['p145','p21','recy'];
+  return [sel];
+}
+function _setPpPerim(p){
+  window._ppPerimSel=p;
+  document.querySelectorAll('.pp-perim-btn').forEach(b=>{
+    const on=b.dataset.p===p;
+    b.style.background=on?'rgba(0,210,255,0.12)':'transparent';
+    b.style.borderColor=on?'rgba(0,210,255,0.4)':'rgba(255,255,255,0.12)';
+    b.style.color=on?'var(--cyan)':'var(--t3)';
+  });
+}
 function _ppData(){
   const weeks=_ppWeeks();
   if(!weeks.length) return null;
@@ -17618,7 +18175,9 @@ function _ppData(){
 function runProgXls(){
   const D=_ppData();
   if(!D){ toast('Période invalide'); return; }
-  if(!D.rows.length){ toast('Aucun chantier avec besoin sur cette période'); return; }
+  // Vérifier qu'au moins un périmètre sélectionné a des données
+  const perimData=_ppPerimList().map(p=>_ppPerimData(p,D.weeks)).filter(pd=>pd.rows.length>0);
+  if(!perimData.length){ toast('Aucun besoin sur cette période pour le périmètre choisi'); return; }
   toast('⏳ Génération de l\'export coloré…');
   _loadExcelJS(async()=>{
     if(!window.ExcelJS){ toast('Export coloré indisponible (connexion requise une fois)'); return; }
@@ -17652,13 +18211,19 @@ async function _buildProgXls(D){
   st.value=`Site LFBF · ${nW} semaine(s) · ${rows.length} chantier(s) · les cases bleues sont modifiables : les totaux et écarts se recalculent`;
   st.font={italic:true,size:9,color:{argb:'FF8A93A5'}};
 
-  // ── Section 1 ──
-  const s1=ws.getRow(3); s1.getCell(1).value='1 · Besoin en personnel (par chantier × semaine)';
-  s1.getCell(1).font={bold:true,size:11,color:{argb:'FF1A2440'}};
+  // ── SECTION 1 : Besoin & capacité par périmètre étanche ──
+  const perims=_ppPerimList();
+  const perimData=perims.map(p=>_ppPerimData(p,weeks)).filter(pd=>pd.rows.length>0);
 
-  const R_HEAD=4;
+  let curRow=3;
+  ws.getRow(curRow).getCell(1).value='1 · Besoin en personnel & charge (par périmètre)';
+  ws.getRow(curRow).getCell(1).font={bold:true,size:11,color:{argb:'FF1A2440'}};
+  curRow++;
+
+  // En-tête des semaines (commun)
+  const R_HEAD=curRow;
   const head=ws.getRow(R_HEAD);
-  head.getCell(1).value='Chantier';
+  head.getCell(1).value='Activité';
   weeks.forEach((m,i)=>{ head.getCell(2+i).value=`S${wkN(m)}\n${m.getDate()}/${m.getMonth()+1}`; });
   head.height=28;
   head.eachCell((c,i)=>{
@@ -17668,80 +18233,78 @@ async function _buildProgXls(D){
     c.alignment={horizontal:i===1?'left':'center',vertical:'middle',wrapText:true,indent:i===1?1:0};
     c.border={bottom:{style:'medium',color:{argb:'FF00D2FF'}}};
   });
+  curRow++;
 
-  // ── Lignes chantiers (valeurs modifiables) ──
-  const R0=R_HEAD+1;
-  rows.forEach((r,ri)=>{
-    const row=ws.getRow(R0+ri), c=r.c, col=colOf(c);
-    const nm=row.getCell(1);
-    nm.value=`${c.nom}${c.statut==='prevision'?' (prév.)':''}`;
-    nm.font={bold:true,size:9,color:{argb:'FF14203A'}};
-    nm.alignment={vertical:'middle',indent:1};
-    nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(col)}};
-    nm.font={bold:true,size:9,color:{argb:txtOn(col)}};
-    r.vals.forEach((v,i)=>{
-      const cell=row.getCell(2+i);
-      cell.value=v||null;                                   // vide si aucun besoin
-      cell.numFmt='0';
-      cell.alignment={horizontal:'center',vertical:'middle'};
-      cell.font={size:9,bold:!!v,color:{argb:'FF14203A'}};
-      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};   // bleu pâle = saisissable
-      cell.border={right:{style:'hair',color:{argb:'FFDFE3EC'}},bottom:{style:'hair',color:{argb:'FFDFE3EC'}}};
+  const chargeRows=[];   // pour la mise en forme conditionnelle des taux
+
+  perimData.forEach(pd=>{
+    // Bandeau de section
+    const bnd=ws.getRow(curRow);
+    ws.mergeCells(curRow,1,curRow,1+nW);
+    bnd.getCell(1).value=`${pd.title}`;
+    bnd.getCell(1).font={bold:true,size:10,color:{argb:argb(pd.accent)}};
+    bnd.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1628'}};
+    bnd.getCell(1).alignment={vertical:'middle',indent:1};
+    curRow++;
+
+    const rowStart=curRow;
+    pd.rows.forEach(r=>{
+      const row=ws.getRow(curRow);
+      const nm=row.getCell(1);
+      nm.value=r.label;
+      nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(r.color)}};
+      nm.font={bold:true,size:9,color:{argb:txtOn(r.color)}};
+      nm.alignment={vertical:'middle',indent:1};
+      r.vals.forEach((v,i)=>{
+        const cell=row.getCell(2+i);
+        cell.value=v||null; cell.numFmt='0';
+        cell.alignment={horizontal:'center',vertical:'middle'};
+        cell.font={size:9,bold:!!v,color:{argb:'FF14203A'}};
+        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};
+        cell.border={right:{style:'hair',color:{argb:'FFDFE3EC'}},bottom:{style:'hair',color:{argb:'FFDFE3EC'}}};
+      });
+      curRow++;
     });
+    const rowEnd=curRow-1;
+
+    // Besoin total (formule), Dispo, Écart, Taux de charge
+    const R_TOT=curRow, R_DIS=curRow+1, R_ECA=curRow+2, R_TAUX=curRow+3;
+    const mkL=(rIdx,label)=>{ const row=ws.getRow(rIdx); row.getCell(1).value=label; row.getCell(1).font={bold:true,size:9,color:{argb:'FF14203A'}}; row.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}}; row.getCell(1).alignment={vertical:'middle',indent:1}; return row; };
+    const rowTot=mkL(R_TOT,'Besoin total'), rowDis=mkL(R_DIS,'Dispo'), rowEca=mkL(R_ECA,'Écart'), rowTaux=mkL(R_TAUX,'Charge %');
+    weeks.forEach((m,i)=>{
+      const L=colL(2+i);
+      const cT=rowTot.getCell(2+i);
+      cT.value=rowEnd>=rowStart?{formula:`SUM(${L}${rowStart}:${L}${rowEnd})`}:0;
+      cT.numFmt='0'; cT.font={bold:true,size:9,color:{argb:'FF14203A'}}; cT.alignment={horizontal:'center'};
+      cT.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}};
+      const cD=rowDis.getCell(2+i);
+      cD.value=pd.dispo[i]; cD.numFmt='0.0'; cD.font={bold:true,size:9,color:{argb:'FF14203A'}}; cD.alignment={horizontal:'center'};
+      cD.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};
+      const cE=rowEca.getCell(2+i);
+      cE.value={formula:`${L}${R_DIS}-${L}${R_TOT}`}; cE.numFmt='+0.0;-0.0;0'; cE.font={bold:true,size:9}; cE.alignment={horizontal:'center'};
+      const cX=rowTaux.getCell(2+i);
+      cX.value={formula:`IF(${L}${R_DIS}=0,"",${L}${R_TOT}/${L}${R_DIS})`}; cX.numFmt='0%'; cX.font={bold:true,size:9}; cX.alignment={horizontal:'center'};
+    });
+    // Écart : couleur conditionnelle
+    ws.addConditionalFormatting({ ref:`B${R_ECA}:${lastC}${R_ECA}`, rules:[
+      {type:'cellIs',operator:'lessThan',formulae:['0'],priority:1,style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFC7CE'}},font:{color:{argb:'FF9C0006'},bold:true}}},
+      {type:'cellIs',operator:'greaterThanOrEqual',formulae:['0'],priority:2,style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFC6EFCE'}},font:{color:{argb:'FF1E7E34'},bold:true}}}
+    ]});
+    // Taux de charge : vert ≤96%, orange 96-105%, rouge >105% (mise en forme conditionnelle vivante)
+    ws.addConditionalFormatting({ ref:`B${R_TAUX}:${lastC}${R_TAUX}`, rules:[
+      {type:'cellIs',operator:'greaterThan',formulae:['1.05'],priority:1,style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFC7CE'}},font:{color:{argb:'FF9C0006'},bold:true}}},
+      {type:'cellIs',operator:'greaterThan',formulae:['0.96'],priority:2,style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFE0B3'}},font:{color:{argb:'FF9C6500'},bold:true}}},
+      {type:'cellIs',operator:'lessThanOrEqual',formulae:['0.96'],priority:3,style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFC6EFCE'}},font:{color:{argb:'FF1E7E34'},bold:true}}}
+    ]});
+    curRow=R_TAUX+2;   // espace avant le périmètre suivant
   });
 
-  // ── Totaux (FORMULES vivantes) ──
-  const R_TOT=R0+rows.length, R_DIS=R_TOT+1, R_ECA=R_DIS+1;
-  const mk=(rIdx,label,fill)=>{
-    const row=ws.getRow(rIdx);
-    row.getCell(1).value=label;
-    row.getCell(1).font={bold:true,size:9,color:{argb:'FF14203A'}};
-    row.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:fill}};
-    row.getCell(1).alignment={vertical:'middle',indent:1};
-    return row;
-  };
-  const rowTot=mk(R_TOT,'Besoin total','FFDDE6F5');
-  const rowDis=mk(R_DIS,'Dispo (techniciens)','FFDDE6F5');
-  const rowEca=mk(R_ECA,'Écart (Dispo − Besoin)','FFDDE6F5');
-  weeks.forEach((m,i)=>{
-    const L=colL(2+i);
-    const cT=rowTot.getCell(2+i);
-    cT.value={formula:`SUM(${L}${R0}:${L}${R0+rows.length-1})`};   // se recalcule si tu changes un besoin
-    cT.numFmt='0'; cT.font={bold:true,size:9,color:{argb:'FF14203A'}};
-    cT.alignment={horizontal:'center'};
-    cT.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDDE6F5'}};
-
-    const cD=rowDis.getCell(2+i);
-    cD.value=capa[i];                                              // modifiable
-    cD.numFmt='0.0'; cD.font={bold:true,size:9,color:{argb:'FF14203A'}};
-    cD.alignment={horizontal:'center'};
-    cD.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FE'}};
-
-    const cE=rowEca.getCell(2+i);
-    cE.value={formula:`${L}${R_DIS}-${L}${R_TOT}`};                // se recalcule si besoin OU dispo change
-    cE.numFmt='+0.0;-0.0;0'; cE.font={bold:true,size:9};
-    cE.alignment={horizontal:'center'};
-  });
-
-  // ── Mise en forme CONDITIONNELLE : la couleur suit la valeur, en direct ──
-  ws.addConditionalFormatting({
-    ref:`B${R_ECA}:${lastC}${R_ECA}`,
-    rules:[
-      {type:'cellIs',operator:'lessThan',formulae:['0'],priority:1,
-       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFC7CE'}},font:{color:{argb:'FF9C0006'},bold:true}}},
-      {type:'cellIs',operator:'greaterThan',formulae:['0'],priority:2,
-       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFC6EFCE'}},font:{color:{argb:'FF1E7E34'},bold:true}}},
-      {type:'cellIs',operator:'equal',formulae:['0'],priority:3,
-       style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFFFEB9C'}},font:{color:{argb:'FF9C6500'},bold:true}}}
-    ]
-  });
-  // Barres de données sur le besoin total
-  ws.addConditionalFormatting({
-    ref:`B${R_TOT}:${lastC}${R_TOT}`,
-    rules:[{type:'dataBar',cfvo:[{type:'min'},{type:'max'}],color:{argb:'FF2979FF'},priority:4}]
-  });
+  // Pour la Section 2 : Gantt des chantiers, uniquement si Part 145 exporté
+  const R_ECA=curRow-2;
+  const showGantt=perims.includes('p145') && rows.length>0;
 
   // ── Section 2 : programme des chantiers (bandes colorées, mêmes colonnes) ──
+  if(showGantt){
   const R_S2=R_ECA+2;
   ws.getRow(R_S2).getCell(1).value='2 · Programme des chantiers';
   ws.getRow(R_S2).getCell(1).font={bold:true,size:11,color:{argb:'FF1A2440'}};
@@ -17779,12 +18342,14 @@ async function _buildProgXls(D){
       cell.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
     });
   });
+  } // fin if(showGantt)
 
   // Largeurs + pied
   ws.getColumn(1).width=32;
   for(let i=0;i<nW;i++) ws.getColumn(2+i).width=7;
-  const foot=ws.getRow(R_H2+2+rows.length+1);
-  foot.getCell(1).value=`Établi le ${disp(fmt(new Date()))} · Section 2 : couleur = chantier, hachuré = prévisionnel · MARDAM AeroDesk Pro`;
+  const footRow=curRow+ (showGantt? (2+rows.length+3) : 1);
+  const foot=ws.getRow(footRow);
+  foot.getCell(1).value=`Établi le ${disp(fmt(new Date()))} · Charge % : vert ≤96%, orange 96-105%, rouge >105% · Cases bleues modifiables (totaux/écarts/taux recalculés) · MARDAM AeroDesk Pro`;
   foot.getCell(1).font={italic:true,size:8,color:{argb:'FF8A93A5'}};
 
   const buf=await wb.xlsx.writeBuffer();
@@ -17800,54 +18365,52 @@ function runProgPdf(){
   const weeks=_ppWeeks();
   if(!weeks.length){ toast('Période invalide'); return; }
   const wStart=weeks[0], wEnd=addD(weeks[weeks.length-1],6);
+  const todayWk=fmt(getMon(new Date()));
 
-  // Chantiers retenus : non terminés + ayant un besoin sur la période
+  const perims=_ppPerimList();
+  const perimData=perims.map(p=>_ppPerimData(p,weeks)).filter(pd=>pd.rows.length>0);
+  if(!perimData.length){ toast('Aucun besoin sur cette période pour le périmètre choisi'); return; }
+
+  // Chantiers (pour le Gantt, section 2) — uniquement si Part 145 exporté
   const cands=S.chantiers.filter(c=>['encours','futur','prevision'].includes(c.statut));
   const rows=cands.map(c=>({c, vals:weeks.map(m=>_ppBesoin(c,m))}))
                   .filter(r=>r.vals.some(v=>v>0))
                   .sort((a,b)=>(!a.c.debut?1:!b.c.debut?-1:a.c.debut.localeCompare(b.c.debut)));
-  if(!rows.length){ toast('Aucun chantier avec besoin sur cette période'); return; }
-
-  const capa=weeks.map(m=>_ppCapa(m));
-  const tot =weeks.map((m,i)=>rows.reduce((s,r)=>s+r.vals[i],0));
-  const todayWk=fmt(getMon(new Date()));
+  const showGantt=perims.includes('p145') && rows.length>0;
 
   const AUTO=['#2979ff','#00c2a8','#7c5cff','#ff9a3c','#ff5c8a','#00a0ff','#8bc34a','#00bcd4','#ffb300','#9c27b0'];
   const colOf=c=>{ if(c.color) return c.color; const s=String(c.id||c.nom||''); let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return AUTO[h%AUTO.length]; };
   const txtOn=hex=>{const x=(hex||'').replace('#','');if(x.length<6)return '#fff';const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'#0b1020':'#ffffff';};
   const msnOf=c=>{ const m=(c.msn||'').trim(); if(m) return m; const g=(c.nom||'').match(/MSN\s*([A-Z0-9-]+)/i); return g?g[1]:(c.nom||'—'); };
+  // Couleur du taux de charge (PDF figé)
+  const tauxCol=pct=>pct>105?{bg:'#fdeaea',fg:'#a32d2d'}:pct>96?{bg:'#fff2e0',fg:'#9c6500'}:{bg:'#eaf7ee',fg:'#27500a'};
 
   const thWk=weeks.map(m=>{
     const cur=fmt(m)===todayWk;
     return `<th style="min-width:34px;${cur?'background:#7a1030':''}">${cur?'📍':''}S${wkN(m)}<br><span style="font-weight:400;font-size:8px">${m.getDate()}/${m.getMonth()+1}</span></th>`;
   }).join('');
 
-  // ── Tableau 1 : besoin en personnel ──
-  const bodyBesoin=rows.map(r=>{
-    const c=r.c, col=colOf(c);
-    const tds=r.vals.map((v,i)=>{
-      const cur=fmt(weeks[i])===todayWk;
-      return `<td style="text-align:center;font-weight:${v?'700':'400'};color:${v?'#0d1e3d':'#c8d4e4'};${cur?'background:#fff0f3;':''}">${v||'·'}</td>`;
+  // ── Tableau 1 : besoin & charge par périmètre ──
+  const perimBlocks=perimData.map(pd=>{
+    const body=pd.rows.map(r=>{
+      const tds=r.vals.map((v,i)=>{ const cur=fmt(weeks[i])===todayWk; return `<td style="text-align:center;font-weight:${v?'700':'400'};color:${v?'#0d1e3d':'#c8d4e4'};${cur?'background:#fff0f3;':''}">${v||'·'}</td>`; }).join('');
+      return `<tr><td style="border-left:3px solid ${r.color};min-width:150px"><div style="font-weight:700;font-size:10px;color:#0d1e3d">${r.label}</div></td>${tds}</tr>`;
     }).join('');
-    return `<tr>
-      <td style="border-left:3px solid ${col};min-width:150px">
-        <div style="font-weight:700;font-size:10px;color:#0d1e3d">${c.nom}${c.statut==='prevision'?' <span style="color:#8898bb;font-weight:400">(prév.)</span>':''}</div>
-        ${c.client?`<div style="font-size:8px;color:#8898bb">${c.client} · théo. ${(c.ressources?.technicien)||0}T</div>`:''}
-      </td>${tds}</tr>`;
+    const rowTot=`<tr><td style="font-weight:800;background:#eef3fb">Besoin total</td>${pd.besoinTot.map(v=>`<td style="text-align:center;font-weight:800;background:#eef3fb">${v}</td>`).join('')}</tr>`;
+    const rowCapa=`<tr><td style="font-weight:800;background:#eef3fb">Dispo</td>${pd.dispo.map(v=>`<td style="text-align:center;font-weight:700;background:#eef3fb">${v}</td>`).join('')}</tr>`;
+    const rowEcart=`<tr><td style="font-weight:800;background:#eef3fb">Écart</td>${pd.dispo.map((v,i)=>{const e=Math.round((v-pd.besoinTot[i])*10)/10;const bg=e<0?'#fdeaea':'#eaf7ee',fg=e<0?'#a32d2d':'#27500a';return `<td style="text-align:center;font-weight:800;background:${bg};color:${fg}">${e>0?'+':''}${e}</td>`;}).join('')}</tr>`;
+    const rowTaux=`<tr><td style="font-weight:800;background:#eef3fb">Charge %</td>${pd.dispo.map((v,i)=>{if(v<=0)return '<td style="text-align:center;background:#eef3fb;color:#c8d4e4">—</td>';const pct=Math.round(pd.besoinTot[i]/v*100);const c=tauxCol(pct);return `<td style="text-align:center;font-weight:800;background:${c.bg};color:${c.fg}">${pct}%</td>`;}).join('')}</tr>`;
+    return `<div style="margin-bottom:10px">
+      <div style="font-weight:800;font-size:11px;color:${pd.accent};border-left:4px solid ${pd.accent};padding-left:8px;margin-bottom:4px">${pd.title}</div>
+      <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Activité</th>${thWk}</tr></thead>
+      <tbody>${body}${rowTot}${rowCapa}${rowEcart}${rowTaux}</tbody></table>
+    </div>`;
   }).join('');
-  const rowTot=`<tr><td style="font-weight:800;background:#eef3fb">Besoin total</td>${tot.map(v=>`<td style="text-align:center;font-weight:800;background:#eef3fb">${v}</td>`).join('')}</tr>`;
-  const rowCapa=`<tr><td style="font-weight:800;background:#eef3fb">Dispo (techs)</td>${capa.map(v=>`<td style="text-align:center;font-weight:700;background:#eef3fb">${v}</td>`).join('')}</tr>`;
-  const rowEcart=`<tr><td style="font-weight:800;background:#eef3fb">Écart</td>${capa.map((v,i)=>{
-    const e=Math.round((v-tot[i])*10)/10;
-    const bg=e<0?'#fdeaea':'#eaf7ee', fg=e<0?'#a32d2d':'#27500a';
-    return `<td style="text-align:center;font-weight:800;background:${bg};color:${fg}">${e>0?'+':''}${e}</td>`;
-  }).join('')}</tr>`;
 
   const t1=`<div class="section">
-    <div class="section-title">1 · Besoin en personnel (par chantier × semaine)</div>
-    <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Chantier</th>${thWk}</tr></thead>
-    <tbody>${bodyBesoin}${rowTot}${rowCapa}${rowEcart}</tbody></table>
-    <div style="font-size:8px;color:#8898bb;margin-top:4px">Écart = Dispo − Besoin · rouge = sous-effectif · 📍 = semaine en cours · « · » = pas de besoin</div>
+    <div class="section-title">1 · Besoin en personnel & charge (par périmètre)</div>
+    ${perimBlocks}
+    <div style="font-size:8px;color:#8898bb;margin-top:4px">Écart = Dispo − Besoin · Charge % = Besoin ÷ Dispo (<span style="color:#27500a">vert ≤96%</span>, <span style="color:#9c6500">orange 96-105%</span>, <span style="color:#a32d2d">rouge &gt;105%</span>) · 📍 = semaine en cours · « · » = pas de besoin</div>
   </div>`;
 
   // ── Tableau 2 : programme des chantiers (même période, échelle semaine) ──
@@ -17873,14 +18436,15 @@ function runProgPdf(){
         </div>
       </td></tr>`;
   }).join('');
-  const t2=`<div class="section">
+  const t2 = showGantt ? `<div class="section">
     <div class="section-title">2 · Programme des chantiers</div>
     <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Chantier</th><th style="padding:0"><div style="display:flex">${weeks.map(m=>`<div style="flex:1;text-align:center;padding:4px 0;font-size:8px">S${wkN(m)}</div>`).join('')}</div></th></tr></thead>
     <tbody>${bodyGantt}</tbody></table>
     <div style="font-size:8px;color:#8898bb;margin-top:4px">Couleur = chantier · hachuré = prévisionnel · trait rouge = aujourd'hui · ◀ ▶ = le chantier déborde de la période · terminés exclus</div>
-  </div>`;
+  </div>` : '';
 
-  const sub=`${disp(fmt(wStart))} → ${disp(fmt(wEnd))} · ${weeks.length} semaine${weeks.length>1?'s':''} · ${rows.length} chantier${rows.length>1?'s':''}`;
+  const perimLabel={all:'Tous périmètres',p145:'Part 145',p21:'Part 21',recy:'Recyclage'}[window._ppPerimSel||'all'];
+  const sub=`${disp(fmt(wStart))} → ${disp(fmt(wEnd))} · ${weeks.length} semaine${weeks.length>1?'s':''} · ${perimLabel}`;
   closeM('m-progpdf');
   openPrintView(pdfBase('Programme Activité',sub,'landscape',t1+t2), 'Programme Activité');
   toast('Export PDF ✓');
