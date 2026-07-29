@@ -6871,14 +6871,16 @@ function renderDash(){
           <span>${pctTech >= 60 ? '✅' : pctTech >= 40 ? '⚠️' : '🚨'}</span>${ratioMsg}
         </div>
       </div>`;
-  // ── Calculs pour les indicateurs de la semaine en cours ──
+  // ── Écart Part 145 de la semaine — MÊME logique que la synthèse Charge/Capacité ──
+  // Dispo : productifs Part 145 présents (dates embauche/fin), hors absences
   const _mon=getMon(new Date());
   const _wEnd=addD(_mon,6);
+  const _wEnd5=addD(_mon,4);
   const _ABSENT=new Set(['conge','maladie','formation','formation_int','absence','deplacement','ferie','we']);
   const _techs=S.personnel.filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
-  // Dispo de la semaine
   let _dispo=0;
   _techs.forEach(p=>{
+    if(typeof _presentSemaine==='function' && !_presentSemaine(p,_mon,_wEnd5)) return;  // hors effectif cette semaine
     let pres=0,tot=0;
     for(let d=0;d<5;d++){const ds=fmt(addD(_mon,d));if(isHol(ds))continue;tot++;
       const am=S.planning[`${p.id}_${ds}_AM`]||{},pm=S.planning[`${p.id}_${ds}_PM`]||{};
@@ -6887,16 +6889,8 @@ function renderDash(){
     _dispo+=tot>0?pres/tot:1;
   });
   _dispo=Math.round(_dispo*10)/10;
-  // Besoin de la semaine (chantiers + overrides)
-  const _ovWk=`${_mon.getFullYear()}-S${wkN(_mon)}`;
-  let _besoin=0;
-  S.chantiers.filter(c=>['encours','futur','termine'].includes(c.statut)).forEach(c=>{
-    const cd=c.debut?parseLocal(c.debut):null,cf=c.fin?parseLocal(c.fin):null;
-    const dansP=(!cd||cd<=_wEnd)&&(!cf||cf>=_mon);
-    const ov=S.besoinOverrides?.[`${c.id}_${_ovWk}`];const hasOv=ov!=null&&ov!=='';
-    if(dansP)_besoin+=hasOv?parseInt(ov):(c.ressources?.technicien||0);
-    else if(hasOv)_besoin+=parseInt(ov);
-  });
+  // Besoin Part 145 : chantiers EN COURS + stockage + structure (même fonction que la synthèse)
+  const _besoin = (typeof _besoinP145Semaine==='function') ? _besoinP145Semaine(_mon) : 0;
   const _ecart=Math.round((_dispo-_besoin)*10)/10;
   // Personnes absentes cette semaine (au moins une demi-journée non travaillée)
   const _ABS_LBL={conge:'🏖️ Congé',maladie:'🤒 Maladie',formation:'📚 Formation',formation_int:'📚 Formation',absence:'🚫 Absence',deplacement:'✈️ Déplacement'};
@@ -6979,7 +6973,7 @@ function renderDash(){
     </div>`;
   document.getElementById('statsGrid').innerHTML=[
     {v:_eff.length,l:'Effectif total',c:'c-cyan',pop:_effPop},
-    {v:(_ecart>=0?'+':'')+_ecart,l:'Écart capacité/besoin (sem.)',c:ecartColor},
+    {v:(_ecart>=0?'+':'')+_ecart,l:'Écart capacité/besoin Part 145 (sem.)',c:ecartColor},
     {v:_absents,l:'Absences de la semaine',c:'c-orange',pop:_absPop,tog:'_toggleAbs'},
     {v:exp+autoExp,l:'Formations/Auto. exp.',c:'c-rose'},
     {v:_avions,l:'Avions sur site',c:'c-mint',pop:_acPop,tog:'_toggleAc'},
@@ -9475,6 +9469,9 @@ function renderAvancement(){
         if(half!=='AM'&&half!=='PM') return;
         // Comparer par string de date — inclut le jour actuel
         if(ds>todayStr) return;
+        // Réel JUSTE : ne pas compter une demi-journée où la personne est en absence
+        // (le planning est tenu à jour au quotidien, donc une case absence = pas de travail réalisé)
+        if(entry.type && ABSENT.has(entry.type)) return;
         const d=parseLocal(ds); if(!d||isNaN(d)) return;
         // 2 chantiers sur la demi-journée → 3,5 h divisées (1,75 h chacun), sinon 3,5 h
         const partage = entry.chantierId && entry.chantierId2;
@@ -9525,6 +9522,33 @@ function renderAvancement(){
 
     // Effectif théorique initialement prévu sur le chantier
     const nbTechTheo = c.ressources?.technicien || 0;
+
+    // Effectif de référence pour le futur : override semaine en cours prioritaire, sinon besoin fiche
+    const _wkNow=`${getMon(today).getFullYear()}-S${wkN(getMon(today))}`;
+    const _ovNow=S.besoinOverrides?.[`${c.id}_${_wkNow}`];
+    const nbTechFutur = (_ovNow!=null&&_ovNow!=='') ? (parseInt(_ovNow)||0) : nbTechTheo;
+
+    // Vitesse réelle constatée (MH réalisées ÷ jours ouvrés écoulés)
+    const vitesseReelle = joursEcoules>0 ? mhConsommees/joursEcoules : 0;
+
+    // Projection « au rythme actuel »
+    let finRythme=null, decalRythme=null;
+    if(vitesseReelle>0 && mhRestantes>0){
+      const joursR=Math.ceil(mhRestantes/vitesseReelle);
+      finRythme=addWorkingDays(today, joursR);
+      if(c.fin) decalRythme=calcJoursOuvres(fmt(addD(today,1)), fmt(finRythme)) - joursRestants;
+    } else if(mhRestantes<=0){ finRythme='done'; }
+
+    // Projection « selon l'effectif prévu »
+    let finBesoin=null, decalBesoin=null;
+    if(nbTechFutur>0 && mhRestantes>0){
+      const joursB=Math.ceil(mhRestantes/(nbTechFutur*MH_PAR_TECH_JOUR));
+      finBesoin=addWorkingDays(today, joursB);
+      if(c.fin) decalBesoin=calcJoursOuvres(fmt(addD(today,1)), fmt(finBesoin)) - joursRestants;
+    } else if(mhRestantes<=0){ finBesoin='done'; }
+
+    // Alerte rythme inhabituel (volume MH sous-estimé ou trop d'effectif)
+    const alerteRythme = (delta>=30 && avancementTheo<70 && mhConsommees>0);
 
     // Scénario A — tenir la date prévue : nb de techs nécessaires (et à ajouter)
     const persNecessaires = joursRestants>0 ? Math.ceil(mhRestantes/(joursRestants*MH_PAR_TECH_JOUR)) : (mhRestantes>0?null:0);
@@ -9609,6 +9633,21 @@ function renderAvancement(){
         <div style="font-size:10px;color:#607090;margin-top:4px;font-style:italic">
           📐 ${joursRestants}j ouvrés restants × 7h = ${joursRestants*MH_PAR_TECH_JOUR} MH/tech dispo → <strong style="color:#00d2ff">${techTheo} tech.</strong> nécessaires pour tenir le ${disp(c.fin||'')}
         </div>
+        ${alerteRythme?`<div style="margin-top:8px;background:rgba(255,154,60,0.08);border:1px solid rgba(255,154,60,0.3);border-radius:8px;padding:7px 10px;font-size:11px;color:#ffb45c"><strong>⚠️ Rythme inhabituel</strong> — l'avancement réel (${avancementReel}%) dépasse largement le théorique (${avancementTheo}%) tôt dans le chantier. Vérifiez le volume MH (peut-être sous-estimé) ou l'effectif mobilisé.</div>`:''}
+        ${(finRythme||finBesoin)?`<div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:rgba(0,210,255,0.06);border:1px solid rgba(0,210,255,0.2);border-radius:8px;padding:8px 10px">
+            <div style="font-size:9px;color:#8090a8;text-transform:uppercase;letter-spacing:.3px">📈 Au rythme actuel</div>
+            ${finRythme==='done'?`<div style="font-size:13px;font-weight:800;color:#34c759;margin-top:3px">Terminé ✓</div>`
+              :finRythme?`<div style="font-size:14px;font-weight:900;color:#00d2ff;margin-top:2px">${disp(fmt(finRythme))}</div><div style="font-size:10px;font-weight:700;color:${decalRythme>0?'#ff9a3c':'#34c759'}">${decalRythme>0?'+'+decalRythme+'j après prévu':decalRythme<0?Math.abs(decalRythme)+'j avant prévu':'pile à la date'}</div>`
+              :`<div style="font-size:11px;color:#8090a8;margin-top:4px">pas encore de rythme mesurable</div>`}
+          </div>
+          <div style="background:rgba(255,208,96,0.06);border:1px solid rgba(255,208,96,0.2);border-radius:8px;padding:8px 10px">
+            <div style="font-size:9px;color:#8090a8;text-transform:uppercase;letter-spacing:.3px">👥 Avec ${nbTechFutur} tech. prévus</div>
+            ${finBesoin==='done'?`<div style="font-size:13px;font-weight:800;color:#34c759;margin-top:3px">Terminé ✓</div>`
+              :finBesoin?`<div style="font-size:14px;font-weight:900;color:#ffd060;margin-top:2px">${disp(fmt(finBesoin))}</div><div style="font-size:10px;font-weight:700;color:${decalBesoin>0?'#ff9a3c':'#34c759'}">${decalBesoin>0?'+'+decalBesoin+'j après prévu':decalBesoin<0?Math.abs(decalBesoin)+'j avant prévu':'pile à la date'}</div>`
+              :`<div style="font-size:11px;color:#8090a8;margin-top:4px">définir l'effectif</div>`}
+          </div>
+        </div>`:''}
         <div style="font-size:10px;color:#506070;margin-top:4px">
           👥 Comptabilisés : ${allTechs.filter(p=>{
             return Object.keys(S.planning||{}).some(k=>k.startsWith(p.id+'_')&&S.planning[k]?.chantierId===c.id);
@@ -9639,9 +9678,37 @@ function renderAvancement(){
     </div>`;
   }).join('');
 
+  // ── Vue consolidée : compteurs par statut + MH restantes globales ──
+  const MH_TECH=7;
+  let nAvance=0,nOk=0,nRetard=0,mhResteTot=0;
+  encours.forEach(c=>{
+    if(!(c.manHours>0)) return;
+    const jT=calcJoursOuvres(c.debut||fmt(today), c.fin||fmt(today));
+    const jE=c.debut?Math.max(0,calcJoursOuvres(c.debut, fmt(addD(today,-1)))):0;
+    let mh=0; const tIds=new Set(allTechs.map(p=>p.id)); const tStr=fmt(today);
+    Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; if(e.chantierId!==c.id&&e.chantierId2!==c.id)return; const pa=k.split('_'); if(pa.length<3)return; if(!tIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>tStr)return; if(e.type&&ABSENT.has(e.type))return; mh+=(e.chantierId&&e.chantierId2)?(MH_TECH/2)/2:(MH_TECH/2); });
+    const mhSupp=(Array.isArray(c.mhAjouts)?c.mhAjouts:[]).reduce((s,a)=>s+(parseFloat(a.heures)||0),0);
+    const mhTot=c.manHours+mhSupp;
+    const aR=mhTot>0?Math.min(100,Math.round(mh/mhTot*100)):0;
+    const aT=jT>0?Math.min(100,Math.round(jE/jT*100)):0;
+    const dl=aR-aT;
+    if(dl>=5)nAvance++; else if(dl<=-10)nRetard++; else nOk++;
+    mhResteTot+=Math.max(0,mhTot-mh);
+  });
+  const nTotal=nAvance+nOk+nRetard;
+  const consolidated = nTotal>0 ? `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 16px;margin-bottom:14px;background:rgba(13,22,40,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
+    <div style="font-size:13px;font-weight:800;color:#e0e8ff">${nTotal} chantier${nTotal>1?'s':''} en cours</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+      ${nAvance?`<span style="font-size:12px;font-weight:700;color:#34c759;background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.3);border-radius:99px;padding:3px 11px">✅ ${nAvance} en avance</span>`:''}
+      ${nOk?`<span style="font-size:12px;font-weight:700;color:#ffd060;background:rgba(255,208,96,0.12);border:1px solid rgba(255,208,96,0.3);border-radius:99px;padding:3px 11px">🟡 ${nOk} dans les temps</span>`:''}
+      ${nRetard?`<span style="font-size:12px;font-weight:700;color:#ff4d6d;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.3);border-radius:99px;padding:3px 11px">🚨 ${nRetard} en retard</span>`:''}
+    </div>
+    <div style="font-size:12px;color:#8090a8;width:100%;margin-top:2px">Charge globale restante : <strong style="color:#00d2ff">${Math.round(mhResteTot)} MH</strong> à réaliser tous chantiers confondus</div>
+  </div>` : '';
+
   el.innerHTML=`<div class="gc" style="margin-bottom:14px">
     <div class="gc-head"><div class="gc-title">🏗 Avancement des chantiers en cours</div></div>
-    <div style="padding:14px 18px">${cards}</div>
+    <div style="padding:14px 18px">${consolidated}${cards}</div>
   </div>`;
 }
 
@@ -10802,8 +10869,8 @@ function renderChantiers(){
   }
   const selYear=parseInt(yrSel?.value)||new Date().getFullYear();
   const _cq=(document.getElementById('chantier-search')?.value||'').toLowerCase().trim();
+  checkConflicts();      // peuple _conflictChIds avant le Gantt (pour le surlignage)
   renderRespGantt();
-  checkConflicts();
   const cols=[{k:'prevision',l:'🔮 Prévision'},{k:'futur',l:'📅 À venir'},{k:'encours',l:'🔄 En cours'},{k:'termine',l:'✅ Terminés'}];
   const totalYear=S.chantiers.filter(c=>_chantierInYear(c,selYear)&&_matchChantier(c,_cq)).length;
   const ylbl=document.getElementById('kanban-yearlbl');
@@ -11068,10 +11135,12 @@ function renderRespGantt(){
       const fullLbl=(inc?'\u26a0 ':'')+_chMsnLabel(c.id);
       const shortLbl=((inc?'\u26a0 ':'')+_chMsnShort(c.id)).replace(/"/g,'');
       const barTitle=`${c.nom} (${role}) · ${disp(c.debut||'')} → ${disp(c.fin||'')}${over?' · chevauchement':''}`;
-      return `<div onclick="editChantier('${c.id}')" title="${barTitle}"
-        style="position:absolute;top:${top}px;height:${CH_H-6}px;left:${l}%;width:${w}%;background:${col};border-radius:6px;cursor:pointer;z-index:3;box-shadow:0 2px 8px ${col}55;${over?'border-top:2px solid #ffb02e;':''}transition:opacity .15s;display:flex;align-items:center;padding:0 8px;overflow:hidden"
+      const inConflict = window._conflictChIds && window._conflictChIds.has(c.id);
+      const conflictRing = inConflict ? `box-shadow:0 0 0 2px #ff4d6d, 0 0 10px 1px rgba(255,77,109,0.7);` : `box-shadow:0 2px 8px ${col}55;`;
+      return `<div onclick="editChantier('${c.id}')" title="${barTitle}${inConflict?' · ⚠ EN CONFLIT':''}"
+        style="position:absolute;top:${top}px;height:${CH_H-6}px;left:${l}%;width:${w}%;background:${col};border-radius:6px;cursor:pointer;z-index:3;${conflictRing}${over?'border-top:2px solid #ffb02e;':''}transition:opacity .15s;display:flex;align-items:center;padding:0 8px;overflow:hidden"
         onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
-        <span class="rg-chlbl" data-short="${shortLbl}" style="font-size:11px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fullLbl}</span>
+        <span class="rg-chlbl" data-short="${shortLbl}" style="font-size:11px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inConflict?'⚠ ':''}${fullLbl}</span>
       </div>`;
     }).join('');
 
@@ -11151,13 +11220,19 @@ function checkConflicts(){
         const aD=parseLocal(a.debut), aF=parseLocal(a.fin);
         const bD=parseLocal(b.debut), bF=parseLocal(b.fin);
         if(aD<=bF&&aF>=bD){
-          const ovEnd = aF<bF?aF:bF; // fin du chevauchement
+          const ovStart = aD>bD?aD:bD;   // début du chevauchement
+          const ovEnd = aF<bF?aF:bF;      // fin du chevauchement
           if(ovEnd < today) continue; // chevauchement entièrement passé → plus utile
           const roleA=a.resp===emp.id?'Resp.':'Chef d\'équipe';
           const roleB=b.resp===emp.id?'Resp.':'Chef d\'équipe';
+          const ovJours=calcJoursOuvres(fmt(ovStart),fmt(ovEnd));
           conflicts.push({
             type:'chantier',
-            msg:`<strong style="color:#ffd060">${emp.prenom} ${emp.nom}</strong> — ${roleA} <em>${a.nom}</em> (${disp(a.debut)}→${disp(a.fin)}) chevauche ${roleB} <em>${b.nom}</em> (${disp(b.debut)}→${disp(b.fin)})`
+            empId:emp.id,
+            chIds:[a.id,b.id],
+            sortDate:ovStart,
+            imminent:ovStart<=addD(today,14),
+            msg:`<strong style="color:#ffd060">${emp.prenom} ${emp.nom}</strong> — ${roleA} <em>${a.nom}</em> (${disp(a.debut)}→${disp(a.fin)}) chevauche ${roleB} <em>${b.nom}</em> (${disp(b.debut)}→${disp(b.fin)}) · <strong style="color:#ff8fa3">${ovJours}j ouvrés en commun</strong>`
           });
         }
       }
@@ -11206,34 +11281,88 @@ function checkConflicts(){
         runs.push(run);
         runs.forEach(r=>{
           if(parseLocal(r[r.length-1]) < today) return; // absence déjà passée → ne plus alerter
+          const absDeb=parseLocal(r[0]), absFin=parseLocal(r[r.length-1]);
+          const chJours=calcJoursOuvres(c.debut,c.fin)||1;
+          const absJoursOuvres=calcJoursOuvres(fmt(absDeb),fmt(absFin))||r.length;
+          const partPct=Math.min(100,Math.round(absJoursOuvres/chJours*100));
+          const gravite = partPct>=40?'haute':partPct>=15?'moyenne':'basse';
+          const gCol = gravite==='haute'?'#ff6b85':gravite==='moyenne'?'#ffb45c':'#ffd060';
           conflicts.push({
             type:'absence',
-            msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} du ${disp(r[0])} au ${disp(r[r.length-1])} (${r.length}j) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')})`
+            empId:emp.id,
+            chIds:[c.id],
+            sortDate:absDeb,
+            sortEnd:absFin,
+            imminent:absDeb<=addD(today,14),
+            gravite,
+            msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} du ${disp(r[0])} au ${disp(r[r.length-1])} (${r.length}j) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')}) · <strong style="color:${gCol}">${absJoursOuvres}j ouvrés absents sur ${chJours} (${partPct}%)</strong>`
           });
         });
       });
     });
   });
 
-  if(!conflicts.length){el.innerHTML='';return;}
+  if(!conflicts.length){el.innerHTML=''; window._conflictChIds=new Set(); if(typeof renderRespGantt==='function'){} return;}
 
-  const c2c=conflicts.filter(c=>c.type==='chantier');
-  const c2a=conflicts.filter(c=>c.type==='absence');
+  const c2c=conflicts.filter(c=>c.type==='chantier').sort((a,b)=>a.sortDate-b.sortDate);
+  const c2a=conflicts.filter(c=>c.type==='absence').sort((a,b)=>{
+    // Gravité haute d'abord, puis date la plus proche
+    const g={haute:0,moyenne:1,basse:2};
+    if(g[a.gravite]!==g[b.gravite]) return g[a.gravite]-g[b.gravite];
+    return a.sortDate-b.sortDate;
+  });
+
+  // Mémoriser les chantiers en conflit pour surligner le Gantt
+  window._conflictChIds=new Set();
+  conflicts.forEach(c=>(c.chIds||[]).forEach(id=>window._conflictChIds.add(id)));
+
+  // Couverture : un chantier est "découvert" si son resp ET son chef sont absents en même temps
+  const absByCh={};   // chId -> [{empId, deb, fin}]
+  c2a.forEach(a=>{ const id=a.chIds[0]; (absByCh[id]=absByCh[id]||[]).push(a); });
+  const decouverts=new Set();
+  Object.entries(absByCh).forEach(([chId,list])=>{
+    const ch=S.chantiers.find(x=>x.id===chId); if(!ch||!ch.resp||!ch.chef) return;
+    // Chercher un chevauchement entre une absence du resp et une du chef
+    const respAbs=list.filter(a=>a.empId===ch.resp);
+    const chefAbs=list.filter(a=>a.empId===ch.chef);
+    respAbs.forEach(ra=>chefAbs.forEach(ca=>{
+      if(ra.sortDate<=ca.sortEnd&&ra.sortEnd>=ca.sortDate) decouverts.add(chId);
+    }));
+  });
+
+  // Boutons d'action : ouvrir le chantier + voir le planning de la personne
+  const actions=(cf)=>{
+    const btns=[];
+    (cf.chIds||[]).forEach(id=>{
+      const ch=S.chantiers.find(x=>x.id===id);
+      if(ch) btns.push(`<button onclick="event.stopPropagation();editChantier('${id}')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#cfe0f5;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap">🔧 ${(ch.nom||'').split('—')[0].trim().slice(0,16)}</button>`);
+    });
+    if(cf.empId) btns.push(`<button onclick="event.stopPropagation();_focusRespPlanning('${cf.empId}')" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap">📅 Voir planning</button>`);
+    return `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">${btns.join('')}</div>`;
+  };
 
   let html='';
   if(c2c.length){
     html+=`<div style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);border-radius:12px;padding:12px 16px;margin-bottom:8px">
       <div style="font-size:12px;font-weight:800;color:#ff4d6d;margin-bottom:8px">🚨 ${c2c.length} CONFLIT${c2c.length>1?'S':''} — Double affectation chantier</div>
-      ${c2c.map(c=>`<div style="font-size:12px;color:#ffa0b0;margin-bottom:5px;line-height:1.5">• ${c.msg}</div>`).join('')}
+      ${c2c.map(c=>`<div style="font-size:12px;color:#ffa0b0;margin-bottom:9px;line-height:1.5">${c.imminent?'<span style="background:#ff4d6d;color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-right:5px">IMMINENT</span>':''}• ${c.msg}${actions(c)}</div>`).join('')}
     </div>`;
   }
   if(c2a.length){
+    const gBadge=g=>g==='haute'?'<span style="background:#ff6b85;color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-right:5px">CRITIQUE</span>':g==='moyenne'?'<span style="background:#ffb45c;color:#3a2600;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-right:5px">MODÉRÉ</span>':'';
     html+=`<div style="background:rgba(255,208,96,0.08);border:1px solid rgba(255,208,96,0.3);border-radius:12px;padding:12px 16px">
-      <div style="font-size:12px;font-weight:800;color:#ffd060;margin-bottom:8px">⚠️ ${c2a.length} ALERTE${c2a.length>1?'S':''} — Absence pendant un chantier</div>
-      ${c2a.map(c=>`<div style="font-size:12px;color:#ffe090;margin-bottom:5px;line-height:1.5">• ${c.msg}</div>`).join('')}
+      <div style="font-size:12px;font-weight:800;color:#ffd060;margin-bottom:8px">⚠️ ${c2a.length} ALERTE${c2a.length>1?'S':''} — Absence pendant un chantier <span style="font-size:10px;font-weight:400;color:var(--t4)">(triées par gravité puis échéance)</span></div>
+      ${c2a.map(c=>{const dec=decouverts.has(c.chIds[0]);return `<div style="font-size:12px;color:#ffe090;margin-bottom:9px;line-height:1.5">${gBadge(c.gravite)}${dec?'<span style="background:#ff4d6d;color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-right:5px">CHANTIER DÉCOUVERT</span>':''}• ${c.msg}${actions(c)}</div>`;}).join('')}
     </div>`;
   }
   el.innerHTML=html;
+}
+// Focus sur le planning d'un encadrant : filtre + scroll vers le Gantt responsables
+function _focusRespPlanning(empId){
+  const sel=document.getElementById('gantt-resp-person');
+  if(sel){ sel.value=empId; if(typeof renderRespGantt==='function') renderRespGantt(); }
+  const g=document.getElementById('gantt-resp');
+  if(g&&g.scrollIntoView) g.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
 /* ═══ A/C RECYCLAGE ═══ */
@@ -17878,7 +18007,7 @@ function buildGantt(containerId, chantiers, year){
     const g=(c.nom||'').match(/MSN\s*([A-Z0-9-]+)/i);
     return g?g[1]:((c.nom||'').trim()||'—');
   };
-  const barFull = c => { const t=_avShort(c.avion||''); return msnOf(c)+(t?' · '+t:''); };
+  const barFull = c => { const t=_avShort(c.avion||''); const nt=(c.ressources?.technicien)||0; return msnOf(c)+(t?' · '+t:'')+(nt?' · '+nt+'T':''); };
 
   // Une ligne par chantier, triées par date de début
   const sorted=[...chantiers].map(c=>{
@@ -17893,33 +18022,93 @@ function buildGantt(containerId, chantiers, year){
   const rowsHtml = sorted.map(it=>{
     const c=it.c, col=barColor(c);
     const isPrev=c.statut==='prevision';
-    // Prévisionnel = hachuré · Terminé = plus pâle · Actif aujourd'hui = liseré blanc
     const bg = isPrev
       ? `repeating-linear-gradient(135deg,${col} 0 5px,${hexRgba(col,0.28)} 5px 10px)`
       : col;
     const op = c.statut==='termine' ? 0.6 : (isPrev ? 0.9 : 1);
-    const isActive = !isPrev && todayPct!=null && todayPct>=it.l && todayPct<=it.r;
+    const isActive = c.statut==='encours';   // en cours = glow lumineux (option B)
     const dr=[c.debut?disp(c.debut):'', c.fin?disp(c.fin):''].filter(Boolean).join(' → ');
     const st=STATUT_LBL[c.statut]||'';
-    const tip=`${c.nom}${st?' · '+st:''}${dr?' · '+dr:''}`;
-    const full=barFull(c), short=msnOf(c);
+    const nt=(c.ressources?.technicien)||0;
+    // Infobulle enrichie : nom · statut · client · dates · besoin théorique
+    const tipParts=[c.nom];
+    if(st) tipParts.push('Statut : '+st);
+    if(c.client) tipParts.push('Client : '+c.client);
+    if(dr) tipParts.push(dr);
+    if(nt) tipParts.push('Besoin théorique : '+nt+' tech'+(nt>1?'s':''));
+    if(c.avion) tipParts.push('Avion : '+c.avion);
+    const tip=tipParts.join('\n');
+    const full=barFull(c), short=msnOf(c)+(nt?' · '+nt+'T':'');
+    // Contour blanc épais + halo pour les chantiers en cours (bien visible)
+    const shadow=isActive
+      ? `box-shadow:0 0 0 3px #ffffff, 0 0 0 4px ${hexRgba(col,0.5)}, 0 0 12px 2px rgba(255,255,255,0.35);`
+      : `box-shadow:0 1px 4px ${hexRgba(col,0.4)};`;
 
     return `<div style="display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,0.04)">
-      <div class="gantt-label-col" style="padding:4px 12px;display:flex;align-items:center;border-right:1px solid rgba(255,255,255,0.06);gap:7px">
-        <span style="width:9px;height:9px;border-radius:2px;flex-shrink:0;background:${col};${isPrev?'opacity:.7':''}"></span>
-        <span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${tip}">${c.nom}</span>
+      <div class="gantt-label-col" style="padding:5px 12px;display:flex;align-items:center;border-right:1px solid rgba(255,255,255,0.06);gap:7px">
+        <span style="width:9px;height:9px;border-radius:2px;flex-shrink:0;background:${col};${isActive?'box-shadow:0 0 6px '+col:''};${isPrev?'opacity:.7':''}"></span>
+        <span style="font-size:11px;font-weight:700;color:var(--t1);white-space:normal;line-height:1.25;word-break:break-word" title="${tip}">${c.nom}${isActive?' <span style="color:'+col+';font-size:9px">●</span>':''}</span>
       </div>
       <div class="gantt-timeline" style="height:${ROW}px">
         <div class="gantt-grid">${gridCols}</div>
         ${weekLines}
         ${todayLine}
         <div class="pg-bar" onclick="editChantier('${c.id}')" title="${tip}"
-          style="top:${(ROW-LANE)/2}px;height:${LANE}px;left:${it.l}%;width:${Math.max(0.6,it.r-it.l)}%;background:${bg};opacity:${op};${isActive?'box-shadow:0 0 0 2px rgba(255,255,255,0.7);':`box-shadow:0 1px 4px ${hexRgba(col,0.4)};`}">
+          style="top:${(ROW-LANE)/2}px;height:${LANE}px;left:${it.l}%;width:${Math.max(0.6,it.r-it.l)}%;background:${bg};opacity:${op};${shadow}">
           <span class="pg-chlbl" data-short="${short}" style="color:${txtOn(col)}">${full}</span>
         </div>
       </div>
     </div>`;
   }).join('');
+
+  // ── Bande de charge Part 145 par semaine (alignée sur la timeline) ──
+  const chargeSegs=weeks.map((w,i)=>{
+    const nextPct=(i<weeks.length-1)?weeks[i+1].pct:100;
+    const width=nextPct-w.pct;
+    // retrouver le lundi correspondant à la semaine w.n
+    let d=new Date(year,0,1); while(d.getDay()!==1) d.setDate(d.getDate()+1);
+    d=addD(d,i*7);
+    const bes=_besoinP145Semaine(d);
+    const disp=dispoP145Fn(d);
+    if(bes<=0&&disp<=0) return `<div style="position:absolute;left:${w.pct}%;width:${width}%;top:0;bottom:0;background:rgba(255,255,255,0.02)"></div>`;
+    const pct=disp>0?Math.round(bes/disp*100):(bes>0?999:0);
+    const c=_tauxColor(pct);
+    const pctTxt=disp>0?pct+'%':'∞';
+    return `<div title="S${w.n} · Besoin ${bes} · Dispo ${disp} → ${pctTxt}" style="position:absolute;left:${w.pct}%;width:${width}%;top:0;bottom:0;background:${c.bg};border-right:1px solid rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:${c.txt};overflow:hidden">${width>2.2?pctTxt:''}</div>`;
+  }).join('');
+  // dispoP145Fn peut ne pas être défini dans ce scope → fallback local
+  function dispoP145Fn(mon){
+    const wEnd=addD(mon,4);
+    const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+    let cap=0;
+    S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&!_isHorsP145(x)&&x.actif!==false).forEach(emp=>{
+      if(typeof _presentSemaine==='function'&&!_presentSemaine(emp,mon,wEnd)) return;
+      let j=0;
+      for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ const e=S.planning[`${emp.id}_${ds}_${h}`]; const t=e?e.type:'travail'; if(!ABSENT.has(t)) j+=0.5; }); }
+      cap+=j/5;
+    });
+    return Math.round(cap);
+  }
+
+  const chargeBand=`<div style="display:flex;align-items:stretch;border-top:2px solid rgba(255,255,255,0.1);background:rgba(13,22,40,0.6)">
+    <div class="gantt-label-col" style="padding:6px 12px;display:flex;align-items:center;border-right:1px solid rgba(255,255,255,0.06)">
+      <span style="font-size:10px;font-weight:800;color:#6effc4">📊 Charge Part 145</span>
+    </div>
+    <div class="gantt-timeline" style="height:24px;position:relative">${chargeSegs}${todayLine}</div>
+  </div>`;
+
+  const legend=`<div style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 14px;font-size:10px;color:#8090a8;border-top:1px solid rgba(255,255,255,0.06)">
+    <span style="font-weight:700;color:#a0b0c8">Légende :</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:22px;height:11px;border-radius:3px;background:#2979ff;box-shadow:0 0 0 2px #ffffff;display:inline-block;margin:2px"></span>● en cours</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:22px;height:11px;border-radius:3px;background:#2979ff;display:inline-block"></span>à venir</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:22px;height:11px;border-radius:3px;background:repeating-linear-gradient(135deg,#2979ff 0 4px,rgba(41,121,255,0.28) 4px 8px);display:inline-block"></span>prévisionnel</span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:2px;height:12px;background:#ff4d6d;display:inline-block"></span>aujourd'hui</span>
+    <span style="margin-left:8px;font-weight:700;color:#a0b0c8">Charge :</span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:11px;border-radius:2px;background:rgba(52,199,89,0.18);border:1px solid rgba(52,199,89,0.5)"></span>≤96%</span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:11px;border-radius:2px;background:rgba(255,159,64,0.18);border:1px solid rgba(255,159,64,0.55)"></span>96-105%</span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:12px;height:11px;border-radius:2px;background:rgba(255,77,109,0.20);border:1px solid rgba(255,77,109,0.6)"></span>&gt;105%</span>
+    <span style="color:#607090">· Besoin en techs affiché à côté du MSN · clic sur une barre = ouvrir le chantier</span>
+  </div>`;
 
   el.innerHTML = `<div class="gantt-container">
     <div class="gantt-header">
@@ -17930,7 +18119,9 @@ function buildGantt(containerId, chantiers, year){
       </div>
     </div>
     <div class="gantt-rows">${rowsHtml}</div>
-  </div>`;
+    ${chargeBand}
+  </div>
+  ${legend}`;
 
   requestAnimationFrame(()=>{
     // Priorité MSN : si « MSN · type » déborde de la barre, ne garder que le MSN
@@ -18319,12 +18510,15 @@ async function _buildProgXls(D){
     c.alignment={horizontal:i===1?'left':'center',indent:i===1?1:0};
   });
   rows.forEach((r,ri)=>{
-    const row=ws.getRow(R_H2+1+ri), c=r.c, col=colOf(c), isPrev=c.statut==='prevision';
+    const row=ws.getRow(R_H2+1+ri), c=r.c, col=colOf(c), isPrev=c.statut==='prevision', isEncours=c.statut==='encours';
+    const nt=(c.ressources?.technicien)||0;
     const nm=row.getCell(1);
-    nm.value=`${c.nom}${c.statut==='prevision'?' (prév.)':''}`;
+    nm.value=`${isEncours?'● ':''}${c.nom}${c.statut==='prevision'?' (prév.)':''}${isEncours?' — EN COURS':''}${nt?' · '+nt+'T':''}`;
     nm.font={bold:true,size:9,color:{argb:txtOn(col)}};
     nm.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(col)}};
     nm.alignment={vertical:'middle',indent:1};
+    // En cours : contour foncé épais autour de la cellule nom
+    if(isEncours) nm.border={top:{style:'medium',color:{argb:'FF0D1E3D'}},bottom:{style:'medium',color:{argb:'FF0D1E3D'}},left:{style:'medium',color:{argb:'FF0D1E3D'}}};
     const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
     let first=true;
     weeks.forEach((m,i)=>{
@@ -18333,13 +18527,15 @@ async function _buildProgXls(D){
       const cell=row.getCell(2+i);
       if(inside){
         cell.fill={type:'pattern',pattern:isPrev?'lightUp':'solid',fgColor:{argb:argb(col)},bgColor:{argb:'FFFFFFFF'}};
-        if(first){ cell.value=msnOf(c); first=false; }
+        if(first){ cell.value=`${msnOf(c)}${nt?' ·'+nt+'T':''}`; first=false; }
         cell.font={size:8,bold:true,color:{argb:txtOn(col)}};
         cell.alignment={horizontal:'left',vertical:'middle'};
+        // Contour foncé haut/bas pour matérialiser le "en cours" sur toute la barre
+        if(isEncours) cell.border={top:{style:'medium',color:{argb:'FF0D1E3D'}},bottom:{style:'medium',color:{argb:'FF0D1E3D'}}};
       } else {
         cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F9FC'}};
+        cell.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
       }
-      cell.border={right:{style:'hair',color:{argb:'FFE2E6EE'}},bottom:{style:'hair',color:{argb:'FFE2E6EE'}}};
     });
   });
   } // fin if(showGantt)
@@ -18418,20 +18614,24 @@ function runProgPdf(){
   const pct=d=>Math.min(100,Math.max(0,(parseLocal(d)-wStart)/spanMs*100));
   const todayPct=(new Date()>=wStart&&new Date()<=wEnd)?((new Date()-wStart)/spanMs*100):null;
   const bodyGantt=rows.map(r=>{
-    const c=r.c, col=colOf(c), isPrev=c.statut==='prevision';
+    const c=r.c, col=colOf(c), isPrev=c.statut==='prevision', isEncours=c.statut==='encours';
     let l=c.debut?pct(c.debut):0, rr=c.fin?pct(c.fin):100;
     const cutL=c.debut&&parseLocal(c.debut)<wStart, cutR=c.fin&&parseLocal(c.fin)>wEnd;
     if(rr<=l) rr=Math.min(100,l+1);
     const bg=isPrev?`repeating-linear-gradient(135deg,${col} 0 4px,${col}55 4px 8px)`:col;
+    const nt=(c.ressources?.technicien)||0;
+    // En cours : contour foncé épais autour de la barre
+    const encoursBorder=isEncours?'outline:2px solid #0d1e3d;outline-offset:0;':'';
+    const barLabel=`${cutL?'◀ ':''}${msnOf(c)}${nt?' · '+nt+'T':''}${cutR?' ▶':''}`;
     return `<tr>
-      <td style="border-left:3px solid ${col};min-width:150px"><div style="font-weight:700;font-size:10px;color:#0d1e3d">${c.nom}</div>
-      <div style="font-size:8px;color:#8898bb">${[c.debut?disp(c.debut):'',c.fin?disp(c.fin):''].filter(Boolean).join(' → ')}</div></td>
+      <td style="border-left:3px solid ${col};min-width:150px"><div style="font-weight:700;font-size:10px;color:#0d1e3d">${isEncours?'<span style="color:#1e7e34;font-weight:900">● </span>':''}${c.nom}${isEncours?' <span style="font-size:7px;background:#1e7e34;color:#fff;padding:1px 4px;border-radius:3px;font-weight:700">EN COURS</span>':''}</div>
+      <div style="font-size:8px;color:#8898bb">${[c.debut?disp(c.debut):'',c.fin?disp(c.fin):''].filter(Boolean).join(' → ')}${nt?' · '+nt+'T':''}</div></td>
       <td style="padding:0">
         <div style="position:relative;height:20px;background:#f7faff">
           <div style="position:absolute;inset:0;display:flex">${weeks.map(()=>`<div style="flex:1;border-right:1px solid #e6edf7"></div>`).join('')}</div>
           ${todayPct!==null?`<div style="position:absolute;top:0;bottom:0;left:${todayPct}%;width:1.5px;background:#e24b4a;z-index:2"></div>`:''}
-          <div style="position:absolute;top:3px;height:14px;left:${l}%;width:${Math.max(0.7,rr-l)}%;background:${bg};border-radius:2px;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;${cutL?'border-left:2px solid #0d1e3d;':''}${cutR?'border-right:2px solid #0d1e3d;':''}">
-            <span style="font-size:8px;font-weight:700;color:${txtOn(col)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cutL?'◀ ':''}${msnOf(c)}${cutR?' ▶':''}</span>
+          <div style="position:absolute;top:3px;height:14px;left:${l}%;width:${Math.max(0.7,rr-l)}%;background:${bg};border-radius:2px;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;${encoursBorder}${cutL?'border-left:2px solid #0d1e3d;':''}${cutR?'border-right:2px solid #0d1e3d;':''}">
+            <span style="font-size:8px;font-weight:700;color:${txtOn(col)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${barLabel}</span>
           </div>
         </div>
       </td></tr>`;
@@ -18440,7 +18640,7 @@ function runProgPdf(){
     <div class="section-title">2 · Programme des chantiers</div>
     <table style="font-size:9px"><thead><tr><th style="text-align:left;min-width:150px">Chantier</th><th style="padding:0"><div style="display:flex">${weeks.map(m=>`<div style="flex:1;text-align:center;padding:4px 0;font-size:8px">S${wkN(m)}</div>`).join('')}</div></th></tr></thead>
     <tbody>${bodyGantt}</tbody></table>
-    <div style="font-size:8px;color:#8898bb;margin-top:4px">Couleur = chantier · hachuré = prévisionnel · trait rouge = aujourd'hui · ◀ ▶ = le chantier déborde de la période · terminés exclus</div>
+    <div style="font-size:8px;color:#8898bb;margin-top:4px">● <strong>EN COURS</strong> = contour foncé · couleur = chantier · hachuré = prévisionnel · trait rouge = aujourd'hui · ◀ ▶ = déborde de la période · « ·NT » = besoin en techniciens · terminés exclus</div>
   </div>` : '';
 
   const perimLabel={all:'Tous périmètres',p145:'Part 145',p21:'Part 21',recy:'Recyclage'}[window._ppPerimSel||'all'];
