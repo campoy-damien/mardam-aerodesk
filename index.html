@@ -3238,11 +3238,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div id="cloture-msn" style="font-size:12px;color:var(--t3);margin-bottom:12px"></div>
   <div style="font-size:13px;color:var(--t2);margin-bottom:14px">Que devient l'avion à la fin de la maintenance ?</div>
   <div style="display:flex;flex-direction:column;gap:10px">
-    <button type="button" class="btn btn-cyan" style="justify-content:flex-start;padding:14px 16px;text-align:left" onclick="_clotureChoix('stockage')">
-      🅿️ <b>Retour en stockage</b><br><span style="font-size:11px;font-weight:400;opacity:.8">L'avion reste sur site — sa fiche stockage est créée ou réactivée (même MSN)</span>
+    <button type="button" class="btn btn-cyan" style="justify-content:flex-start;padding:14px 16px;text-align:left;white-space:normal;height:auto;line-height:1.45" onclick="_clotureChoix('stockage')">
+      <span>🅿️ <b>Retour en stockage</b><br><span style="font-size:11px;font-weight:400;opacity:.85">L'avion reste sur site — sa fiche stockage est créée ou réactivée (même MSN)</span></span>
     </button>
-    <button type="button" class="btn btn-ghost" style="justify-content:flex-start;padding:14px 16px;text-align:left" onclick="_clotureChoix('parti')">
-      🛫 <b>Avion parti / livré</b><br><span style="font-size:11px;font-weight:400;opacity:.7">L'avion quitte le site — il ne compte plus dans les avions sur site</span>
+    <button type="button" class="btn btn-ghost" style="justify-content:flex-start;padding:14px 16px;text-align:left;white-space:normal;height:auto;line-height:1.45" onclick="_clotureChoix('parti')">
+      <span>🛫 <b>Avion parti / livré</b><br><span style="font-size:11px;font-weight:400;opacity:.75">L'avion quitte le site — il ne compte plus dans les avions sur site</span></span>
     </button>
   </div>
   <div class="mfooter">
@@ -7868,6 +7868,48 @@ function _chMsnLabel(cid){
   return '\ud83d\udd27 '+(t?t+' - ':'')+(ch.msn||(ch.nom||'Trav.').slice(0,8));
 }
 function _chIncomplete(cid){ const ch=S.chantiers.find(c=>c.id===cid); if(!ch) return false; return !((ch.avion||'').trim()) || !((ch.msn||'').trim()); }
+// Liste des champs manquants d'un chantier (pour le badge « À compléter »)
+function _chMissing(cid){
+  const ch=S.chantiers.find(c=>c.id===cid); if(!ch) return [];
+  const miss=[];
+  if(!((ch.avion||'').trim())) miss.push('type avion');
+  if(!((ch.msn||'').trim())) miss.push('MSN');
+  if(!ch.resp) miss.push('responsable');
+  if(!ch.chef) miss.push('chef d\'équipe');
+  if(!ch.debut) miss.push('date début');
+  if(!ch.fin) miss.push('date fin');
+  return miss;
+}
+// Alertes visuelles d'un chantier pour les cartes kanban
+function _chAlerts(c){
+  const al=[];
+  if(window._conflictChIds && window._conflictChIds.has(c.id)) al.push({ic:'🚨',txt:'Conflit d\'encadrement',col:'#ff4d6d'});
+  // Absence d'un encadrant pendant le chantier (à venir)
+  const today=new Date();
+  [c.resp,c.chef].filter(Boolean).forEach(pid=>{
+    const p=byId(pid); if(!p||!c.debut||!c.fin) return;
+    const d0=parseLocal(c.debut),d1=parseLocal(c.fin);
+    const ABS=['conge','maladie','formation','absence','deplacement'];
+    const hasAbs=Object.entries(S.planning||{}).some(([k,e])=>{
+      if(!e||!ABS.includes(e.type)) return false;
+      const pa=k.split('_'); if(pa[0]!==pid) return false;
+      const ds=pa.slice(1,-1).join('_'); const dd=parseLocal(ds);
+      return dd&&dd>=d0&&dd<=d1&&dd>=today;
+    });
+    if(hasAbs && !al.some(a=>a.ic==='⚠️')) al.push({ic:'⚠️',txt:'Encadrant absent pendant le chantier',col:'#ffb45c'});
+  });
+  // Retard (en cours) : réel < théorique
+  if(c.statut==='encours' && c.manHours>0 && c.debut && c.fin){
+    const jT=calcJoursOuvres(c.debut,c.fin)||1;
+    const jE=Math.max(0,calcJoursOuvres(c.debut, fmt(addD(today,-1))));
+    const aT=Math.min(100,Math.round(jE/jT*100));
+    let mh=0; const tIds=new Set(S.personnel.filter(p=>!_isHorsP145(p)).map(p=>p.id)); const tStr=fmt(today);
+    Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; if(e.chantierId!==c.id&&e.chantierId2!==c.id)return; const pa=k.split('_'); if(pa.length<3)return; if(!tIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>tStr)return; if(e.type&&['conge','maladie','formation','absence','deplacement','ferie'].includes(e.type))return; mh+=(e.chantierId&&e.chantierId2)?1.75:3.5; });
+    const aR=Math.min(100,Math.round(mh/c.manHours*100));
+    if(aR - aT <= -10) al.push({ic:'🔴',txt:`En retard (${aR}% vs ${aT}% attendu)`,col:'#ff4d6d'});
+  }
+  return al;
+}
 // Libellé court : MSN en premier (prioritaire sur cases étroites), type d'avion ensuite si présent
 function _chMsnShort(cid){
   if(!cid) return '';
@@ -8069,9 +8111,7 @@ function buildGrid(emps,dates,containerId){
       };
       const amTwo = at==='travail' && am.chantierId && am.chantierId2;
       const pmTwo = pt==='travail' && pm.chantierId && pm.chantierId2;
-      const vmBadge = t => !t ? '' : (isWeekly
-        ? `<span style="position:absolute;top:1px;right:2px;background:#22b8cf;color:#04222a;font-size:6.5px;font-weight:800;border-radius:3px;padding:0 2px;line-height:1.5;pointer-events:none;z-index:2">VM ${t}</span>`
-        : `<span title="VM ${t}" style="position:absolute;top:0;right:1px;font-size:7px;line-height:1;pointer-events:none;z-index:2">🩺</span>`);
+      const vmBadge = t => !t ? '' : `<span style="position:absolute;top:1px;right:2px;background:#22b8cf;color:#04222a;font-size:6.5px;font-weight:800;border-radius:3px;padding:0 2px;line-height:1.5;pointer-events:none;z-index:2">VM ${t}</span>`;
       const amInner = amTwo ? twoBands(am) : (amLbl || (!at && isH ? 'Férié' : !at && isW ? 'W-E' : ''));
       const pmInner = pmTwo ? twoBands(pm) : (pmLbl || (!pt && isH ? 'Férié' : !pt && isW ? 'W-E' : ''));
       const amDivStyle = amTwo ? 'padding:0;overflow:hidden' : amStyle;
@@ -8401,7 +8441,10 @@ function _plPaste(){
     const col=PLGRID.cols[c]; if(!col) return;
     const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
     undo.push({key:k, prev:_plClone(S.planning[k])});
-    if(src&&src.type) S.planning[k]=_plClone(src); else delete S.planning[k];
+    const tgtVm=(S.planning[k]||{}).vm||'';
+    if(src&&src.type){ const cl=_plClone(src); if(tgtVm) cl.vm=tgtVm; S.planning[k]=cl; }
+    else if(tgtVm){ S.planning[k]={type:'',vm:tgtVm}; }   // garder la VM seule si la source est vide
+    else delete S.planning[k];
     count++;
   }));
   // refléter la zone réellement collée dans la sélection
@@ -8417,7 +8460,7 @@ function _plFill(){
   if(!PLCLIP){ try{toast("Copie d'abord une case");}catch(_){} return; }
   const pl=PLCLIP.data[0][0], cells=_plCells(); if(!cells.length) return;
   const undo=[];
-  cells.forEach(o=>{ undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); if(pl&&pl.type) S.planning[o.key]=_plClone(pl); else delete S.planning[o.key]; });
+  cells.forEach(o=>{ undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); const tgtVm=(S.planning[o.key]||{}).vm||''; if(pl&&pl.type){ const cl=_plClone(pl); if(tgtVm) cl.vm=tgtVm; S.planning[o.key]=cl; } else if(tgtVm){ S.planning[o.key]={type:'',vm:tgtVm}; } else delete S.planning[o.key]; });
   PLUNDO={items:undo}; _plRefresh();
   try{toast(`🪣 ${cells.length} case${cells.length>1?'s':''} remplie${cells.length>1?'s':''}`);}catch(_){}
 }
@@ -8535,7 +8578,7 @@ function applyAffectPerm(){
       slots.forEach(sl=>{
         const k=`${empId}_${ds}_${sl}`, ex=S.planning[k];
         if(ex&&ex.type) return;                       // ne jamais écraser (absence, formation, ou déjà affecté)
-        S.planning[k]={type:'travail',note:'',chantierId:act};
+        S.planning[k]={type:'travail',note:'',chantierId:act,vm:(ex&&ex.vm)||''};
         n++;
       });
     }
@@ -8612,7 +8655,11 @@ function copyPrevWeek(){
         const src=S.planning[`${p.id}_${prevD}_${h}`];
         if(!src||!src.type) return;
         if(!COPY_WEEK_TYPES.has(src.type)){ skipped++; return; }    // événement ponctuel : jamais recopié
-        S.planning[curK]=JSON.parse(JSON.stringify(src));
+        const copy=JSON.parse(JSON.stringify(src));
+        // Préserver une éventuelle visite médicale déjà posée sur la case cible
+        const tgt=S.planning[curK];
+        if(tgt && tgt.vm) copy.vm=tgt.vm; else copy.vm=copy.vm||'';
+        S.planning[curK]=copy;
         undo.push({key:curK});
         filled++;
       });
@@ -8823,16 +8870,23 @@ function saveCellEdit(){
   if(cellType==='formation_int' && !formInt){toast('⚠️ Sélectionnez l\'intitulé de la formation');return;}
   const vmTime=cellVM?(document.getElementById('cellVMTime').value||''):'';
   if(cellVM && !vmTime){toast('⚠️ Indiquez l\'heure de la visite médicale');return;}
+  // Une visite médicale est un événement propre à SA case (personne+jour+demi-journée).
+  // On n'applique la VM saisie qu'à la case réellement ouverte ; pour toutes les autres
+  // cases touchées par une action groupée, on PRÉSERVE la VM déjà présente au lieu de l'écraser.
+  const openKey=`${empId}_${dateStr}_${half}`;
   const setHD=(eid,ds,h)=>{
     const k=`${eid}_${ds}_${h}`;
-    if(!cellType && !vmTime)delete S.planning[k];
+    const existing=S.planning[k]||{};
+    // VM à conserver : celle saisie si c'est la case ouverte, sinon la VM déjà présente sur cette case
+    const vmKeep = (k===openKey) ? vmTime : (existing.vm||'');
+    if(!cellType && !vmKeep){ delete S.planning[k]; }
     else S.planning[k]={
       type:cellType,
       note:['formation','absence','deplacement'].includes(cellType)?note:'',
       chantierId:cellType==='travail'?chantierId:'',
       chantierId2:cellType==='travail'?chantierId2:'',
       formInt:cellType==='formation_int'?formInt:'',
-      vm:vmTime
+      vm:vmKeep
     };
   };
   // Collecte des dates où une formation interne est planifiée (pour le suivi)
@@ -9426,6 +9480,16 @@ function deleteChantier(){
     S.chantiers=S.chantiers.filter(c=>c.id!==id);
     save();closeM('m-chantier');renderChantiers();popSelects();
     toast('Chantier supprimé');
+  });
+}
+// Suppression directe depuis le kanban (carte terminée) avec confirmation
+function deleteChantierById(id, ev){
+  if(ev) ev.stopPropagation();
+  const ch=S.chantiers.find(x=>x.id===id); if(!ch) return;
+  confirmDel('Supprimer le chantier terminé',`Supprimer définitivement « ${ch.nom||'ce chantier'} » ? Cette action est irréversible et retire aussi sa fiche REX.`,()=>{
+    S.chantiers=S.chantiers.filter(c=>c.id!==id);
+    save(); renderChantiers(); if(typeof popSelects==='function') popSelects();
+    toast('🗑 Chantier terminé supprimé');
   });
 }
 
@@ -10860,6 +10924,97 @@ async function _buildRexXls(D){
   a.click(); setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
+// ── Kanban : glisser-déposer pour changer le statut d'un chantier ──
+let _kanDragId=null;
+let _kanScrollRAF=null;
+let _kanScrollVy=0;
+function _kanAutoScrollLoop(){
+  if(_kanScrollVy!==0){
+    window.scrollBy(0,_kanScrollVy);
+    _kanScrollRAF=requestAnimationFrame(_kanAutoScrollLoop);
+  } else {
+    _kanScrollRAF=null;
+  }
+}
+function _kanEdgeScroll(clientY){
+  const h=window.innerHeight;
+  const EDGE=110;                 // zone sensible en haut/bas
+  const MAX=22;                   // vitesse max px/frame
+  if(clientY<EDGE){
+    _kanScrollVy=-Math.ceil((EDGE-clientY)/EDGE*MAX);
+  } else if(clientY>h-EDGE){
+    _kanScrollVy=Math.ceil((clientY-(h-EDGE))/EDGE*MAX);
+  } else {
+    _kanScrollVy=0;
+  }
+  if(_kanScrollVy!==0 && !_kanScrollRAF){ _kanScrollRAF=requestAnimationFrame(_kanAutoScrollLoop); }
+}
+function _kanDragStart(ev,cid){
+  _kanDragId=cid;
+  ev.dataTransfer.effectAllowed='move';
+  try{ev.dataTransfer.setData('text/plain',cid);}catch(e){}
+  if(ev.currentTarget&&ev.currentTarget.style) ev.currentTarget.style.opacity='0.4';
+  // Écouteur global pour le défilement automatique pendant le glissement
+  document.addEventListener('dragover',_kanGlobalDragOver);
+}
+function _kanGlobalDragOver(ev){ _kanEdgeScroll(ev.clientY); }
+function _kanDragEnd(ev){
+  if(ev.currentTarget&&ev.currentTarget.style) ev.currentTarget.style.opacity='';
+  document.querySelectorAll('.kcol').forEach(k=>k.style.boxShadow='');
+  _kanScrollVy=0;
+  document.removeEventListener('dragover',_kanGlobalDragOver);
+}
+function _kanDragOver(ev){
+  ev.preventDefault(); ev.dataTransfer.dropEffect='move';
+  const col=ev.currentTarget;
+  if(col) col.style.boxShadow='inset 0 0 0 2px var(--cyan)';
+}
+function _kanDragLeave(ev){
+  const col=ev.currentTarget;
+  if(col) col.style.boxShadow='';
+}
+function _kanDrop(ev,newStatus){
+  ev.preventDefault();
+  _kanScrollVy=0;
+  document.removeEventListener('dragover',_kanGlobalDragOver);
+  const col=ev.currentTarget; if(col) col.style.boxShadow='';
+  const cid=_kanDragId||ev.dataTransfer.getData('text/plain');
+  _kanDragId=null;
+  const c=S.chantiers.find(x=>x.id===cid); if(!c) return;
+  if(c.statut===newStatus) return;   // même colonne, rien à faire
+
+  const LBL={prevision:'Prévision',futur:'À venir',encours:'En cours',termine:'Terminés'};
+  const ORDER={prevision:0,futur:1,encours:2,termine:3};
+  const recul = ORDER[newStatus] < ORDER[c.statut];
+
+  // Transitions à workflow métier → passer par la fiche pour déclencher les règles (clôture, arrivée…)
+  const needsWorkflow = (newStatus==='encours' || newStatus==='termine');
+  const proceed=()=>{
+    if(needsWorkflow){
+      // Ouvre la fiche avec le nouveau statut présélectionné ; l'utilisateur valide → workflows appliqués
+      editChantier(cid);
+      setTimeout(()=>{
+        const sel=document.getElementById('c-statut');
+        if(sel){ sel.value=newStatus; }
+        toast(`Statut « ${LBL[newStatus]} » présélectionné — validez pour appliquer`);
+      },150);
+    } else {
+      c.statut=newStatus;
+      save(); renderChantiers();
+      toast(`✓ « ${(c.nom||'Chantier').split('—')[0].trim()} » déplacé vers ${LBL[newStatus]}`);
+    }
+  };
+  if(recul){
+    _confirmModal(`Revenir en arrière ?`,`Déplacer ce chantier vers « ${LBL[newStatus]} » est un retour en arrière inhabituel. Confirmer ?`,proceed);
+  } else {
+    proceed();
+  }
+}
+// Petit modal de confirmation générique (si absent ailleurs)
+function _confirmModal(title,msg,onOk){
+  if(confirm(msg)){ onOk(); }   // fallback simple ; confirm() est bloqué en iframe mais OK en app réelle
+}
+
 function renderChantiers(){
   // Populate year selector
   const yrSel=document.getElementById('gantt-resp-year');
@@ -10876,12 +11031,18 @@ function renderChantiers(){
   const ylbl=document.getElementById('kanban-yearlbl');
   if(ylbl) ylbl.textContent=`📋 ${totalYear} chantier(s) sur l'année ${selYear}${_cq?` · recherche « ${_cq} »`:''}`;
   document.getElementById('kanban').innerHTML=cols.map(col=>{
-    const cards=S.chantiers.filter(c=>c.statut===col.k && _chantierInYear(c,selYear) && _matchChantier(c,_cq));
+    let cards=S.chantiers.filter(c=>c.statut===col.k && _chantierInYear(c,selYear) && _matchChantier(c,_cq));
+    // Tri par colonne : à venir=début imminent · en cours=fin urgente · terminés=fin récente · prévision=date prévue
+    const _dnull=(v,def)=>v?parseLocal(v).getTime():def;
+    if(col.k==='futur') cards.sort((a,b)=>_dnull(a.debut,Infinity)-_dnull(b.debut,Infinity));
+    else if(col.k==='encours') cards.sort((a,b)=>_dnull(a.fin,Infinity)-_dnull(b.fin,Infinity));
+    else if(col.k==='termine') cards.sort((a,b)=>_dnull(b.fin,0)-_dnull(a.fin,0));
+    else if(col.k==='prevision') cards.sort((a,b)=>_dnull(a.debut,Infinity)-_dnull(b.debut,Infinity));
     // Colonnes "Prévision" et "Terminés" → liste compacte pour optimiser la place
     if(col.k==='termine'||col.k==='prevision'){
       const isPrev=col.k==='prevision';
       const accent=isPrev?'#a78bfa':'#34c759';
-      return`<div class="kcol">
+      return`<div class="kcol" data-status="${col.k}" ondragover="_kanDragOver(event)" ondragleave="_kanDragLeave(event)" ondrop="_kanDrop(event,'${col.k}')">
         <div class="kcol-head">${col.l}<span class="kcol-count">${cards.length}</span></div>
         ${cards.length===0?`<div style="text-align:center;padding:24px;color:var(--t4);font-size:12px">Aucun chantier</div>`:
           `<div style="display:flex;flex-direction:column;gap:4px">`+cards.map(c=>{
@@ -10890,26 +11051,30 @@ function renderChantiers(){
             const sub=isPrev
               ? `${c.client?c.client+' · ':''}${c.debut?'prévu '+disp(c.debut):''}${tech?(c.debut?' · ':'')+tech+' tech.':''}`
               : `${c.client?c.client+' · ':''}${c.fin?'terminé '+disp(c.fin):''}`;
-            return`<div onclick="editChantier('${c.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.06);border-left:3px solid ${c.color||accent};border-radius:8px;cursor:pointer;opacity:${isPrev?'0.9':'0.75'}">
+            return`<div draggable="true" ondragstart="_kanDragStart(event,'${c.id}')" ondragend="_kanDragEnd(event)" onclick="editChantier('${c.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.06);border-left:3px solid ${c.color||accent};border-radius:8px;cursor:pointer;opacity:${isPrev?'0.9':'0.75'}">
               <div style="flex:1;min-width:0">
                 <div style="font-size:12px;font-weight:700;color:${isPrev?'#c0c8e0':'#a0b0c8'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}</div>
                 <div style="font-size:10px;color:#607090">${sub}</div>
               </div>
               ${chef?`<span style="font-size:10px;color:#607090;flex-shrink:0">${chef.trigramme}</span>`:''}
-              ${!isPrev?`<button class="btn btn-ghost btn-xs" style="flex-shrink:0" title="Fiche retour d'expérience" onclick="event.stopPropagation();openRex('${c.id}')">📋</button>`:''}
+              ${!isPrev?`<button class="btn btn-ghost btn-xs" style="flex-shrink:0" title="Fiche retour d'expérience" onclick="event.stopPropagation();openRex('${c.id}')">📋</button><button class="btn btn-ghost btn-xs" style="flex-shrink:0;color:#ff6b81" title="Supprimer ce chantier terminé" onclick="deleteChantierById('${c.id}',event)">🗑</button>`:''}
             </div>`;
           }).join('')+`</div>`}
       </div>`;
     }
-    return`<div class="kcol">
+    return`<div class="kcol" data-status="${col.k}" ondragover="_kanDragOver(event)" ondragleave="_kanDragLeave(event)" ondrop="_kanDrop(event,'${col.k}')">
       <div class="kcol-head">${col.l}<span class="kcol-count">${cards.length}</span></div>
       ${cards.length===0?`<div style="text-align:center;padding:24px;color:var(--t4);font-size:12px">Aucun chantier</div>`:
         cards.map(c=>{
           const resp=byId(c.resp);const chef=byId(c.chef);
           const eq=(c.equipe||[]).map(id=>{const p=byId(id);return p?p.trigramme:null}).filter(Boolean);
-          return`<div class="kcard" style="border-left-color:${c.color||'var(--glass-border)'}" onclick="editChantier('${c.id}')">
+          const miss=_chMissing(c.id);
+          const alerts=_chAlerts(c);
+          const alertsHtml=alerts.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${alerts.map(a=>`<span title="${a.txt}" style="font-size:9px;font-weight:800;color:${a.col};background:${a.col}1e;border:1px solid ${a.col}55;border-radius:99px;padding:1px 7px">${a.ic} ${a.txt}</span>`).join('')}</div>`:'';
+          return`<div class="kcard" draggable="true" ondragstart="_kanDragStart(event,'${c.id}')" ondragend="_kanDragEnd(event)" style="border-left-color:${c.color||'var(--glass-border)'}" onclick="editChantier('${c.id}')">
             <div class="kcard-name">${c.nom}</div>
-            ${_chIncomplete(c.id)?`<div style="display:inline-block;margin-top:3px;margin-bottom:4px;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.4);border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800;color:#ff9a3c">\u26a0 \u00c0 COMPL\u00c9TER (type/MSN)</div>`:''}
+            ${miss.length?`<div title="Manque : ${miss.join(', ')}" style="display:inline-block;margin-top:3px;margin-bottom:4px;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.4);border-radius:99px;padding:1px 8px;font-size:9px;font-weight:800;color:#ff9a3c">\u26a0 \u00c0 COMPL\u00c9TER (${miss.length})</div>`:''}
+            ${alertsHtml}
             ${c.client?`<div style="font-size:11px;color:var(--t3);margin-bottom:5px">🏢 ${c.client}</div>`:''}
             ${c.desc?`<div style="font-size:11px;color:var(--t2);margin-bottom:6px;line-height:1.4">${c.desc.slice(0,80)}${c.desc.length>80?'…':''}</div>`:''}
             ${c.ressources&&Object.keys(c.ressources).length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${Object.entries(c.ressources).map(([k,v])=>`<span style="background:${CATS[k]?.col||'rgba(255,255,255,0.1)'}22;border:1px solid ${CATS[k]?.col||'rgba(255,255,255,0.1)'}44;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:${CATS[k]?.col||'var(--t3)'};">${v} ${CATS[k]?.lbl||k}</span>`).join('')}</div>`:''}
@@ -10992,11 +11157,21 @@ function renderRespGantt(){
     const bands=[];
     Object.entries(byType).forEach(([type,dates])=>{
       const sorted=[...new Set(dates)].sort();
+      if(!sorted.length) return;
       let start=sorted[0],prev=sorted[0];
       for(let i=1;i<sorted.length;i++){
-        const d=parseLocal(sorted[i]), pd=parseLocal(prev);
-        const diff=(d-pd)/(1000*60*60*24);
-        if(diff<=3){ prev=sorted[i]; }
+        // Ne fusionner que si l'écart entre deux jours d'absence n'est que week-end/férié
+        let bridge=true;
+        const probe=parseLocal(prev); probe.setDate(probe.getDate()+1);
+        const cur=parseLocal(sorted[i]);
+        while(probe<cur){
+          const wd=probe.getDay();
+          const isWE=(wd===0||wd===6);
+          const isH=(typeof isHol==='function')?isHol(fmt(probe)):false;
+          if(!isWE&&!isH){bridge=false;break;}
+          probe.setDate(probe.getDate()+1);
+        }
+        if(bridge){ prev=sorted[i]; }
         else{ bands.push({start,end:prev,type}); start=sorted[i]; prev=sorted[i]; }
       }
       bands.push({start,end:prev,type});
@@ -11025,7 +11200,7 @@ function renderRespGantt(){
   }
   // N'afficher qu'une semaine sur 2 pour le numéro, mais tous les traits de séparation
   const weekHeader=`<div style="display:flex;position:sticky;top:0;z-index:5;background:#0d1628">
-    <div style="width:180px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08)"></div>
+    <div style="width:180px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;left:0;z-index:6;background:#0d1628"></div>
     <div style="flex:1;position:relative;height:22px;border-bottom:1px solid rgba(255,255,255,0.08)">
       ${weekTicks.map((w,i)=>i%2===0
         ?`<div style="position:absolute;left:${w.pct}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.12)"></div><div style="position:absolute;left:${w.pct}%;top:3px;font-size:9px;font-weight:700;color:#ffffff;transform:translateX(-50%);white-space:nowrap">S${w.num}</div>`
@@ -11035,7 +11210,7 @@ function renderRespGantt(){
   </div>`;
 
   const monthHeader=`<div style="display:flex;position:sticky;top:0;z-index:6;background:#0d1628">
-    <div style="width:180px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08)"></div>
+    <div style="width:180px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;left:0;z-index:6;background:#0d1628"></div>
     <div style="flex:1;display:flex;border-bottom:1px solid rgba(255,255,255,0.08)">
       ${MONTHS_SHORT.map((m,i)=>`<div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px 0;color:${i===currentMonth?'var(--cyan)':'#6080a0'};${i===currentMonth?'background:rgba(0,210,255,0.06);':''}border-right:1px solid rgba(255,255,255,0.04)">${m}</div>`).join('')}
     </div>
@@ -11076,18 +11251,38 @@ function renderRespGantt(){
 
   const PAD=6, MOD_H=22, CH_H=28, ABS_H=22, GAP=6;
 
-  const rows=people.map(emp=>{
+  // Un chantier est une "activité permanente" (Structure, etc.) s'il couvre ~toute l'année
+  // et porte un nom d'activité transverse. Il s'affiche comme un module permanent.
+  const PERM_NAMES=/^(stru|struct|structure|sto|stockage|rec|recyclage|part\s?21|frc)$/i;
+  const _isPermActivite=c=>{
+    const nm=(c.nom||'').trim();
+    if(PERM_NAMES.test(nm)) return true;
+    // ou couvre quasiment l'année entière (>= 350 jours)
+    if(c.debut&&c.fin){ const dur=(parseLocal(c.fin)-parseLocal(c.debut))/86400000; if(dur>=350) return true; }
+    return false;
+  };
+  const renderPersonRow=(emp)=>{
     const cat=CATS[emp.categorie]||{};
     const normalChantiers=S.chantiers.filter(c=>{
       if(c.statut==='termine') return false;
       if(!(c.resp===emp.id||c.chef===emp.id)) return false;
       if(!(c.debut||c.fin)) return false;
-      // Ne garder que les chantiers qui chevauchent l'année affichée
+      if(_isPermActivite(c)) return false;   // traité comme module permanent
       const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
       const start=d||f, end=f||d;
       return start<=yearEnd && end>=yearStart;
     });
+    // Modules permanents : config Stockage/Recy/Part21 + chantiers "activité permanente" (Structure…)
     const specialModules=getSpecialModules(emp.id);
+    S.chantiers.filter(c=>c.statut!=='termine'&&_isPermActivite(c)&&(c.resp===emp.id||c.chef===emp.id)).forEach(c=>{
+      const nm=(c.nom||'').trim().toUpperCase();
+      let label=c.nom, icon='🔧';
+      if(/^stru/i.test(nm)){ label='Structure'; icon='🔩'; }
+      else if(/^sto/i.test(nm)){ label='Stockage'; icon='🅿️'; }
+      else if(/^(rec)/i.test(nm)){ label='Recyclage'; icon='♻️'; }
+      else if(/part\s?21|frc/i.test(nm)){ label='Part 21'; icon='✈️'; }
+      specialModules.push({nom:`${icon} ${label}`,client:c.resp===emp.id?'Responsable':'Chef',color:c.color||'#6d8fb0',role:c.resp===emp.id?'Resp.':'Chef',special:'CH',chId:c.id,full:true});
+    });
     const absenceBands=getAbsenceBands(emp.id);
 
     // ── Packing des trois sections ──
@@ -11113,6 +11308,10 @@ function renderRespGantt(){
     const totalH=Math.max(42, cursor+PAD);
 
     const chantierCount=normalChantiers.length;
+    const nbEnCours=normalChantiers.filter(c=>c.statut==='encours').length;
+    const nbAvenir=normalChantiers.filter(c=>c.statut==='futur'||c.statut==='prevision').length;
+    // Surcharge d'encadrement : 2+ chantiers simultanés (packing a créé plusieurs lanes)
+    const surcharge = chPack.lanes>=2;
     const nothing = !modH && !chH && !absH;
 
     // ── Barres ──
@@ -11120,8 +11319,10 @@ function renderRespGantt(){
       const c=it.m, role=c.role||(c.resp===emp.id?'Resp.':'Chef');
       const col=c.color||'#e67e22', txt=_txtOn(col);
       const top=modTop+it.lane*MOD_H;
-      return `<div title="${c.nom} (${role})" style="position:absolute;top:${top}px;height:${MOD_H-4}px;left:0;width:100%;background:${col};opacity:0.92;border-radius:5px;z-index:2;display:flex;align-items:center;padding:0 8px;overflow:hidden">
-        <span style="font-size:10px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom} · ${role} · permanent</span>
+      const clickable=c.chId?`onclick="editChantier('${c.chId}')" style="cursor:pointer;`:'style="';
+      // Barre atténuée : fond translucide + liseré, moins dominante que les chantiers
+      return `<div title="${c.nom} (${role}) · activité permanente" ${clickable}position:absolute;top:${top}px;height:${MOD_H-6}px;left:0;width:100%;background:${hexRgba(col,0.16)};border:1px dashed ${hexRgba(col,0.6)};border-radius:5px;z-index:2;display:flex;align-items:center;padding:0 8px;overflow:hidden">
+        <span style="font-size:10px;font-weight:700;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom} · ${role} · permanent</span>
       </div>`;
     }).join('');
 
@@ -11136,11 +11337,16 @@ function renderRespGantt(){
       const shortLbl=((inc?'\u26a0 ':'')+_chMsnShort(c.id)).replace(/"/g,'');
       const barTitle=`${c.nom} (${role}) · ${disp(c.debut||'')} → ${disp(c.fin||'')}${over?' · chevauchement':''}`;
       const inConflict = window._conflictChIds && window._conflictChIds.has(c.id);
-      const conflictRing = inConflict ? `box-shadow:0 0 0 2px #ff4d6d, 0 0 10px 1px rgba(255,77,109,0.7);` : `box-shadow:0 2px 8px ${col}55;`;
-      return `<div onclick="editChantier('${c.id}')" title="${barTitle}${inConflict?' · ⚠ EN CONFLIT':''}"
-        style="position:absolute;top:${top}px;height:${CH_H-6}px;left:${l}%;width:${w}%;background:${col};border-radius:6px;cursor:pointer;z-index:3;${conflictRing}${over?'border-top:2px solid #ffb02e;':''}transition:opacity .15s;display:flex;align-items:center;padding:0 8px;overflow:hidden"
+      const isEncours = c.statut==='encours';
+      let ring;
+      if(inConflict) ring = `box-shadow:0 0 0 2px #ff4d6d, 0 0 10px 1px rgba(255,77,109,0.7);`;      // conflit = rouge (prioritaire)
+      else if(isEncours) ring = `box-shadow:0 0 0 2px #ffffff, 0 0 8px 1px rgba(255,255,255,0.5);`;   // en cours = contour blanc
+      else ring = `box-shadow:0 2px 8px ${col}55;`;                                                    // à venir = ombre simple
+      const dot = isEncours&&!inConflict ? '● ' : '';
+      return `<div onclick="editChantier('${c.id}')" title="${barTitle}${inConflict?' · ⚠ EN CONFLIT':isEncours?' · en cours':''}"
+        style="position:absolute;top:${top}px;height:${CH_H-6}px;left:${l}%;width:${w}%;background:${col};border-radius:6px;cursor:pointer;z-index:3;${ring}${over?'border-top:2px solid #ffb02e;':''}transition:opacity .15s;display:flex;align-items:center;padding:0 8px;overflow:hidden"
         onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
-        <span class="rg-chlbl" data-short="${shortLbl}" style="font-size:11px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inConflict?'⚠ ':''}${fullLbl}</span>
+        <span class="rg-chlbl" data-short="${dot}${shortLbl}" style="font-size:11px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inConflict?'⚠ ':dot}${fullLbl}</span>
       </div>`;
     }).join('');
 
@@ -11148,9 +11354,11 @@ function renderRespGantt(){
       const b=it.b, l=it.l, w=Math.max(1.2,it.r-it.l);
       const col=ABSENCE_COLORS[b.type]||'#6b7280', txt=_txtOn(col);
       const lbl=ABSENCE_LABELS[b.type]||b.type;
+      const nbJ=Math.round((parseLocal(b.end)-parseLocal(b.start))/86400000)+1;
       const top=absTop+it.lane*ABS_H;
-      return `<div onclick="gotoMasterAbsence('${emp.id}','${b.start}')" title="${lbl}: ${disp(b.start)} \u2192 ${disp(b.end)} \u00b7 ouvrir le Master Planning" style="position:absolute;top:${top}px;height:${ABS_H-4}px;left:${l}%;width:${w}%;background:${col};opacity:0.9;border-radius:4px;z-index:2;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;padding:0 6px;overflow:hidden" onmouseenter="this.style.opacity='0.65'" onmouseleave="this.style.opacity='0.9'">
-        <span style="font-size:10px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lbl}</span>
+      const showTxt=w>3.5;   // n'afficher le texte que si la pastille est assez large
+      return `<div onclick="gotoMasterAbsence('${emp.id}','${b.start}')" title="${lbl}: ${disp(b.start)} \u2192 ${disp(b.end)} · ${nbJ}j · ouvrir le Master Planning" style="position:absolute;top:${top}px;height:${ABS_H-4}px;left:${l}%;width:${w}%;background:${col};opacity:0.9;border-radius:4px;z-index:2;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;padding:0 4px;overflow:hidden" onmouseenter="this.style.opacity='0.65'" onmouseleave="this.style.opacity='0.9'">
+        <span style="font-size:9px;font-weight:800;color:${txt};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${showTxt?lbl+' '+nbJ+'j':nbJ+'j'}</span>
       </div>`;
     }).join('');
 
@@ -11160,13 +11368,13 @@ function renderRespGantt(){
     const absSep = absH?`<div style="position:absolute;top:${absTop-GAP/2}px;left:0;right:0;height:1px;background:rgba(255,255,255,0.08);z-index:1"></div>`:'';
 
     const accent=cat.col||'#4a5a7a';
-    const html=`<div style="display:flex;align-items:stretch;margin:12px 0;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1.5px rgba(255,255,255,0.22),0 3px 12px rgba(0,0,0,0.35)">
-      <div style="width:180px;flex-shrink:0;padding:10px 14px;border-right:1px solid rgba(255,255,255,0.10);display:flex;flex-direction:column;justify-content:center;background:rgba(16,23,38,0.92);box-shadow:inset 4px 0 0 ${accent}">
-        <div style="font-size:14px;font-weight:900;color:${cat.col||'#ffffff'}">${emp.nom} ${emp.prenom}</div>
+    const html=`<div style="display:flex;align-items:stretch;margin:12px 0;border-radius:10px;box-shadow:0 0 0 1.5px rgba(255,255,255,0.22),0 3px 12px rgba(0,0,0,0.35)">
+      <div style="width:180px;flex-shrink:0;padding:10px 14px;border-right:1px solid rgba(255,255,255,0.10);display:flex;flex-direction:column;justify-content:center;background:#0e1420;box-shadow:inset 4px 0 0 ${surcharge?'#ff9a3c':accent};position:sticky;left:0;z-index:6;border-radius:10px 0 0 10px">
+        <div style="font-size:14px;font-weight:900;color:${cat.col||'#ffffff'}">${emp.nom} ${emp.prenom}${surcharge?' <span title="Encadre 2+ chantiers en simultané" style="font-size:10px">⚠️</span>':''}</div>
         <div style="font-size:11px;color:#8090a8;margin-top:2px">${cat.lbl||emp.categorie}</div>
-        ${nothing?'<div style="font-size:10px;color:#4a5a7a;margin-top:3px">Aucun chantier</div>':`<div style="font-size:10px;color:#4a5a7a;margin-top:3px">${chantierCount} chantier${chantierCount>1?'s':''}</div>`}
+        ${nothing?'<div style="font-size:10px;color:#4a5a7a;margin-top:3px">Aucun chantier</div>':`<div style="font-size:10px;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap">${nbEnCours?`<span style="color:#34c759;font-weight:700">${nbEnCours} en cours</span>`:''}${nbAvenir?`<span style="color:#82b1ff">${nbAvenir} à venir</span>`:''}</div>${surcharge?'<div style="font-size:9px;color:#ff9a3c;font-weight:700;margin-top:2px">⚠️ surcharge encadrement</div>':''}`}
       </div>
-      <div style="flex:1;position:relative;height:${totalH}px;background:rgba(255,255,255,0.015)">
+      <div style="flex:1;position:relative;height:${totalH}px;background:rgba(255,255,255,0.015);border-radius:0 10px 10px 0;overflow:hidden">
         <!-- Grille mois -->
         <div style="position:absolute;inset:0;display:flex;pointer-events:none">
           ${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<div style="flex:1;border-right:1px solid rgba(255,255,255,0.04);${i===currentMonth?'background:rgba(0,210,255,0.03)':''}"></div>`).join('')}
@@ -11178,17 +11386,42 @@ function renderRespGantt(){
     </div>`;
 
     return html;
-  }).join('');
+  };
+  // Deux sections séparées : Responsables de projet, puis Chefs d'équipe
+  const _sectionBanner=(icon,txt,col,n)=>`<div style="display:flex;align-items:center;gap:8px;margin:16px 0 4px;padding:6px 14px;background:linear-gradient(90deg,${col}22,transparent);border-left:4px solid ${col};border-radius:6px">
+    <span style="font-size:13px;font-weight:900;color:${col};letter-spacing:.5px;text-transform:uppercase">${icon} ${txt}</span>
+    <span style="font-size:11px;color:#8090a8">${n} personne${n>1?'s':''}</span>
+  </div>`;
+  const respPeople=people.filter(p=>p.categorie==='responsable');
+  const chefPeople=people.filter(p=>p.categorie==='chef');
+  let sectionsHtml='';
+  if(respPeople.length){
+    sectionsHtml+=_sectionBanner('🎖','Responsables de projet','#00d2ff',respPeople.length);
+    sectionsHtml+=respPeople.map(renderPersonRow).join('');
+  }
+  if(chefPeople.length){
+    sectionsHtml+=_sectionBanner('👷','Chefs d\'équipe','#ffd060',chefPeople.length);
+    sectionsHtml+=chefPeople.map(renderPersonRow).join('');
+  }
+  const rows=sectionsHtml;
 
-  el.innerHTML=`<div style="overflow-x:auto">
-    <div style="min-width:600px">
-      <div style="max-height:60vh;overflow-y:auto;position:relative">
+  // Position d'aujourd'hui en % de l'année (pour le scroll auto et le bouton)
+  const _todayPctYear = today.getFullYear()===year ? ((today-yearStart)/yearMs*100) : null;
+
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+      <button onclick="_respGanttToday()" style="background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.35);color:#ff8fa3;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📍 Aujourd'hui</button>
+      <span style="font-size:10px;color:#8090a8">Fenêtre ~4 mois · faites défiler horizontalement pour parcourir l'année</span>
+    </div>
+    <div id="resp-gantt-scroll" style="overflow-x:auto;overflow-y:auto;max-height:70vh;position:relative" data-todaypct="${_todayPctYear!==null?_todayPctYear.toFixed(3):''}">
+      <div style="width:300%;min-width:1100px;position:relative">
         <div style="position:sticky;top:0;z-index:10;background:#0d1628">${monthHeader}</div>
         <div style="position:relative">${rows}</div>
       </div>
-      ${_ganttLegendHtml()}
     </div>
-  </div>`;
+    ${_ganttLegendHtml()}`;
+
+  // Scroll automatique pour centrer la fenêtre sur aujourd'hui
+  requestAnimationFrame(()=>_respGanttToday());
 
   // Priorité MSN : si le libellé complet (type - MSN) déborde de la barre, basculer sur le format court MSN-first
   requestAnimationFrame(()=>{
@@ -11198,6 +11431,18 @@ function renderRespGantt(){
   });
 }
 
+// Centre la fenêtre du Gantt responsables sur aujourd'hui
+function _respGanttToday(){
+  const sc=document.getElementById('resp-gantt-scroll'); if(!sc) return;
+  const pctStr=sc.dataset.todaypct;
+  const inner=sc.firstElementChild; // le canvas 300%
+  const fullW=inner?inner.scrollWidth:sc.scrollWidth;
+  if(pctStr==='' ){ sc.scrollLeft=0; return; }
+  const pct=parseFloat(pctStr)/100;
+  // placer aujourd'hui à ~1/3 de la fenêtre visible
+  const target=fullW*pct - sc.clientWidth*0.33;
+  sc.scrollLeft=Math.max(0,target);
+}
 /* ── Détection conflits double affectation + absences ── */
 function checkConflicts(){
   const el=document.getElementById('chantier-conflicts');
@@ -14829,95 +15074,169 @@ function _kpiEvolutionHtml(){
       <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><th style="padding:6px 10px;text-align:left;font-size:10px;color:#8090a8;text-transform:uppercase;position:sticky;left:0;background:#0d1628">Indicateur</th>${head}</tr></thead>
       <tbody>${rows}</tbody></table></div></div>`;
 }
+// ═══ HISTORIQUE KPI — calcul automatique par semaine ═══
+// Heures théoriques (planning) + réelles (pointage HR_ALLJob) + absentéisme par motif + flux avions
+function _kpiWeekData(mon){
+  const wEnd=addD(mon,6);
+  const monStr=fmt(mon), endStr=fmt(wEnd);
+  const wNum=wkN(mon);
+  const H=REX_H_JOUR;   // 7h/jour
+  const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
+
+  // ── Heures théoriques : demi-journées de travail planifiées × 3,5h ──
+  const ABS_MOTIFS={conge:0,maladie:0,formation:0,deplacement:0,absence:0};
+  let hTheo=0, demiTravail=0, demiAbs=0, demiTot=0;
+  prod.forEach(p=>{
+    for(let d=0;d<5;d++){
+      const ds=fmt(addD(mon,d)); if(isHol(ds))continue;
+      ['AM','PM'].forEach(h=>{
+        const e=S.planning[`${p.id}_${ds}_${h}`]||{};
+        const t=e.type||'travail';
+        demiTot++;
+        if(t==='travail'||!t){ hTheo+=H/2; demiTravail++; }
+        else if(ABS_MOTIFS.hasOwnProperty(t)){ ABS_MOTIFS[t]++; demiAbs++; }
+        else if(t==='formation_int'){ ABS_MOTIFS.formation++; demiAbs++; }
+      });
+    }
+  });
+
+  // ── Heures réelles : pointage importé (S.realHours) sur les dates de la semaine ──
+  let hReel=0, hasReel=false;
+  Object.entries(S.realHours||{}).forEach(([k,v])=>{
+    const parts=k.split('_'); const ds=parts[parts.length-1];
+    if(ds>=monStr && ds<=endStr){ hReel+=(parseFloat(v)||0); hasReel=true; }
+  });
+  hReel=Math.round(hReel*10)/10;
+  hTheo=Math.round(hTheo*10)/10;
+
+  // ── Absentéisme ──
+  const tauxAbs=demiTot>0?Math.round(demiAbs/demiTot*1000)/10:0;
+
+  // ── Flux avions : arrivées / départs dont la date tombe dans la semaine ──
+  let arrivees=0, departs=0;
+  const inWk=d=>d&&d>=monStr&&d<=endStr;
+  S.chantiers.forEach(c=>{
+    if(inWk(c.arrivee||c.debut)) arrivees++;
+    if(inWk(c.dateSortie)) departs++;
+  });
+  (S.stockage?.avions||[]).forEach(a=>{ if(inWk(a.entree)) arrivees++; if(inWk(a.sortie)) departs++; });
+  (S.recycling?.avions||[]).forEach(a=>{ if(inWk(a.entree)) arrivees++; });
+  (S.airbus?.msns||[]).forEach(m=>{ if(inWk(m.entree)) arrivees++; if(inWk(m.sortie)) departs++; });
+
+  // Avions sur site à la fin de la semaine (snapshot approximatif : présents à wEnd)
+  const surSite=(()=>{
+    const seen=new Set(); let n=0;
+    const add=msn=>{ const k=(msn||'').toUpperCase().trim(); if(!k||seen.has(k))return; seen.add(k); n++; };
+    S.chantiers.filter(c=>{const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null;return (!d||d<=wEnd)&&(!f||f>=wEnd)&&c.statut!=='prevision';}).forEach(c=>add(c.msn));
+    (S.recycling?.avions||[]).filter(a=>a.statut!=='termine').forEach(a=>add(a.msn));
+    (S.airbus?.msns||[]).filter(m=>(!m.entree||parseLocal(m.entree)<=wEnd)&&(!m.sortie||parseLocal(m.sortie)>=wEnd)).forEach(m=>add(m.msn));
+    (S.stockage?.avions||[]).filter(a=>a.statut!=='termine'&&a.statut!=='sorti').forEach(a=>add(a.msn));
+    return n;
+  })();
+
+  return {
+    wNum, mon:monStr, label:`S${wNum}`,
+    hTheo, hReel, hasReel,
+    ecartH: hasReel?Math.round((hReel-hTheo)*10)/10:null,
+    demiTravail, demiAbs, demiTot, tauxAbs,
+    motifs:{...ABS_MOTIFS},
+    arrivees, departs, surSite,
+    isCurrent: fmt(getMon(new Date()))===monStr,
+    isFuture: mon>getMon(new Date())
+  };
+}
+// Construit l'historique de toutes les semaines de l'année
+function _kpiYearWeeks(year){
+  const out=[];
+  let d=new Date(year,0,1); while(d.getDay()!==1) d.setDate(d.getDate()+1);
+  const end=new Date(year,11,31);
+  const todayMon=getMon(new Date());
+  while(d<=end){
+    const mon=new Date(d);
+    if(mon<=todayMon) out.push(_kpiWeekData(mon));   // que les semaines écoulées ou en cours
+    d=addD(d,7);
+  }
+  return out;
+}
 function renderKPI(){
   const el=document.getElementById('kpiGrid'); if(!el) return;
-  if(!S.kpiHistory) S.kpiHistory={};
-  // ── Vue historique (semaine figée sélectionnée) ──
-  if(_kpiViewWeek && S.kpiHistory[_kpiViewWeek]){
-    const snap=S.kpiHistory[_kpiViewWeek];
-    const sub0=document.getElementById('kpiSubtitle'); if(sub0) sub0.textContent='🗄 '+snap.label+' · figé le '+(snap.date?disp(snap.date):'?');
-    el.innerHTML=_kpiControlsHtml()+_renderKPISections(snap)+_kpiEvolutionHtml()+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Instantané figé — valeurs telles qu'enregistrées à la date indiquée.</div>`;
-    return;
-  }
   const today=new Date(); today.setHours(0,0,0,0);
   const curMon=getMon(today);
-  const wkKey=`${curMon.getFullYear()}-S${wkN(curMon)}`;
-  const MHJ=7;
-  const sub=document.getElementById('kpiSubtitle');
-  if(sub) sub.textContent=`Semaine ${wkN(curMon)} · ${disp(fmt(curMon))} → ${disp(fmt(addD(curMon,6)))}`;
+  const curKey=fmt(curMon);
 
-  const card=(val,label,color,sub2)=>`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;min-width:0">
+  // Liste des semaines sélectionnables (écoulées + en cours, année courante par défaut)
+  const year=window._kpiYear||curMon.getFullYear();
+  const weeks=_kpiYearWeeks(year);
+  if(!weeks.length){ el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--t4)">Aucune semaine pour ${year}.</div>`; return; }
+
+  // Semaine sélectionnée (défaut = en cours)
+  if(!window._kpiWeekSel || !weeks.some(w=>w.mon===window._kpiWeekSel)){
+    const cur=weeks.find(w=>w.isCurrent)||weeks[weeks.length-1];
+    window._kpiWeekSel=cur.mon;
+  }
+  const idx=weeks.findIndex(w=>w.mon===window._kpiWeekSel);
+  const w=weeks[idx];
+  const prev=idx>0?weeks[idx-1]:null;
+
+  const sub=document.getElementById('kpiSubtitle');
+  if(sub) sub.textContent=`Semaine ${w.wNum} \u00b7 ${disp(w.mon)} \u2192 ${disp(fmt(addD(parseLocal(w.mon),6)))}`;
+
+  // ── Sélecteur de semaine (déroulant + navigation) ──
+  const years=[curMon.getFullYear()]; (S.archives||[]).forEach(a=>{ if(!years.includes(a.year)) years.push(a.year); }); years.sort((a,b)=>b-a);
+  const yearBtns=years.length>1?`<div style="display:flex;gap:5px;margin-right:8px">${years.map(y=>`<button onclick="window._kpiYear=${y};window._kpiWeekSel=null;renderKPI()" style="padding:6px 11px;border-radius:8px;border:1px solid ${y===year?'rgba(0,210,255,0.4)':'rgba(255,255,255,0.12)'};background:${y===year?'rgba(0,210,255,0.12)':'transparent'};color:${y===year?'var(--cyan)':'var(--t3)'};font-size:12px;font-weight:800;cursor:pointer;font-family:\'Outfit\',sans-serif">${y}</button>`).join('')}</div>`:'';
+  const opts=weeks.slice().reverse().map(x=>`<option value="${x.mon}" ${x.mon===w.mon?'selected':''}>S${x.wNum} \u00b7 ${disp(x.mon)}${x.isCurrent?' \u2014 en cours':''}</option>`).join('');
+  const selector=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    ${yearBtns}
+    <button onclick="_kpiWeekNav(-1)" ${idx<=0?'disabled':''} style="padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:${idx<=0?'#4a5568':'#cfe0f5'};font-size:14px;font-weight:800;cursor:${idx<=0?'default':'pointer'};font-family:\'Outfit\',sans-serif">\u2039</button>
+    <select onchange="window._kpiWeekSel=this.value;renderKPI()" style="padding:8px 12px;border-radius:9px;background:#141d2e;border:1px solid rgba(0,210,255,0.3);color:#e6eefc;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Outfit\',sans-serif;min-width:200px">${opts}</select>
+    <button onclick="_kpiWeekNav(1)" ${idx>=weeks.length-1?'disabled':''} style="padding:7px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:${idx>=weeks.length-1?'#4a5568':'#cfe0f5'};font-size:14px;font-weight:800;cursor:${idx>=weeks.length-1?'default':'pointer'};font-family:\'Outfit\',sans-serif">\u203a</button>
+    ${!w.isCurrent?`<button onclick="window._kpiWeekSel=\'${curKey}\';renderKPI()" style="padding:7px 12px;border-radius:8px;border:1px solid rgba(255,77,109,0.35);background:rgba(255,77,109,0.12);color:#ff8fa3;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Outfit\',sans-serif">\ud83d\udccd Semaine en cours</button>`:''}
+  </div>`;
+
+  // Carte avec tendance vs semaine précédente
+  const trend=(cur,pv,inv)=>{
+    if(pv===null||pv===undefined||cur===null) return '';
+    const d=Math.round((cur-pv)*10)/10; if(d===0) return `<span style="font-size:10px;color:#8090a8">\u2192 stable</span>`;
+    const up=d>0; const good=inv?!up:up;
+    return `<span style="font-size:10px;font-weight:700;color:${good?'#34c759':'#ff8090'}">${up?'\u2197':'\u2198'} ${up?'+':''}${d} vs S-1</span>`;
+  };
+  const card=(val,label,color,sub2,trendHtml)=>`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;min-width:0">
     <div style="font-size:25px;font-weight:900;color:${color};line-height:1.05">${val}</div>
     <div style="font-size:10.5px;color:#9fb0c8;margin-top:6px;text-transform:uppercase;letter-spacing:.4px;font-weight:700">${label}</div>
     ${sub2?`<div style="font-size:11px;color:#7088a8;margin-top:4px">${sub2}</div>`:''}
+    ${trendHtml?`<div style="margin-top:5px">${trendHtml}</div>`:''}
   </div>`;
-  const section=(title,inner)=>`<div class="gc" style="margin-bottom:14px"><div class="gc-head"><div class="gc-title">${title}</div></div><div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">${inner}</div></div>`;
-  const colHigh=(v,t1,t2)=>v>=t1?'#34c759':v>=t2?'#ffd060':'#ff4d6d';
+  const section=(title,inner,grid)=>`<div class="gc" style="margin-bottom:14px"><div class="gc-head"><div class="gc-title">${title}</div></div><div style="padding:14px 18px${grid===false?'':';display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px'}">${inner}</div></div>`;
   const colLow=(v,t1,t2)=>v<=t1?'#34c759':v<=t2?'#ffd060':'#ff4d6d';
 
-  let html='';
+  let html=selector;
+  if(w.isCurrent) html+=`<div style="margin-bottom:12px;padding:8px 14px;background:rgba(255,77,109,0.06);border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;font-size:11px;color:var(--t3)">\ud83d\udccd Semaine en cours \u2014 les donn\u00e9es \u00e9voluent encore (planning et pointage en cours de saisie).</div>`;
 
-  // ── RH & Capacité ──
-  try{
-    const dd=_aiDispoSemaine(curMon); const bb=_aiBesoinSemaine(curMon);
-    const eff=dd.nbTechs;
-    const tauxDispo=eff>0?Math.round(dd.dispo/eff*100):0;
-    const ecart=Math.round((dd.dispo-bb.total)*10)/10;
-    const prod=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
-    let absH=0,totH=0,formH=0;
-    prod.forEach(p=>{ for(let d=0;d<5;d++){ const ds=fmt(addD(curMon,d)); if(isHol(ds))continue; ['AM','PM'].forEach(h=>{ totH++; const t=(S.planning[`${p.id}_${ds}_${h}`]||{}).type||''; if(t==='conge'||t==='maladie')absH++; else if(t==='formation'||t==='formation_int')formH++; }); } });
-    const tauxAbs=totH>0?Math.round(absH/totH*100):0;
-    const nbInterim=prod.filter(p=>p.categorie==='interimaire').length;
-    const tauxInt=eff>0?Math.round(nbInterim/eff*100):0;
-    let sousEff=0; for(let i=0;i<8;i++){ const m=addD(curMon,7*i); if(_aiDispoSemaine(m).dispo<_aiBesoinSemaine(m).total) sousEff++; }
-    html+=section('👥 Capacité &amp; RH (semaine en cours)',
-      card(tauxDispo+'%','Taux de disponibilité',colHigh(tauxDispo,85,70),`${dd.dispo} / ${eff} productifs`)+
-      card((ecart>=0?'+':'')+ecart,'Écart capacité / besoin',ecart>=0?'#34c759':'#ff4d6d',`dispo ${dd.dispo} · besoin ${bb.total}`)+
-      card(tauxAbs+'%','Absentéisme',colLow(tauxAbs,8,15),`${absH} demi-j. (congé+maladie)`)+
-      card(tauxInt+'%','Recours intérim',colLow(tauxInt,30,50),`${nbInterim} intérimaires / ${eff}`)+
-      card((formH/2)+' j','Charge formation',formH>0?'#ffd060':'#34c759','jours-homme cette semaine')+
-      card(sousEff,'Semaines en sous-effectif',colLow(sousEff,0,2),'sur les 8 prochaines')
-    );
-  }catch(e){ html+=section('👥 Capacité & RH',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
+  // ── HEURES THÉORIQUES vs RÉELLES ──
+  const ecCol=w.ecartH===null?'#8090a8':w.ecartH>=0?'#ffd060':'#34c759';
+  html+=section('\u23f1 Heures de production \u2014 S'+w.wNum,
+    card(Math.round(w.hTheo)+' h','Heures th\u00e9oriques','#82b1ff','planning \u00d7 3,5h/demi-j.',trend(w.hTheo,prev?prev.hTheo:null))+
+    card(w.hasReel?Math.round(w.hReel)+' h':'\u2014','Heures r\u00e9elles point\u00e9es',w.hasReel?'#6effc4':'#8090a8',w.hasReel?'pointage HR_ALLJob':'pointage non import\u00e9',w.hasReel&&prev&&prev.hasReel?trend(w.hReel,prev.hReel):'')+
+    card(w.ecartH===null?'\u2014':(w.ecartH>=0?'+':'')+Math.round(w.ecartH)+' h','\u00c9cart r\u00e9el / th\u00e9o',ecCol,w.ecartH===null?'pointage requis':w.ecartH>=0?'heures suppl\u00e9mentaires':'sous-r\u00e9alis\u00e9')+
+    card(w.demiTravail/2+' j','Jours-homme travaill\u00e9s','#82b1ff',`${w.demiTravail} demi-journ\u00e9es`)
+  );
 
-  // ── Chantiers ──
-  try{
-    const techIds=new Set((S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false).map(p=>p.id));
-    const todayStr=fmt(today);
-    const consom=(cid)=>{ let mh=0; Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e)return; const isP=e.chantierId===cid,isS=e.chantierId2===cid; if(!isP&&!isS)return; const pa=k.split('_'); if(pa.length<3)return; if(!techIds.has(pa[0]))return; const h=pa[pa.length-1]; if(h!=='AM'&&h!=='PM')return; const ds=pa.slice(1,-1).join('_'); if(ds>todayStr)return; mh+=(e.chantierId&&e.chantierId2)?(MHJ/2)/2:(MHJ/2); }); return mh; };
-    const enc=(S.chantiers||[]).filter(c=>c.statut==='encours');
-    let sumW=0,sumReel=0,sumTheo=0,sumInit=0,sumSupp=0,nbA=0,nbO=0,nbR=0,nbVol=0;
-    enc.forEach(c=>{
-      const mhInit=c.manHours||0; const mhSupp=Array.isArray(c.mhAjouts)?c.mhAjouts.reduce((s,a)=>s+(parseFloat(a.heures)||0),0):0;
-      const mhTot=mhInit+mhSupp; sumInit+=mhInit; sumSupp+=mhSupp;
-      if(mhTot<=0) return; nbVol++;
-      const mhC=consom(c.id);
-      const reel=Math.min(100,mhC/mhTot*100);
-      const jT=calcJoursOuvres(c.debut,c.fin); const finEff=(c.fin&&parseLocal(c.fin)<today)?c.fin:todayStr; const jE=calcJoursOuvres(c.debut,finEff);
-      const theo=jT>0?Math.min(100,jE/jT*100):0;
-      const delta=reel-theo;
-      sumW+=mhTot; sumReel+=reel*mhTot; sumTheo+=theo*mhTot;
-      if(delta>=5)nbA++; else if(delta<=-10)nbR++; else nbO++;
-    });
-    const avMoy=sumW>0?Math.round(sumReel/sumW):0;
-    const thMoy=sumW>0?Math.round(sumTheo/sumW):0;
-    const derive=sumInit>0?Math.round(sumSupp/sumInit*100):0;
-    if(nbVol===0){
-      html+=section('🔧 Chantiers en cours',
-        `<div style="grid-column:1/-1;color:#ffd060;font-size:12px;margin-bottom:8px">💡 Renseignez le volume Man/Hours des chantiers (dashboard ou fiche chantier) pour activer l'avancement, la dérive de périmètre et le statut avance/retard.</div>`+
-        card(enc.length,'Chantiers en cours','#82b1ff','volume MH non renseigné'));
-    } else {
-      const dlt=avMoy-thMoy;
-      html+=section('🔧 Chantiers en cours',
-        card(avMoy+'%','Avancement réel moyen','#82b1ff',`pondéré MH · ${nbVol} chantier(s)`)+
-        card((dlt>=0?'+':'')+dlt+'%','Écart réel / théorique',dlt>=0?'#34c759':dlt>=-10?'#ffd060':'#ff4d6d',`théorique ${thMoy}%`)+
-        card(nbR,'Chantiers en retard',colLow(nbR,0,1),`✅ ${nbA} avance · 🟡 ${nbO} dans les temps`)+
-        card('+'+derive+'%','Dérive de périmètre',colLow(derive,5,15),`+${sumSupp} h ajoutées / ${sumInit} h`)
-      );
-    }
-  }catch(e){ html+=section('🔧 Chantiers',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
+  // ── ABSENTÉISME PAR MOTIF ──
+  const MOTIF_LBL={conge:'\ud83c\udfd6 Cong\u00e9',maladie:'\ud83e\udd12 Maladie',formation:'\ud83c\udf93 Formation',deplacement:'\u2708\ufe0f D\u00e9placement',absence:'\u2753 Absence'};
+  const MOTIF_COL={conge:'#34c759',maladie:'#ff4d6d',formation:'#ffd060',deplacement:'#a78bfa',absence:'#ff9a3c'};
+  const totM=Object.values(w.motifs).reduce((a,b)=>a+b,0)||1;
+  const absCards=card(w.tauxAbs+'%','Absent\u00e9isme global',colLow(w.tauxAbs,8,15),`${w.demiAbs} / ${w.demiTot} demi-j.`,trend(w.tauxAbs,prev?prev.tauxAbs:null,true))+
+    Object.keys(MOTIF_LBL).map(m=>{const demi=w.motifs[m]||0;const pct=Math.round(demi/totM*100);return card(Math.round(demi/2*10)/10+' j',MOTIF_LBL[m],demi>0?MOTIF_COL[m]:'#8090a8',demi>0?`${pct}% des absences`:'\u2014');}).join('');
+  html+=section('\ud83d\udcca Absent\u00e9isme par motif \u2014 S'+w.wNum, absCards);
 
-  // ── Qualifications ──
+  // ── FLUX D'AVIONS DE LA SEMAINE ──
+  html+=section('\u2708\ufe0f Avions \u2014 S'+w.wNum,
+    card(w.surSite,'Avions sur site','#82b1ff','en fin de semaine',trend(w.surSite,prev?prev.surSite:null))+
+    card(w.arrivees,'Arriv\u00e9es','#00d2ff','cette semaine')+
+    card(w.departs,'D\u00e9parts','#ff9a3c','cette semaine')
+  );
+
+  // ── QUALIFICATIONS (état actuel) ──
   try{
     const active=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived);
     const allQ=[]; (S.formations||[]).forEach(f=>{ if(_empHorsEffectif(f.empId))return; if(f.dateExpiration) allQ.push({empId:f.empId,type:f.type,exp:f.dateExpiration}); });
@@ -14930,43 +15249,27 @@ function renderKPI(){
     const tauxConf=active.length>0?Math.round(conformes/active.length*100):100;
     const holders={}; allQ.forEach(q=>{ if(days(q.exp)>=0){ (holders[q.type]=holders[q.type]||new Set()).add(q.empId); } });
     const risque=Object.keys(holders).filter(t=>holders[t].size<=1).length;
-    html+=section('🛡 Qualifications &amp; conformité',
-      card(tauxConf+'%','Conformité habilitations',colHigh(tauxConf,95,85),`${conformes}/${active.length} sans expiration`)+
-      card(expired,'Qualifications expirées',colLow(expired,0,3),'à régulariser')+
+    const colHigh=(v,t1,t2)=>v>=t1?'#34c759':v>=t2?'#ffd060':'#ff4d6d';
+    html+=section('\ud83d\udee1 Qualifications &amp; conformit\u00e9 <span style="font-size:10px;font-weight:400;color:var(--t4)">(\u00e9tat actuel)</span>',
+      card(tauxConf+'%','Conformit\u00e9 habilitations',colHigh(tauxConf,95,85),`${conformes}/${active.length} sans expiration`)+
+      card(expired,'Qualifications expir\u00e9es',colLow(expired,0,3),'\u00e0 r\u00e9gulariser')+
       card(exp30,'Expirent &lt; 30 jours',colLow(exp30,0,5),'formations + autorisations')+
-      card(exp90,'Expirent &lt; 90 jours',colLow(exp90,3,10),'à anticiper')+
-      card(risque,'Compétences à risque',colLow(risque,0,3),'détenues par ≤ 1 personne')
-    );
-  }catch(e){ html+=section('🛡 Qualifications',`<div style="color:#ff8090;font-size:12px">Erreur de calcul</div>`); }
-
-  // ── Activités spécifiques ──
-  try{
-    const bb=_aiBesoinSemaine(curMon);
-    const recActifs=(S.recycling?.avions||[]).filter(a=>a.statut!=='termine').length;
-    const stMH=S.stockage?.mhHebdo?.[wkKey]?.total||0;
-    const prevMon=addD(curMon,-7); const prevKey=`${prevMon.getFullYear()}-S${wkN(prevMon)}`;
-    const stPrev=S.stockage?.mhHebdo?.[prevKey]?.total||0;
-    const stTrend=stPrev>0?Math.round((stMH-stPrev)/stPrev*100):0;
-    const ac=S.airbus?.charge?.[wkKey]||{}; const airb=(ac.part21||0);  /* IQ = improductif, hors besoin productif */
-    html+=section('♻️ Recyclage · Stockage · Airbus',
-      card(recActifs,'Avions en recyclage','#6effc4',`besoin ${bb.recT} tech.`)+
-      card(stMH+' h','Charge stockage (sem.)',stMH>0?'#ff9a3c':'#8090a8',stPrev>0?`${stTrend>=0?'+':''}${stTrend}% vs S-1`:'pas de référence S-1')+
-      card(airb,'Charge Airbus Part 21',airb>0?'#00a0ff':'#8090a8','techniciens requis (sem.)')
+      card(exp90,'Expirent &lt; 90 jours',colLow(exp90,3,10),'\u00e0 anticiper')+
+      card(risque,'Comp\u00e9tences \u00e0 risque',colLow(risque,0,3),'d\u00e9tenues par \u2264 1 personne')
     );
   }catch(e){}
 
-  // ── Heures de production réalisées par catégorie ──
-  try{
-    const hd=_kpiHeuresData(curMon);
-    const cards=hd.cards.map(c=>card(c.val,c.label,c.col,c.sub)).join('');
-    const legend=`<div style="grid-column:1/-1;font-size:11px;color:#7088a8;margin-top:6px;line-height:1.5;padding:8px 10px;background:rgba(16,23,38,0.90);border-radius:8px;border-left:3px solid rgba(0,210,255,0.3)">${hd.legend}</div>`;
-    html+=section('⏱ Heures de production réalisées (semaine)', cards+legend);
-  }catch(e){}
-
-  el.innerHTML=_kpiControlsHtml()+html+_kpiEvolutionHtml()+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Indicateurs calculés sur la semaine en cours et l'état actuel des données · actualisés à chaque ouverture de l'onglet.</div>`;
-  try{ _kpiSnapshot(false); }catch(e){}
+  el.innerHTML=html+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Synth\u00e8se calcul\u00e9e automatiquement pour la semaine s\u00e9lectionn\u00e9e \u00b7 tendances compar\u00e9es \u00e0 la semaine pr\u00e9c\u00e9dente.</div>`;
 }
-
+// Navigation semaine précédente / suivante
+function _kpiWeekNav(dir){
+  const curMon=getMon(new Date());
+  const year=window._kpiYear||curMon.getFullYear();
+  const weeks=_kpiYearWeeks(year);
+  const idx=weeks.findIndex(x=>x.mon===window._kpiWeekSel);
+  const ni=idx+dir;
+  if(ni>=0&&ni<weeks.length){ window._kpiWeekSel=weeks[ni].mon; renderKPI(); }
+}
 function renderAI(){ try{ aiRenderSuggestions(); }catch(e){} }
 
 // ── Export PDF des KPI (présentation partenaires) ──
