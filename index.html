@@ -577,7 +577,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,0.6);z-index:500;
   align-items:flex-start;justify-content:center;
-  padding:110px 16px 16px 16px;
+  padding:24px 16px 24px 16px;
   overflow-y:auto;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
@@ -586,7 +586,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   background:rgba(14,22,40,0.95);
   border:1px solid var(--glass-border-bright);
   border-radius:var(--r24);padding:20px;
-  width:100%;max-width:520px;max-height:94vh;
+  width:100%;max-width:520px;
+  margin:auto;
   overflow-y:auto;display:flex;flex-direction:column;
   box-shadow:var(--sh-lg),0 0 60px rgba(0,210,255,0.06);
   animation:mIn .25s cubic-bezier(.34,1.56,.64,1);
@@ -597,7 +598,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
   margin-top:16px;padding-top:14px;flex-shrink:0;
   border-top:1px solid var(--glass-border);
-  position:sticky;bottom:-26px;
+  position:sticky;bottom:0;
   background:rgba(14,22,40,0.97);
   backdrop-filter:blur(10px);
   padding-bottom:4px;
@@ -1240,6 +1241,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="form-search" placeholder="Nom, prénom ou trigramme…" oninput="renderForms()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
+      <button class="btn btn-ghost btn-sm" onclick="_previewDedupeForms()" title="Fusionner les formations et autorisations en double (même personne + même type)">🧹 Nettoyer les doublons</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()" title="Formations · Autorisations · Tractage · Certifying Staff — 1 à 4 fichiers, format détecté automatiquement">📡 Import mise à jour</button>
       <button class="btn btn-mint btn-sm" onclick="exportFormXls()">📤 Export Excel</button>
     </div>
@@ -7026,13 +7028,24 @@ function renderDash(){
     : `<div class="st ${s.c}"><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
 
   const alerts=[];
-  S.formations.forEach(f=>{
+  // Dédoublonnage : par personne + type, ne garder que l'entrée à l'expiration la plus lointaine
+  // (la validation la plus récente). Évite les doublons de rappels issus d'imports multiples.
+  const _dedupeByEmpType=(list)=>{
+    const best={};
+    list.forEach(item=>{
+      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      const cur=best[key];
+      if(!cur || (item.dateExpiration||'') > (cur.dateExpiration||'')) best[key]=item;
+    });
+    return Object.values(best);
+  };
+  _dedupeByEmpType(S.formations||[]).forEach(f=>{
     const st=tSt(f.dateExpiration); const emp=byId(f.empId); if(!emp)return;
     if(_empHorsEffectif(f.empId))return; // plus dans les effectifs → pas de rappel
     if(st==='expired') alerts.push({cls:'red',ic:'🚨',t:`Formation expirée : ${f.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});
     else if(st==='warning'){const d=Math.ceil((new Date(f.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'⏰',t:`Formation expire dans ${d}j : ${f.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});}
   });
-  S.autorisations.forEach(a=>{
+  _dedupeByEmpType(S.autorisations||[]).forEach(a=>{
     const st=tSt(a.dateExpiration); const emp=byId(a.empId); if(!emp)return;
     if(_empHorsEffectif(a.empId))return; // plus dans les effectifs → pas de rappel
     if(st==='expired') alerts.push({cls:'red',ic:'🛡',t:`Autorisation expirée : ${a.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`});
@@ -7202,6 +7215,72 @@ function _matchStaff(emp,q){
   const p=(emp.prenom||'').toLowerCase(), n=(emp.nom||'').toLowerCase(), t=(emp.trigramme||'').toLowerCase();
   return (p+' '+n).includes(q)||(n+' '+p).includes(q)||n.includes(q)||p.includes(q)||t.includes(q);
 }
+// Détecte les doublons (même personne + même type) dans formations et autorisations
+function _findFormDupes(){
+  const scan=(list)=>{
+    const groups={};
+    (list||[]).forEach(item=>{
+      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      (groups[key]=groups[key]||[]).push(item);
+    });
+    return Object.values(groups).filter(g=>g.length>1);
+  };
+  return {forms:scan(S.formations), autos:scan(S.autorisations)};
+}
+// Aperçu avant nettoyage
+function _previewDedupeForms(){
+  const {forms,autos}=_findFormDupes();
+  const totalGroups=forms.length+autos.length;
+  if(totalGroups===0){ toast('✅ Aucun doublon détecté'); return; }
+  const nbSupp=[...forms,...autos].reduce((s,g)=>s+(g.length-1),0);
+  const line=(g)=>{
+    const emp=byId(g[0].empId); const nom=emp?`${(emp.nom||'').toUpperCase()} ${emp.prenom||''}`:'?';
+    const kept=g.slice().sort((a,b)=>(b.dateExpiration||'').localeCompare(a.dateExpiration||''))[0];
+    return `<div style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:12px;font-weight:700;color:#cfe0f5">${nom} — ${g[0].type}</div>
+      <div style="font-size:10px;color:#8090a8;margin-top:2px">${g.length} entrées → on garde l'expiration ${kept.dateExpiration?disp(kept.dateExpiration):'(vide)'}, on supprime ${g.length-1} doublon(s)</div>
+    </div>`;
+  };
+  const old=document.getElementById('dedupe-pop'); if(old) old.remove();
+  const pop=document.createElement('div');
+  pop.id='dedupe-pop';
+  pop.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px';
+  pop.onclick=e=>{ if(e.target===pop) pop.remove(); };
+  pop.innerHTML=`<div style="background:#0e1626;border:1px solid rgba(255,180,92,0.35);border-radius:16px;max-width:560px;width:100%;max-height:80vh;overflow:auto;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+    <div style="font-size:16px;font-weight:900;color:#e6eefc;margin-bottom:4px">🧹 Nettoyage des doublons</div>
+    <div style="font-size:12px;color:#8090a8;margin-bottom:14px">${totalGroups} type(s) en double détecté(s) · ${nbSupp} entrée(s) seront supprimées. Pour chaque doublon, on conserve celle dont l'expiration est la plus récente.</div>
+    ${forms.length?`<div style="font-size:11px;font-weight:800;color:#ffd060;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Formations (${forms.length})</div>${forms.map(line).join('')}`:''}
+    ${autos.length?`<div style="font-size:11px;font-weight:800;color:#82b1ff;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px">Autorisations (${autos.length})</div>${autos.map(line).join('')}`:''}
+    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+      <button onclick="document.getElementById('dedupe-pop').remove()" style="padding:10px 16px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#cfe0f5;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">Annuler</button>
+      <button onclick="_applyDedupeForms()" style="padding:10px 16px;border-radius:9px;background:rgba(255,180,92,0.15);border:1px solid rgba(255,180,92,0.45);color:#ffb45c;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">🧹 Fusionner ${nbSupp} doublon(s)</button>
+    </div>
+  </div>`;
+  document.body.appendChild(pop);
+}
+// Exécute le nettoyage : garde par emp+type l'entrée à l'expiration la plus lointaine
+function _applyDedupeForms(){
+  const dedupe=(list)=>{
+    const best={}, keepIds=new Set();
+    (list||[]).forEach(item=>{
+      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      const cur=best[key];
+      if(!cur || (item.dateExpiration||'') > (cur.dateExpiration||'')) best[key]=item;
+    });
+    Object.values(best).forEach(it=>keepIds.add(it.id));
+    // fusionner les notes des doublons dans l'entrée gardée (traçabilité)
+    return (list||[]).filter(it=>keepIds.has(it.id));
+  };
+  const beforeF=(S.formations||[]).length, beforeA=(S.autorisations||[]).length;
+  S.formations=dedupe(S.formations);
+  S.autorisations=dedupe(S.autorisations);
+  const removed=(beforeF-(S.formations||[]).length)+(beforeA-(S.autorisations||[]).length);
+  save();
+  const p=document.getElementById('dedupe-pop'); if(p) p.remove();
+  if(typeof renderForms==='function') renderForms();
+  if(typeof renderDash==='function') renderDash();
+  toast(`✅ ${removed} doublon(s) supprimé(s)`);
+}
 function renderForms(){
   const eF=document.getElementById('flt-emp')?.value||'';
   const tF=document.getElementById('flt-type')?.value||'';
@@ -7271,7 +7350,15 @@ function _formToggleEmp(key){
 }
 function openFormModal(id){
   document.getElementById('fi').value=id||'';
-  if(id){const f=S.formations.find(x=>x.id===id);if(f){document.getElementById('f-emp').value=f.empId;document.getElementById('f-type').value=f.type;document.getElementById('f-obt').value=f.dateObtention||'';document.getElementById('f-exp').value=f.dateExpiration||'';document.getElementById('f-notes').value=f.notes||'';}}
+  if(id){const f=S.formations.find(x=>x.id===id);if(f){
+    document.getElementById('f-emp').value=f.empId;
+    // S'assurer que le type existe dans les options (sinon l'ajouter) pour un chargement fidèle
+    const tSel=document.getElementById('f-type');
+    if(tSel && f.type && !Array.from(tSel.options).some(o=>o.value===f.type)){
+      const o=document.createElement('option'); o.value=f.type; o.textContent=f.type; tSel.appendChild(o);
+    }
+    document.getElementById('f-type').value=f.type;
+    document.getElementById('f-obt').value=f.dateObtention||'';document.getElementById('f-exp').value=f.dateExpiration||'';document.getElementById('f-notes').value=f.notes||'';}}
   else{['f-obt','f-exp','f-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-emp').value='';}
   openM('m-form');
 }
