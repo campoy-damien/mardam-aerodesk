@@ -1230,7 +1230,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="gc" style="margin-bottom:14px">
     <div class="gc-head">
       <div class="gc-title">⚠️ Alertes actives</div>
-      <button class="btn btn-ghost btn-sm" onclick="goTab('formations')">Voir formations →</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="_exportAlertsPdf()" title="Exporter les alertes en PDF">📄 PDF</button>
+        <button class="btn btn-ghost btn-sm" onclick="_exportAlertsXls()" title="Exporter les alertes en Excel">📊 Excel</button>
+        <button class="btn btn-ghost btn-sm" onclick="goTab('formations')">Voir formations →</button>
+      </div>
     </div>
     <div id="alertsBox"><div class="empty"><div class="empty-ico">✅</div><p>Aucune alerte — tout est à jour !</p></div></div>
   </div>
@@ -6954,6 +6958,87 @@ function _toggleImprod(ev){ _togglePop('improd-pop',ev); }
 function _toggleEff(ev){ _togglePop('eff-pop',ev); }
 function _toggleAbs(ev){ _togglePop('abs-pop',ev); }
 function _toggleAc(ev){ _togglePop('ac-pop',ev); }
+// Collecte les alertes formations/autorisations/licences (actifs uniquement) pour export
+function _collectAlertsData(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const out=[];
+  const push=(kind,type,empId,exp)=>{
+    if(!exp) return;
+    if(_empHorsEffectif(empId)) return;
+    const emp=byId(empId); if(!emp) return;
+    const days=Math.round((parseLocal(exp)-today)/86400000);
+    let statut=null;
+    if(days<0) statut='expired';
+    else if(days<=90) statut='warning';
+    else return;   // on n'exporte que expiré ou à renouveler (<90j)
+    out.push({kind,type,emp,exp,days,statut});
+  };
+  const _norm=s=>(s||'').toUpperCase().replace(/\s+/g,'').replace(/[·.]/g,'').trim();
+  // dédoublonnage emp+type (garde l'expiration la plus lointaine)
+  const dedup=(list)=>{ const best={}; list.forEach(it=>{ const k=`${it.empId}__${_norm(it.type)}`; if(!best[k]||(it.dateExpiration||'')>(best[k].dateExpiration||'')) best[k]=it; }); return Object.values(best); };
+  dedup(S.formations||[]).forEach(f=>push('Formation',f.type,f.empId,f.dateExpiration));
+  dedup((S.autorisations||[]).map(a=>({...a,type:a.type||a.nom}))).forEach(a=>push('Autorisation',a.type,a.empId,a.dateExpiration));
+  (S.certifiants||[]).forEach(c=>{ if(c.licExp) push('Licence Part 66','Licence Part 66',c.empId||c.id,c.licExp); });
+  // tri : expirés d'abord (plus anciens en haut), puis à renouveler (plus proches)
+  return out.sort((a,b)=>{ if(a.statut!==b.statut) return a.statut==='expired'?-1:1; return a.days-b.days; });
+}
+const _ALERT_STLBL={expired:'Expiré',warning:'À renouveler'};
+function _exportAlertsPdf(){
+  const rows=_collectAlertsData();
+  const nbExp=rows.filter(r=>r.statut==='expired').length;
+  const nbWarn=rows.filter(r=>r.statut==='warning').length;
+  const kindIc={Formation:'📚',Autorisation:'🛡','Licence Part 66':'🛫'};
+  const trs=rows.map(r=>`<tr>
+    <td style="border:1px solid #dde6f0;padding:6px 9px;font-weight:700">${r.emp.trigramme||'—'}</td>
+    <td style="border:1px solid #dde6f0;padding:6px 9px">${r.emp.nom} ${r.emp.prenom}</td>
+    <td style="border:1px solid #dde6f0;padding:6px 9px">${kindIc[r.kind]||''} ${r.type}</td>
+    <td style="border:1px solid #dde6f0;padding:6px 9px;text-align:center">${disp(r.exp)}</td>
+    <td style="border:1px solid #dde6f0;padding:6px 9px;text-align:center;color:${r.statut==='expired'?'#dc2626':'#d97706'};font-weight:800">${r.statut==='expired'?'Expiré depuis '+Math.abs(r.days)+'j':'Dans '+r.days+'j'}</td>
+  </tr>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Alertes</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f1e3d;margin:0;padding:30px}
+    .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #ff4d6d;padding-bottom:13px}.hd img{width:32px;height:32px;object-fit:contain}
+    .brand{font-size:15px;font-weight:800}.brand em{font-style:normal;color:#ff4d6d}
+    h1{font-size:19px;margin:16px 0 2px}.sub{color:#5a6b85;font-size:12px;margin-bottom:16px}
+    table{border-collapse:collapse;width:100%;font-size:11px}th{background:#7a1526;color:#fff;padding:7px 9px;text-align:left;font-size:11px;border:1px solid #7a1526}
+    .ft{margin-top:22px;display:flex;align-items:center;gap:8px;border-top:1px solid #dde6f0;padding-top:12px}.ft img{width:20px;height:20px}
+  </style></head><body>
+    <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div></div>
+    <h1>⚠️ Alertes — Formations, autorisations & licences</h1>
+    <div class="sub">Site LFBF · <b style="color:#dc2626">${nbExp} expirée(s)</b> · <b style="color:#d97706">${nbWarn} à renouveler (&lt;90j)</b> · Personnel actif uniquement · Édité le ${disp(fmt(new Date()))}</div>
+    <table><thead><tr><th>Tri.</th><th>Nom</th><th>Qualification</th><th style="text-align:center">Expiration</th><th style="text-align:center">Statut</th></tr></thead>
+    <tbody>${trs||'<tr><td colspan="5" style="padding:16px;text-align:center;border:1px solid #dde6f0">Aucune alerte</td></tr>'}</tbody></table>
+    <div class="ft"><img src="${PDF_LOGO_B64}"><b style="font-size:12px">MARDAM AeroDesk Pro</b><span style="color:#8094ad;font-size:10px;margin-left:auto">Alertes qualifications</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Alertes');
+}
+function _exportAlertsXls(){
+  _loadExcelJS(async()=>{
+    if(!window.ExcelJS){ toast('Export indisponible (connexion requise une fois)'); return; }
+    try{
+      const rows=_collectAlertsData();
+      const wb=new ExcelJS.Workbook();
+      const ws=wb.addWorksheet('Alertes',{views:[{state:'frozen',ySplit:2}]});
+      ws.columns=[{width:10},{width:26},{width:14},{width:28},{width:14},{width:20}];
+      ws.mergeCells('A1:F1'); const t=ws.getCell('A1'); t.value='⚠️ Alertes — Formations, autorisations & licences · Site LFBF · '+disp(fmt(new Date())); t.font={bold:true,size:13,color:{argb:'FF7a1526'}}; ws.getRow(1).height=22;
+      const hr=ws.addRow(['Tri.','Nom','Type','Qualification','Expiration','Statut']);
+      hr.eachCell(c=>{ c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF7a1526'}}; c.font={bold:true,color:{argb:'FFFFFFFF'}}; c.alignment={horizontal:'center'}; });
+      rows.forEach(r=>{
+        const stTxt=r.statut==='expired'?`Expiré depuis ${Math.abs(r.days)}j`:`À renouveler (${r.days}j)`;
+        const row=ws.addRow([r.emp.trigramme||'—',`${r.emp.nom} ${r.emp.prenom}`,r.kind,r.type,disp(r.exp),stTxt]);
+        const sc=row.getCell(6);
+        sc.fill={type:'pattern',pattern:'solid',fgColor:{argb:r.statut==='expired'?'FFF8D7DA':'FFFFF0D9'}};
+        sc.font={bold:true,color:{argb:r.statut==='expired'?'FFC0392B':'FF9C6500'}};
+        row.getCell(5).alignment={horizontal:'center'}; row.getCell(1).alignment={horizontal:'center'};
+      });
+      const buf=await wb.xlsx.writeBuffer();
+      const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=`Alertes_${fmt(new Date())}.xlsx`; a.click(); URL.revokeObjectURL(url);
+      toast('✅ Excel Alertes généré');
+    }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
 function renderDash(){
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -16856,6 +16941,7 @@ function aiAnswerExpirations(n){
   (S.formations||[]).forEach(f=>{
     if(!f.dateExpiration) return;
     const emp=byId(f.empId); if(!emp) return;
+    if(_empHorsEffectif(f.empId)) return;   // exclure archivés / hors-prod
     const exp=parseLocal(f.dateExpiration);
     const days=Math.round((exp-today)/86400000);
     all.push({emp,type:f.type,exp:f.dateExpiration,days,kind:'Formation'});
@@ -16863,6 +16949,7 @@ function aiAnswerExpirations(n){
   (S.autorisations||[]).forEach(a=>{
     if(!a.dateExpiration) return;
     const emp=byId(a.empId); if(!emp) return;
+    if(_empHorsEffectif(a.empId)) return;   // exclure archivés / hors-prod
     const exp=parseLocal(a.dateExpiration);
     const days=Math.round((exp-today)/86400000);
     all.push({emp,type:a.type||a.nom||'Autorisation',exp:a.dateExpiration,days,kind:'Autorisation'});
