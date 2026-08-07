@@ -577,8 +577,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,0.6);z-index:500;
   align-items:flex-start;justify-content:center;
-  padding:24px 16px 24px 16px;
-  overflow-y:auto;
+  padding:150px 16px 30px 16px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
 .mbg.on{display:flex}
@@ -587,8 +587,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   border:1px solid var(--glass-border-bright);
   border-radius:var(--r24);padding:20px;
   width:100%;max-width:520px;
-  margin:auto;
-  overflow-y:auto;display:flex;flex-direction:column;
+  max-height:calc(100vh - 180px);
+  margin:0 auto;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;
   box-shadow:var(--sh-lg),0 0 60px rgba(0,210,255,0.06);
   animation:mIn .25s cubic-bezier(.34,1.56,.64,1);
 }
@@ -1553,7 +1555,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 <!-- Modal avion recyclage -->
 <div class="mbg" id="m-avion-rec">
-<div class="modal" style="max-height:90vh;overflow-y:auto">
+<div class="modal">
   <div class="modal-title">♻️ Avion recyclage</div>
   <input type="hidden" id="avr-id">
   <div class="fgrid">
@@ -1736,6 +1738,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="auto-search" placeholder="Nom, prénom ou trigramme…" oninput="renderAutorisations()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openAutoModal()">+ Ajouter</button>
+      <button class="btn btn-sm" onclick="_showPushbackList()" style="background:rgba(124,110,230,0.15);border:1px solid rgba(124,110,230,0.4);color:#b9aeff">🛫 Qui a le Pushback ?</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsInAuto').click()">📥 Import Excel</button>
       <button class="btn btn-ghost btn-sm" onclick="exportAutoXls()">📤 Export Excel</button>
     </div>
@@ -2018,11 +2021,27 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     </div>
   <input type="hidden" id="slot-edit-id">
   <input type="hidden" id="slot-edit-pos">
+  <div id="slot-dup-pos-wrap" style="display:none;margin-bottom:12px">
+    <label style="font-size:11px;color:#8090a8;display:block;margin-bottom:5px;font-weight:700">Position de destination</label>
+    <div id="slot-dup-pos-btns" style="display:flex;gap:8px"></div>
+  </div>
   <div id="slot-cell-err" style="display:none;color:#ff4d6d;font-size:11px;padding:6px 10px;background:rgba(255,77,109,0.1);border-radius:6px;margin-top:8px"></div>
-  <div style="display:flex;gap:10px;margin-top:16px">
-    <button class="btn btn-ghost" onclick="closeM('m-slot-cell')" style="flex:1">Annuler</button>
-    <button id="slot-del-btn" onclick="deleteSlotEntry()" style="flex:1;display:none;background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.3);border-radius:10px;color:#ff4d6d;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700">🗑 Supprimer</button>
-    <button class="btn btn-cyan" onclick="saveSlotEntry()" style="flex:2">💾 Enregistrer</button>
+  <div id="slot-cutday-toggle" style="display:none;margin-top:10px">
+    <button type="button" onclick="_slotToggleCut()" style="width:100%;background:rgba(255,180,92,0.10);border:1px solid rgba(255,180,92,0.3);border-radius:9px;color:#ffb45c;padding:9px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✂️ Retirer un ou plusieurs jours…</button>
+  </div>
+  <div id="slot-cutday-wrap" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(255,180,92,0.08);border:1px solid rgba(255,180,92,0.3);border-radius:10px">
+    <div style="font-size:11px;font-weight:800;color:#ffb45c;margin-bottom:6px">✂️ Jours à retirer de cette occupation</div>
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <div style="flex:1;min-width:110px"><label style="font-size:10px;color:#8090a8;display:block;margin-bottom:3px">Du</label><input type="date" id="slot-cut-from" style="width:100%"></div>
+      <div style="flex:1;min-width:110px"><label style="font-size:10px;color:#8090a8;display:block;margin-bottom:3px">Au</label><input type="date" id="slot-cut-to" style="width:100%"></div>
+      <button onclick="_slotCutDays()" style="background:rgba(255,180,92,0.18);border:1px solid rgba(255,180,92,0.45);border-radius:8px;color:#ffb45c;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">✂️ Retirer</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+    <button class="btn btn-ghost" onclick="closeM('m-slot-cell')" style="flex:1;min-width:90px">Annuler</button>
+    <button id="slot-dup-btn" onclick="_slotDuplicate()" style="flex:1;min-width:110px;display:none;background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.35);border-radius:10px;color:#00d2ff;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700">📋 Dupliquer</button>
+    <button id="slot-del-btn" onclick="deleteSlotEntry()" style="flex:1;min-width:110px;display:none;background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.3);border-radius:10px;color:#ff4d6d;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700">🗑 Tout supprimer</button>
+    <button class="btn btn-cyan" onclick="saveSlotEntry()" style="flex:2;min-width:120px">💾 Enregistrer</button>
   </div>
 </div></div>
 
@@ -3464,7 +3483,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 </div>
 <div class="mbg" id="m-drive">
-<div class="modal" style="max-width:580px;max-height:92vh">
+<div class="modal" style="max-width:580px">
   <div class="modal-title">☁️ Sync Google Drive</div>
 
   <!-- Tabs -->
@@ -5071,6 +5090,9 @@ function openSlotNew(pos,dateStr){
   document.getElementById('slot-notes').value='';
   document.getElementById('slot-msn-custom').value='';
   document.getElementById('slot-del-btn').style.display='none';
+  const dupN=document.getElementById('slot-dup-btn'); if(dupN) dupN.style.display='none';
+  const dupPN=document.getElementById('slot-dup-pos-wrap'); if(dupPN) dupPN.style.display='none';
+  const cutW=document.getElementById('slot-cutday-wrap'); if(cutW) cutW.style.display='none';
   document.getElementById('slot-cell-err').style.display='none';
   // Pré-sélectionner mode journée
   _slotDurationMode='day';
@@ -5091,6 +5113,12 @@ function openSlotEdit(id){
   document.getElementById('slot-notes').value=entry.notes||'';
   document.getElementById('slot-msn-custom').value=entry.msn||'';
   document.getElementById('slot-del-btn').style.display='';
+  const dupE=document.getElementById('slot-dup-btn'); if(dupE) dupE.style.display='';
+  const dupPE=document.getElementById('slot-dup-pos-wrap'); if(dupPE) dupPE.style.display='none';
+  const cutToggle=document.getElementById('slot-cutday-toggle');
+  const cutWrap=document.getElementById('slot-cutday-wrap');
+  if(cutToggle) cutToggle.style.display='';
+  if(cutWrap){ cutWrap.style.display='none'; document.getElementById('slot-cut-from').value=entry.debut; document.getElementById('slot-cut-to').value=entry.debut; document.getElementById('slot-cut-from').min=entry.debut; document.getElementById('slot-cut-from').max=entry.fin; document.getElementById('slot-cut-to').min=entry.debut; document.getElementById('slot-cut-to').max=entry.fin; }
   document.getElementById('slot-cell-err').style.display='none';
   // Détecter le mode selon les dates
   _slotDurationMode=entry.debut===entry.fin?'day':'custom';
@@ -5185,6 +5213,102 @@ function saveSlotEntry(){
   toast(`✅ Slot ${SLOT_POSITIONS.find(p=>p.id===pos)?.lbl} — MSN ${msn||'?'} enregistré (${nbJours}j ouvrés)`);
 }
 
+function _slotToggleCut(){
+  const wrap=document.getElementById('slot-cutday-wrap');
+  const tog=document.getElementById('slot-cutday-toggle');
+  if(!wrap) return;
+  const showing=wrap.style.display!=='none';
+  wrap.style.display=showing?'none':'';
+  if(tog) tog.style.display=showing?'':'none';
+}
+// Retire un ou plusieurs jours d'une occupation en la raccourcissant ou la découpant
+function _slotCutDays(){
+  const id=document.getElementById('slot-edit-id').value;
+  const entry=(S.slot?.entries||[]).find(e=>e.id===id);
+  if(!entry){ toast('Occupation introuvable'); return; }
+  const cutFrom=document.getElementById('slot-cut-from').value;
+  const cutTo=document.getElementById('slot-cut-to').value||cutFrom;
+  if(!cutFrom){ toast('Choisissez une date à retirer'); return; }
+  const from=cutFrom<cutTo?cutFrom:cutTo, to=cutFrom<cutTo?cutTo:cutFrom;
+  // La période retirée doit chevaucher l'occupation
+  if(to<entry.debut||from>entry.fin){ toast('Ces dates ne font pas partie de l\'occupation'); return; }
+  const dayBefore=fmt(addD(parseLocal(from),-1));
+  const dayAfter=fmt(addD(parseLocal(to),1));
+  const nb=Math.round((parseLocal(to)-parseLocal(from))/86400000)+1;
+  const msn=entry.msn||'?';
+  confirmDel('Retirer '+(nb>1?nb+' jours':'ce jour'),`Retirer ${nb>1?`les ${nb} jours du ${disp(from)} au ${disp(to)}`:`le ${disp(from)}`} de l'occupation MSN ${msn} ?`,()=>{
+    const cutStartsBefore = from<=entry.debut;
+    const cutEndsAfter = to>=entry.fin;
+    if(cutStartsBefore && cutEndsAfter){
+      // toute l'occupation retirée → suppression
+      S.slot.entries=(S.slot.entries||[]).filter(e=>e.id!==id);
+    } else if(cutStartsBefore){
+      // retire le début → l'occupation reprend après
+      entry.debut=dayAfter;
+      entry.nbJours=Math.round((parseLocal(entry.fin)-parseLocal(entry.debut))/86400000)+1;
+    } else if(cutEndsAfter){
+      // retire la fin → l'occupation s'arrête avant
+      entry.fin=dayBefore;
+      entry.nbJours=Math.round((parseLocal(entry.fin)-parseLocal(entry.debut))/86400000)+1;
+    } else {
+      // retire au milieu → découpe en deux occupations
+      const seg2={...entry, id:uid(), debut:dayAfter, fin:entry.fin};
+      seg2.nbJours=Math.round((parseLocal(seg2.fin)-parseLocal(seg2.debut))/86400000)+1;
+      entry.fin=dayBefore;
+      entry.nbJours=Math.round((parseLocal(entry.fin)-parseLocal(entry.debut))/86400000)+1;
+      S.slot.entries.push(seg2);
+    }
+    save(); closeM('m-slot-cell'); renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels();
+    toast(`✂️ ${nb>1?nb+' jours retirés':'Jour retiré'} de MSN ${msn}`);
+  },{btn:'✂️ Retirer',icon:'✂️',safe:true});
+}
+
+function _slotDupSetPos(pos){
+  document.getElementById('slot-edit-pos').value=pos;
+  SLOT_POSITIONS.forEach(p=>{
+    const b=document.getElementById('slot-dup-pos-'+p.id); if(!b) return;
+    const on=(p.id===pos);
+    b.style.border=`1.5px solid ${on?p.col:'rgba(255,255,255,0.12)'}`;
+    b.style.background=on?p.col+'22':'transparent';
+    b.style.color=on?p.col:'#8090a8';
+  });
+}
+// Duplique l'occupation en cours d'édition : ouvre une nouvelle saisie pré-remplie
+function _slotDuplicate(){
+  const id=document.getElementById('slot-edit-id').value;
+  const src=(S.slot?.entries||[]).find(e=>e.id===id);
+  if(!src){ toast('Occupation introuvable'); return; }
+  // Bascule le modal en mode création, en gardant MSN / notes / avion / durée
+  document.getElementById('slot-edit-id').value='';
+  document.getElementById('slot-edit-pos').value=src.pos;
+  const posInfo=SLOT_POSITIONS.find(p=>p.id===src.pos)||SLOT_POSITIONS[0];
+  document.getElementById('slot-cell-title').innerHTML=`📋 Duplication — <span style="color:${posInfo.col}">choisissez position & dates</span>`;
+  // Dates : par défaut, même durée juste après la fin de l'original
+  const dur=Math.round((parseLocal(src.fin)-parseLocal(src.debut))/86400000);
+  const newDebut=fmt(addD(parseLocal(src.fin),1));
+  const newFin=fmt(addD(parseLocal(newDebut),dur));
+  document.getElementById('slot-date-debut').value=newDebut;
+  document.getElementById('slot-date-fin').value=newFin;
+  document.getElementById('slot-fin-wrap').style.display='';
+  _slotDurationMode='custom';
+  document.getElementById('slot-notes').value=src.notes||'';
+  document.getElementById('slot-msn-custom').value=src.msn||'';
+  populateSlotAvionSel(src.avionId||'');
+  // Sélecteur de position visible (choisir la destination de la copie)
+  const dupPosWrap=document.getElementById('slot-dup-pos-wrap');
+  const dupPosBtns=document.getElementById('slot-dup-pos-btns');
+  if(dupPosWrap&&dupPosBtns){
+    dupPosWrap.style.display='';
+    dupPosBtns.innerHTML=SLOT_POSITIONS.map(p=>`<button type="button" onclick="_slotDupSetPos(${p.id})" id="slot-dup-pos-${p.id}" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${p.id===src.pos?p.col:'rgba(255,255,255,0.12)'};background:${p.id===src.pos?p.col+'22':'transparent'};color:${p.id===src.pos?p.col:'#8090a8'};font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">${p.lbl}</button>`).join('');
+  }
+  // Boutons : masquer suppression/découpe/dupliquer (on est en création de la copie)
+  document.getElementById('slot-del-btn').style.display='none';
+  const dupB=document.getElementById('slot-dup-btn'); if(dupB) dupB.style.display='none';
+  const cutT=document.getElementById('slot-cutday-toggle'); if(cutT) cutT.style.display='none';
+  const cutW=document.getElementById('slot-cutday-wrap'); if(cutW) cutW.style.display='none';
+  document.getElementById('slot-cell-err').style.display='none';
+  toast('📋 Copie prête — ajustez la position et les dates, puis Enregistrer');
+}
 function deleteSlotEntry(){
   const id=document.getElementById('slot-edit-id').value;
   if(!id) return;
@@ -7033,7 +7157,7 @@ function renderDash(){
   const _dedupeByEmpType=(list)=>{
     const best={};
     list.forEach(item=>{
-      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      const key=`${item.empId}__${(item.type||'').toUpperCase().replace(/\s+/g,'').replace(/[·.]/g,'').trim()}`;
       const cur=best[key];
       if(!cur || (item.dateExpiration||'') > (cur.dateExpiration||'')) best[key]=item;
     });
@@ -7083,6 +7207,23 @@ function renderDash(){
       alerts.push({cls:'blue',ic:'📋',t:'Tâche en attente +7 jours',s:t.text.slice(0,90)});
     }
   });
+  // ── Intérimaires / CDD planifiés APRÈS leur fin de contrat ──
+  (S.personnel||[]).forEach(emp=>{
+    if(!emp.dateFin || _empHorsEffectif(emp.id)) return;
+    const finStr=emp.dateFin;
+    // Chercher la première demi-journée planifiée (travail/formation/absence) au-delà de la fin
+    let over=null, overType=null;
+    Object.entries(S.planning||{}).forEach(([k,e])=>{
+      if(!e||!e.type) return;
+      const parts=k.split('_'); if(parts[0]!==emp.id) return;
+      const ds=parts.slice(1,-1).join('_');
+      if(ds>finStr){ if(!over || ds<over){ over=ds; overType=e.type; } }
+    });
+    if(over){
+      const lbl={travail:'affecté',formation:'en formation',formation_int:'en formation',conge:'en congé',maladie:'en arrêt',absence:'absent',deplacement:'en déplacement'}[overType]||'planifié';
+      alerts.push({cls:'red',ic:'⏳',t:`${emp.prenom} ${emp.nom} planifié après fin de contrat`,s:`${emp.contrat||'Contrat'} jusqu'au ${disp(finStr)} · ${lbl} dès le ${disp(over)}`});
+    }
+  });
   // Grouper les alertes par catégorie
   const groups={
     formations_exp:   {ic:'🚨',title:'Formations expirées',       col:'#ff4d6d',bg:'rgba(255,77,109,0.08)',  items:[]},
@@ -7094,9 +7235,11 @@ function renderDash(){
     todos_late:       {ic:'🔴',title:'Tâches en retard',          col:'#ff4d6d',bg:'rgba(255,77,109,0.08)', items:[]},
     todos_urgent:     {ic:'⚡',title:'Tâches urgentes (≤3j)',     col:'#ffd060',bg:'rgba(255,208,96,0.08)', items:[]},
     todos_pending:    {ic:'📋',title:'Tâches en attente (+7j)',   col:'#82b1ff',bg:'rgba(130,177,255,0.08)',items:[]},
+    contrat_fin:      {ic:'⏳',title:'Planifiés après fin de contrat',col:'#ff4d6d',bg:'rgba(255,77,109,0.08)',items:[]},
   };
   alerts.forEach(a=>{
-    if(a.ic==='🚨') groups.formations_exp.items.push(a);
+    if(a.ic==='⏳') groups.contrat_fin.items.push(a);
+    else if(a.ic==='🚨') groups.formations_exp.items.push(a);
     else if(a.ic==='⏰') groups.formations_warn.items.push(a);
     else if(a.ic==='🛡'&&a.cls==='red') groups.autorisations_exp.items.push(a);
     else if(a.ic==='🛡') groups.autorisations_warn.items.push(a);
@@ -7220,7 +7363,7 @@ function _findFormDupes(){
   const scan=(list)=>{
     const groups={};
     (list||[]).forEach(item=>{
-      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      const key=`${item.empId}__${(item.type||'').toUpperCase().replace(/\s+/g,'').replace(/[·.]/g,'').trim()}`;
       (groups[key]=groups[key]||[]).push(item);
     });
     return Object.values(groups).filter(g=>g.length>1);
@@ -7263,7 +7406,7 @@ function _applyDedupeForms(){
   const dedupe=(list)=>{
     const best={}, keepIds=new Set();
     (list||[]).forEach(item=>{
-      const key=`${item.empId}__${(item.type||'').trim().toUpperCase()}`;
+      const key=`${item.empId}__${(item.type||'').toUpperCase().replace(/\s+/g,'').replace(/[·.]/g,'').trim()}`;
       const cur=best[key];
       if(!cur || (item.dateExpiration||'') > (cur.dateExpiration||'')) best[key]=item;
     });
@@ -8859,6 +9002,17 @@ function applyAffectPerm(){
   if(!from||!to){ toast('⚠️ Renseignez la période'); return; }
   let d=parseLocal(from), end=parseLocal(to);
   if(d>end){ toast('⚠️ La date de début est après la fin'); return; }
+  // Garde-fou fin de contrat : si la période dépasse la fin de contrat, demander confirmation via modal
+  const _emp=byId(empId);
+  if(_emp && _emp.dateFin && to > _emp.dateFin && !window._skipContratCheck){
+    confirmDel(
+      'Hors période de contrat',
+      `${_emp.prenom} ${_emp.nom} est en ${_emp.contrat||'contrat temporaire'} jusqu'au ${disp(_emp.dateFin)}. La période saisie va jusqu'au ${disp(to)}, après la fin de son contrat. Confirmer quand même ?`,
+      ()=>{ window._skipContratCheck=true; applyAffectPerm(); window._skipContratCheck=false; },
+      {btn:'✓ Confirmer', icon:'⏳', safe:true}
+    );
+    return;
+  }
   const slots = scope==='am'?['AM']: scope==='pm'?['PM']:['AM','PM'];
   let n=0;
   while(d<=end){
@@ -9297,6 +9451,20 @@ function saveCellEdit(){
   if(cellType==='formation_int' && !formInt){toast('⚠️ Sélectionnez l\'intitulé de la formation');return;}
   const vmTime=cellVM?(document.getElementById('cellVMTime').value||''):'';
   if(cellVM && !vmTime){toast('⚠️ Indiquez l\'heure de la visite médicale');return;}
+  // Garde-fou fin de contrat (intérim/CDD) : si la case saisie dépasse la fin de contrat, demander confirmation
+  if(cellType && cellType!=='' && !window._skipContratCheck){
+    const emp=byId(empId);
+    if(emp && emp.dateFin && dateStr > emp.dateFin){
+      const actLbl = cellType==='formation_int'||cellType==='formation' ? 'former' : (['conge','maladie','absence','deplacement'].includes(cellType) ? 'poser une absence à' : 'affecter');
+      confirmDel(
+        'Hors période de contrat',
+        `${emp.prenom} ${emp.nom} est en ${emp.contrat||'contrat temporaire'} jusqu'au ${disp(emp.dateFin)}. Vous voulez ${actLbl} cette personne le ${disp(dateStr)}, après la fin de son contrat. Confirmer quand même ?`,
+        ()=>{ window._skipContratCheck=true; saveCellEdit(); window._skipContratCheck=false; },
+        {btn:'✓ Confirmer', icon:'⏳', safe:true}
+      );
+      return;   // on stoppe ici ; la sauvegarde reprend après confirmation
+    }
+  }
   // Une visite médicale est un événement propre à SA case (personne+jour+demi-journée).
   // On n'applique la VM saisie qu'à la case réellement ouverte ; pour toutes les autres
   // cases touchées par une action groupée, on PRÉSERVE la VM déjà présente au lieu de l'écraser.
@@ -13478,7 +13646,7 @@ function renderInterimSynthese(){
     const pendings=_pendingList(p);
     const pendHtml=pendings.length?`<div style="font-size:9px;color:#ffd060;font-weight:700;margin-top:2px">🟡 Demande${pendings.length>1?'s':''} en attente : ${pendings.map(_periodeLbl).join(' · ')}</div>`:'';
     return `<tr data-nom="${(p.nom+' '+p.prenom).toLowerCase().replace(/"/g,'')}" style="${rowBg};border-bottom:1px solid rgba(255,255,255,0.05)">
-      <td style="padding:8px 10px;font-weight:700;color:var(--t1);font-size:12px">${p.nom} ${p.prenom}${nbProl?` <span style="font-size:9px;color:#82b1ff" title="${nbProl} prolongation(s)">↗${nbProl}</span>`:''}${pendHtml}</td>
+      <td style="padding:8px 10px;font-weight:700;color:var(--t1);font-size:12px"><span onclick="openPanel('${p.id}')" style="cursor:pointer;border-bottom:1px dashed rgba(0,210,255,0.4)" title="Ouvrir le profil de ${p.nom} ${p.prenom}">${p.nom} ${p.prenom}</span>${nbProl?` <span style="font-size:9px;color:#82b1ff" title="${nbProl} prolongation(s)">↗${nbProl}</span>`:''}${pendHtml}</td>
       <td style="padding:8px 10px;color:#a0b0c8;font-size:12px">${p.agence||'—'}</td>
       <td style="padding:8px 10px;font-size:11px">${p.niveau?`<span style="color:#c9a8ff;font-weight:700">${p.niveau}</span>`:'<span style="color:#52617a">—</span>'}</td>
       <td style="padding:8px 10px;color:#a0b0c8;font-size:11px">${p.debutContrat?disp(p.debutContrat):'—'}</td>
@@ -14259,6 +14427,168 @@ function delTodo(id){
 }
 
 /* ═══ AUTORISATIONS ═══ */
+// Données pushback pour export (triées par statut puis nom) — avec présence de la semaine sélectionnée
+function _pushbackData(){
+  const mon=_pbWeekMon||getMon(new Date());
+  const byEmp={};
+  (S.autorisations||[]).forEach(a=>{
+    if(_empHorsEffectif(a.empId)) return;
+    if(_autoGroup(a)!=='tractage') return;
+    const cur=byEmp[a.empId];
+    if(!cur || (a.dateExpiration||'')>(cur.dateExpiration||'')) byEmp[a.empId]=a;
+  });
+  const rank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
+  return Object.values(byEmp).map(a=>({a,emp:byId(a.empId),st:tSt(a.dateExpiration),pres:_certifPresence(a.empId,mon)}))
+    .filter(x=>x.emp)
+    .sort((x,y)=>{ const r=rank(x.st)-rank(y.st); if(r) return r; return `${x.emp.nom} ${x.emp.prenom}`.localeCompare(`${y.emp.nom} ${y.emp.prenom}`,'fr'); });
+}
+const _PB_STLBL={expired:'Expiré',warning:'Expire bientôt',valid:'Valide',na:'Sans limite'};
+function _exportPushbackPdf(){
+  const rows=_pushbackData();
+  const mon=_pbWeekMon||getMon(new Date()), wNum=wkN(mon);
+  const nbValid=rows.filter(r=>r.st==='valid'||r.st==='na').length;
+  const nbWarn=rows.filter(r=>r.st==='warning').length;
+  const nbExp=rows.filter(r=>r.st==='expired').length;
+  const nbDispo=rows.filter(r=>(r.st==='valid'||r.st==='na')&&(r.pres.status==='site'||r.pres.status==='partial')).length;
+  const stColor={expired:'#dc2626',warning:'#d97706',valid:'#16a34a',na:'#5a6b85'};
+  const presMeta={site:{c:'#16a34a',l:'Sur site'},partial:{c:'#d97706',l:'Partiel'},absent:{c:'#dc2626',l:'Absent'},unplanned:{c:'#8094ad',l:'Non planifié'}};
+  const trs=rows.map(r=>{
+    const pm=presMeta[r.pres.status]||presMeta.unplanned;
+    return `<tr>
+    <td style="border:1px solid #dde6f0;padding:7px 10px;font-weight:700">${r.emp.trigramme||'—'}</td>
+    <td style="border:1px solid #dde6f0;padding:7px 10px">${r.emp.nom} ${r.emp.prenom}</td>
+    <td style="border:1px solid #dde6f0;padding:7px 10px;color:#5a6b85">${CATS[r.emp.categorie]?.lbl||r.emp.categorie||'—'}</td>
+    <td style="border:1px solid #dde6f0;padding:7px 10px;text-align:center">${r.a.dateExpiration?disp(r.a.dateExpiration):'—'}</td>
+    <td style="border:1px solid #dde6f0;padding:7px 10px;text-align:center;color:${stColor[r.st]};font-weight:800">${_PB_STLBL[r.st]||'—'}</td>
+    <td style="border:1px solid #dde6f0;padding:7px 10px;color:${pm.c};font-weight:700">${pm.l}${r.pres.note?` <span style="color:#8094ad;font-weight:400;font-size:10px">(${r.pres.note})</span>`:''}</td>
+  </tr>`;}).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pushback S${wNum}</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f1e3d;margin:0;padding:30px}
+    .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #7c6ee6;padding-bottom:13px}.hd img{width:32px;height:32px;object-fit:contain}
+    .brand{font-size:15px;font-weight:800}.brand em{font-style:normal;color:#7c6ee6}
+    h1{font-size:19px;margin:16px 0 2px}.sub{color:#5a6b85;font-size:12px;margin-bottom:16px}
+    table{border-collapse:collapse;width:100%;font-size:12px}th{background:#3a2f6e;color:#fff;padding:8px 10px;text-align:left;font-size:11px;border:1px solid #3a2f6e}
+    .ft{margin-top:22px;display:flex;align-items:center;gap:8px;border-top:1px solid #dde6f0;padding-top:12px}.ft img{width:20px;height:20px}
+  </style></head><body>
+    <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div></div>
+    <h1>🛫 Pushback (tractage avion) — Semaine ${wNum}</h1>
+    <div class="sub">Site LFBF · ${disp(fmt(mon))} → ${disp(fmt(addD(mon,6)))} · <b style="color:#16a34a">${nbDispo} dispo sur site</b> · ${rows.length} habilité(s) · ${nbValid} valide(s)${nbWarn?' · '+nbWarn+' bientôt':''}${nbExp?' · '+nbExp+' expiré(s)':''} · Édité le ${disp(fmt(new Date()))}</div>
+    <table><thead><tr><th>Tri.</th><th>Nom</th><th>Catégorie</th><th style="text-align:center">Expiration</th><th style="text-align:center">Autorisation</th><th>Présence semaine ${wNum}</th></tr></thead>
+    <tbody>${trs||'<tr><td colspan="6" style="padding:16px;text-align:center;border:1px solid #dde6f0">Aucune personne habilitée</td></tr>'}</tbody></table>
+    <div class="ft"><img src="${PDF_LOGO_B64}"><b style="font-size:12px">MARDAM AeroDesk Pro</b><span style="color:#8094ad;font-size:10px;margin-left:auto">Pushback · présence semaine ${wNum}</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Pushback S'+wNum);
+}
+function _exportPushbackXls(){
+  _loadExcelJS(async()=>{
+    if(!window.ExcelJS){ toast('Export indisponible (connexion requise une fois)'); return; }
+    try{
+      const rows=_pushbackData();
+      const mon=_pbWeekMon||getMon(new Date()), wNum=wkN(mon);
+      const wb=new ExcelJS.Workbook();
+      const ws=wb.addWorksheet('Pushback S'+wNum,{views:[{state:'frozen',ySplit:2}]});
+      ws.columns=[{width:10},{width:26},{width:18},{width:14},{width:14},{width:34}];
+      ws.mergeCells('A1:F1'); const t=ws.getCell('A1'); t.value=`🛫 Pushback (tractage avion) — Semaine ${wNum} · ${disp(fmt(mon))} → ${disp(fmt(addD(mon,6)))}`; t.font={bold:true,size:13,color:{argb:'FF3a2f6e'}}; ws.getRow(1).height=22;
+      const hr=ws.addRow(['Tri.','Nom','Catégorie','Expiration','Autorisation','Présence S'+wNum]);
+      hr.eachCell(c=>{ c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF3a2f6e'}}; c.font={bold:true,color:{argb:'FFFFFFFF'}}; c.alignment={horizontal:'center'}; });
+      const stFill={expired:'FFF8D7DA',warning:'FFFFF0D9',valid:'FFD9F5E3',na:'FFEDEFF2'};
+      const stFont={expired:'FFC0392B',warning:'FF9C6500',valid:'FF1E7E45',na:'FF5A6B85'};
+      const presFill={site:'FFD9F5E3',partial:'FFFFF0D9',absent:'FFF8D7DA',unplanned:'FFEDEFF2'};
+      const presFont={site:'FF1E7E45',partial:'FF9C6500',absent:'FFC0392B',unplanned:'FF5A6B85'};
+      const presLbl={site:'Sur site',partial:'Partiel',absent:'Absent',unplanned:'Non planifié'};
+      rows.forEach(r=>{
+        const presTxt=(presLbl[r.pres.status]||'—')+(r.pres.note?' — '+r.pres.note:'');
+        const row=ws.addRow([r.emp.trigramme||'—',`${r.emp.nom} ${r.emp.prenom}`,CATS[r.emp.categorie]?.lbl||r.emp.categorie||'—',r.a.dateExpiration?disp(r.a.dateExpiration):'—',_PB_STLBL[r.st]||'—',presTxt]);
+        const sc=row.getCell(5); sc.fill={type:'pattern',pattern:'solid',fgColor:{argb:stFill[r.st]||'FFEDEFF2'}}; sc.font={bold:true,color:{argb:stFont[r.st]||'FF5A6B85'}}; sc.alignment={horizontal:'center'};
+        const pc=row.getCell(6); pc.fill={type:'pattern',pattern:'solid',fgColor:{argb:presFill[r.pres.status]||'FFEDEFF2'}}; pc.font={bold:true,color:{argb:presFont[r.pres.status]||'FF5A6B85'}}; pc.alignment={wrapText:true};
+        row.getCell(4).alignment={horizontal:'center'}; row.getCell(1).alignment={horizontal:'center'};
+      });
+      const buf=await wb.xlsx.writeBuffer();
+      const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=`Pushback_S${wNum}_${fmt(mon)}.xlsx`; a.click(); URL.revokeObjectURL(url);
+      toast('✅ Excel Pushback S'+wNum+' généré');
+    }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
+// Vue rapide : qui détient l'autorisation Pushback (tractage avion)
+let _pbWeekMon=null;   // lundi de la semaine sélectionnée (null = pas de filtre présence)
+function _showPushbackList(){
+  const old=document.getElementById('pushback-pop'); if(old) old.remove();
+  if(!_pbWeekMon) _pbWeekMon=getMon(new Date());
+  const mon=_pbWeekMon, wNum=wkN(mon);
+
+  // Personnes habilitées pushback (expiration la plus lointaine si plusieurs lignes)
+  const byEmp={};
+  (S.autorisations||[]).forEach(a=>{
+    if(_empHorsEffectif(a.empId)) return;
+    if(_autoGroup(a)!=='tractage') return;
+    const cur=byEmp[a.empId];
+    if(!cur || (a.dateExpiration||'')>(cur.dateExpiration||'')) byEmp[a.empId]=a;
+  });
+  const rank=s=>({expired:0,warning:1,valid:2,na:3}[s]??3);
+  const rows=Object.values(byEmp).map(a=>({a,emp:byId(a.empId),st:tSt(a.dateExpiration),pres:_certifPresence(a.empId,mon)}))
+    .filter(x=>x.emp)
+    .sort((x,y)=>{ const r=rank(x.st)-rank(y.st); if(r) return r; return `${x.emp.nom} ${x.emp.prenom}`.localeCompare(`${y.emp.nom} ${y.emp.prenom}`,'fr'); });
+
+  const nbValid=rows.filter(r=>r.st==='valid'||r.st==='na').length;
+  const nbWarn=rows.filter(r=>r.st==='warning').length;
+  const nbExp=rows.filter(r=>r.st==='expired').length;
+  // dispo = pushback valide ET présent (site ou partiel) cette semaine
+  const nbDispo=rows.filter(r=>(r.st==='valid'||r.st==='na')&&(r.pres.status==='site'||r.pres.status==='partial')).length;
+
+  const stBadge=(st,exp)=>{
+    if(st==='expired') return `<span style="background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.4);color:#ff6b85;border-radius:99px;padding:2px 9px;font-size:10.5px;font-weight:800">❌ ${exp?disp(exp):'Expiré'}</span>`;
+    if(st==='warning') return `<span style="background:rgba(255,180,92,0.15);border:1px solid rgba(255,180,92,0.4);color:#ffb45c;border-radius:99px;padding:2px 9px;font-size:10.5px;font-weight:800">⚠️ ${disp(exp)}</span>`;
+    if(st==='na') return `<span style="background:rgba(160,176,200,0.12);border:1px solid rgba(160,176,200,0.3);color:#a0b0c8;border-radius:99px;padding:2px 9px;font-size:10.5px;font-weight:700">∞</span>`;
+    return `<span style="background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);color:#6effc4;border-radius:99px;padding:2px 9px;font-size:10.5px;font-weight:800">✅ ${disp(exp)}</span>`;
+  };
+  const presBadge=(pres)=>{
+    const M=_CERTIF_PRES_META[pres.status]||_CERTIF_PRES_META.unplanned;
+    return `<div style="text-align:right"><span style="color:${M.c};font-size:11px;font-weight:800">${M.ic} ${M.lbl}</span>${pres.note?`<div style="font-size:9px;color:#8090a8;margin-top:1px">${pres.note}</div>`:''}</div>`;
+  };
+  const rowsHtml=rows.length?rows.map(r=>{
+    const cat=CATS[r.emp.categorie]||{};
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1">
+        <span style="background:${cat.col||'#7c6ee6'}22;border:1px solid ${cat.col||'#7c6ee6'}55;color:${cat.col||'#b9aeff'};border-radius:6px;padding:2px 6px;font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0">${r.emp.trigramme||'—'}</span>
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:700;color:#e6eefc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.emp.nom} ${r.emp.prenom}</div>
+          <div style="margin-top:2px">${stBadge(r.st,r.a.dateExpiration)}</div>
+        </div>
+      </div>
+      ${presBadge(r.pres)}
+    </div>`;
+  }).join(''):'<div style="padding:24px;text-align:center;color:#8090a8">Aucune personne n\'a l\'autorisation Pushback.</div>';
+
+  const pop=document.createElement('div');
+  pop.id='pushback-pop';
+  pop.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px';
+  pop.onclick=e=>{ if(e.target===pop) pop.remove(); };
+  pop.innerHTML=`<div style="background:#0e1626;border:1px solid rgba(124,110,230,0.4);border-radius:16px;max-width:560px;width:100%;max-height:84vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+    <div style="padding:18px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:16px;font-weight:900;color:#e6eefc">🛫 Pushback — semaine ${wNum}</div>
+        <button onclick="document.getElementById('pushback-pop').remove()" style="background:none;border:none;color:#8090a8;font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button onclick="_pbWeekNav(-1)" style="padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#cfe0f5;font-size:14px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">‹</button>
+        <span style="font-size:12px;color:#cfe0f5;font-weight:700">${disp(fmt(mon))} → ${disp(fmt(addD(mon,6)))}</span>
+        <button onclick="_pbWeekNav(1)" style="padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#cfe0f5;font-size:14px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">›</button>
+        <button onclick="_pbWeekToday()" style="padding:6px 11px;border-radius:8px;border:1px solid rgba(0,210,255,0.35);background:rgba(0,210,255,0.1);color:#00d2ff;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📍 Cette semaine</button>
+      </div>
+      <div style="font-size:12px;color:#8090a8;margin-top:9px"><b style="color:#6effc4">${nbDispo} dispo sur site</b> (habilité + présent) · ${rows.length} habilité(s) · <span style="color:#6effc4">${nbValid} valide(s)</span>${nbWarn?` · <span style="color:#ffb45c">${nbWarn} bientôt</span>`:''}${nbExp?` · <span style="color:#ff6b85">${nbExp} expiré(s)</span>`:''}</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button onclick="_exportPushbackPdf()" style="background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.35);color:#ff8fa3;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📄 Export PDF</button>
+        <button onclick="_exportPushbackXls()" style="background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.35);color:#6effc4;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📊 Export Excel</button>
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1">${rowsHtml}</div>
+  </div>`;
+  document.body.appendChild(pop);
+}
+function _pbWeekNav(dir){ _pbWeekMon=addD(_pbWeekMon||getMon(new Date()),dir*7); _showPushbackList(); }
+function _pbWeekToday(){ _pbWeekMon=getMon(new Date()); _showPushbackList(); }
 function renderAutorisations(){
   const eF=document.getElementById('auto-flt-emp')?.value||'';
   const tF=document.getElementById('auto-flt-type')?.value||'';
@@ -19574,6 +19904,8 @@ function exportDayHtml(){
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
       if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'Stockage (STO)',col:'#e65100'};
+      if(e.chantierId==='STRUCT') return{txt:'🔩 Structure',col:'#6d8fb0'};
+      if(e.chantierId==='PROD') return{txt:'🏭 Production',col:'#2979ff'};
       if(e.chantierId==='AIRBUS') return{txt:'Airbus Part 21',col:'#0277bd'};
       if(e.chantierId==='REC') return{txt:'Recyclage',col:'#2e7d32'};
       if(e.chantierId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===e.chantierId.slice(4));return{txt:av?`${av.type||'A/C'} MSN${av.msn||'?'}`:'Recyclage',col:'#2e7d32'};}
@@ -19693,6 +20025,8 @@ function _cellInfo(entry){
       return {txt:_chMsnLabel(id)+' + '+_chMsnLabel(entry.chantierId2), color:_chColor(id).replace('#','')};
     }
     if(id==='STO') return {txt:'STO',color:'ff9a3c'};
+    if(id==='STRUCT') return {txt:'🔩 Structure',color:'6d8fb0'};
+    if(id==='PROD') return {txt:'🏭 Production',color:'2979ff'};
     if(id==='AIRBUS') return {txt:'PART 21',color:'00e5b0'};
     if(id==='REC') return {txt:'Recyclage',color:'00e5b0'};
     if(id.startsWith('REC_')){const a=(S.recycling?.avions||[]).find(x=>x.id===id.slice(4));return {txt:a?`♻️ ${a.type||''} ${a.msn||''}`.trim():'Recyclage',color:'00e5b0'};}
@@ -20069,10 +20403,12 @@ function confirmFormDone(trackId,done,customYears){
     const emp=byId(t.empId);
     if(emp){
       const formsToUpdate = t.formInt==='Global Refresh' ? GLOBAL_REFRESH_FORMS : [t.formInt];
+      const _norm=s=>(s||'').toUpperCase().replace(/\s+/g,'').replace(/[·.]/g,'').trim();
       formsToUpdate.forEach(formType=>{
         const years=customYears||FORM_VALIDITY_YEARS[formType]||2;
         const dateExp=calcExpiration(formDate,years);
-        let f=(S.formations||[]).find(x=>x.empId===t.empId && x.type===formType);
+        // Correspondance normalisée : « MOE / PART 145 » == « MOE/PART 145 » (espaces/casse ignorés)
+        let f=(S.formations||[]).find(x=>x.empId===t.empId && _norm(x.type)===_norm(formType));
         if(f){
           f.dateObtention=formDate;
           f.dateExpiration=dateExp;
