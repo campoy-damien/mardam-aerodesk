@@ -5759,6 +5759,22 @@ function filterAirbusMSN(f,el){
   renderAirbusMSNList(f);
 }
 
+// Marquer un avion Part 21 FRC comme parti aujourd'hui (pose la date du jour en sortie)
+function airbusDepartNow(id){
+  const m=(S.airbus?.msns||[]).find(x=>x.id===id); if(!m) return;
+  const todayStr=fmt(new Date());
+  confirmDel(
+    'Avion parti ?',
+    `Marquer le MSN ${m.msn} comme parti aujourd'hui (${disp(todayStr)}) ? La date de sortie sera enregistrée.`,
+    ()=>{
+      m.sortie=todayStr;
+      save();
+      renderAirbus();
+      toast(`✈️ MSN ${m.msn} marqué parti le ${disp(todayStr)}`);
+    },
+    {btn:'✈️ Confirmer le départ', icon:'✈️', safe:true}
+  );
+}
 function renderAirbusMSNList(filter){
   const el=document.getElementById('airbus-msn-list');
   if(!el) return;
@@ -5770,43 +5786,35 @@ function renderAirbusMSNList(filter){
     return;
   }
   const today=fmt(new Date());
-  el.innerHTML=msns.map(m=>{
+  const GRID='display:grid;grid-template-columns:minmax(130px,1.4fr) 130px 90px 90px 60px 120px 220px;align-items:center;gap:10px;';
+  // En-tête de colonnes
+  const head=`<div style="${GRID}padding:8px 16px;border-bottom:2px solid rgba(0,160,255,0.3);background:#0a1120">
+    ${['MSN / Client','Activité','Entrée','Sortie prévue','Durée','Statut',''].map((h,i)=>`<div style="font-size:10px;font-weight:800;color:#6080a0;text-transform:uppercase;text-align:${i>=2&&i<=4?'center':'left'}">${h}</div>`).join('')}
+  </div>`;
+  el.innerHTML=head+msns.map(m=>{
     const actCol=m.activite==='peinture'?'#82b4ff':'#ffc800';
     const actLbl=m.activite==='peinture'?'🎨 Peinture':'📦 Stockage FRC';
     const isActive=(!m.entree||m.entree<=today)&&(!m.sortie||m.sortie>=today);
     const statCol=isActive?'#34c759':'#8090a8';
     const statLbl=isActive?'En cours':'Planifié / Terminé';
-    const duree=m.entree&&m.sortie?Math.ceil((new Date(m.sortie)-new Date(m.entree))/(86400000)):'—';
-    return`<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);border-left:3px solid ${actCol}">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="flex:1;min-width:120px">
-          <div style="font-size:14px;font-weight:900;color:var(--t1)">MSN ${m.msn}</div>
-          ${m.type?`<div style="font-size:11px;color:var(--t3)">${m.type}</div>`:''}
-          ${m.client?`<div style="font-size:10px;color:#6080a0">🏢 ${m.client}</div>`:''}
-        </div>
-        <div style="text-align:center;min-width:80px">
-          <div style="font-size:10px;color:var(--t4);margin-bottom:2px">Activité</div>
-          <span style="font-size:11px;font-weight:700;color:${actCol};background:${actCol}18;border:1px solid ${actCol}40;border-radius:99px;padding:2px 8px">${actLbl}</span>
-        </div>
-        <div style="text-align:center;min-width:70px">
-          <div style="font-size:10px;color:var(--t4);margin-bottom:2px">Entrée</div>
-          <div style="font-size:11px;font-weight:700;color:var(--t2)">${m.entree?disp(m.entree):'—'}</div>
-        </div>
-        <div style="text-align:center;min-width:70px">
-          <div style="font-size:10px;color:var(--t4);margin-bottom:2px">Sortie prévue</div>
-          <div style="font-size:11px;font-weight:700;color:var(--t2)">${m.sortie?disp(m.sortie):'—'}</div>
-        </div>
-        <div style="text-align:center;min-width:50px">
-          <div style="font-size:10px;color:var(--t4);margin-bottom:2px">Durée</div>
-          <div style="font-size:11px;font-weight:700;color:var(--t2)">${duree!=='—'?duree+'j':''}</div>
-        </div>
-        <span style="font-size:10px;color:${statCol};font-weight:700">${statLbl}</span>
-        <div style="display:flex;gap:6px;flex-shrink:0">
-          <button onclick="openAirbusEditMSN('${m.id}')" style="background:rgba(0,160,255,0.1);border:1px solid rgba(0,160,255,0.25);border-radius:8px;color:#00a0ff;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">✏️ Modifier</button>
-          <button onclick="delAirbusMSN('${m.id}')" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:#ff4d6d;padding:5px 8px;cursor:pointer;font-size:11px">🗑</button>
-        </div>
+    const duree=m.entree&&m.sortie?Math.ceil((new Date(m.sortie)-new Date(m.entree))/(86400000)):null;
+    return`<div style="${GRID}padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.05);border-left:3px solid ${actCol}">
+      <div style="min-width:0">
+        <div style="font-size:14px;font-weight:900;color:var(--t1)">MSN ${m.msn}</div>
+        ${m.type?`<div style="font-size:11px;color:var(--t3)">${m.type}</div>`:''}
+        ${m.client?`<div style="font-size:10px;color:#6080a0">🏢 ${m.client}</div>`:''}
       </div>
-      ${m.notes?`<div style="font-size:11px;color:var(--t4);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05)">${m.notes}</div>`:''}
+      <div><span style="font-size:11px;font-weight:700;color:${actCol};background:${actCol}18;border:1px solid ${actCol}40;border-radius:99px;padding:2px 8px;white-space:nowrap">${actLbl}</span></div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--t2)">${m.entree?disp(m.entree):'—'}</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:${m.sortie?'var(--t2)':'#ff9a3c'}">${m.sortie?disp(m.sortie):'à renseigner'}</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:var(--t2)">${duree!=null?duree+'j':'—'}</div>
+      <div style="font-size:10px;color:${statCol};font-weight:700">${statLbl}</div>
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        ${isActive?`<button onclick="airbusDepartNow('${m.id}')" title="Marquer l'avion parti aujourd'hui (${disp(today)})" style="background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.4);border-radius:8px;color:#34c759;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:800;font-family:'Outfit',sans-serif;white-space:nowrap">✈️ Parti</button>`:''}
+        <button onclick="openAirbusEditMSN('${m.id}')" style="background:rgba(0,160,255,0.1);border:1px solid rgba(0,160,255,0.25);border-radius:8px;color:#00a0ff;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif;white-space:nowrap">✏️ Modifier</button>
+        <button onclick="delAirbusMSN('${m.id}')" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:#ff4d6d;padding:5px 8px;cursor:pointer;font-size:11px">🗑</button>
+      </div>
+      ${m.notes?`<div style="grid-column:1/-1;font-size:11px;color:var(--t4);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05)">${m.notes}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -10087,6 +10095,7 @@ function saveChantier(){
     document.getElementById('cloture-msn').innerHTML=`✈️ <b style="color:var(--cyan)">MSN ${_clotureCtx.msn}</b>${data.avion?' · '+data.avion:''}${data.client?' · '+data.client.trim():''}`;
     closeM('m-chantier'); openM('m-cloture');
     renderChantiers();
+    if(typeof renderProgramme==='function'){try{renderProgramme();}catch(e){}}
     return;
   }
 
@@ -10147,6 +10156,9 @@ function saveChantier(){
   save();closeM('m-chantier');renderChantiers();popSelects();
   if(typeof renderWeekly==='function'){try{renderWeekly();}catch(e){}}
   if(typeof renderMaster==='function'){try{renderMaster();}catch(e){}}
+  if(typeof renderProgramme==='function'){try{renderProgramme();}catch(e){}}   // Gantt Programme Activité
+  if(typeof renderAvancement==='function'){try{renderAvancement();}catch(e){}}
+  if(typeof renderDash==='function'){try{renderDash();}catch(e){}}
   if(equipe.length){
     const cf=_syncChantierPlanning._conflits||0;
     toast(`✅ Équipe affectée au planning : ${nbAff} demi-journée(s)${cf?` · ${cf} déjà sur un autre chantier (ignorées)`:''}`);
@@ -12166,8 +12178,9 @@ function checkConflicts(){
     // ── 2. Conflit chantier vs absence dans le planning ──
     myChantiers.forEach(c=>{
       const cD=parseLocal(c.debut), cF=parseLocal(c.fin);
-      // Scan planning for absence days during chantier
-      const absenceDays={};
+      // Scan planning for absence days during chantier — en comptant les demi-journées
+      const absenceDays={};        // {type: [ds, ...]} jours où au moins une demi-journée d'absence
+      const absHalfCount={};       // {type: {ds: 0.5 | 1}} nombre de demi-journées absentes par jour
       Object.entries(S.planning||{}).forEach(([key,entry])=>{
         if(!entry||!entry.type||entry.type==='travail'||entry.type==='we') return;
         if(!key.startsWith(emp.id+'_')) return;
@@ -12177,6 +12190,8 @@ function checkConflicts(){
         if(d<cD||d>cF) return; // outside chantier range
         if(!absenceDays[entry.type]) absenceDays[entry.type]=[];
         if(!absenceDays[entry.type].includes(ds)) absenceDays[entry.type].push(ds);
+        if(!absHalfCount[entry.type]) absHalfCount[entry.type]={};
+        absHalfCount[entry.type][ds]=(absHalfCount[entry.type][ds]||0)+0.5;
       });
       Object.entries(absenceDays).forEach(([type,days])=>{
         if(!days.length) return;
@@ -12208,10 +12223,14 @@ function checkConflicts(){
           if(parseLocal(r[r.length-1]) < today) return; // absence déjà passée → ne plus alerter
           const absDeb=parseLocal(r[0]), absFin=parseLocal(r[r.length-1]);
           const chJours=calcJoursOuvres(c.debut,c.fin)||1;
-          const absJoursOuvres=calcJoursOuvres(fmt(absDeb),fmt(absFin))||r.length;
-          const partPct=Math.min(100,Math.round(absJoursOuvres/chJours*100));
+          // Durée réelle en demi-journées (0,5 par demi-journée absente)
+          const absDemiJ=r.reduce((s,ds)=>s+(absHalfCount[type]?.[ds]||1),0);
+          const fmtJ=v=>v%1===0?v+'j':v.toFixed(1).replace('.',',')+'j';
+          const partPct=Math.min(100,Math.round(absDemiJ/chJours*100));
           const gravite = partPct>=40?'haute':partPct>=15?'moyenne':'basse';
           const gCol = gravite==='haute'?'#ff6b85':gravite==='moyenne'?'#ffb45c':'#ffd060';
+          // Formulation : un seul jour → "le X" ; plusieurs → "du X au Y"
+          const periodeTxt = r.length===1 ? `le ${disp(r[0])}` : `du ${disp(r[0])} au ${disp(r[r.length-1])}`;
           conflicts.push({
             type:'absence',
             empId:emp.id,
@@ -12220,7 +12239,7 @@ function checkConflicts(){
             sortEnd:absFin,
             imminent:absDeb<=addD(today,14),
             gravite,
-            msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} du ${disp(r[0])} au ${disp(r[r.length-1])} (${r.length}j) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')}) · <strong style="color:${gCol}">${absJoursOuvres}j ouvrés absents sur ${chJours} (${partPct}%)</strong>`
+            msg:`<strong style="color:#ffd060">${emp.nom} ${emp.prenom}</strong> — ${lbl} ${periodeTxt} (${fmtJ(absDemiJ)}) · pendant le chantier <em>${c.nom}</em> (${role} · ${disp(c.debut||'')}→${disp(c.fin||'')}) · <strong style="color:${gCol}">${fmtJ(absDemiJ)} sur ${chJours}j (${partPct}%)</strong>`
           });
         });
       });
@@ -16000,6 +16019,137 @@ function _kpiYearWeeks(year){
   }
   return out;
 }
+// Flux avions annuel : arrivées / départs / recyclés par avion physique (MSN)
+function _fluxAvionsAnnuel(year){
+  const inYear=ds=>ds && parseInt(ds.slice(0,4))===year;
+  // Map par MSN : { arrivees:[dates], departs:[dates], recycled:bool, recycledDate }
+  const byMsn={};
+  const ensure=(msn,type)=>{ const k=(msn||'').trim(); if(!k) return null; if(!byMsn[k]) byMsn[k]={arr:[],dep:[],recy:false,recyDate:null,type:''}; if(type&&!byMsn[k].type) byMsn[k].type=type; return byMsn[k]; };
+
+  // 1) Chantiers de maintenance — uniquement le RÉEL (en cours / terminé), pas les prévisions/futurs
+  (S.chantiers||[]).forEach(c=>{
+    if(c.statut==='prevision'||c.statut==='futur') return;   // prévisionnel : l'avion n'est pas (encore) arrivé
+    const o=ensure(c.msn,c.avion); if(!o) return;
+    if(c.debut) o.arr.push(c.debut);
+    if(c.sortie==='parti' && c.dateSortie) o.dep.push(c.dateSortie);
+    else if(c.statut==='termine' && c.fin) o.dep.push(c.fin);
+  });
+  // 2) Airbus Part 21 FRC
+  (S.airbus?.msns||[]).forEach(m=>{
+    const o=ensure(m.msn,m.type); if(!o) return;
+    if(m.entree) o.arr.push(m.entree);
+    if(m.sortie) o.dep.push(m.sortie);
+  });
+  // 3) Stockage
+  (S.stockage?.avions||[]).forEach(a=>{
+    const o=ensure(a.msn,a.type); if(!o) return;
+    if(a.entree) o.arr.push(a.entree);
+    if(a.sortie) o.dep.push(a.sortie);
+  });
+  // 4) Recyclage — arrivée sur site, PAS de départ (cassé sur site)
+  (S.recycling?.avions||[]).forEach(a=>{
+    const o=ensure(a.msn,a.type); if(!o) return;
+    const arrivee=a.debutChantier||a.entree;
+    if(arrivee) o.arr.push(arrivee);
+    if(a.statut==='termine'){ o.recy=true; o.recyDate=a.finChantier||a.finPrev||arrivee; }
+  });
+
+  // Comptage par avion physique
+  let arrivees=0, departs=0, recycles=0;
+  const detArr=[], detDep=[], detRecy=[];
+  Object.entries(byMsn).forEach(([msn,o])=>{
+    // Arrivée : première date d'arrivée de l'année
+    const arrYear=o.arr.filter(inYear).sort();
+    if(arrYear.length){ arrivees++; detArr.push({msn,type:o.type,date:arrYear[0]}); }
+    // Recyclé : si terminé dans l'année (prime sur départ)
+    if(o.recy && inYear(o.recyDate)){ recycles++; detRecy.push({msn,type:o.type,date:o.recyDate}); }
+    else {
+      // Départ : dernière date de départ de l'année (seulement si pas recyclé)
+      const depYear=o.dep.filter(inYear).sort();
+      if(depYear.length){ departs++; detDep.push({msn,type:o.type,date:depYear[depYear.length-1]}); }
+    }
+  });
+  return {arrivees,departs,recycles,detArr,detDep,detRecy};
+}
+// Bloc listing (MSN · type · date) pour arrivées/départs/recyclés
+function _fluxListBlock(titre, items, col){
+  const lignes = items.length
+    ? items.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(it=>
+        `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 9px;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <div style="min-width:0"><span style="font-size:12px;font-weight:800;color:var(--t1)">MSN ${it.msn}</span>${it.type?`<span style="font-size:10px;color:var(--t4);margin-left:6px">${it.type}</span>`:''}</div>
+          <span style="font-size:10px;color:${col};font-weight:700;white-space:nowrap">${it.date?disp(it.date):''}</span>
+        </div>`).join('')
+    : '<div style="padding:10px;text-align:center;color:var(--t4);font-size:11px">Aucun</div>';
+  return `<div style="background:rgba(255,255,255,0.02);border:1px solid ${col}22;border-radius:10px;overflow:hidden">
+    <div style="padding:7px 10px;background:${col}14;border-bottom:1px solid ${col}33;font-size:11px;font-weight:800;color:${col}">${titre} · ${items.length}</div>
+    <div style="max-height:200px;overflow-y:auto">${lignes}</div>
+  </div>`;
+}
+function _exportFluxPdf(year){
+  const fx=_fluxAvionsAnnuel(year);
+  const sect=(titre,items,col)=>{
+    const rows=items.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(it=>`<tr>
+      <td style="border:1px solid #dde6f0;padding:6px 10px;font-weight:700">MSN ${it.msn}</td>
+      <td style="border:1px solid #dde6f0;padding:6px 10px">${it.type||'—'}</td>
+      <td style="border:1px solid #dde6f0;padding:6px 10px;text-align:center">${it.date?disp(it.date):'—'}</td>
+    </tr>`).join('');
+    return `<h2 style="color:${col};font-size:15px;margin:18px 0 6px">${titre} — ${items.length}</h2>
+      <table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr>
+      <th style="background:#12233f;color:#fff;padding:6px 10px;text-align:left;font-size:11px;border:1px solid #12233f">MSN</th>
+      <th style="background:#12233f;color:#fff;padding:6px 10px;text-align:left;font-size:11px;border:1px solid #12233f">Type avion</th>
+      <th style="background:#12233f;color:#fff;padding:6px 10px;text-align:center;font-size:11px;border:1px solid #12233f">Date</th>
+      </tr></thead><tbody>${rows||'<tr><td colspan="3" style="border:1px solid #dde6f0;padding:12px;text-align:center;color:#8094ad">Aucun</td></tr>'}</tbody></table>`;
+  };
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Flux avions ${year}</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f1e3d;margin:0;padding:30px}
+    .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #00a0d6;padding-bottom:13px}.hd img{width:32px;height:32px;object-fit:contain}
+    .brand{font-size:15px;font-weight:800}.brand em{font-style:normal;color:#00a0d6}
+    h1{font-size:20px;margin:16px 0 2px}.sub{color:#5a6b85;font-size:12px;margin-bottom:8px}
+    .cards{display:flex;gap:12px;margin:14px 0}
+    .kc{flex:1;border:1px solid #dde6f0;border-radius:10px;padding:12px 14px}.kv{font-size:26px;font-weight:900}.kl{font-size:11px;color:#5a6b85;font-weight:700;margin-top:3px}
+    .ft{margin-top:22px;display:flex;align-items:center;gap:8px;border-top:1px solid #dde6f0;padding-top:12px}.ft img{width:20px;height:20px}
+  </style></head><body>
+    <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div></div>
+    <h1>✈️ Flux avions — année ${year}</h1>
+    <div class="sub">Site LFBF · Comptage par avion physique (MSN) · Prévisionnels exclus · Édité le ${disp(fmt(new Date()))}</div>
+    <div class="cards">
+      <div class="kc" style="border-top:3px solid #16a34a"><div class="kv" style="color:#16a34a">${fx.arrivees}</div><div class="kl">🛬 Arrivées</div></div>
+      <div class="kc" style="border-top:3px solid #0891b2"><div class="kv" style="color:#0891b2">${fx.departs}</div><div class="kl">🛫 Départs (hors recyclés)</div></div>
+      <div class="kc" style="border-top:3px solid #d97706"><div class="kv" style="color:#d97706">${fx.recycles}</div><div class="kl">♻️ Recyclés</div></div>
+    </div>
+    ${sect('🛬 Arrivées',fx.detArr,'#16a34a')}
+    ${sect('🛫 Départs',fx.detDep,'#0891b2')}
+    ${sect('♻️ Recyclés',fx.detRecy,'#d97706')}
+    <div class="ft"><img src="${PDF_LOGO_B64}"><b style="font-size:12px">MARDAM AeroDesk Pro</b><span style="color:#8094ad;font-size:10px;margin-left:auto">Flux avions ${year}</span></div>
+  </body></html>`;
+  openPrintView(html,'PDF — Flux avions '+year);
+}
+function _exportFluxXls(year){
+  _loadExcelJS(async()=>{
+    if(!window.ExcelJS){ toast('Export indisponible (connexion requise une fois)'); return; }
+    try{
+      const fx=_fluxAvionsAnnuel(year);
+      const wb=new ExcelJS.Workbook();
+      const ws=wb.addWorksheet('Flux '+year,{views:[{state:'frozen',ySplit:1}]});
+      ws.columns=[{width:16},{width:22},{width:14},{width:16}];
+      ws.mergeCells('A1:D1'); const t=ws.getCell('A1'); t.value=`✈️ Flux avions — année ${year} · Site LFBF · Arrivées ${fx.arrivees} · Départs ${fx.departs} · Recyclés ${fx.recycles}`; t.font={bold:true,size:13,color:{argb:'FF12233f'}}; ws.getRow(1).height=22;
+      const addSect=(titre,items,argb)=>{
+        const sr=ws.addRow([titre+' — '+items.length]); ws.mergeCells(`A${sr.number}:D${sr.number}`); sr.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb}}; sr.getCell(1).font={bold:true,color:{argb:'FFFFFFFF'}};
+        const hr=ws.addRow(['MSN','Type avion','Date','Flux']); hr.eachCell(c=>{c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDEFF2'}};});
+        items.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(it=>ws.addRow([`MSN ${it.msn}`,it.type||'—',it.date?disp(it.date):'—',titre.replace(/[^\wàâéèê)]/g,'').trim()]));
+        ws.addRow([]);
+      };
+      addSect('Arrivees',fx.detArr,'FF16A34A');
+      addSect('Departs',fx.detDep,'FF0891B2');
+      addSect('Recycles',fx.detRecy,'FFD97706');
+      const buf=await wb.xlsx.writeBuffer();
+      const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=`Flux_avions_${year}.xlsx`; a.click(); URL.revokeObjectURL(url);
+      toast('✅ Excel Flux avions '+year+' généré');
+    }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
+  });
+}
 function renderKPI(){
   const el=document.getElementById('kpiGrid'); if(!el) return;
   const today=new Date(); today.setHours(0,0,0,0);
@@ -16101,7 +16251,47 @@ function renderKPI(){
     );
   }catch(e){}
 
-  el.innerHTML=html+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Synth\u00e8se calcul\u00e9e automatiquement pour la semaine s\u00e9lectionn\u00e9e \u00b7 tendances compar\u00e9es \u00e0 la semaine pr\u00e9c\u00e9dente.</div>`;
+  // ── Module Flux avions annuel ──
+  let fluxHtml='';
+  try{
+    const fYear=window._fluxYear||year;
+    const fx=_fluxAvionsAnnuel(fYear);
+    // Sélecteur déroulant 2020 → 2060 + navigation par flèches
+    const Y_MIN=2020, Y_MAX=2060;
+    let fYearOpts='';
+    for(let y=Y_MAX;y>=Y_MIN;y--){ fYearOpts+=`<option value="${y}" ${y===fYear?'selected':''}>${y}</option>`; }
+    const fYearBtns=`<button onclick="window._fluxYear=${Math.max(Y_MIN,fYear-1)};renderKPI()" ${fYear<=Y_MIN?'disabled':''} title="Année précédente" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:${fYear<=Y_MIN?'#4a5568':'#cfe0f5'};font-size:13px;font-weight:800;cursor:${fYear<=Y_MIN?'default':'pointer'};font-family:'Outfit',sans-serif">‹</button>
+      <select onchange="window._fluxYear=parseInt(this.value);renderKPI()" style="padding:6px 12px;border-radius:8px;background:#141d2e;border:1px solid rgba(0,210,255,0.3);color:#e6eefc;font-size:13px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">${fYearOpts}</select>
+      <button onclick="window._fluxYear=${Math.min(Y_MAX,fYear+1)};renderKPI()" ${fYear>=Y_MAX?'disabled':''} title="Année suivante" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:${fYear>=Y_MAX?'#4a5568':'#cfe0f5'};font-size:13px;font-weight:800;cursor:${fYear>=Y_MAX?'default':'pointer'};font-family:'Outfit',sans-serif">›</button>`;
+    const fcard=(val,lbl,col,ic,det)=>`<div style="flex:1;min-width:150px;background:rgba(255,255,255,0.03);border:1px solid ${col}33;border-top:3px solid ${col};border-radius:12px;padding:16px 18px">
+      <div style="font-size:34px;font-weight:900;color:${col};line-height:1">${val}</div>
+      <div style="font-size:12px;font-weight:800;color:var(--t2);margin-top:6px">${ic} ${lbl}</div>
+      <div style="font-size:10px;color:var(--t4);margin-top:3px">${det}</div>
+    </div>`;
+    fluxHtml=`<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:900;color:var(--t1)">✈️ Flux avions — année ${fYear}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          ${fYearBtns}
+          <button onclick="_exportFluxPdf(${fYear})" style="margin-left:6px;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.35);color:#ff8fa3;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📄 PDF</button>
+          <button onclick="_exportFluxXls(${fYear})" style="background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.35);color:#6effc4;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📊 Excel</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${fcard(fx.arrivees,'Arrivées','#34c759','🛬','avions entrés sur site')}
+        ${fcard(fx.departs,'Départs','#00a0ff','🛫','avions repartis (hors recyclés)')}
+        ${fcard(fx.recycles,'Recyclés','#ff9a3c','♻️','démantelés sur site')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px">
+        ${_fluxListBlock('🛬 Arrivées',fx.detArr,'#34c759')}
+        ${_fluxListBlock('🛫 Départs',fx.detDep,'#00a0ff')}
+        ${_fluxListBlock('♻️ Recyclés',fx.detRecy,'#ff9a3c')}
+      </div>
+      <div style="font-size:10px;color:#607090;margin-top:10px">Comptage par avion physique (MSN unique), toutes activités confondues. Les chantiers prévisionnels et futurs ne sont pas comptés (avion non encore arrivé). Un avion recyclé compte comme recyclé et non comme départ.</div>
+    </div>`;
+  }catch(e){ console.warn('flux avions',e); }
+
+  el.innerHTML=html+fluxHtml+`<div style="font-size:10px;color:#607090;text-align:center;padding:8px">Synth\u00e8se calcul\u00e9e automatiquement pour la semaine s\u00e9lectionn\u00e9e \u00b7 tendances compar\u00e9es \u00e0 la semaine pr\u00e9c\u00e9dente.</div>`;
 }
 // Navigation semaine précédente / suivante
 function _kpiWeekNav(dir){
@@ -18178,6 +18368,106 @@ function _presentSemaine(p, wStart, wEnd){
   }
   return true;
 }
+// Détail des personnes disponibles pour une semaine (clic sur le chiffre DISPO)
+function _showDispoDetail(year, wNum, monStr){
+  const old=document.getElementById('dispo-detail-pop'); if(old) old.remove();
+  const mon=parseLocal(monStr);
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const ABSL={conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié'};
+  // Catégorisation d'une personne
+  const catOf=(p)=>{
+    if(_isRecyMecano(p)) return 'recy';
+    if(_isPart21Staff(p)) return 'p21';
+    if(_isIqStaff(p)) return 'iq';
+    if(p.categorie==='sheetmetal') return 'sheet';
+    if(_isInterimP145(p)) return 'intP145';
+    if(p.categorie==='technicien') return 'techP145';
+    return 'autre';
+  };
+  const CATMETA={
+    techP145:{lbl:'Technicien Part 145',col:'#60e0a8',p145:true},
+    intP145:{lbl:'Intérimaire Part 145',col:'#82b1ff',p145:true},
+    sheet:{lbl:'Sheet metal',col:'#c9a0ff',p145:true},
+    recy:{lbl:'Intérimaire Recyclage',col:'#ff9a3c',p145:false},
+    p21:{lbl:'Intérimaire Part 21',col:'#00a0ff',p145:false},
+    iq:{lbl:'Intérimaire IQ',col:'#ffd060',p145:false},
+    autre:{lbl:'Autre',col:'#8090a8',p145:false},
+  };
+  // Tous les productifs (Part 145 ET hors Part 145), actifs
+  const prod=S.personnel.filter(p=>
+    (p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal'||p.categorie==='recycling'||p.categorie==='part21'||p.categorie==='iq')
+    && p.actif!==false
+  );
+  const rows=[];
+  prod.forEach(emp=>{
+    if(!_presentSemaine(emp, mon, addD(mon,4))) return;
+    let dispoDemi=0; const absByType={};
+    [0,1,2,3,4].forEach(i=>{
+      const d=addD(mon,i), ds=fmt(d);
+      if(isHol(ds)) return;
+      ['AM','PM'].forEach(h=>{
+        const entry=S.planning[`${emp.id}_${ds}_${h}`];
+        const t=entry?entry.type:'travail';
+        if(!ABSENT.has(t)) dispoDemi+=0.5;
+        else absByType[t]=(absByType[t]||0)+0.5;
+      });
+    });
+    if(dispoDemi>0) rows.push({emp,dispoDemi,absByType,cat:catOf(emp)});
+  });
+  rows.sort((a,b)=>b.dispoDemi-a.dispoDemi || `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr'));
+  const fmtJ=v=>v%1===0?v+'j':v.toFixed(1).replace('.',',')+'j';
+
+  // Répartition par catégorie (nb de personnes + techniciens-semaine)
+  const parCat={};
+  rows.forEach(r=>{ if(!parCat[r.cat]) parCat[r.cat]={n:0,demi:0}; parCat[r.cat].n++; parCat[r.cat].demi+=r.dispoDemi; });
+  const catOrder=['techP145','intP145','sheet','recy','p21','iq','autre'];
+  const p145Total=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.demi||0),0)/5*10)/10;
+
+  const chipHtml=(only145)=>catOrder.filter(c=>CATMETA[c].p145===only145 && parCat[c]).map(c=>{
+    const m=CATMETA[c], pc=parCat[c];
+    const jS=Math.round(pc.demi/5*10)/10;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:${m.col}12;border:1px solid ${m.col}33;border-radius:8px">
+      <span style="font-size:11px;font-weight:700;color:${m.col}">${m.lbl}</span>
+      <span style="font-size:11px;color:#cfe0f5;font-weight:800">${pc.n} pers. · ${fmtJ(jS)}</span>
+    </div>`;
+  }).join('');
+  const chips145=chipHtml(true);
+  const chipsHors=chipHtml(false);
+
+  const listHtml=rows.length?rows.map(r=>{
+    const m=CATMETA[r.cat];
+    const absTxt=Object.keys(r.absByType).length?Object.entries(r.absByType).map(([t,n])=>`${fmtJ(n)} ${ABSL[t]||t}`).join(', '):'';
+    const pleinTemps=r.dispoDemi>=2.5;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="display:flex;align-items:center;gap:9px;min-width:0">
+        <span style="background:${m.col}22;border:1px solid ${m.col}55;color:${m.col};border-radius:6px;padding:2px 6px;font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0">${r.emp.trigramme||'—'}</span>
+        <div style="min-width:0">
+          <div style="font-size:12px;font-weight:700;color:#e6eefc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.emp.nom} ${r.emp.prenom} <span style="font-size:9px;color:${m.col};font-weight:600">· ${m.lbl}</span></div>
+          ${absTxt?`<div style="font-size:9px;color:#ffb45c">dont absent : ${absTxt}</div>`:''}
+        </div>
+      </div>
+      <span style="font-size:12px;font-weight:800;color:${pleinTemps?'#60e0a8':'#ffd060'};white-space:nowrap">${fmtJ(r.dispoDemi)}</span>
+    </div>`;
+  }).join(''):'<div style="padding:20px;text-align:center;color:#8090a8">Aucune personne disponible cette semaine.</div>';
+
+  const pop=document.createElement('div');
+  pop.id='dispo-detail-pop';
+  pop.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px';
+  pop.onclick=e=>{ if(e.target===pop) pop.remove(); };
+  pop.innerHTML=`<div style="background:#0e1626;border:1px solid rgba(96,224,168,0.4);border-radius:16px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+    <div style="padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:900;color:#e6eefc">🔧 Disponibles — S${wNum}</div>
+        <button onclick="document.getElementById('dispo-detail-pop').remove()" style="background:none;border:none;color:#8090a8;font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="font-size:12px;color:#8090a8;margin-top:5px">${disp(fmt(mon))} → ${disp(fmt(addD(mon,4)))}</div>
+      ${chips145?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#60e0a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Part 145 — total ${fmtJ(p145Total)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chips145}</div></div>`:''}
+      ${chipsHors?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Hors Part 145 (non compté dans le DISPO)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chipsHors}</div></div>`:''}
+    </div>
+    <div style="overflow-y:auto;flex:1">${listHtml}</div>
+  </div>`;
+  document.body.appendChild(pop);
+}
 function renderChargeCapaTable(year){
   const el=document.getElementById('chargeCapaTable');
   if(!el) return;
@@ -18452,15 +18742,17 @@ function renderChargeCapaTable(year){
 
   const badgeBesoin=(besoin,stockT,recT,airbusT,structT,wNum,detailChantiers,detailRecAvions,detailStruct)=>{
     if(!besoin) return `<span style="color:#8090a8;font-size:11px">—</span>`;
-    // Besoin Part 145 uniquement (chantiers + stockage + structure). Le détail par
-    // périmètre est accessible via les cartes de synthèse (clic sur une semaine).
+    // Besoin Part 145 uniquement (chantiers + stockage + structure).
     const chantierT=besoin-(stockT||0)-(structT||0);
     let detail='';
     if(chantierT>0) detail+=`<span style="color:#82b1ff">🔧${chantierT}</span> `;
     if(stockT>0)    detail+=`<span style="color:#a0b8d8">🅿️${stockT}</span> `;
     if(structT>0)   detail+=`<span style="color:#a7c1de">🔩${structT}</span>`;
+    // Données pour l'infobulle de détail
+    const dataObj={wNum,besoin,chantierT,stockT:stockT||0,recT:recT||0,airbusT:airbusT||0,structT:structT||0,detailChantiers:detailChantiers||[],detailRecAvions:detailRecAvions||[],detailStruct:detailStruct||[]};
+    const dataJson=encodeURIComponent(JSON.stringify(dataObj));
     return `<div style="text-align:center">
-      <span style="font-size:18px;font-weight:900;color:#c0d0e8">${besoin}</span>
+      <span onclick="event.stopPropagation();showBesoinsDetail(this,'${dataJson}')" title="Voir le détail du besoin" style="font-size:18px;font-weight:900;color:#c0d0e8;cursor:pointer;border-bottom:1px dashed rgba(192,208,232,0.5);padding-bottom:1px">${besoin}</span>
       <div style="font-size:9px;color:#8090a8;font-weight:600">tech. requis</div>
       ${detail?`<div style="font-size:9px;margin-top:2px;display:flex;gap:3px;justify-content:center;flex-wrap:wrap">${detail}</div>`:''}
     </div>`;
@@ -18479,7 +18771,7 @@ function renderChargeCapaTable(year){
         ${isSel&&!d.isCurrent?'<br><span style="font-size:8px;color:var(--cyan)">▸ affichée</span>':''}
       </td>
       <td style="padding:7px 10px;text-align:center">
-        <span style="font-size:16px;font-weight:900;color:#60e0a8">${d.capaTechs}</span>
+        <span onclick="event.stopPropagation();_showDispoDetail(${d.mon.getFullYear()},${d.wNum},'${fmt(d.mon)}')" title="Voir le détail des personnes disponibles" style="font-size:16px;font-weight:900;color:#60e0a8;cursor:pointer;border-bottom:1px dashed rgba(96,224,168,0.5);padding-bottom:1px">${d.capaTechs}</span>
       </td>
       <td style="padding:7px 10px">${badgeBesoin(d.besoinActifs,d.stockTechs,d.recTechs,d.airbusTechs,d.structTechs,d.wNum,d.detailChantiers,d.detailRecAvions,d.detailStruct)}</td>
       <td style="padding:7px 10px">${badgeEcart(d.ecartTotal,d.besoinTotal)}</td>
@@ -18714,21 +19006,30 @@ function _besoinEditCell(ovKey,theo,d,f,mon,isCur){
       </td>`;
     }
     return`<td style="padding:2px;text-align:center;${cellCurStyle}">
-      <button type="button" onclick="activateBesoinCell(this,'${ovKey}',${avant?1:0})"
+      ${window._besoinClip!=null
+        ? `<button type="button" onclick="_besoinPaste('${ovKey}',-1)" title="Coller ${window._besoinClip} ici" style="width:30px;height:26px;border-radius:6px;border:1px dashed rgba(110,255,196,0.5);background:rgba(110,255,196,0.08);color:#6effc4;font-size:11px;font-weight:800;cursor:pointer">📎</button>`
+        : `<button type="button" onclick="activateBesoinCell(this,'${ovKey}',${avant?1:0})"
         title="Ajouter un besoin pour cette semaine (démarrage anticipé ou prolongation)"
-        style="width:30px;height:26px;border-radius:6px;border:1px dashed rgba(255,255,255,0.16);background:transparent;color:#52617a;font-size:13px;font-weight:700;cursor:pointer">+</button>
+        style="width:30px;height:26px;border-radius:6px;border:1px dashed rgba(255,255,255,0.16);background:transparent;color:#52617a;font-size:13px;font-weight:700;cursor:pointer">+</button>`}
     </td>`;
   }
   const val=hasOv?parseInt(ov):theo;
   const bgColor=hasOv?'rgba(255,208,96,0.15)':'rgba(255,255,255,0.04)';
   const brdColor=hasOv?'rgba(255,208,96,0.5)':'rgba(255,255,255,0.1)';
   const txtColor=hasOv?'#ffd060':'#c0d0e8';
+  // Bouton copier (📋) ; si une valeur est déjà copiée, bouton coller (📎)
+  const copyBtn = (window._besoinClip!=null)
+    ? `<button type="button" onclick="_besoinPaste('${ovKey}',${theo})" title="Coller ${window._besoinClip} ici" style="width:16px;height:24px;border:none;background:transparent;color:#6effc4;font-size:10px;cursor:pointer;padding:0;line-height:1">📎</button>`
+    : `<button type="button" onclick="_besoinCopy(${val})" title="Copier cette valeur" style="width:16px;height:24px;border:none;background:transparent;color:#5a7aa0;font-size:10px;cursor:pointer;padding:0;line-height:1">📋</button>`;
   return`<td style="padding:2px;text-align:center;${cellCurStyle}">
-    <input type="number" min="0" max="99" value="${val}"
-      data-ck="${ovKey}" data-theo="${theo}"
-      onchange="setBesoinOverride('${ovKey}',this.value,${theo})"
-      title="${hasOv?'Ajusté (théorique: '+theo+')':'Théorique'}"
-      style="width:38px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:${bgColor};border:1px solid ${brdColor};color:${txtColor}">
+    <div style="display:flex;align-items:center;justify-content:center;gap:1px">
+      <input type="number" min="0" max="99" value="${val}"
+        data-ck="${ovKey}" data-theo="${theo}"
+        onchange="setBesoinOverride('${ovKey}',this.value,${theo})"
+        title="${hasOv?'Ajusté (théorique: '+theo+')':'Théorique'}"
+        style="width:36px;padding:4px 2px;text-align:center;font-size:12px;font-weight:800;border-radius:6px;font-family:'Outfit',sans-serif;background:${bgColor};border:1px solid ${brdColor};color:${txtColor}">
+      ${copyBtn}
+    </div>
   </td>`;
 }
 // ── Helpers pour la ligne TOTAL + taux de charge par périmètre ──
@@ -18850,7 +19151,7 @@ function buildBesoinEditTable(year,weeks){
         <div style="display:flex;align-items:center;gap:6px">
           <span style="width:3px;height:24px;border-radius:2px;background:${col};display:inline-block"></span>
           <div>
-            <div style="font-size:12px;font-weight:800;color:#e0e8ff">${c.nom}</div>
+            <div style="font-size:12px;font-weight:800;color:#e0e8ff${c.id&&S.chantiers.find(x=>x.id===c.id)?';cursor:pointer;border-bottom:1px dashed rgba(0,210,255,0.35)':''}" ${c.id&&S.chantiers.find(x=>x.id===c.id)?`onclick="editChantier('${c.id}')" title="Ouvrir la fiche du chantier"`:''}>${c.nom}</div>
             <div style="font-size:9px;color:#8090a8">${c.client||''} · théo. ${theo}T</div>
           </div>
         </div>
@@ -19018,8 +19319,9 @@ function buildBesoinEditTable(year,weeks){
           <tbody>${secP145}${rows}${stockRow}${structRow}${totP145}${secP21}${airbusRow}${totP21}${secRecy}${recRows||'<tr><td style="padding:6px 12px;position:sticky;left:0;background:#0d1628;color:#8090a8;font-size:10px;font-style:italic">Aucun avion en recyclage</td>'+relevantWeeks.map(()=>'<td style="background:#0d1628"></td>').join('')+'</tr>'}${totRecy}</tbody>
         </table>
       </div>
-      <div style="padding:4px 14px 12px">
+      <div style="padding:4px 14px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <button onclick="resetAllBesoinOverrides()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#a0b0c8;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">↺ Tout réinitialiser au théorique</button>
+        ${window._besoinClip!=null?`<span style="display:inline-flex;align-items:center;gap:8px;background:rgba(110,255,196,0.1);border:1px solid rgba(110,255,196,0.4);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:800;color:#6effc4">📋 Valeur copiée : ${window._besoinClip} — cliquez 📎 dans les cases pour coller<button onclick="_besoinClearClip()" style="background:none;border:none;color:#6effc4;cursor:pointer;font-size:13px;padding:0;margin-left:4px" title="Arrêter le collage">✕</button></span>`:'<span style="font-size:10px;color:#5a7aa0">💡 Astuce : cliquez 📋 sur une case pour copier sa valeur, puis 📎 sur les cases où la coller</span>'}
       </div>
     </div>
   </div>`;
@@ -19051,17 +19353,33 @@ function setBesoinOverride(key,value,theo){
   if(!S.besoinOverrides) S.besoinOverrides={};
   const v=parseInt(value);
   if(value===''||isNaN(v)){
-    delete S.besoinOverrides[key];  // vide → supprimer
-  }else if(theo!==-1 && v===theo){
-    delete S.besoinOverrides[key];  // = théorique → retour au théorique (pas en zone retard)
+    delete S.besoinOverrides[key];  // champ vidé → retour au théorique
   }else{
-    S.besoinOverrides[key]=v;
+    S.besoinOverrides[key]=v;       // toute valeur saisie est conservée (même si = théorique)
   }
   save();
   renderProgramme();
 }
 
-// Active une case hors période (avance/retard) au clic et place le curseur dedans
+// Copier-coller libre d'une valeur de besoin, cellule par cellule
+function _besoinCopy(v){
+  window._besoinClip = parseInt(v);
+  renderProgramme();   // re-rendre pour afficher les boutons "coller" 📎
+  toast(`📋 ${window._besoinClip} copié — cliquez 📎 pour coller`);
+}
+function _besoinPaste(ovKey, theo){
+  if(window._besoinClip==null){ return; }
+  if(!S.besoinOverrides) S.besoinOverrides={};
+  S.besoinOverrides[ovKey] = window._besoinClip;
+  save();
+  renderProgramme();   // garde le mode "coller" actif pour coller ailleurs
+  toast(`📎 ${window._besoinClip} collé`);
+}
+// Sortir du mode copier-coller (clic ailleurs / bouton dédié)
+function _besoinClearClip(){
+  window._besoinClip = null;
+  renderProgramme();
+}
 function activateBesoinCell(btn, ovKey, avant){
   const td=btn.parentElement;
   const accent=avant?'110,200,255':'255,77,109';
