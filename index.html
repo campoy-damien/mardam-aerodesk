@@ -18376,9 +18376,16 @@ function _showDispoDetail(year, wNum, monStr){
   const ABSL={conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié'};
   // Catégorisation d'une personne
   const catOf=(p)=>{
-    if(_isRecyMecano(p)) return 'recy';
-    if(_isPart21Staff(p)) return 'p21';
-    if(_isIqStaff(p)) return 'iq';
+    // Part 21 : distinguer CDI (embauché) et intérimaire
+    if(p.categorie==='part21') return 'p21CDI';
+    if(p.categorie==='interimaire' && p.activite==='part21') return 'p21Int';
+    // IQ
+    if(p.categorie==='iq') return 'iqCDI';
+    if(p.categorie==='interimaire' && p.activite==='iq') return 'iqInt';
+    // Recyclage
+    if(p.categorie==='recycling') return 'recyCDI';
+    if(p.categorie==='interimaire' && p.activite==='recycling') return 'recyInt';
+    // Part 145
     if(p.categorie==='sheetmetal') return 'sheet';
     if(_isInterimP145(p)) return 'intP145';
     if(p.categorie==='technicien') return 'techP145';
@@ -18388,9 +18395,12 @@ function _showDispoDetail(year, wNum, monStr){
     techP145:{lbl:'Technicien Part 145',col:'#60e0a8',p145:true},
     intP145:{lbl:'Intérimaire Part 145',col:'#82b1ff',p145:true},
     sheet:{lbl:'Sheet metal',col:'#c9a0ff',p145:true},
-    recy:{lbl:'Intérimaire Recyclage',col:'#ff9a3c',p145:false},
-    p21:{lbl:'Intérimaire Part 21',col:'#00a0ff',p145:false},
-    iq:{lbl:'Intérimaire IQ',col:'#ffd060',p145:false},
+    recyCDI:{lbl:'Technicien Recyclage',col:'#ff9a3c',p145:false},
+    recyInt:{lbl:'Intérimaire Recyclage',col:'#ffb45c',p145:false},
+    p21CDI:{lbl:'Technicien Part 21',col:'#00a0ff',p145:false},
+    p21Int:{lbl:'Intérimaire Part 21',col:'#5ab8ff',p145:false},
+    iqCDI:{lbl:'Technicien IQ',col:'#ffd060',p145:false},
+    iqInt:{lbl:'Intérimaire IQ',col:'#ffe08a',p145:false},
     autre:{lbl:'Autre',col:'#8090a8',p145:false},
   };
   // Tous les productifs (Part 145 ET hors Part 145), actifs
@@ -18417,18 +18427,18 @@ function _showDispoDetail(year, wNum, monStr){
   rows.sort((a,b)=>b.dispoDemi-a.dispoDemi || `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr'));
   const fmtJ=v=>v%1===0?v+'j':v.toFixed(1).replace('.',',')+'j';
 
-  // Répartition par catégorie (nb de personnes + techniciens-semaine)
+  // Répartition par catégorie (nb de personnes + jours cumulés disponibles)
   const parCat={};
   rows.forEach(r=>{ if(!parCat[r.cat]) parCat[r.cat]={n:0,demi:0}; parCat[r.cat].n++; parCat[r.cat].demi+=r.dispoDemi; });
-  const catOrder=['techP145','intP145','sheet','recy','p21','iq','autre'];
-  const p145Total=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.demi||0),0)/5*10)/10;
+  const catOrder=['techP145','intP145','sheet','recyCDI','recyInt','p21CDI','p21Int','iqCDI','iqInt','autre'];
+  // dispoDemi accumule déjà des jours (0,5 par demi-journée) → total = somme directe
+  const p145Total=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.demi||0),0)*10)/10;
 
   const chipHtml=(only145)=>catOrder.filter(c=>CATMETA[c].p145===only145 && parCat[c]).map(c=>{
     const m=CATMETA[c], pc=parCat[c];
-    const jS=Math.round(pc.demi/5*10)/10;
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:${m.col}12;border:1px solid ${m.col}33;border-radius:8px">
       <span style="font-size:11px;font-weight:700;color:${m.col}">${m.lbl}</span>
-      <span style="font-size:11px;color:#cfe0f5;font-weight:800">${pc.n} pers. · ${fmtJ(jS)}</span>
+      <span style="font-size:11px;color:#cfe0f5;font-weight:800">${pc.n} pers. · ${fmtJ(pc.demi)}</span>
     </div>`;
   }).join('');
   const chips145=chipHtml(true);
@@ -18461,7 +18471,7 @@ function _showDispoDetail(year, wNum, monStr){
         <button onclick="document.getElementById('dispo-detail-pop').remove()" style="background:none;border:none;color:#8090a8;font-size:20px;cursor:pointer">✕</button>
       </div>
       <div style="font-size:12px;color:#8090a8;margin-top:5px">${disp(fmt(mon))} → ${disp(fmt(addD(mon,4)))}</div>
-      ${chips145?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#60e0a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Part 145 — total ${fmtJ(p145Total)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chips145}</div></div>`:''}
+      ${chips145?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#60e0a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Part 145 — ${fmtJ(p145Total)} cumulés dispo</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chips145}</div></div>`:''}
       ${chipsHors?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Hors Part 145 (non compté dans le DISPO)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chipsHors}</div></div>`:''}
     </div>
     <div style="overflow-y:auto;flex:1">${listHtml}</div>
