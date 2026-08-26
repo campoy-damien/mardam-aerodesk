@@ -3062,9 +3062,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="modal-title">👤 Employé</div>
   <input type="hidden" id="pi">
   <div class="fgrid">
-    <div class="field"><label>Prénom *</label><input type="text" id="p-pre"></div>
-    <div class="field"><label>Nom *</label><input type="text" id="p-nom"></div>
-    <div class="field"><label>Trigramme *</label><input type="text" id="p-tri" maxlength="4" style="text-transform:uppercase"></div>
+    <div class="field" id="wrap-prenom"><label>Prénom *</label><input type="text" id="p-pre"></div>
+    <div class="field" id="wrap-nom"><label>Nom *</label><input type="text" id="p-nom"></div>
+    <div class="field" id="wrap-trigramme"><label>Trigramme *</label><input type="text" id="p-tri" maxlength="4" style="text-transform:uppercase"></div>
+    <div class="field" id="wrap-societe" style="display:none;grid-column:1/-1"><label>Société *</label><input type="text" id="p-societe" placeholder="Nom de la société prestataire"></div>
     <div class="field"><label>Catégorie *</label>
       <select id="p-cat" onchange="togglePrestFields(this.value)">
         <option value="responsable">Responsable Projet</option>
@@ -3848,6 +3849,8 @@ let cellCtx=null, cellType='', cellVM=false;
 const uid   = ()=>'x'+Date.now()+Math.random().toString(36).slice(2,5);
 const fmt   = d=>{ if(!d)return''; if(typeof d==='string')return d; const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),j=String(d.getDate()).padStart(2,'0'); return`${y}-${m}-${j}`; };
 const disp  = d=>{ if(!d)return'—'; const p=d.split('-'); return`${p[2]}/${p[1]}/${p[0]}`; };
+// Étiquette courte d'une personne : société pour un prestataire, sinon trigramme
+const _persTag = p => (p && p.categorie==='prestataire' && p.societe) ? p.societe : (p?.trigramme||'');
 const addD  = (d,n)=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); x.setDate(x.getDate()+n); return x; };
 const parseLocal = s=>{ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); };
 const getMon= d=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); const w=x.getDay(); x.setDate(x.getDate()-(w===0?6:w-1)); x.setHours(0,0,0,0); return x; };
@@ -7556,7 +7559,7 @@ function renderForms(){
     const open=expandAll;
     const hdr=`<tr onclick="_formToggleEmp('${empId}')" style="cursor:pointer;background:rgba(0,210,255,0.05);border-top:1px solid rgba(255,255,255,0.07)">
       <td style="font-weight:800"><span id="femptog-${empId}" style="display:inline-block;width:16px;color:var(--cyan)">${open?'▾':'▸'}</span>${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
-      <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${emp?.trigramme||'—'}</span></td>
+      <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${(_persTag(emp)||'—')}</span></td>
       <td>${catBadge(emp?.categorie||'')}</td>
       <td colspan="5" style="color:var(--t3);font-size:12px">${list.length} formation(s)&nbsp;&nbsp;·&nbsp;&nbsp;${sum.join('&nbsp;&nbsp;')}</td>
       <td></td>
@@ -7628,7 +7631,7 @@ function exportFormXls(){
     if(typeof XLSX==='undefined'){toast('Export Excel non disponible hors ligne');return;}
     try{
       const rows=[['Employé','Trigramme','Catégorie','Formation','Obtention','Expiration','Statut','Notes']];
-      S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',emp?.trigramme||'—',CATS[emp?.categorie||'']?.lbl||'—',(f.type||'').toUpperCase(),f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
+      S.formations.forEach(f=>{const emp=byId(f.empId);rows.push([emp?`${emp.prenom} ${emp.nom}`:'—',(_persTag(emp)||'—'),CATS[emp?.categorie||'']?.lbl||'—',(f.type||'').toUpperCase(),f.dateObtention?disp(f.dateObtention):'—',f.dateExpiration?disp(f.dateExpiration):'—',{valid:'Valide',warning:'Expire bientôt',expired:'Expiré',na:'Illimité'}[tSt(f.dateExpiration)]||'—',f.notes||'']);});
       const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:22},{wch:9},{wch:22},{wch:26},{wch:14},{wch:14},{wch:14},{wch:30}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Formations');
       XLSX.writeFile(wb,'AeroStaff_Formations.xlsx');
@@ -8429,7 +8432,9 @@ function buildGrid(emps,dates,containerId){
         if(cId && cId!=='zzz_sans_chantier'){
           // Affectés = personnes distinctes travaillant sur ce chantier au moins une demi-journée cette semaine
           const affectSet=new Set();
+          const _PROD_CATS=new Set(['technicien','interimaire','sheetmetal']);
           (emps||[]).forEach(p=>{
+            if(!_PROD_CATS.has(p.categorie)) return;   // exclure improductifs (chef, expert, workshop, responsable, manager)
             dates.forEach(d=>{
               ['AM','PM'].forEach(h=>{
                 const e=S.planning[`${p.id}_${fmt(d)}_${h}`];
@@ -9425,10 +9430,11 @@ function _renderWeekSummary(dates, wlist){
     if(set.size>=requis) complet++; else { manque++; manqueList.push(`${(c.nom||'').split('—')[0].trim()} (${set.size}/${requis})`); }
   });
 
-  // Personnes actives : libres totales vs partielles
+  // Personnes actives : libres totales vs partielles (hors contrat terminé / pas encore embauché)
   const ABS=new Set(['conge','maladie','formation','formation_int','absence','deplacement']);
   const libres=[], partiels=[];
-  (S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')).forEach(p=>{
+  const _wStart=dates[0], _wEnd=dates[dates.length-1];
+  (S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&_presentSemaine(p,_wStart,_wEnd)).forEach(p=>{
     let travail=0, vide=0, tot=0;
     dates.forEach(d=>{ const wd=d.getDay(); if(wd===0||wd===6||isHol(fmt(d)))return; ['AM','PM'].forEach(h=>{ tot++; const e=S.planning[`${p.id}_${fmt(d)}_${h}`]; if(!e||!e.type) vide++; else if(e.type==='travail') travail++; }); });
     const nom=`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim();
@@ -13633,7 +13639,7 @@ function renderPersonnel(){
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
         <div class="sc-avatar" style="background:${cat.col||'#2979ff'}18;color:${cat.col||'#2979ff'}">${ini}</div>
         <div><div style="font-size:14px;font-weight:800;color:var(--t1)">${emp.nom} ${emp.prenom}</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${cat.col||'var(--t3)'};letter-spacing:1.2px;margin-top:2px">${emp.trigramme}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${cat.col||'var(--t3)'};letter-spacing:1.2px;margin-top:2px">${emp.categorie==='prestataire'&&emp.societe?'🏢 '+emp.societe:emp.trigramme}</div>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">
@@ -14170,6 +14176,7 @@ function openPanel(id){
       <div class="sc-avatar" style="width:54px;height:54px;font-size:18px;border-radius:16px;background:${cat.col||'#2979ff'}18;color:${cat.col||'#2979ff'}">${ini}</div>
       <div>${catBadge(emp.categorie)}
         <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:${cat.col||'var(--cyan)'};letter-spacing:2px;margin-top:6px">${emp.trigramme}</div>
+        ${emp.categorie==='prestataire'&&emp.societe?`<div style="display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#ffdd00;background:rgba(255,221,0,0.12);border:1px solid rgba(255,221,0,0.35);border-radius:6px;padding:2px 9px">🏢 ${emp.societe}</div>`:''}
         ${emp.niveau?`<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#c9a8ff;background:rgba(201,168,255,0.12);border:1px solid rgba(201,168,255,0.3);border-radius:6px;padding:2px 9px">🎖 ${emp.niveau}</div>`:''}
       </div>
     </div>
@@ -14321,6 +14328,17 @@ function togglePrestFields(cat){
   // Activité principale — visible uniquement pour intérimaires
   const actEl=document.getElementById('wrap-activite');
   if(actEl) actEl.style.display=isInt?'':'none';
+
+  // Trigramme masqué pour prestataires, remplacé par le champ Société
+  const triEl=document.getElementById('wrap-trigramme');
+  if(triEl) triEl.style.display=isPrest?'none':'';
+  const socEl=document.getElementById('wrap-societe');
+  if(socEl) socEl.style.display=isPrest?'':'none';
+  // Prénom / Nom masqués pour prestataires (seule la société compte)
+  const preEl=document.getElementById('wrap-prenom');
+  if(preEl) preEl.style.display=isPrest?'none':'';
+  const nomEl=document.getElementById('wrap-nom');
+  if(nomEl) nomEl.style.display=isPrest?'none':'';
 }
 
 function selectActivite(val){
@@ -14347,6 +14365,7 @@ function editPersonnel(id){
   document.getElementById('pi').value=id;
   document.getElementById('p-pre').value=emp.prenom||'';document.getElementById('p-nom').value=emp.nom||'';
   document.getElementById('p-tri').value=emp.trigramme||'';document.getElementById('p-cat').value=emp.categorie||'technicien';
+  { const s=document.getElementById('p-societe'); if(s) s.value=emp.societe||''; }
   document.getElementById('p-tel').value=emp.tel||'';
   document.getElementById('p-email').value=emp.email||'';document.getElementById('p-emb').value=emp.dateEmbauche||'';
   document.getElementById('p-fin').value=emp.dateFin||'';
@@ -14362,12 +14381,23 @@ function editPersonnel(id){
 }
 function savePersonnel(){
   const pre=document.getElementById('p-pre').value.trim();const nom=document.getElementById('p-nom').value.trim();
-  const tri=document.getElementById('p-tri').value.trim().toUpperCase();
-  if(!pre||!nom||!tri){alert('Prénom, nom et trigramme requis');return;}
-  const editId=document.getElementById('pi').value;
   const cat=document.getElementById('p-cat').value;
+  const isPrest=cat==='prestataire';
+  let tri=document.getElementById('p-tri').value.trim().toUpperCase();
+  const societe=(document.getElementById('p-societe')?.value||'').trim();
+  const editId=document.getElementById('pi').value;
+  let preF=pre, nomF=nom;
+  if(isPrest){
+    // Prestataire : seule la société est requise (ni prénom, ni nom, ni trigramme)
+    if(!societe){alert('Nom de la société requis');return;}
+    if(!tri) tri=societe.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)||'PRES';
+    nomF=societe;   // le "nom" affiché partout = la société
+    preF='';        // pas de prénom pour un prestataire
+  }else{
+    if(!pre||!nom||!tri){alert('Prénom, nom et trigramme requis');return;}
+  }
   const activite=cat==='interimaire'?(document.getElementById('p-activite')?.value||''):'';
-  const data={prenom:pre,nom,trigramme:tri,categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||''};
+  const data={prenom:preF,nom:nomF,trigramme:tri,societe:isPrest?societe:'',categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||''};
   if(editId){const i=S.personnel.findIndex(p=>p.id===editId);if(i>-1)S.personnel[i]={...S.personnel[i],...data};}
   else S.personnel.push({id:uid(),...data,actif:true});
   save();closeM('m-pers');popSelects();
@@ -14737,7 +14767,7 @@ function renderAutorisations(){
       const open=expandAll;
       const hdr=`<tr onclick="_autoToggleEmp('${empId}')" style="cursor:pointer;background:rgba(0,210,255,0.05);border-top:1px solid rgba(255,255,255,0.07)">
         <td style="font-weight:800"><span id="autoemptog-${empId}" style="display:inline-block;width:16px;color:var(--cyan)">${open?'▾':'▸'}</span>${emp?`${emp.prenom} ${emp.nom}`:'—'}</td>
-        <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${emp?.trigramme||'—'}</span></td>
+        <td><span class="badge bn" style="font-family:'JetBrains Mono',monospace">${(_persTag(emp)||'—')}</span></td>
         <td>${catBadge(emp?.categorie||'')}</td>
         <td colspan="5" style="color:var(--t3);font-size:12px">${list.length} autorisation(s)&nbsp;&nbsp;·&nbsp;&nbsp;${sum.join('&nbsp;&nbsp;')}</td>
         <td></td>
@@ -14954,7 +14984,7 @@ function exportAutoXls(){
         const emp=byId(a.empId);
         rows.push([
           emp?`${emp.prenom} ${emp.nom}`:'—',
-          emp?.trigramme||'—',
+          (_persTag(emp)||'—'),
           CATS[emp?.categorie||'']?.lbl||'—',
           a.type,
           a.dateObtention?disp(a.dateObtention):'—',
@@ -18409,8 +18439,9 @@ function _showDispoDetail(year, wNum, monStr){
     && p.actif!==false
   );
   const rows=[];
+  const parCat={};   // {cat:{theo, reelDemi}} — theo=présents cette semaine, reelDemi=demi-j dispo cumulées
   prod.forEach(emp=>{
-    if(!_presentSemaine(emp, mon, addD(mon,4))) return;
+    if(!_presentSemaine(emp, mon, addD(mon,4))) return;   // présent cette semaine = théorique
     let dispoDemi=0; const absByType={};
     [0,1,2,3,4].forEach(i=>{
       const d=addD(mon,i), ds=fmt(d);
@@ -18422,23 +18453,30 @@ function _showDispoDetail(year, wNum, monStr){
         else absByType[t]=(absByType[t]||0)+0.5;
       });
     });
-    if(dispoDemi>0) rows.push({emp,dispoDemi,absByType,cat:catOf(emp)});
+    const cat=catOf(emp);
+    // théorique : toute personne présente cette semaine compte
+    if(!parCat[cat]) parCat[cat]={theo:0, reelDemi:0};
+    parCat[cat].theo++;
+    parCat[cat].reelDemi+=dispoDemi;
+    // liste : seulement ceux qui ont au moins une demi-journée dispo
+    if(dispoDemi>0) rows.push({emp,dispoDemi,absByType,cat});
   });
   rows.sort((a,b)=>b.dispoDemi-a.dispoDemi || `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr'));
   const fmtJ=v=>v%1===0?v+'j':v.toFixed(1).replace('.',',')+'j';
+  const fmtN=v=>v%1===0?String(v):v.toFixed(1).replace('.',',');   // équivalent personnes
 
-  // Répartition par catégorie (nb de personnes + jours cumulés disponibles)
-  const parCat={};
-  rows.forEach(r=>{ if(!parCat[r.cat]) parCat[r.cat]={n:0,demi:0}; parCat[r.cat].n++; parCat[r.cat].demi+=r.dispoDemi; });
   const catOrder=['techP145','intP145','sheet','recyCDI','recyInt','p21CDI','p21Int','iqCDI','iqInt','autre'];
-  // dispoDemi accumule déjà des jours (0,5 par demi-journée) → total = somme directe
-  const p145Total=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.demi||0),0)*10)/10;
+  // Réel en équivalent temps plein = demi-journées dispo / 10 (5 jours × 2 demi-j)
+  const reelETP=c=>Math.round((parCat[c]?.reelDemi||0)/10*10)/10;
+  const theoP145=catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.theo||0),0);
+  const reelP145=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.reelDemi||0),0)/10*10)/10;
 
   const chipHtml=(only145)=>catOrder.filter(c=>CATMETA[c].p145===only145 && parCat[c]).map(c=>{
-    const m=CATMETA[c], pc=parCat[c];
+    const m=CATMETA[c], pc=parCat[c], reel=reelETP(c);
+    const manque=reel<pc.theo-0.05;
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:${m.col}12;border:1px solid ${m.col}33;border-radius:8px">
       <span style="font-size:11px;font-weight:700;color:${m.col}">${m.lbl}</span>
-      <span style="font-size:11px;color:#cfe0f5;font-weight:800">${pc.n} pers. · ${fmtJ(pc.demi)}</span>
+      <span style="font-size:11px;color:#cfe0f5;font-weight:800"><span style="color:#8090a8">${pc.theo} théo</span> · <span style="color:${manque?'#ffb45c':'#60e0a8'}">${fmtN(reel)} réel</span></span>
     </div>`;
   }).join('');
   const chips145=chipHtml(true);
@@ -18471,7 +18509,7 @@ function _showDispoDetail(year, wNum, monStr){
         <button onclick="document.getElementById('dispo-detail-pop').remove()" style="background:none;border:none;color:#8090a8;font-size:20px;cursor:pointer">✕</button>
       </div>
       <div style="font-size:12px;color:#8090a8;margin-top:5px">${disp(fmt(mon))} → ${disp(fmt(addD(mon,4)))}</div>
-      ${chips145?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#60e0a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Part 145 — ${fmtJ(p145Total)} cumulés dispo</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chips145}</div></div>`:''}
+      ${chips145?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#60e0a8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Part 145 — ${theoP145} théo · ${fmtN(reelP145)} réel (dispo)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chips145}</div></div>`:''}
       ${chipsHors?`<div style="margin-top:10px"><div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Hors Part 145 (non compté dans le DISPO)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${chipsHors}</div></div>`:''}
     </div>
     <div style="overflow-y:auto;flex:1">${listHtml}</div>
