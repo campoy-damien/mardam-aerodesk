@@ -3851,6 +3851,12 @@ const fmt   = d=>{ if(!d)return''; if(typeof d==='string')return d; const y=d.ge
 const disp  = d=>{ if(!d)return'—'; const p=d.split('-'); return`${p[2]}/${p[1]}/${p[0]}`; };
 // Étiquette courte d'une personne : société pour un prestataire, sinon trigramme
 const _persTag = p => (p && p.categorie==='prestataire' && p.societe) ? p.societe : (p?.trigramme||'');
+// Libellé complet pour listes/exports : société seule pour un prestataire, sinon "Nom Prénom (TRI)"
+const _persFull = p => {
+  if(!p) return '—';
+  if(p.categorie==='prestataire') return p.societe || p.nom || 'Prestataire';
+  return `${p.nom} ${p.prenom}${p.trigramme?` (${p.trigramme})`:''}`;
+};
 const addD  = (d,n)=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); x.setDate(x.getDate()+n); return x; };
 const parseLocal = s=>{ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); };
 const getMon= d=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); const w=x.getDay(); x.setDate(x.getDate()-(w===0?6:w-1)); x.setHours(0,0,0,0); return x; };
@@ -18439,9 +18445,9 @@ function _showDispoDetail(year, wNum, monStr){
     && p.actif!==false
   );
   const rows=[];
-  const parCat={};   // {cat:{theo, reelDemi}} — theo=présents cette semaine, reelDemi=demi-j dispo cumulées
+  const parCat={};
   prod.forEach(emp=>{
-    if(!_presentSemaine(emp, mon, addD(mon,4))) return;   // présent cette semaine = théorique
+    if(!_presentSemaine(emp, mon, addD(mon,4))) return;
     let dispoDemi=0; const absByType={};
     [0,1,2,3,4].forEach(i=>{
       const d=addD(mon,i), ds=fmt(d);
@@ -18454,11 +18460,9 @@ function _showDispoDetail(year, wNum, monStr){
       });
     });
     const cat=catOf(emp);
-    // théorique : toute personne présente cette semaine compte
     if(!parCat[cat]) parCat[cat]={theo:0, reelDemi:0};
     parCat[cat].theo++;
     parCat[cat].reelDemi+=dispoDemi;
-    // liste : seulement ceux qui ont au moins une demi-journée dispo
     if(dispoDemi>0) rows.push({emp,dispoDemi,absByType,cat});
   });
   rows.sort((a,b)=>b.dispoDemi-a.dispoDemi || `${a.emp.nom} ${a.emp.prenom}`.localeCompare(`${b.emp.nom} ${b.emp.prenom}`,'fr'));
@@ -18466,10 +18470,10 @@ function _showDispoDetail(year, wNum, monStr){
   const fmtN=v=>v%1===0?String(v):v.toFixed(1).replace('.',',');   // équivalent personnes
 
   const catOrder=['techP145','intP145','sheet','recyCDI','recyInt','p21CDI','p21Int','iqCDI','iqInt','autre'];
-  // Réel en équivalent temps plein = demi-journées dispo / 10 (5 jours × 2 demi-j)
-  const reelETP=c=>Math.round((parCat[c]?.reelDemi||0)/10*10)/10;
+  // Réel en équivalent-personnes : dispoDemi = 5 max par personne pleine (10 demi-j × 0,5) → ÷5 = 1,0
+  const reelETP=c=>Math.round((parCat[c]?.reelDemi||0)/5*10)/10;
   const theoP145=catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.theo||0),0);
-  const reelP145=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.reelDemi||0),0)/10*10)/10;
+  const reelP145=Math.round(catOrder.filter(c=>CATMETA[c].p145).reduce((s,c)=>s+(parCat[c]?.reelDemi||0),0)/5*10)/10;
 
   const chipHtml=(only145)=>catOrder.filter(c=>CATMETA[c].p145===only145 && parCat[c]).map(c=>{
     const m=CATMETA[c], pc=parCat[c], reel=reelETP(c);
@@ -18558,6 +18562,8 @@ function renderChargeCapaTable(year){
         });
       });
     });
+    // Capacité = équivalent-personnes disponibles.
+    // dispoDemi = 5 max par personne pleine (10 demi-j × 0,5) → ÷5 = 1,0 personne.
     const capaTechs=Math.round(capaJours/5*10)/10;
 
     // Besoin chantiers validés — avec override hebdo par chantier si présent
@@ -20299,7 +20305,7 @@ function exportWeekHtml(){
         <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:8px;font-weight:800;margin-top:1px">🩺 VM ${pm.vm}</div>`:''}</div>
       </div></td>`;
     }).join('');
-    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>${cells}</tr>`;
+    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.categorie==='prestataire'?(emp.societe||emp.nom):`${emp.nom} ${emp.prenom}`}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.categorie==='prestataire'?'—':emp.trigramme}</td>${cells}</tr>`;
   });
 
   const thCells=dates.map((d,i)=>{const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));return`<th style="min-width:78px;padding:6px;background:${isH?'#fff3cd':isW?'#f8f9fa':'#1e3a5f'};color:${isH?'#856404':isW?'#6c757d':'#fff'};border:1px solid #ddd;font-size:10px">${JOURS[wd===0?6:wd-1]}<br><small>${d.getDate()}/${d.getMonth()+1}</small></th>`;}).join('');
@@ -20541,7 +20547,7 @@ async function _buildColoredWeekXls(){
       if(vms.length){ base={txt:(base.txt?base.txt+'\n':'')+vms.join(' · '), color:base.color}; }
       return base;
     });
-    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
+    const row=ws.addRow([`${_persFull(emp)}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
     row.height=26;
     // Nom coloré par catégorie
     const c0=row.getCell(1);
@@ -20685,7 +20691,7 @@ async function _buildColoredMasterXls(){
       if(vms.length){ base={txt:(base.txt?base.txt+'\n':'')+vms.join(' · '), color:base.color}; }
       return base;
     });
-    const row=ws.addRow([`${emp.nom} ${emp.prenom} (${emp.trigramme})${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
+    const row=ws.addRow([`${_persFull(emp)}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
     row.height=26;
     const c0=row.getCell(1);
     c0.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(emp.categorie)}};
