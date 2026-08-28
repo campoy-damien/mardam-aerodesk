@@ -6424,13 +6424,12 @@ function showBesoinsDetail(el, dataJson){
   pop.id='pop-besoins';
   pop._triggerEl=el;
 
-  // Construire le contenu
-  let rows='';
+  // Construire le contenu — séparé Part 145 / Hors Part 145
+  let rowsP145='', rowsHors='';
   if(d.detailChantiers&&d.detailChantiers.length){
     d.detailChantiers.forEach(c=>{
       const statLabel=c.statut==='encours'?'En cours':c.statut==='futur'?'À venir':'Terminé';
       const retardTag=c.retard?'<span style="font-size:9px;color:#ff8fa3;font-weight:700"> · ⚠ Prolongation</span>':'';
-      // Affichage du besoin : si ajusté, montrer théo barré + ajusté
       let besoinDisplay;
       if(c.ajuste && !c.retard){
         besoinDisplay=`<div style="text-align:right;flex-shrink:0">
@@ -6445,7 +6444,7 @@ function showBesoinsDetail(el, dataJson){
       }else{
         besoinDisplay=`<div style="font-size:16px;font-weight:900;color:#82b1ff;flex-shrink:0">${c.nb}T</div>`;
       }
-      rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      rowsP145+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
         <div style="width:3px;height:32px;border-radius:2px;background:${c.color};flex-shrink:0"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:700;color:#e0e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nom}${retardTag}</div>
@@ -6457,44 +6456,16 @@ function showBesoinsDetail(el, dataJson){
     });
   }
   if(d.stockT>0){
-    rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+    rowsP145+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
       <div style="width:3px;height:32px;border-radius:2px;background:#a0b8d8;flex-shrink:0"></div>
       <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#a0b8d8">Stockage</div>
       <div style="font-size:10px;color:#607090">Man Hours → techs</div></div>
       <div style="font-size:16px;font-weight:900;color:#a0b8d8">${d.stockT}T</div>
     </div>`;
   }
-  if(d.detailRecAvions&&d.detailRecAvions.length){
-    d.detailRecAvions.forEach(a=>{
-      const statLabel=a.statut==='futur'?'À venir':'En cours';
-      rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-        <div style="width:3px;height:32px;border-radius:2px;background:${a.color||'#ff9a3c'};flex-shrink:0"></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;color:#ffcaa0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">♻️ ${a.type} MSN ${a.msn}</div>
-          <div style="font-size:10px;color:#607090">Recyclage · ${statLabel}</div>
-        </div>
-        <div style="font-size:16px;font-weight:900;color:#ff9a3c;flex-shrink:0">${a.nb}T</div>
-      </div>`;
-    });
-  }else if(d.recT>0){
-    rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <div style="width:3px;height:32px;border-radius:2px;background:#ff9a3c;flex-shrink:0"></div>
-      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#ff9a3c">Recyclage</div>
-      <div style="font-size:10px;color:#607090">Avions en démantèlement</div></div>
-      <div style="font-size:16px;font-weight:900;color:#ff9a3c">${d.recT}T</div>
-    </div>`;
-  }
-  if(d.airbusT>0){
-    rows+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0">
-      <div style="width:3px;height:32px;border-radius:2px;background:#0064c8;flex-shrink:0"></div>
-      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#00a0ff">Airbus Part 21</div>
-      <div style="font-size:10px;color:#607090">Tech P21 + IQ requis</div></div>
-      <div style="font-size:16px;font-weight:900;color:#00a0ff">${d.airbusT}T</div>
-    </div>`;
-  }
   if(d.structT>0){
     const noms=(d.detailStruct||[]).map(p=>p.nom+(p.tri?` (${p.tri})`:'')).join(', ');
-    rows+=`<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,0.05)">
+    rowsP145+=`<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
       <div style="width:3px;height:32px;border-radius:2px;background:#6d8fb0;flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:700;color:#a7c1de">🔩 Structure</div>
@@ -6504,6 +6475,42 @@ function showBesoinsDetail(el, dataJson){
       <div style="font-size:16px;font-weight:900;color:#a7c1de;flex-shrink:0">${d.structT}T</div>
     </div>`;
   }
+  // ── Hors Part 145 : Recyclage + Airbus Part 21 ──
+  if(d.detailRecAvions&&d.detailRecAvions.length){
+    d.detailRecAvions.forEach(a=>{
+      const statLabel=a.statut==='futur'?'À venir':'En cours';
+      rowsHors+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="width:3px;height:32px;border-radius:2px;background:${a.color||'#ff9a3c'};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:#ffcaa0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">♻️ ${a.type} MSN ${a.msn}</div>
+          <div style="font-size:10px;color:#607090">Recyclage · ${statLabel}</div>
+        </div>
+        <div style="font-size:16px;font-weight:900;color:#ff9a3c;flex-shrink:0">${a.nb}T</div>
+      </div>`;
+    });
+  }else if(d.recT>0){
+    rowsHors+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="width:3px;height:32px;border-radius:2px;background:#ff9a3c;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#ff9a3c">Recyclage</div>
+      <div style="font-size:10px;color:#607090">Avions en démantèlement</div></div>
+      <div style="font-size:16px;font-weight:900;color:#ff9a3c">${d.recT}T</div>
+    </div>`;
+  }
+  if(d.airbusT>0){
+    rowsHors+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+      <div style="width:3px;height:32px;border-radius:2px;background:#0064c8;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#00a0ff">Airbus Part 21</div>
+      <div style="font-size:10px;color:#607090">Tech P21 + IQ requis</div></div>
+      <div style="font-size:16px;font-weight:900;color:#00a0ff">${d.airbusT}T</div>
+    </div>`;
+  }
+  const totP145=(d.chantierT||0)+(d.stockT||0)+(d.structT||0);
+  const totHors=(d.recT||0)+(d.airbusT||0);
+  const sec=(titre,col,contenu,tot)=>contenu?`<div style="margin-bottom:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:800;color:${col};text-transform:uppercase;letter-spacing:.5px;padding:4px 0;border-bottom:2px solid ${col}44">
+      <span>${titre}</span><span>${tot}T</span>
+    </div>${contenu}</div>`:'';
+  const rows=sec('🔧 Part 145','#82b1ff',rowsP145,totP145)+sec('Hors Part 145 (Part 21 · Recyclage)','#ff9a3c',rowsHors,totHors);
 
   pop.style.cssText=`position:fixed;z-index:9999;background:#141b2d;border:1px solid rgba(0,210,255,0.25);border-radius:14px;padding:14px;width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.6);`;
   pop.innerHTML=`
@@ -6512,11 +6519,9 @@ function showBesoinsDetail(el, dataJson){
       <button onclick="document.getElementById('pop-besoins').remove()" style="background:none;border:none;color:#8090a8;font-size:16px;cursor:pointer;padding:0;line-height:1">✕</button>
     </div>
     <div>${rows||'<span style="color:#8090a8;font-size:12px">Aucun détail disponible</span>'}</div>
-    <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px;color:#607090">
-      <span>🔧 Chantiers: <strong style="color:#82b1ff">${d.chantierT}</strong></span>
-      <span>✈️ Stock: <strong style="color:#a0b8d8">${d.stockT||0}</strong></span>
-      <span>♻️ Rec: <strong style="color:#ff9a3c">${d.recT||0}</strong></span>
-      <span>🔩 Struct: <strong style="color:#a7c1de">${d.structT||0}</strong></span>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;gap:6px;font-size:12px;font-weight:800">
+      <span style="color:#82b1ff">🔧 Part 145 : ${totP145}T</span>
+      <span style="color:#ff9a3c">Hors P145 : ${totHors}T</span>
     </div>`;
 
   // Positionner près de l'élément cliqué
