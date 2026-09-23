@@ -7978,11 +7978,16 @@ function _importHrFlat(wb){
     const raw=label.replace(/^AUTHOR\.?\s*/i,'').trim();
 
     const upsertAuto=(t,grp)=>{
-      // Correspondance tolérante : on ignore le préfixe « Conduite — » pour retrouver une entrée
-      // existante créée sous une autre variante de libellé (ex. « Plateforme verticale »).
-      const _stripPrefix=s=>_hrNorm(s).replace(/^CONDUITE[—\-\s]*/,'');
-      const want=_stripPrefix(t);
-      const ex=(S.autorisations||[]).find(z=>z.empId===emp.id && _stripPrefix(z.type)===want);
+      // Correspondance très tolérante entre variantes de libellé de conduite :
+      // ignore le préfixe « Conduite — », le contenu entre parenthèses (ex. « (Tracma) »),
+      // et unifie « ≤ » / « <= » / « moins de » / « jusqu'à » / « jusqua ».
+      const _canon=s=>_hrNorm(s)
+        .replace(/^CONDUITE[—\-\s]*/,'')       // préfixe
+        .replace(/\([^)]*\)/g,'')              // (...) parenthèses
+        .replace(/JUSQU'?A|MOINS DE|<=|≤/g,'') // équivalents "≤"
+        .replace(/[^A-Z0-9]/g,'');             // ne garder que lettres/chiffres
+      const want=_canon(t);
+      const ex=(S.autorisations||[]).find(z=>z.empId===emp.id && _canon(z.type)===want);
       if(ex){ ex.grp=grp; ex.type=t; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; rep.autoUpd++; } }
       else { S.autorisations.push({id:uid(),empId:emp.id,type:t,grp,dateObtention:dobt||'',dateExpiration:dexp,notes:noteImp}); rep.autoCre++; }
     };
