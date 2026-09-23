@@ -7978,8 +7978,12 @@ function _importHrFlat(wb){
     const raw=label.replace(/^AUTHOR\.?\s*/i,'').trim();
 
     const upsertAuto=(t,grp)=>{
-      const ex=(S.autorisations||[]).find(z=>z.empId===emp.id && _hrNorm(z.type)===_hrNorm(t));
-      if(ex){ ex.grp=grp; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; rep.autoUpd++; } }
+      // Correspondance tolérante : on ignore le préfixe « Conduite — » pour retrouver une entrée
+      // existante créée sous une autre variante de libellé (ex. « Plateforme verticale »).
+      const _stripPrefix=s=>_hrNorm(s).replace(/^CONDUITE[—\-\s]*/,'');
+      const want=_stripPrefix(t);
+      const ex=(S.autorisations||[]).find(z=>z.empId===emp.id && _stripPrefix(z.type)===want);
+      if(ex){ ex.grp=grp; ex.type=t; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; rep.autoUpd++; } }
       else { S.autorisations.push({id:uid(),empId:emp.id,type:t,grp,dateObtention:dobt||'',dateExpiration:dexp,notes:noteImp}); rep.autoCre++; }
     };
 
