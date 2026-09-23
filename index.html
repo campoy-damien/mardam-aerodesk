@@ -4707,6 +4707,9 @@ function load(){
       if(!S.besoinOverrides) S.besoinOverrides={};
       // Migration : forcer pos en entier sur toutes les entrées existantes
       if(S.slot.entries) S.slot.entries=S.slot.entries.map(e=>({...e,pos:parseInt(e.pos)}));
+      // Migration : toute personne archivée doit être inactive (répare les anciennes archives
+      // où actif était resté true → elles réapparaissaient dans les vues filtrées sur actif)
+      if(Array.isArray(S.personnel)) S.personnel.forEach(p=>{ if(p && p.archived) p.actif=false; });
       // Migration : anciens intitulés d'accueil ("WELCOME MOE", "Welcome HSE") → "ACCUEIL HSE"
       try{
         const OLD_ACCUEIL=['WELCOME MOE','Welcome HSE'];
@@ -6046,7 +6049,7 @@ function openAirbusSettings(){
   // Responsable = responsable + chef pour le champ Responsable
   const resps=S.personnel.filter(p=>p.categorie==='responsable'&&p.actif!==false).sort((a,b)=>(a.nom+a.prenom).localeCompare(b.nom+b.prenom,'fr'));
   // Chef d'équipe = uniquement chefs
-  const chefs=S.personnel.filter(p=>p.categorie==='chef'&&p.actif!==false).sort((a,b)=>(a.nom+a.prenom).localeCompare(b.nom+b.prenom,'fr'));
+  const chefs=S.personnel.filter(p=>p.categorie==='chef'&&!_empHorsEffectif(p.id)).sort((a,b)=>(a.nom+a.prenom).localeCompare(b.nom+b.prenom,'fr'));
 
   const fillSelect=(id,list)=>{
     const sel=document.getElementById(id);
@@ -7467,11 +7470,25 @@ function _matchStaff(emp,q){
   return (p+' '+n).includes(q)||(n+' '+p).includes(q)||n.includes(q)||p.includes(q)||t.includes(q);
 }
 // Détecte les doublons (même personne + même type) dans formations et autorisations
+// Canonisation d'un libellé pour repérer les doublons (formations + autorisations).
+// Ignore casse, accents, ponctuation, pluriels, préfixe « Conduite — », parenthèses,
+// et unifie « ≤ » / « moins de » / « jusqu'à ».
+function _formCanon(s){
+  return (s==null?'':s).toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // enlever accents
+    .toUpperCase()
+    .replace(/^CONDUITE[—\-\s]*/,'')                   // préfixe Conduite —
+    .replace(/\([^)]*\)/g,'')                          // (Tracma), etc.
+    .replace(/JUSQU'?A|MOINS DE|<=|≤/g,'')             // équivalents "≤"
+    .replace(/S\b/g,'')                                // pluriels
+    .replace(/[^A-Z0-9]/g,'')                          // ne garder que lettres/chiffres
+    .trim();
+}
 function _findFormDupes(){
   const scan=(list)=>{
     const groups={};
     (list||[]).forEach(item=>{
-      const key=`${item.empId}__${(item.type||'').toUpperCase().replace(/[·.]/g,'').replace(/S\b/g,'').replace(/\s+/g,'').trim()}`;
+      const key=`${item.empId}__${_formCanon(item.type)}`;
       (groups[key]=groups[key]||[]).push(item);
     });
     return Object.values(groups).filter(g=>g.length>1);
@@ -7514,9 +7531,12 @@ function _applyDedupeForms(){
   const dedupe=(list)=>{
     const best={}, keepIds=new Set();
     (list||[]).forEach(item=>{
-      const key=`${item.empId}__${(item.type||'').toUpperCase().replace(/[·.]/g,'').replace(/S\b/g,'').replace(/\s+/g,'').trim()}`;
+      const key=`${item.empId}__${_formCanon(item.type)}`;
       const cur=best[key];
-      if(!cur || (item.dateExpiration||'') > (cur.dateExpiration||'')) best[key]=item;
+      if(!cur){ best[key]=item; return; }
+      const newExp=item.dateExpiration||'', curExp=cur.dateExpiration||'';
+      if(newExp>curExp) best[key]=item;
+      else if(newExp===curExp && (item.dateObtention||'') && !(cur.dateObtention||'')) best[key]=item; // à exp égale, garder celle qui a une date d'obtention
     });
     Object.values(best).forEach(it=>keepIds.add(it.id));
     // fusionner les notes des doublons dans l'entrée gardée (traçabilité)
