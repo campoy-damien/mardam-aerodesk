@@ -12188,7 +12188,7 @@ function checkConflicts(){
   if(!el) return;
   const conflicts=[];
   const today=new Date(); today.setHours(0,0,0,0);
-  const people=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie));
+  const people=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie)&&!_empHorsEffectif(p.id));
   const ABSENCE_LABELS={conge:'Congé',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Jour férié'};
 
   people.forEach(emp=>{
