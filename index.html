@@ -11841,7 +11841,7 @@ function renderRespGantt(){
   const yearMs=yearEnd-yearStart;
   const today=new Date(); const todayStr=fmt(today);
 
-  const allPeople=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie));
+  const allPeople=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie)&&!_empHorsEffectif(p.id));
   // Peupler le sélecteur de personne (une seule fois)
   const pSel=document.getElementById('gantt-resp-person');
   if(pSel && pSel.options.length<=1){
