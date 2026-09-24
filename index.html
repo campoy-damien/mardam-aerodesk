@@ -6839,9 +6839,9 @@ function popSelects(){
     _sortByNom(S.personnel).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom} (${p.trigramme})`;sel.appendChild(o);});
   });
   const resp=document.getElementById('c-resp');
-  if(resp){resp.innerHTML='<option value="">— Aucun —</option>';_sortByNom(S.personnel.filter(p=>p.categorie==='responsable')).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;resp.appendChild(o);});}
+  if(resp){resp.innerHTML='<option value="">— Aucun —</option>';_sortByNom(S.personnel.filter(p=>p.categorie==='responsable'&&!_empHorsEffectif(p.id))).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;resp.appendChild(o);});}
   const chef=document.getElementById('c-chef');
-  if(chef){chef.innerHTML='<option value="">— Aucun —</option>';_sortByNom(S.personnel.filter(p=>p.categorie==='chef')).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;chef.appendChild(o);});}
+  if(chef){chef.innerHTML='<option value="">— Aucun —</option>';_sortByNom(S.personnel.filter(p=>p.categorie==='chef'&&!_empHorsEffectif(p.id))).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;chef.appendChild(o);});}
   const eq=document.getElementById('c-equipe');
   if(eq){eq.innerHTML=_sortByNom(S.personnel.filter(p=>p.actif!==false && !p.archived)).map(p=>`<label class="eq-row" data-nom="${(p.nom+' '+p.prenom).toLowerCase().replace(/"/g,'')}" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px"><input type="checkbox" class="eq-chk" value="${p.id}" onchange="_onEquipeChange(this)"><span>${p.nom} ${p.prenom} <span style="color:var(--t4)">· ${CATS[p.categorie]?.lbl||p.categorie}</span></span></label>`).join('');}
   const cc=document.getElementById('cellChantier');
