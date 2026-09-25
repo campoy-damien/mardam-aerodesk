@@ -3857,6 +3857,29 @@ const _persFull = p => {
   if(p.categorie==='prestataire') return p.societe || p.nom || 'Prestataire';
   return `${p.nom} ${p.prenom}${p.trigramme?` (${p.trigramme})`:''}`;
 };
+// Marque un avion (par son MSN) comme parti du site dans TOUS les modules à la fois.
+// Chantier, Stockage, Airbus Part 21 → date de sortie posée. Le Recyclage est laissé tel quel
+// (avion cassé sur site, il ne part jamais). Renvoie le nombre de fiches mises à jour.
+function _marquerAvionParti(msn, dateStr){
+  const m=(msn||'').toString().trim();
+  if(!m) return 0;
+  let n=0;
+  // Chantiers (statut réel, pas prévisionnel) portant ce MSN
+  (S.chantiers||[]).forEach(c=>{
+    if((c.msn||'').toString().trim()===m && c.statut!=='prevision' && c.statut!=='futur'){
+      if(c.sortie!=='parti'){ c.sortie='parti'; c.dateSortie=dateStr; if(c.statut==='encours') c.statut='termine'; n++; }
+    }
+  });
+  // Stockage
+  (S.stockage?.avions||[]).forEach(a=>{
+    if((a.msn||'').toString().trim()===m && !a.sortie){ a.sortie=dateStr; n++; }
+  });
+  // Airbus Part 21
+  (S.airbus?.msns||[]).forEach(a=>{
+    if((a.msn||'').toString().trim()===m && !a.sortie){ a.sortie=dateStr; n++; }
+  });
+  return n;
+}
 const addD  = (d,n)=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); x.setDate(x.getDate()+n); return x; };
 const parseLocal = s=>{ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); };
 const getMon= d=>{ const x=typeof d==='string'?parseLocal(d):new Date(d); const w=x.getDay(); x.setDate(x.getDate()-(w===0?6:w-1)); x.setHours(0,0,0,0); return x; };
@@ -5778,12 +5801,16 @@ function airbusDepartNow(id){
   const todayStr=fmt(new Date());
   confirmDel(
     'Avion parti ?',
-    `Marquer le MSN ${m.msn} comme parti aujourd'hui (${disp(todayStr)}) ? La date de sortie sera enregistrée.`,
+    `Marquer le MSN ${m.msn} comme parti aujourd'hui (${disp(todayStr)}) ? Il sera marqué parti dans tous les modules (chantier, stockage, Part 21).`,
     ()=>{
-      m.sortie=todayStr;
+      const n=_marquerAvionParti(m.msn, todayStr);
+      if(!m.sortie){ m.sortie=todayStr; }
       save();
       renderAirbus();
-      toast(`✈️ MSN ${m.msn} marqué parti le ${disp(todayStr)}`);
+      if(typeof renderChantiers==='function') renderChantiers();
+      if(typeof renderProgramme==='function') renderProgramme();
+      if(typeof renderStockageAvions==='function') renderStockageAvions();
+      toast(`✈️ MSN ${m.msn} parti — ${n} fiche(s) mise(s) à jour`);
     },
     {btn:'✈️ Confirmer le départ', icon:'✈️', safe:true}
   );
@@ -10052,7 +10079,11 @@ function _clotureChoix(dest){
     if(typeof renderStockage==='function') renderStockage();
   } else {
     // Avion parti : on marque le chantier terminé + sortie, on le laisse dans l'historique
-    if(ch){ ch.sortie='parti'; ch.dateSortie=fmt(new Date()); }
+    if(ch){
+      ch.sortie='parti'; ch.dateSortie=fmt(new Date());
+      // Propager le départ à toutes les autres fiches du même MSN (stockage, Part 21)
+      if(ch.msn){ _marquerAvionParti(ch.msn, ch.dateSortie); }
+    }
     toast(`🛫 MSN ${msn} — avion parti, chantier clôturé`);
   }
   _clotureCtx=null;
@@ -13269,10 +13300,32 @@ function renderStockageGantt(){
 /* ── Parc avions ── */
 let _stockSearch='';
 function _onStockSearch(v){ _stockSearch=(v||'').toLowerCase().trim(); renderStockageAvions(); }
+// Marquer un avion en stockage comme parti aujourd'hui (le retire de la liste, garde l'historique)
+function stockageDepartNow(id){
+  const av=(S.stockage?.avions||[]).find(a=>a.id===id); if(!av) return;
+  const todayStr=fmt(new Date());
+  confirmDel(
+    'Avion parti ?',
+    `Marquer le MSN ${av.msn} (${av.type||''}) comme parti du site aujourd'hui (${disp(todayStr)}) ? Il sortira du stockage et sera marqué parti dans tous les modules (chantier, Part 21).`,
+    ()=>{
+      const n=_marquerAvionParti(av.msn, todayStr);
+      if(!av.sortie){ av.sortie=todayStr; }   // sécurité si MSN vide
+      save();
+      renderStockageAvions();
+      if(typeof renderStockage==='function') renderStockage();
+      if(typeof renderChantiers==='function') renderChantiers();
+      if(typeof renderProgramme==='function') renderProgramme();
+      if(typeof renderAirbus==='function') renderAirbus();
+      toast(`✈️ MSN ${av.msn} parti — ${n} fiche(s) mise(s) à jour`);
+    },
+    {btn:'✈️ Confirmer le départ', icon:'✈️', safe:true}
+  );
+}
 function renderStockageAvions(){
   const el=document.getElementById('stockage-avions');
   if(!el) return;
-  let avions=(S.stockage.avions||[]);
+  // Ne pas afficher les avions déjà partis (sortie renseignée) — ils restent en historique pour le flux annuel
+  let avions=(S.stockage.avions||[]).filter(a=>!a.sortie);
   const total=avions.length;
   if(_stockSearch){
     const q=_stockSearch;
@@ -13321,6 +13374,7 @@ function renderStockageAvions(){
       <div style="font-size:11px;color:var(--t4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${av.notes||''}</div>
       <div style="display:flex;gap:6px">
         <button onclick="openAvionEdit('${av.id}')" title="Modifier" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);padding:5px 10px;cursor:pointer;font-size:12px">✏️</button>
+        <button onclick="stockageDepartNow('${av.id}')" title="Marquer l'avion parti aujourd'hui" style="background:rgba(52,199,89,0.12);border:1px solid rgba(52,199,89,0.4);border-radius:8px;color:#34c759;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:800">✈️ Parti</button>
         <button onclick="openAvionToChantier('${av.id}')" title="Convertir en chantier" style="background:rgba(41,121,255,0.15);border:1px solid rgba(41,121,255,0.3);border-radius:8px;color:#82b1ff;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700">🔧 → Chantier</button>
         <button onclick="stockageToRecyclage('${av.id}')" title="Envoyer directement au recyclage" style="background:rgba(110,255,196,0.14);border:1px solid rgba(110,255,196,0.3);border-radius:8px;color:#6effc4;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:700">♻️ → Recyclage</button>
         <button onclick="delAvion('${av.id}')" title="Supprimer" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:#ff4d6d;padding:5px 8px;cursor:pointer;font-size:12px">🗑</button>
