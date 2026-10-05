@@ -16341,32 +16341,55 @@ function _renderDayExtractCats(){
   const ref=(typeof CATS!=='undefined')?Object.keys(CATS):[];
   cats.sort((a,b)=>{const ia=ref.indexOf(a),ib=ref.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return _dayExtractCatLbl(a).localeCompare(_dayExtractCatLbl(b));});
   if(!cats.length){ box.innerHTML='<span style="color:var(--t3);font-size:11px">Aucun personnel ce jour</span>'; return; }
-  box.innerHTML=cats.map(c=>{
-    const on=!S.dayExtractHidden.includes(c);
-    const n=roster.filter(p=>(p.categorie||'autre')===c).length;
-    return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:8px;padding:5px 9px;cursor:pointer">
-      <input type="checkbox" ${on?'checked':''} onchange="_toggleDayExtractCat('${c}',this.checked)" style="cursor:pointer">
-      ${_dayExtractCatLbl(c)} <span style="color:var(--t3);font-weight:400">(${n})</span>
-    </label>`;
-  }).join('');
+  box.innerHTML=cats.map(c=>_dayExtractChipHtml(c,roster)).join('');
 }
 
-function _toggleDayExtractCat(cat,checked){
+// Couleur d'accent d'une catégorie (résout les var(--x) via le DOM)
+function _dayExtractCatColor(c){
+  let col=(typeof CATS!=='undefined'&&CATS[c]&&CATS[c].col)?CATS[c].col:'';
+  if(col.startsWith('var(')){ const v=col.slice(4,-1).trim(); const r=getComputedStyle(document.documentElement).getPropertyValue(v).trim(); if(r) col=r; }
+  return col||'#5a7090';
+}
+
+// HTML d'une puce catégorie (état coché/décoché visible)
+function _dayExtractChipHtml(c,roster){
+  const on=!(S.dayExtractHidden||[]).includes(c);
+  const n=roster.filter(p=>(p.categorie||'autre')===c).length;
+  const col=_dayExtractCatColor(c);
+  const sty=on
+    ? `background:${col}26;border:1.5px solid ${col};color:#eef3ff`
+    : `background:rgba(255,255,255,0.03);border:1.5px solid var(--glass-border);color:var(--t3);opacity:.6`;
+  const mark=on?`<span style="color:${col};font-weight:900;font-size:13px">✓</span>`:`<span style="color:var(--t4);font-weight:900;font-size:13px">○</span>`;
+  return `<div class="dex-chip" data-cat="${c}" onclick="_toggleDayExtractCat('${c}')" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;border-radius:9px;padding:7px 11px;cursor:pointer;user-select:none;transition:all .12s;${sty}">
+    ${mark}<span>${_dayExtractCatLbl(c)}</span><span style="font-weight:500;opacity:.75">(${n})</span>
+  </div>`;
+}
+
+// Re-dessine une seule puce sans tout reconstruire
+function _refreshDayExtractChip(c){
+  const box=document.getElementById('dayextract-cats'); if(!box) return;
+  const el=box.querySelector(`.dex-chip[data-cat="${c}"]`); if(!el) return;
+  const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
+  const roster=(S.personnel||[]).filter(p=>p.actif!==false).concat(_inactifsAvecPlanning(dates));
+  el.outerHTML=_dayExtractChipHtml(c,roster);
+}
+
+function _toggleDayExtractCat(cat){
   if(!Array.isArray(S.dayExtractHidden)) S.dayExtractHidden=[];
-  if(checked){ S.dayExtractHidden=S.dayExtractHidden.filter(c=>c!==cat); }
-  else if(!S.dayExtractHidden.includes(cat)){ S.dayExtractHidden.push(cat); }
+  if(S.dayExtractHidden.includes(cat)){ S.dayExtractHidden=S.dayExtractHidden.filter(c=>c!==cat); }
+  else { S.dayExtractHidden.push(cat); }
   save();
+  _refreshDayExtractChip(cat);
 }
 
 function _dayExtractCatsAll(on){
-  const box=document.getElementById('dayextract-cats'); if(!box) return;
   if(!Array.isArray(S.dayExtractHidden)) S.dayExtractHidden=[];
   const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
   const roster=(S.personnel||[]).filter(p=>p.actif!==false).concat(_inactifsAvecPlanning(dates));
   const cats=[...new Set(roster.map(p=>p.categorie||'autre'))];
   S.dayExtractHidden = on ? [] : cats.slice();
   save();
-  box.querySelectorAll('input[type=checkbox]').forEach(cb=>{cb.checked=on;});
+  _renderDayExtractCats();
 }
 
 function exportDayHtml(){
@@ -16413,7 +16436,8 @@ function exportDayHtml(){
     const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
     const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
     const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
-    rows+=`<tr><td style="padding:8px 12px;font-weight:700;border:1px solid #ddd">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:10px;font-weight:700">(hors prod.)</span>':''}</td>
+    const catC=_dayExtractCatColor(emp.categorie);const catL=_dayExtractCatLbl(emp.categorie);
+    rows+=`<tr><td style="padding:8px 12px;font-weight:700;border:1px solid #ddd;border-left:5px solid ${catC}">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:10px;font-weight:700">(hors prod.)</span>':''}<div style="font-size:9px;font-weight:800;color:${catC};text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${catL}</div></td>
       <td style="padding:8px;text-align:center;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>
       <td style="padding:8px;background:${la.col}15;color:${la.col};border:1px solid #ddd;font-weight:600">${la.txt}${am.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${am.vm}</div>`:''}</td>
       <td style="padding:8px;background:${lp.col}15;color:${lp.col};border:1px solid #ddd;font-weight:600">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${pm.vm}</div>`:''}</td></tr>`;
@@ -16424,6 +16448,9 @@ function exportDayHtml(){
   emps.forEach(emp=>{const c=mainCh(emp);if(c)usedChIds.add(c);['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${ds}_${h}`]||{};if(e.type==='travail'&&e.chantierId)usedChIds.add(e.chantierId);if(e.chantierId2)usedChIds.add(e.chantierId2);});});
   const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
   const typeLegend=[['conge','Congé'],['maladie','Maladie'],['formation','Formation'],['absence','Absence'],['deplacement','Déplacement'],['ferie','Férié'],['we','Week-end']].map(([k,l])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${l}</span>`).join('');
+  // Légende catégories (uniquement celles présentes dans la page)
+  const catsPresent=[...new Set(emps.map(e=>e.categorie||'autre'))];
+  const catLegend=catsPresent.map(c=>{const col=_dayExtractCatColor(c);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0;font-size:10px"><span style="width:12px;height:12px;border-radius:3px;background:${col};display:inline-block"></span>${_dayExtractCatLbl(c)}</span>`;}).join('');
 
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planning ${ds}</title>
   <style>body{font-family:Arial,sans-serif;margin:16px}table{border-collapse:collapse;width:100%}h2{color:#1e3a5f}.legend-box{margin-top:16px;padding:12px 14px;border:1px solid #ddd;border-radius:8px;background:#fafbfc}.legend-title{font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.footer{margin-top:16px;text-align:center;font-size:10px;color:#999}@media print{@page{size:A4}}</style></head>
@@ -16431,6 +16458,8 @@ function exportDayHtml(){
   <table><thead><tr><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff;text-align:left">Personnel</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Tri.</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Matin</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Après-midi</th></tr></thead>
   <tbody>${rows}</tbody></table>
   <div class="legend-box">
+    <div class="legend-title">👥 Catégories de personnel</div>
+    <div style="margin-bottom:10px">${catLegend||'<span style="font-size:10px;color:#999">—</span>'}</div>
     <div class="legend-title">🔧 Chantiers</div>
     <div style="margin-bottom:10px">${chLegend||'<span style="font-size:10px;color:#999">Aucun chantier affecté ce jour</span>'}</div>
     <div class="legend-title">📋 Types d'activité</div>
