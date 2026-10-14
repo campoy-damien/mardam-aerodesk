@@ -1369,6 +1369,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="gc-head">
       <div class="gc-title">📊 Planning Responsables & Chefs d'équipe</div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="display:inline-flex;gap:4px;background:var(--glass-1);border:1px solid var(--glass-border);border-radius:99px;padding:3px">
+          <button id="rgf-both" onclick="setRespGanttFilter('both')" style="height:24px;border:none;border-radius:99px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--t3);font-family:'Outfit',sans-serif">Les deux</button>
+          <button id="rgf-responsable" onclick="setRespGanttFilter('responsable')" style="height:24px;border:none;border-radius:99px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--t3);font-family:'Outfit',sans-serif">Responsables</button>
+          <button id="rgf-chef" onclick="setRespGanttFilter('chef')" style="height:24px;border:none;border-radius:99px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:var(--t3);font-family:'Outfit',sans-serif">Chefs d'équipe</button>
+        </div>
         <select id="gantt-resp-person" onchange="renderRespGantt()" style="height:30px;border-radius:99px;padding:0 12px;font-size:12px;background:var(--glass-1);border:1px solid var(--glass-border);color:var(--t1);max-width:200px">
           <option value="">👥 Tout le monde</option>
         </select>
@@ -8996,6 +9001,11 @@ function _plCopy(){
   _plUpdateBar();
   try{toast(`📋 ${n} case${n>1?'s':''} copiée${n>1?'s':''}`);}catch(_){}
 }
+// Garde-fou copier/coller : ces événements ponctuels sont prioritaires et ne doivent jamais
+// être écrasés par un collage/remplissage (ils restent modifiables en cliquant la case).
+const PL_PROTECT=new Set(['conge','maladie','formation','formation_int','absence','deplacement']);
+function _plIsProtected(k){ const e=S.planning[k]; return !!(e&&PL_PROTECT.has(e.type)); }
+
 function _plPaste(){
   if(!PLCLIP){ try{toast('Presse-papier vide');}catch(_){} return; }
   const R=_plRect(); if(!R){ try{toast('Choisis une destination');}catch(_){} return; }
@@ -9009,11 +9019,12 @@ function _plPaste(){
     for(let i=0;i<PLCLIP.rows;i++){ const r=R.r0+i; if(r<PLGRID.rowEmps.length) rowsIdx.push(r); }
     for(let j=0;j<PLCLIP.cols;j++){ const c=selCols[0]+j*(PLCLIP.stride||1); if(c<PLGRID.cols.length&&PLGRID.cols[c]) colsIdx.push(c); }
   }
-  const undo=[]; let count=0;
+  const undo=[]; let count=0, protege=0;
   rowsIdx.forEach((r,i)=>colsIdx.forEach((c,j)=>{
     const src=PLCLIP.data[i%PLCLIP.rows][j%PLCLIP.cols];     // répétition (carrelage) si la destination est plus grande
     const col=PLGRID.cols[c]; if(!col) return;
     const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
+    if(_plIsProtected(k)){ protege++; return; }              // garde-fou : ne pas écraser congé/formation/absence
     undo.push({key:k, prev:_plClone(S.planning[k])});
     const tgtVm=(S.planning[k]||{}).vm||'';
     if(src&&src.type){ const cl=_plClone(src); if(tgtVm) cl.vm=tgtVm; S.planning[k]=cl; }
@@ -9028,15 +9039,15 @@ function _plPaste(){
     PLSEL.focus ={empId:PLGRID.rowEmps[rowsIdx[rowsIdx.length-1]],ds:PLGRID.cols[lc].ds,half:PLGRID.cols[lc].half};
   }
   PLUNDO={items:undo}; _plRefresh();
-  try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}`);}catch(_){}
+  try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}`);}catch(_){}
 }
 function _plFill(){
   if(!PLCLIP){ try{toast("Copie d'abord une case");}catch(_){} return; }
   const pl=PLCLIP.data[0][0], cells=_plCells(); if(!cells.length) return;
-  const undo=[];
-  cells.forEach(o=>{ undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); const tgtVm=(S.planning[o.key]||{}).vm||''; if(pl&&pl.type){ const cl=_plClone(pl); if(tgtVm) cl.vm=tgtVm; S.planning[o.key]=cl; } else if(tgtVm){ S.planning[o.key]={type:'',vm:tgtVm}; } else delete S.planning[o.key]; });
+  const undo=[]; let protege=0, n=0;
+  cells.forEach(o=>{ if(_plIsProtected(o.key)){ protege++; return; } undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); const tgtVm=(S.planning[o.key]||{}).vm||''; if(pl&&pl.type){ const cl=_plClone(pl); if(tgtVm) cl.vm=tgtVm; S.planning[o.key]=cl; } else if(tgtVm){ S.planning[o.key]={type:'',vm:tgtVm}; } else delete S.planning[o.key]; n++; });
   PLUNDO={items:undo}; _plRefresh();
-  try{toast(`🪣 ${cells.length} case${cells.length>1?'s':''} remplie${cells.length>1?'s':''}`);}catch(_){}
+  try{toast(`🪣 ${n} case${n>1?'s':''} remplie${n>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}`);}catch(_){}
 }
 function _plDelete(){
   const cells=_plCells(); if(!cells.length) return;
@@ -11874,29 +11885,57 @@ function renderChantiers(){
 }
 
 /* ═══ GANTT RESPONSABLES / CHEFS ═══ */
+// Filtre catégorie du planning Responsables/Chefs — partagé entre le Gantt ET les alertes de conflits
+function _respGanttCats(){
+  const f=S.respGanttFilter||'both';
+  return f==='chef'?['chef']:f==='responsable'?['responsable']:['responsable','chef'];
+}
+function setRespGanttFilter(f){
+  S.respGanttFilter=(f==='chef'||f==='responsable')?f:'both';
+  try{save();}catch(_){}
+  if(typeof renderChantiers==='function') renderChantiers();   // re-rend conflits + Gantt ensemble
+}
+function _syncRespFilterBtns(){
+  const f=S.respGanttFilter||'both';
+  [['rgf-both','both'],['rgf-responsable','responsable'],['rgf-chef','chef']].forEach(([id,val])=>{
+    const b=document.getElementById(id); if(!b) return;
+    const on=(f===val);
+    b.style.background=on?'rgba(0,210,255,0.15)':'transparent';
+    b.style.color=on?'var(--cyan)':'var(--t3)';
+  });
+}
+
 function renderRespGantt(){
   const el=document.getElementById('gantt-resp');
   if(!el) return;
+  _syncRespFilterBtns();
   const year=parseInt(document.getElementById('gantt-resp-year')?.value)||new Date().getFullYear();
   const yearStart=new Date(year,0,1);
   const yearEnd=new Date(year,11,31);
   const yearMs=yearEnd-yearStart;
   const today=new Date(); const todayStr=fmt(today);
 
-  const allPeople=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie)&&!_empHorsEffectif(p.id));
-  // Peupler le sélecteur de personne (une seule fois)
+  const allRC=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie)&&!_empHorsEffectif(p.id));
+  const cats=_respGanttCats();
+  const allPeople=allRC.filter(p=>cats.includes(p.categorie));
+  // Peupler le sélecteur de personne (une seule fois) — liste complète resp.+chefs
   const pSel=document.getElementById('gantt-resp-person');
   if(pSel && pSel.options.length<=1){
-    allPeople.slice().sort((a,b)=>(a.nom||'').localeCompare(b.nom||'')).forEach(p=>{
+    allRC.slice().sort((a,b)=>(a.nom||'').localeCompare(b.nom||'')).forEach(p=>{
       const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nom} ${p.prenom}`;pSel.appendChild(o);
     });
   }
-  // Filtrer selon la personne sélectionnée
+  // Filtrer selon la personne sélectionnée (prioritaire sur le filtre catégorie)
   const selId=pSel?pSel.value:'';
-  const people=selId?allPeople.filter(p=>p.id===selId):allPeople;
+  const people=selId?allRC.filter(p=>p.id===selId):allPeople;
 
-  if(!allPeople.length){
+  if(!allRC.length){
     el.innerHTML='<div style="padding:20px;color:var(--t4);font-size:13px;text-align:center">Aucun responsable ou chef d\'équipe enregistré</div>';
+    return;
+  }
+  if(!people.length){
+    const lbl=cats.length===1?(cats[0]==='chef'?"chef d'équipe":'responsable de projet'):'responsable/chef';
+    el.innerHTML=`<div style="padding:20px;color:var(--t4);font-size:13px;text-align:center">Aucun ${lbl} à afficher pour ce filtre</div>`;
     return;
   }
 
@@ -12230,7 +12269,8 @@ function checkConflicts(){
   if(!el) return;
   const conflicts=[];
   const today=new Date(); today.setHours(0,0,0,0);
-  const people=S.personnel.filter(p=>['responsable','chef'].includes(p.categorie)&&!_empHorsEffectif(p.id));
+  const _rgCats=(typeof _respGanttCats==='function')?_respGanttCats():['responsable','chef'];
+  const people=S.personnel.filter(p=>_rgCats.includes(p.categorie)&&!_empHorsEffectif(p.id));
   const ABSENCE_LABELS={conge:'Congé',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Jour férié'};
 
   people.forEach(emp=>{
@@ -13108,6 +13148,11 @@ function saveAvionRec(){
     notes:document.getElementById('avr-notes').value};
   const id=document.getElementById('avr-id').value;
   if(!S.recycling||!Array.isArray(S.recycling.avions)) S.recycling={avions:[],piecesHebdo:{},config:{resp:'',chef:''}};
+  // Date réelle de fin de démantèlement : stampée le jour du passage à "terminé".
+  // Elle sert au comptage du KPI « Recyclés / démantelés » dans l'année où l'avion est réellement fini.
+  const _prevRec = id ? (S.recycling.avions.find(a=>a.id===id)||{}) : {};
+  if(data.statut==='termine'){ data.dateReelleFin = _prevRec.dateReelleFin || (document.getElementById('avr-fin-calc')?.value) || fmt(new Date()); }
+  else { data.dateReelleFin = ''; }
   // Vérifier doublon MSN (sauf si édition ou MSN vide)
   if(!id && msn){
     const existRec=S.recycling.avions.find(a=>a.msn===msn);
@@ -13121,6 +13166,8 @@ function saveAvionRec(){
   popSelects();
   if(typeof renderWeekly==='function') renderWeekly();
   if(typeof renderMaster==='function') renderMaster();
+  if(typeof renderKPI==='function') renderKPI();
+  if(typeof renderDash==='function') renderDash();
   toast(`Avion ${type} MSN${msn} sauvegardé ✓`);
 }
 
@@ -14970,9 +15017,13 @@ function renderAutoMatrix(){
 
 function buildAutoChips(){
   const wrap=document.getElementById('a-chips'); if(!wrap) return;
-  wrap.innerHTML=AUTORISATIONS_LIST.map(t=>
+  let html=AUTORISATIONS_LIST.map(t=>
     `<div class="auth-chip" data-auth="${t}" onclick="toggleAutoChip(this)">${t}</div>`
   ).join('');
+  // Habilitation Tractage avion (push back) — groupe dédié, badge violet, séparée des engins de conduite
+  html+=`<div style="flex-basis:100%;height:0"></div>
+    <div class="auth-chip" data-auth="${TRACTAGE_LABEL}" data-grp="tractage" onclick="toggleAutoChip(this)" style="border-color:rgba(124,110,230,0.5);color:#b9aeff">🛫 Tractage avion (push back)</div>`;
+  wrap.innerHTML=html;
 }
 
 function toggleAutoChip(el){
@@ -15054,10 +15105,12 @@ function saveAutorisation(){
     types.forEach(type=>{
       // Évite les doublons : si déjà existant pour cet employé, on met à jour
       const existing=S.autorisations.findIndex(a=>a.empId===empId&&a.type===type);
+      // Tractage avion (push back) : marquer le groupe pour qu'il tombe dans la bonne colonne
+      const grp=(type===TRACTAGE_LABEL||_isPushback(type))?'tractage':undefined;
       if(existing>-1){
-        S.autorisations[existing]={...S.autorisations[existing],dateObtention:obt,dateExpiration:exp,notes};
+        S.autorisations[existing]={...S.autorisations[existing],dateObtention:obt,dateExpiration:exp,notes,...(grp?{grp}:{})};
       } else {
-        S.autorisations.push({id:uid(),empId,type,dateObtention:obt,dateExpiration:exp,notes});
+        S.autorisations.push({id:uid(),empId,type,dateObtention:obt,dateExpiration:exp,notes,...(grp?{grp}:{})});
         added++;
       }
     });
@@ -16187,7 +16240,7 @@ function _fluxAvionsAnnuel(year){
     const o=ensure(a.msn,a.type); if(!o) return;
     const arrivee=a.debutChantier||a.entree;
     if(arrivee) o.arr.push(arrivee);
-    if(a.statut==='termine'){ o.recy=true; o.recyDate=a.finChantier||a.finPrev||arrivee; }
+    if(a.statut==='termine'){ o.recy=true; o.recyDate=a.dateReelleFin||a.finChantier||a.finPrev||arrivee; }
   });
 
   // Comptage par avion physique
