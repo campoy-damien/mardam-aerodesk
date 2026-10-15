@@ -1304,6 +1304,17 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="master-search" placeholder="Nom, prénom ou trigramme…" oninput="renderMaster()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <select id="mp-emp" onchange="renderMaster()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select>
       <select id="mp-year" onchange="renderMaster()" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select>
+      <div style="position:relative;display:inline-block">
+        <button class="btn btn-ghost btn-sm" id="master-cats-btn" onclick="_toggleMasterCatsPanel(event)" title="Choisir les catégories affichées">👥 Catégories ▾</button>
+        <div id="master-cats-panel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;min-width:240px;max-height:320px;overflow-y:auto;background:rgba(14,21,40,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.45);padding:10px">
+          <div style="font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Catégories à afficher</div>
+          <div id="master-cats-chips" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_masterCatsAll(true)">Tout</button>
+            <button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_masterCatsAll(false)">Aucun</button>
+          </div>
+        </div>
+      </div>
       <button class="btn btn-gold btn-sm" onclick="openM('m-hol')">🎉 Jours fériés</button>
       <button class="btn btn-cyan btn-sm" onclick="openAffectPerm()">📌 Affectation permanente</button>
       <button class="btn btn-ghost btn-sm" id="btn-gaps" onclick="_toggleGaps()" title="Surligner les demi-journées ouvrées non renseignées">🔍 Repérer les oublis</button>
@@ -1329,7 +1340,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 <div class="page" id="pg-weekly">
   <div class="sh">
     <div class="sh-title">Planning <em>Hebdomadaire</em></div>
-    <div class="btn-row"><select id="wk-emp" onchange="renderWeekly()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select><select id="wk-year" onchange="chWeekYear(this.value)" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select><div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="week-search" placeholder="Nom, prénom ou trigramme…" oninput="renderWeekly()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div></div>
+    <div class="btn-row"><select id="wk-emp" onchange="renderWeekly()" style="width:150px;height:34px;border-radius:99px;padding:0 14px"><option value="">Tous les employés</option></select><select id="wk-year" onchange="chWeekYear(this.value)" style="width:90px;height:34px;border-radius:99px;padding:0 12px"></select><div style="position:relative;display:inline-block"><button class="btn btn-ghost btn-sm" id="weekly-cats-btn" onclick="_toggleWeeklyCatsPanel(event)" title="Choisir les catégories affichées">👥 Catégories ▾</button><div id="weekly-cats-panel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;min-width:240px;max-height:320px;overflow-y:auto;background:rgba(14,21,40,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.45);padding:10px"><div style="font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Catégories à afficher</div><div id="weekly-cats-chips" style="display:flex;flex-wrap:wrap;gap:7px"></div><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_weeklyCatsAll(true)">Tout</button><button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_weeklyCatsAll(false)">Aucun</button></div></div></div><div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="week-search" placeholder="Nom, prénom ou trigramme…" oninput="renderWeekly()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div></div>
   </div>
   <div class="navrow">
     <button class="btn btn-ghost btn-sm" onclick="chWeek(-1)">← Préc.</button>
@@ -1958,7 +1969,17 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <select id="slot-year" onchange="slotGoToYear(this.value)" title="Aller à l'année" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 8px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer"></select>
       </div>
     </div>
+    <div style="font-size:10px;color:var(--t4);margin-top:6px">💡 Astuce : <strong>PC</strong> — glisse sur une ligne de position pour sélectionner une plage (Ctrl+C / Ctrl+V). <strong>iPad/téléphone</strong> — <strong>appui long</strong> sur la 1ʳᵉ case pour démarrer, puis appui simple sur la dernière. Puis <strong>Copier</strong> / <strong>Coller</strong> ailleurs · <strong>Libérer</strong> retire l'occupation · <strong>✕</strong> quitte la sélection.</div>
     <div id="slot-grid" style="overflow-x:auto"></div>
+  </div>
+
+  <!-- Barre flottante sélection Slot (copier/coller) -->
+  <div id="slot-selbar" style="display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:900;background:rgba(14,21,40,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:99px;box-shadow:0 12px 34px rgba(0,0,0,0.5);padding:7px 10px;align-items:center;gap:7px">
+    <span id="slot-selinfo" style="font-size:11px;font-weight:700;color:var(--t2);padding:0 6px;white-space:nowrap"></span>
+    <button class="btn btn-ghost btn-sm" onclick="_slotCopy()">📋 Copier</button>
+    <button class="btn btn-cyan btn-sm" id="slot-paste-btn" onclick="_slotPaste()" style="display:none">📥 Coller</button>
+    <button class="btn btn-ghost btn-sm" onclick="_slotFree()" style="color:#ffb45c">🗑 Libérer</button>
+    <button class="btn btn-ghost btn-sm" onclick="_slotSelClear()">✕</button>
   </div>
 
   <!-- HISTORIQUE -->
@@ -5037,7 +5058,7 @@ function renderSlotGrid(){
         cellContent=`<div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center">${mark}<span style="opacity:0;font-size:10px;color:${pos.col}" class="slot-hover">+</span></div>`;
         cellClick=`openSlotNew(${pos.id},'${ds}')`;
       }
-      return`<td style="padding:1px;${cellStyle};min-width:${CW}px;width:${CW}px;height:52px;vertical-align:middle;text-align:center" ${cellClick?`onclick="${cellClick}"`:''}>${cellContent}</td>`;
+      return`<td class="slotcell" data-pos="${pos.id}" data-ds="${ds}" style="padding:1px;${cellStyle};min-width:${CW}px;width:${CW}px;height:52px;vertical-align:middle;text-align:center" ${cellClick?`onclick="${cellClick}"`:''}>${cellContent}</td>`;
     }).join('');
     const nbOcc=entries.filter(e=>parseInt(e.pos)===pos.id&&e.fin>=fmt(start)&&e.debut<=fmt(lastSun)).length;
     return`<tr>
@@ -5135,6 +5156,159 @@ function slotAutoFin(){
   }
   // En mode semaine ou libre, on ne réécrit plus la date de début (correction du bug)
 }
+
+/* ═══ Sélection + copier/coller Slot Hangar (comme le planning) ═══ */
+let SLOTSEL={active:false,anchor:null,focus:null};   // {pos, ds}
+let SLOTCLIP=null;                                    // {msn, avionId, avionNom, notes, type}
+let _slotMouseDown=false, _slotMoved=false, _slotSuppressClick=false, _slotStartX=0, _slotStartY=0;
+function _slotSelRange(){ if(!SLOTSEL.anchor||!SLOTSEL.focus) return null; const a=SLOTSEL.anchor.ds,b=SLOTSEL.focus.ds; return {pos:SLOTSEL.anchor.pos, from:(a<b?a:b), to:(a<b?b:a)}; }
+function _slotSelDays(){ const r=_slotSelRange(); if(!r) return []; const out=[]; let d=parseLocal(r.from); const end=parseLocal(r.to); while(d<=end){ out.push(fmt(d)); d=addD(d,1); } return out; }
+function _slotApplyHighlight(){
+  document.querySelectorAll('#slot-grid .slotcell.sel').forEach(c=>{ c.classList.remove('sel'); c.style.outline=''; c.style.outlineOffset=''; });
+  if(!SLOTSEL.active) return; const r=_slotSelRange(); if(!r) return;
+  document.querySelectorAll(`#slot-grid .slotcell[data-pos="${r.pos}"]`).forEach(c=>{ const ds=c.getAttribute('data-ds'); if(ds>=r.from&&ds<=r.to){ c.classList.add('sel'); c.style.outline='2px solid var(--cyan)'; c.style.outlineOffset='-2px'; } });
+}
+function _slotSelBar(){
+  const bar=document.getElementById('slot-selbar'); if(!bar) return;
+  if(!SLOTSEL.active){ bar.style.display='none'; return; }
+  const r=_slotSelRange(); const posLbl=SLOT_POSITIONS.find(p=>p.id===r.pos)?.lbl||'?';
+  const info=document.getElementById('slot-selinfo'); if(info) info.textContent=`${posLbl} · ${disp(r.from)}→${disp(r.to)} (${_slotSelDays().length}j)`;
+  const pb=document.getElementById('slot-paste-btn'); if(pb) pb.style.display=SLOTCLIP?'':'none';
+  bar.style.display='flex';
+}
+function _slotSelClear(){ SLOTSEL={active:false,anchor:null,focus:null}; _slotTouchSel=false; _slotApplyHighlight(); _slotSelBar(); }
+function _slotCopy(){
+  const r=_slotSelRange(); if(!r){ toast('Sélectionne une plage'); return; }
+  const e=(S.slot?.entries||[]).find(x=>parseInt(x.pos)===r.pos && !(x.fin<r.from||x.debut>r.to));
+  if(!e){ toast('Aucun avion dans la sélection à copier'); return; }
+  SLOTCLIP={msn:e.msn||'',avionId:e.avionId||'',avionNom:e.avionNom||'',notes:e.notes||'',type:e.type||''};
+  _slotSelBar(); toast(`📋 MSN ${SLOTCLIP.msn||'?'} copié`);
+}
+function _slotPaste(){
+  if(!SLOTCLIP){ toast('Copie d\'abord un avion'); return; }
+  const r=_slotSelRange(); if(!r){ toast('Sélectionne une plage de destination'); return; }
+  if(!S.slot) S.slot={entries:[]};
+  const debut=r.from, fin=r.to, pos=r.pos, msn=SLOTCLIP.msn;
+  const confPos=(S.slot.entries||[]).filter(e=>parseInt(e.pos)===pos && !(e.fin<debut||e.debut>fin));
+  if(confPos.length){ toast(`Conflit : ${SLOT_POSITIONS.find(p=>p.id===pos)?.lbl} déjà occupé (MSN ${confPos[0].msn||'?'})`); return; }
+  if(msn){ const confMsn=(S.slot.entries||[]).filter(e=>e.msn===msn && parseInt(e.pos)!==pos && !(e.fin<debut||e.debut>fin)); if(confMsn.length){ toast(`MSN ${msn} déjà en ${SLOT_POSITIONS.find(p=>p.id===parseInt(confMsn[0].pos))?.lbl} sur cette période`); return; } }
+  let nbJours=0; let cur=parseLocal(debut); const finD=parseLocal(fin); while(cur<=finD){ const wd=cur.getDay(); if(wd!==0&&wd!==6&&!isHol(fmt(cur))) nbJours++; cur=addD(cur,1); }
+  S.slot.entries.push({id:uid(),pos:pos,avionId:SLOTCLIP.avionId,avionNom:SLOTCLIP.avionNom,msn,debut,fin,nbJours,notes:SLOTCLIP.notes,createdAt:fmt(new Date()),type:SLOTCLIP.type});
+  save(); renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels(); _slotApplyHighlight(); _slotSelBar();
+  toast(`📥 MSN ${msn||'?'} collé en ${SLOT_POSITIONS.find(p=>p.id===pos)?.lbl} (${nbJours}j ouvrés)`);
+}
+function _slotFree(){
+  const r=_slotSelRange(); if(!r) return;
+  const overlap=(S.slot?.entries||[]).filter(e=>parseInt(e.pos)===r.pos && !(e.fin<r.from||e.debut>r.to));
+  if(!overlap.length){ toast('Rien à libérer sur la sélection'); return; }
+  confirmDel('Libérer la plage',`Retirer l'occupation sur ${SLOT_POSITIONS.find(p=>p.id===r.pos)?.lbl} du ${disp(r.from)} au ${disp(r.to)} ?`,()=>{
+    const res=[]; (S.slot.entries||[]).forEach(e=>{
+      if(parseInt(e.pos)!==r.pos || e.fin<r.from || e.debut>r.to){ res.push(e); return; }
+      if(e.debut < r.from) res.push({...e, id:uid(), fin:fmt(addD(parseLocal(r.from),-1))});   // garder partie avant
+      if(e.fin  > r.to)   res.push({...e, id:uid(), debut:fmt(addD(parseLocal(r.to),1))});     // garder partie après
+    });
+    S.slot.entries=res;
+    save(); renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels(); _slotApplyHighlight(); _slotSelBar();
+    toast('🗑 Plage libérée');
+  },{btn:'✓ Libérer',icon:'🗑'});
+}
+document.addEventListener('mousedown', e=>{
+  const cell=e.target.closest&&e.target.closest('#slot-grid .slotcell'); if(!cell||e.button!==0) return;
+  e.preventDefault();   // évite la sélection de texte pendant le glisser
+  _slotMouseDown=true; _slotMoved=false; _slotStartX=e.clientX; _slotStartY=e.clientY;
+  SLOTSEL={active:true, anchor:{pos:parseInt(cell.getAttribute('data-pos')),ds:cell.getAttribute('data-ds')}, focus:{pos:parseInt(cell.getAttribute('data-pos')),ds:cell.getAttribute('data-ds')}};
+  _slotApplyHighlight();
+});
+let _slotAutoRaf=null, _slotAutoX=0, _slotAutoY=0;
+function _slotStopAutoScroll(){ if(_slotAutoRaf){ cancelAnimationFrame(_slotAutoRaf); _slotAutoRaf=null; } }
+function _slotAutoScrollStep(){
+  _slotAutoRaf=null;
+  if(!_slotMouseDown||!SLOTSEL.active) return;
+  const sc=document.getElementById('slot-grid'); if(!sc) return;
+  const r=sc.getBoundingClientRect();
+  const vw=window.innerWidth||document.documentElement.clientWidth;
+  const right=Math.min(r.right,vw), left=Math.max(r.left,0);
+  const EDGE=55, SPD=28; let vx=0;
+  if(_slotAutoX>right-EDGE) vx=SPD*Math.min(1,(_slotAutoX-(right-EDGE))/EDGE);
+  else if(_slotAutoX<left+EDGE) vx=-SPD*Math.min(1,((left+EDGE)-_slotAutoX)/EDGE);
+  if(vx){
+    sc.scrollLeft+=vx;
+    const el=document.elementFromPoint(_slotAutoX,_slotAutoY);
+    const cell=el&&el.closest?el.closest('#slot-grid .slotcell'):null;
+    if(cell){ const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds'); if(pos===SLOTSEL.anchor.pos){ _slotMoved=true; SLOTSEL.focus={pos,ds}; _slotApplyHighlight(); _slotSelBar(); } }
+  }
+  _slotAutoRaf=requestAnimationFrame(_slotAutoScrollStep);
+}
+document.addEventListener('mousemove', e=>{
+  if(!_slotMouseDown) return;
+  _slotAutoX=e.clientX; _slotAutoY=e.clientY;
+  if(!_slotMoved && (Math.abs(e.clientX-_slotStartX)>4||Math.abs(e.clientY-_slotStartY)>4)) _slotMoved=true;   // glisser détecté (même sur 1 case)
+  if(!_slotAutoRaf) _slotAutoRaf=requestAnimationFrame(_slotAutoScrollStep);   // auto-défilement au bord
+});
+document.addEventListener('mouseover', e=>{
+  if(!_slotMouseDown) return;
+  const cell=e.target.closest&&e.target.closest('#slot-grid .slotcell'); if(!cell) return;
+  const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds');
+  if(pos!==SLOTSEL.anchor.pos) return;
+  if(ds!==SLOTSEL.focus.ds){ _slotMoved=true; SLOTSEL.focus={pos,ds}; _slotApplyHighlight(); }
+});
+document.addEventListener('mouseup', e=>{
+  _slotStopAutoScroll();
+  if(!_slotMouseDown) return; _slotMouseDown=false;
+  if(_slotMoved){ _slotSuppressClick=true; _slotSelBar(); }
+  else { SLOTSEL={active:false,anchor:null,focus:null}; _slotApplyHighlight(); _slotSelBar(); }
+});
+document.addEventListener('click', e=>{ if(_slotSuppressClick && e.target.closest && e.target.closest('#slot-grid')){ e.preventDefault(); e.stopPropagation(); _slotSuppressClick=false; } }, true);
+document.addEventListener('keydown', e=>{
+  if(!SLOTSEL.active) return;
+  const pg=document.getElementById('pg-slot'); if(!pg||!pg.classList.contains('on')) return;
+  const k=(e.key||'').toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='c'){ e.preventDefault(); _slotCopy(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='v'){ e.preventDefault(); _slotPaste(); }
+  else if(k==='escape'){ e.preventDefault(); _slotSelClear(); }
+  else if(k==='delete'){ e.preventDefault(); _slotFree(); }
+});
+
+/* ── Tactile (iPad/téléphone) : appui long pour démarrer la sélection, appui simple pour la fin.
+   Écouteurs PASSIFS (ne bloquent pas le défilement → pas de latence) ; on n'empêche l'ouverture
+   de la fiche que sur touchend quand une sélection est en cours. ── */
+let _slotTouchTimer=null, _slotTouchSel=false, _slotTouchMoved=false, _slotTouchX=0, _slotTouchY=0;
+function _slotCellFromPoint(x,y){ const el=document.elementFromPoint(x,y); return (el&&el.closest)?el.closest('#slot-grid .slotcell'):null; }
+document.addEventListener('touchstart', e=>{
+  const cell=e.target.closest&&e.target.closest('#slot-grid .slotcell'); if(!cell) return;
+  const t=e.touches&&e.touches[0]; if(!t) return;
+  _slotTouchX=t.clientX; _slotTouchY=t.clientY; _slotTouchMoved=false;
+  if(_slotTouchSel) return;   // déjà en sélection : l'extension se gère au touchend
+  if(_slotTouchTimer) clearTimeout(_slotTouchTimer);
+  _slotTouchTimer=setTimeout(()=>{
+    _slotTouchTimer=null;
+    if(_slotTouchMoved) return;   // le doigt a bougé → c'était un défilement
+    _slotTouchSel=true;
+    const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds');
+    SLOTSEL={active:true, anchor:{pos,ds}, focus:{pos,ds}};
+    _slotApplyHighlight(); _slotSelBar();
+    try{ if(navigator.vibrate) navigator.vibrate(15); }catch(_){}
+  }, 450);
+}, {passive:true});
+document.addEventListener('touchmove', e=>{
+  if(!_slotTouchTimer && !_slotTouchSel) return;
+  const t=e.touches&&e.touches[0]; if(!t) return;
+  if(Math.abs(t.clientX-_slotTouchX)>10||Math.abs(t.clientY-_slotTouchY)>10){
+    _slotTouchMoved=true;
+    if(_slotTouchTimer){ clearTimeout(_slotTouchTimer); _slotTouchTimer=null; }
+  }
+}, {passive:true});
+document.addEventListener('touchend', e=>{
+  if(_slotTouchTimer){ clearTimeout(_slotTouchTimer); _slotTouchTimer=null; }  // appui court → la fiche s'ouvre normalement
+  if(!_slotTouchSel) return;
+  const t=e.changedTouches&&e.changedTouches[0]; if(!t) return;
+  const cell=_slotCellFromPoint(t.clientX,t.clientY);
+  if(cell && SLOTSEL.anchor){
+    const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds');
+    if(pos===SLOTSEL.anchor.pos){ SLOTSEL.focus={pos,ds}; _slotApplyHighlight(); _slotSelBar(); }
+  }
+  e.preventDefault();   // empêche le clic simulé d'ouvrir la fiche pendant la sélection
+}, {passive:false});
 
 function openSlotNew(pos,dateStr){
   document.getElementById('slot-edit-id').value='';
@@ -8743,6 +8917,34 @@ window.PLSEL=window.PLSEL||{active:false,anchor:null,focus:null};
 window.PLCLIP=window.PLCLIP||null;
 window.PLUNDO=window.PLUNDO||null;
 let _plPress=null, _plHintShown=false;
+// Auto-défilement quand le curseur atteint un bord pendant une sélection glissée
+let _plAutoRaf=null, _plAutoVel=null, _plAutoXY={x:0,y:0};
+function _plStopAuto(){ if(_plAutoRaf){ cancelAnimationFrame(_plAutoRaf); _plAutoRaf=null; } }
+function _plEdgeScroll(e){ _plAutoXY={x:e.clientX,y:e.clientY}; if(!_plAutoRaf) _plAutoRaf=requestAnimationFrame(_plAutoStep); }
+function _plAutoStep(){
+  _plAutoRaf=null;
+  if(!_plPress||!_plPress.dragging) return;                // le glisser est terminé
+  const outer=window.PLGRID?document.getElementById(PLGRID.container):null; if(!outer) return;
+  // Le vrai élément qui défile est le div interne (max-height;overflow:auto) créé par buildGrid
+  let sc=outer.firstElementChild||outer;
+  if(sc.scrollWidth<=sc.clientWidth && sc.scrollHeight<=sc.clientHeight && outer!==sc) sc=outer; // repli
+  const r=sc.getBoundingClientRect();
+  const vw=window.innerWidth||document.documentElement.clientWidth;
+  const vh=window.innerHeight||document.documentElement.clientHeight;
+  const right=Math.min(r.right,vw), left=Math.max(r.left,0);
+  const bottom=Math.min(r.bottom,vh), top=Math.max(r.top,0);
+  const EDGE=55, SPD=28;
+  const x=_plAutoXY.x, y=_plAutoXY.y;
+  let vx=0, vy=0;
+  if(x>right-EDGE) vx=SPD*Math.min(1,(x-(right-EDGE))/EDGE);
+  else if(x<left+EDGE) vx=-SPD*Math.min(1,((left+EDGE)-x)/EDGE);
+  if(y>bottom-EDGE) vy=SPD*Math.min(1,(y-(bottom-EDGE))/EDGE);
+  else if(y<top+EDGE) vy=-SPD*Math.min(1,((top+EDGE)-y)/EDGE);
+  if(vx) sc.scrollLeft+=vx;
+  if(vy) sc.scrollTop+=vy;
+  if(vx||vy){ const hd=_plPaintCell(x,y); if(hd) _plExtendTo(hd); }
+  _plAutoRaf=requestAnimationFrame(_plAutoStep);            // continue tant qu'on glisse
+}
 
 function _plInit(){
   if(window._plReady) return; window._plReady=true;
@@ -8789,14 +8991,16 @@ function _plDown(e){
 }
 function _plMove(e){
   if(!_plPress) return;
+  _plAutoXY={x:e.clientX,y:e.clientY};         // position du curseur toujours à jour (pour l'auto-défilement)
   const dx=Math.abs(e.clientX-_plPress.startX), dy=Math.abs(e.clientY-_plPress.startY);
   if(!(dx>6||dy>6)) return;
   _plPress.moved=true;
-  if(!_plPress.dragging){ _plEnter(_plPress.cell); _plPress.dragging=true; }  // glisser = nouvelle plage
+  if(!_plPress.dragging){ _plEnter(_plPress.cell); _plPress.dragging=true; if(!_plAutoRaf) _plAutoRaf=requestAnimationFrame(_plAutoStep); }  // glisser = nouvelle plage + démarrer l'auto-défilement
   const hd=_plPaintCell(e.clientX,e.clientY);
   if(hd) _plExtendTo(hd);
 }
 function _plUp(e){
+  _plStopAuto();
   if(!_plPress) return;
   const p=_plPress; _plPress=null;
   if(p.dragging){ _plFlush(); return; }              // fin de glissement : plage définie (état exact)
@@ -9281,15 +9485,99 @@ function renderMaster(){
   else{
     emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
     emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+    // Filtre catégories (si des catégories sont masquées) — sauf quand une personne précise est sélectionnée
+    const hid=Array.isArray(S.masterHiddenCats)?S.masterHiddenCats:[];
+    if(hid.length) emps=emps.filter(p=>!hid.includes(p.categorie||'autre'));
   }
   const _mq=(document.getElementById('master-search')?.value||'').toLowerCase().trim();
   if(_mq) emps=emps.filter(p=>_matchStaff(p,_mq));
+  _renderMasterCats();
   buildGrid(emps,dates,'masterGrid');
 }
+
+// ── Sélecteur de catégories du Master Planning ──
+function _toggleMasterCatsPanel(ev){
+  if(ev) ev.stopPropagation();
+  const p=document.getElementById('master-cats-panel'); if(!p) return;
+  p.style.display=(p.style.display==='none')?'block':'none';
+}
+function _renderMasterCats(){
+  const box=document.getElementById('master-cats-chips'); if(!box) return;
+  if(!Array.isArray(S.masterHiddenCats)) S.masterHiddenCats=[];
+  const roster=(S.personnel||[]).filter(p=>p.actif!==false);
+  const cats=[...new Set(roster.map(p=>p.categorie||'autre'))];
+  const ref=(typeof CATS!=='undefined')?Object.keys(CATS):[];
+  cats.sort((a,b)=>{const ia=ref.indexOf(a),ib=ref.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return _dayExtractCatLbl(a).localeCompare(_dayExtractCatLbl(b));});
+  if(!cats.length){ box.innerHTML='<span style="color:var(--t3);font-size:11px">Aucun personnel</span>'; return; }
+  box.innerHTML=cats.map(c=>{
+    const on=!S.masterHiddenCats.includes(c);
+    const n=roster.filter(p=>(p.categorie||'autre')===c).length;
+    const col=_dayExtractCatColor(c);
+    const sty=on?`background:${col}26;border:1.5px solid ${col};color:#eef3ff`:`background:rgba(255,255,255,0.03);border:1.5px solid var(--glass-border);color:var(--t3);opacity:.6`;
+    const mark=on?`<span style="color:${col};font-weight:900;font-size:13px">✓</span>`:`<span style="color:var(--t4);font-weight:900;font-size:13px">○</span>`;
+    return `<div data-cat="${c}" onclick="event.stopPropagation();_toggleMasterCat('${c}')" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;border-radius:9px;padding:6px 10px;cursor:pointer;user-select:none;${sty}">${mark}<span>${_dayExtractCatLbl(c)}</span><span style="font-weight:500;opacity:.75">(${n})</span></div>`;
+  }).join('');
+  // état visuel du bouton (badge si filtrage actif)
+  const btn=document.getElementById('master-cats-btn');
+  if(btn){ const act=S.masterHiddenCats.length>0; btn.style.color=act?'var(--cyan)':''; btn.textContent=act?`👥 Catégories (${cats.length-S.masterHiddenCats.filter(c=>cats.includes(c)).length}/${cats.length}) ▾`:'👥 Catégories ▾'; }
+}
+function _toggleMasterCat(cat){
+  if(!Array.isArray(S.masterHiddenCats)) S.masterHiddenCats=[];
+  if(S.masterHiddenCats.includes(cat)) S.masterHiddenCats=S.masterHiddenCats.filter(c=>c!==cat);
+  else S.masterHiddenCats.push(cat);
+  try{save();}catch(_){}
+  renderMaster();
+}
+function _masterCatsAll(on){
+  if(!Array.isArray(S.masterHiddenCats)) S.masterHiddenCats=[];
+  const roster=(S.personnel||[]).filter(p=>p.actif!==false);
+  const cats=[...new Set(roster.map(p=>p.categorie||'autre'))];
+  S.masterHiddenCats = on ? [] : cats.slice();
+  try{save();}catch(_){}
+  renderMaster();
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('#master-cats-panel')&&!e.target.closest('#master-cats-btn')){ const p=document.getElementById('master-cats-panel'); if(p) p.style.display='none'; } });
 
 /* ═══ WEEKLY ═══ */
 function chWeek(dir){S.weekStart=addD(S.weekStart,dir*7);renderWeekly();}
 function thisWeek(){S.weekStart=getMon(new Date());renderWeekly();}
+
+// ── Sélecteur de catégories du Planning Hebdo ──
+function _toggleWeeklyCatsPanel(ev){ if(ev) ev.stopPropagation(); const p=document.getElementById('weekly-cats-panel'); if(p) p.style.display=(p.style.display==='none')?'block':'none'; }
+function _renderWeeklyCats(){
+  const box=document.getElementById('weekly-cats-chips'); if(!box) return;
+  if(!Array.isArray(S.weeklyHiddenCats)) S.weeklyHiddenCats=[];
+  const roster=(S.personnel||[]).filter(p=>p.actif!==false);
+  const cats=[...new Set(roster.map(p=>p.categorie||'autre'))];
+  const ref=(typeof CATS!=='undefined')?Object.keys(CATS):[];
+  cats.sort((a,b)=>{const ia=ref.indexOf(a),ib=ref.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return _dayExtractCatLbl(a).localeCompare(_dayExtractCatLbl(b));});
+  if(!cats.length){ box.innerHTML='<span style="color:var(--t3);font-size:11px">Aucun personnel</span>'; return; }
+  box.innerHTML=cats.map(c=>{
+    const on=!S.weeklyHiddenCats.includes(c);
+    const n=roster.filter(p=>(p.categorie||'autre')===c).length;
+    const col=_dayExtractCatColor(c);
+    const sty=on?`background:${col}26;border:1.5px solid ${col};color:#eef3ff`:`background:rgba(255,255,255,0.03);border:1.5px solid var(--glass-border);color:var(--t3);opacity:.6`;
+    const mark=on?`<span style="color:${col};font-weight:900;font-size:13px">✓</span>`:`<span style="color:var(--t4);font-weight:900;font-size:13px">○</span>`;
+    return `<div data-cat="${c}" onclick="event.stopPropagation();_toggleWeeklyCat('${c}')" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;border-radius:9px;padding:6px 10px;cursor:pointer;user-select:none;${sty}">${mark}<span>${_dayExtractCatLbl(c)}</span><span style="font-weight:500;opacity:.75">(${n})</span></div>`;
+  }).join('');
+  const btn=document.getElementById('weekly-cats-btn');
+  if(btn){ const act=S.weeklyHiddenCats.length>0; btn.style.color=act?'var(--cyan)':''; btn.textContent=act?`👥 Catégories (${cats.length-S.weeklyHiddenCats.filter(c=>cats.includes(c)).length}/${cats.length}) ▾`:'👥 Catégories ▾'; }
+}
+function _toggleWeeklyCat(cat){
+  if(!Array.isArray(S.weeklyHiddenCats)) S.weeklyHiddenCats=[];
+  if(S.weeklyHiddenCats.includes(cat)) S.weeklyHiddenCats=S.weeklyHiddenCats.filter(c=>c!==cat);
+  else S.weeklyHiddenCats.push(cat);
+  try{save();}catch(_){}
+  renderWeekly();
+}
+function _weeklyCatsAll(on){
+  if(!Array.isArray(S.weeklyHiddenCats)) S.weeklyHiddenCats=[];
+  const cats=[...new Set((S.personnel||[]).filter(p=>p.actif!==false).map(p=>p.categorie||'autre'))];
+  S.weeklyHiddenCats = on ? [] : cats.slice();
+  try{save();}catch(_){}
+  renderWeekly();
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('#weekly-cats-panel')&&!e.target.closest('#weekly-cats-btn')){ const p=document.getElementById('weekly-cats-panel'); if(p) p.style.display='none'; } });
 
 // Recopie la semaine précédente vers la semaine courante — NON DESTRUCTIF : ne remplit que les cases vides.
 // Ne recopie QUE les affectations de travail : formations, congés, maladies, absences et déplacements sont
@@ -9500,8 +9788,10 @@ function renderWeekly(){
   let _wlist=sorted.concat(sortis);
   const _wemp=document.getElementById('wk-emp')?.value||'';
   if(_wemp) _wlist=S.personnel.filter(p=>p.id===_wemp);
+  else{ const whid=Array.isArray(S.weeklyHiddenCats)?S.weeklyHiddenCats:[]; if(whid.length) _wlist=_wlist.filter(p=>!whid.includes(p.categorie||'autre')); }
   const _wq=(document.getElementById('week-search')?.value||'').toLowerCase().trim();
   if(_wq) _wlist=_wlist.filter(p=>_matchStaff(p,_wq));
+  _renderWeeklyCats();
   const _wy=document.getElementById('wk-year');
   if(_wy){ if(!_wy.options.length){ const cy=new Date().getFullYear(); let o=''; for(let y=cy-1;y<=2060;y++) o+=`<option value="${y}">${y}</option>`; _wy.innerHTML=o; } _wy.value=S.weekStart.getFullYear(); }
   buildGrid(_wlist, dates, 'weeklyGrid');
@@ -20345,6 +20635,7 @@ function exportMasterPDF(){
   const baseList=empF?S.personnel.filter(p=>p.id===empF):S.personnel.filter(p=>p.actif!==false);
   let emps=sortPersonnel(baseList);
   if(!empF) emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  if(!empF){ const hid=Array.isArray(S.masterHiddenCats)?S.masterHiddenCats:[]; if(hid.length) emps=emps.filter(p=>!hid.includes(p.categorie||'autre')); }
   const D1=['L','M','M','J','V','S','D'];
   const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',formation_int:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
   const LBL={conge:'C',maladie:'M',formation:'F',formation_int:'Fi',absence:'A',deplacement:'D',ferie:'♦',we:''};
@@ -20426,7 +20717,8 @@ function exportWeekHtml(){
   if(!S.weekStart) S.weekStart=getMon(new Date());
   const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
   const JOURS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  const emps=sortByChantier(S.personnel.filter(p=>p.actif!==false),dates).concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  let emps=sortByChantier(S.personnel.filter(p=>p.actif!==false),dates).concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  { const whid=Array.isArray(S.weeklyHiddenCats)?S.weeklyHiddenCats:[]; if(whid.length) emps=emps.filter(p=>!whid.includes(p.categorie||'autre')); }
   const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
   const LBL={conge:'Congé',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'};
 
@@ -20757,7 +21049,8 @@ async function _buildColoredWeekXls(){
   const dates=[];for(let i=0;i<7;i++) dates.push(addD(S.weekStart,i));
   const JOURS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   const MOIS=['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-  const emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false)).concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  let emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false)).concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  { const whid=Array.isArray(S.weeklyHiddenCats)?S.weeklyHiddenCats:[]; if(whid.length) emps=emps.filter(p=>!whid.includes(p.categorie||'autre')); }
 
   // Couleurs catégories (résolues)
   const cs=getComputedStyle(document.documentElement);
@@ -20883,6 +21176,7 @@ async function _buildColoredMasterXls(){
   const baseList=empF?S.personnel.filter(p=>p.id===empF):S.personnel.filter(p=>p.actif!==false);
   let emps=sortPersonnel(baseList);
   if(!empF) emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
+  if(!empF){ const hid=Array.isArray(S.masterHiddenCats)?S.masterHiddenCats:[]; if(hid.length) emps=emps.filter(p=>!hid.includes(p.categorie||'autre')); }
   const D1=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
   const cs=getComputedStyle(document.documentElement);
