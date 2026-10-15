@@ -1969,7 +1969,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <select id="slot-year" onchange="slotGoToYear(this.value)" title="Aller à l'année" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t1);padding:4px 8px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer"></select>
       </div>
     </div>
-    <div style="font-size:10px;color:var(--t4);margin-top:6px">💡 Astuce : <strong>PC</strong> — glisse sur une ligne de position pour sélectionner une plage (Ctrl+C / Ctrl+V). <strong>iPad/téléphone</strong> — <strong>appui long</strong> sur la 1ʳᵉ case pour démarrer, puis appui simple sur la dernière. Puis <strong>Copier</strong> / <strong>Coller</strong> ailleurs · <strong>Libérer</strong> retire l'occupation · <strong>✕</strong> quitte la sélection.</div>
+    <div style="font-size:10px;color:var(--t4);margin-top:6px">💡 Astuce (ordinateur) : <strong>glisse</strong> à la souris sur une ligne de position pour sélectionner une plage, puis <strong>Copier</strong> un MSN et <strong>Coller</strong> ailleurs (Ctrl+C / Ctrl+V). <strong>Libérer</strong> retire l'occupation · <strong>✕</strong> quitte la sélection.</div>
     <div id="slot-grid" style="overflow-x:auto"></div>
   </div>
 
@@ -5176,7 +5176,7 @@ function _slotSelBar(){
   const pb=document.getElementById('slot-paste-btn'); if(pb) pb.style.display=SLOTCLIP?'':'none';
   bar.style.display='flex';
 }
-function _slotSelClear(){ SLOTSEL={active:false,anchor:null,focus:null}; _slotTouchSel=false; _slotApplyHighlight(); _slotSelBar(); }
+function _slotSelClear(){ SLOTSEL={active:false,anchor:null,focus:null}; _slotApplyHighlight(); _slotSelBar(); }
 function _slotCopy(){
   const r=_slotSelRange(); if(!r){ toast('Sélectionne une plage'); return; }
   const e=(S.slot?.entries||[]).find(x=>parseInt(x.pos)===r.pos && !(x.fin<r.from||x.debut>r.to));
@@ -5212,7 +5212,9 @@ function _slotFree(){
     toast('🗑 Plage libérée');
   },{btn:'✓ Libérer',icon:'🗑'});
 }
+const _slotTouchDevice=(navigator.maxTouchPoints>0)||('ontouchstart' in window);  // tactile : sélection désactivée
 document.addEventListener('mousedown', e=>{
+  if(_slotTouchDevice) return;   // sur iPad/téléphone : pas de sélection (évite la latence)
   const cell=e.target.closest&&e.target.closest('#slot-grid .slotcell'); if(!cell||e.button!==0) return;
   e.preventDefault();   // évite la sélection de texte pendant le glisser
   _slotMouseDown=true; _slotMoved=false; _slotStartX=e.clientX; _slotStartY=e.clientY;
@@ -5269,46 +5271,9 @@ document.addEventListener('keydown', e=>{
   else if(k==='delete'){ e.preventDefault(); _slotFree(); }
 });
 
-/* ── Tactile (iPad/téléphone) : appui long pour démarrer la sélection, appui simple pour la fin.
-   Écouteurs PASSIFS (ne bloquent pas le défilement → pas de latence) ; on n'empêche l'ouverture
-   de la fiche que sur touchend quand une sélection est en cours. ── */
-let _slotTouchTimer=null, _slotTouchSel=false, _slotTouchMoved=false, _slotTouchX=0, _slotTouchY=0;
-function _slotCellFromPoint(x,y){ const el=document.elementFromPoint(x,y); return (el&&el.closest)?el.closest('#slot-grid .slotcell'):null; }
-document.addEventListener('touchstart', e=>{
-  const cell=e.target.closest&&e.target.closest('#slot-grid .slotcell'); if(!cell) return;
-  const t=e.touches&&e.touches[0]; if(!t) return;
-  _slotTouchX=t.clientX; _slotTouchY=t.clientY; _slotTouchMoved=false;
-  if(_slotTouchSel) return;   // déjà en sélection : l'extension se gère au touchend
-  if(_slotTouchTimer) clearTimeout(_slotTouchTimer);
-  _slotTouchTimer=setTimeout(()=>{
-    _slotTouchTimer=null;
-    if(_slotTouchMoved) return;   // le doigt a bougé → c'était un défilement
-    _slotTouchSel=true;
-    const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds');
-    SLOTSEL={active:true, anchor:{pos,ds}, focus:{pos,ds}};
-    _slotApplyHighlight(); _slotSelBar();
-    try{ if(navigator.vibrate) navigator.vibrate(15); }catch(_){}
-  }, 450);
-}, {passive:true});
-document.addEventListener('touchmove', e=>{
-  if(!_slotTouchTimer && !_slotTouchSel) return;
-  const t=e.touches&&e.touches[0]; if(!t) return;
-  if(Math.abs(t.clientX-_slotTouchX)>10||Math.abs(t.clientY-_slotTouchY)>10){
-    _slotTouchMoved=true;
-    if(_slotTouchTimer){ clearTimeout(_slotTouchTimer); _slotTouchTimer=null; }
-  }
-}, {passive:true});
-document.addEventListener('touchend', e=>{
-  if(_slotTouchTimer){ clearTimeout(_slotTouchTimer); _slotTouchTimer=null; }  // appui court → la fiche s'ouvre normalement
-  if(!_slotTouchSel) return;
-  const t=e.changedTouches&&e.changedTouches[0]; if(!t) return;
-  const cell=_slotCellFromPoint(t.clientX,t.clientY);
-  if(cell && SLOTSEL.anchor){
-    const pos=parseInt(cell.getAttribute('data-pos')), ds=cell.getAttribute('data-ds');
-    if(pos===SLOTSEL.anchor.pos){ SLOTSEL.focus={pos,ds}; _slotApplyHighlight(); _slotSelBar(); }
-  }
-  e.preventDefault();   // empêche le clic simulé d'ouvrir la fiche pendant la sélection
-}, {passive:false});
+/* ── Tactile (iPad/téléphone) : sélection désactivée (évite la latence). Sur tactile, l'appui
+   simple ouvre la fiche et le défilement reste fluide. La sélection copier/coller est réservée
+   à la souris (ordinateur), comme sur le planning. ── */
 
 function openSlotNew(pos,dateStr){
   document.getElementById('slot-edit-id').value='';
