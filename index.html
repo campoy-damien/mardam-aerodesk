@@ -9005,6 +9005,15 @@ function _plCopy(){
 // être écrasés par un collage/remplissage (ils restent modifiables en cliquant la case).
 const PL_PROTECT=new Set(['conge','maladie','formation','formation_int','absence','deplacement']);
 function _plIsProtected(k){ const e=S.planning[k]; return !!(e&&PL_PROTECT.has(e.type)); }
+// Garde-fou contrat : vrai si la date est hors de la période de contrat de l'employé (avant début ou après fin)
+function _plHorsContrat(empId, ds){
+  const emp=byId(empId); if(!emp) return false;
+  const cStart=emp.debutContrat||emp.dateEmbauche;
+  const cEnd=emp.dateFin;
+  if(cStart && ds < cStart) return true;
+  if(cEnd && ds > cEnd) return true;
+  return false;
+}
 
 function _plPaste(){
   if(!PLCLIP){ try{toast('Presse-papier vide');}catch(_){} return; }
@@ -9019,12 +9028,14 @@ function _plPaste(){
     for(let i=0;i<PLCLIP.rows;i++){ const r=R.r0+i; if(r<PLGRID.rowEmps.length) rowsIdx.push(r); }
     for(let j=0;j<PLCLIP.cols;j++){ const c=selCols[0]+j*(PLCLIP.stride||1); if(c<PLGRID.cols.length&&PLGRID.cols[c]) colsIdx.push(c); }
   }
-  const undo=[]; let count=0, protege=0;
+  const undo=[]; let count=0, protege=0, horsC=0;
   rowsIdx.forEach((r,i)=>colsIdx.forEach((c,j)=>{
     const src=PLCLIP.data[i%PLCLIP.rows][j%PLCLIP.cols];     // répétition (carrelage) si la destination est plus grande
     const col=PLGRID.cols[c]; if(!col) return;
-    const k=`${PLGRID.rowEmps[r]}_${col.ds}_${col.half}`;
+    const empId=PLGRID.rowEmps[r];
+    const k=`${empId}_${col.ds}_${col.half}`;
     if(_plIsProtected(k)){ protege++; return; }              // garde-fou : ne pas écraser congé/formation/absence
+    if(src&&src.type&&_plHorsContrat(empId,col.ds)){ horsC++; return; } // garde-fou : ne pas affecter hors période de contrat
     undo.push({key:k, prev:_plClone(S.planning[k])});
     const tgtVm=(S.planning[k]||{}).vm||'';
     if(src&&src.type){ const cl=_plClone(src); if(tgtVm) cl.vm=tgtVm; S.planning[k]=cl; }
@@ -9039,15 +9050,15 @@ function _plPaste(){
     PLSEL.focus ={empId:PLGRID.rowEmps[rowsIdx[rowsIdx.length-1]],ds:PLGRID.cols[lc].ds,half:PLGRID.cols[lc].half};
   }
   PLUNDO={items:undo}; _plRefresh();
-  try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}`);}catch(_){}
+  try{toast(`📥 ${count} case${count>1?'s':''} collée${count>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}${horsC?` · ${horsC} hors contrat ignoré${horsC>1?'s':''}`:''}`);}catch(_){}
 }
 function _plFill(){
   if(!PLCLIP){ try{toast("Copie d'abord une case");}catch(_){} return; }
   const pl=PLCLIP.data[0][0], cells=_plCells(); if(!cells.length) return;
-  const undo=[]; let protege=0, n=0;
-  cells.forEach(o=>{ if(_plIsProtected(o.key)){ protege++; return; } undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); const tgtVm=(S.planning[o.key]||{}).vm||''; if(pl&&pl.type){ const cl=_plClone(pl); if(tgtVm) cl.vm=tgtVm; S.planning[o.key]=cl; } else if(tgtVm){ S.planning[o.key]={type:'',vm:tgtVm}; } else delete S.planning[o.key]; n++; });
+  const undo=[]; let protege=0, horsC=0, n=0;
+  cells.forEach(o=>{ if(_plIsProtected(o.key)){ protege++; return; } if(pl&&pl.type&&_plHorsContrat(o.empId,o.ds)){ horsC++; return; } undo.push({key:o.key,prev:_plClone(S.planning[o.key])}); const tgtVm=(S.planning[o.key]||{}).vm||''; if(pl&&pl.type){ const cl=_plClone(pl); if(tgtVm) cl.vm=tgtVm; S.planning[o.key]=cl; } else if(tgtVm){ S.planning[o.key]={type:'',vm:tgtVm}; } else delete S.planning[o.key]; n++; });
   PLUNDO={items:undo}; _plRefresh();
-  try{toast(`🪣 ${n} case${n>1?'s':''} remplie${n>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}`);}catch(_){}
+  try{toast(`🪣 ${n} case${n>1?'s':''} remplie${n>1?'s':''}${protege?` · ${protege} congé/formation protégé${protege>1?'s':''}`:''}${horsC?` · ${horsC} hors contrat ignoré${horsC>1?'s':''}`:''}`);}catch(_){}
 }
 function _plDelete(){
   const cells=_plCells(); if(!cells.length) return;
@@ -9190,12 +9201,18 @@ function applyAffectPerm(){
   if(!from||!to){ toast('⚠️ Renseignez la période'); return; }
   let d=parseLocal(from), end=parseLocal(to);
   if(d>end){ toast('⚠️ La date de début est après la fin'); return; }
-  // Garde-fou fin de contrat : si la période dépasse la fin de contrat, demander confirmation via modal
+  // Garde-fou période de contrat : si la période saisie sort du contrat (avant le début OU après la fin), demander confirmation
   const _emp=byId(empId);
-  if(_emp && _emp.dateFin && to > _emp.dateFin && !window._skipContratCheck){
+  const _cStart=_emp && (_emp.debutContrat||_emp.dateEmbauche);
+  const _cEnd=_emp && _emp.dateFin;
+  const _avant=_cStart && from < _cStart;
+  const _apres=_cEnd && to > _cEnd;
+  if(_emp && (_avant||_apres) && !window._skipContratCheck){
+    const _periode=(_cStart&&_cEnd)?`du ${disp(_cStart)} au ${disp(_cEnd)}`:(_cEnd?`jusqu'au ${disp(_cEnd)}`:`à partir du ${disp(_cStart)}`);
+    const _quand=_avant?`commence le ${disp(from)}, avant le début de son contrat (${disp(_cStart)})`:`va jusqu'au ${disp(to)}, après la fin de son contrat (${disp(_cEnd)})`;
     confirmDel(
       'Hors période de contrat',
-      `${_emp.prenom} ${_emp.nom} est en ${_emp.contrat||'contrat temporaire'} jusqu'au ${disp(_emp.dateFin)}. La période saisie va jusqu'au ${disp(to)}, après la fin de son contrat. Confirmer quand même ?`,
+      `${_emp.prenom} ${_emp.nom} est en ${_emp.contrat||'contrat temporaire'} ${_periode}. La période saisie ${_quand}. Confirmer quand même ?`,
       ()=>{ window._skipContratCheck=true; applyAffectPerm(); window._skipContratCheck=false; },
       {btn:'✓ Confirmer', icon:'⏳', safe:true}
     );
@@ -9643,11 +9660,17 @@ function saveCellEdit(){
   // Garde-fou fin de contrat (intérim/CDD) : si la case saisie dépasse la fin de contrat, demander confirmation
   if(cellType && cellType!=='' && !window._skipContratCheck){
     const emp=byId(empId);
-    if(emp && emp.dateFin && dateStr > emp.dateFin){
+    const cStart = emp && (emp.debutContrat||emp.dateEmbauche);
+    const cEnd   = emp && emp.dateFin;
+    const avant  = cStart && dateStr < cStart;   // avant le début de contrat (pas encore là)
+    const apres  = cEnd   && dateStr > cEnd;      // après la fin de contrat (parti)
+    if(emp && (avant||apres)){
       const actLbl = cellType==='formation_int'||cellType==='formation' ? 'former' : (['conge','maladie','absence','deplacement'].includes(cellType) ? 'poser une absence à' : 'affecter');
+      const periode = (cStart&&cEnd) ? `du ${disp(cStart)} au ${disp(cEnd)}` : (cEnd?`jusqu'au ${disp(cEnd)}`:`à partir du ${disp(cStart)}`);
+      const quand = avant ? `avant le début de son contrat (${disp(cStart)})` : `après la fin de son contrat (${disp(cEnd)})`;
       confirmDel(
         'Hors période de contrat',
-        `${emp.prenom} ${emp.nom} est en ${emp.contrat||'contrat temporaire'} jusqu'au ${disp(emp.dateFin)}. Vous voulez ${actLbl} cette personne le ${disp(dateStr)}, après la fin de son contrat. Confirmer quand même ?`,
+        `${emp.prenom} ${emp.nom} est en ${emp.contrat||'contrat temporaire'} ${periode}. Vous voulez ${actLbl} cette personne le ${disp(dateStr)}, ${quand}. Confirmer quand même ?`,
         ()=>{ window._skipContratCheck=true; saveCellEdit(); window._skipContratCheck=false; },
         {btn:'✓ Confirmer', icon:'⏳', safe:true}
       );
@@ -18545,10 +18568,11 @@ function _synthGoto(idx){
 // renseignée = présent dès qu'elle est atteinte (y compris semaines futures) ;
 // intérimaire avec date de fin = présent seulement dans sa période de contrat.
 function _presentSemaine(p, wStart, wEnd){
-  // Embauche : si renseignée, la personne n'existe pas avant
-  if(p.dateEmbauche){
-    const emb=parseLocal(p.dateEmbauche);
-    if(emb && emb>wEnd) return false;          // arrive après cette semaine
+  // Arrivée : début de contrat (intérim/CDD) ou, à défaut, date d'embauche — la personne n'existe pas avant
+  const arrStr=p.debutContrat||p.dateEmbauche;
+  if(arrStr){
+    const arr=parseLocal(arrStr);
+    if(arr && arr>wEnd) return false;          // arrive après cette semaine
   }
   // Fin de contrat : si renseignée (surtout intérimaires), plus présent après
   if(p.dateFin){
