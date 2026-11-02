@@ -3963,13 +3963,31 @@ function catBadge(cat){
 // ═══ SYSTÈME AUTH MULTI-UTILISATEURS ═══
 // Utilisateurs par défaut — modifiables via l'interface Admin
 const _DEFAULT_USERS=[
-  {login:'dcampoy',  hash:'9b2e4912f870e8932692b05eda9a52628906d8efc343ad6d06d6856316124c31', role:'admin', nom:'Damien Campoy'},
+  {login:'dcampoy',  hash:'16e272cf5c2dfd1bc8a4398b5b348004ab6a76539afd06c5652034e7ec0480fa', role:'admin', nom:'Damien Campoy'},
 ];
 function _getUsers(){
   try{const u=localStorage.getItem('mard_users');return u?JSON.parse(u):[..._DEFAULT_USERS];}
   catch(e){return[..._DEFAULT_USERS];}
 }
 function _saveUsers(users){localStorage.setItem('mard_users',JSON.stringify(users));}
+// Réinitialisation unique du mot de passe admin (dcampoy) → C@mpoy3486, même si un mot de passe
+// était déjà enregistré. Le drapeau empêche de le réappliquer : tu pourras le changer ensuite via 🔑.
+(function(){
+  try{
+    if(localStorage.getItem('mard_pwset_campoy_v1')) return;
+    const NEWH='16e272cf5c2dfd1bc8a4398b5b348004ab6a76539afd06c5652034e7ec0480fa';
+    let us=null; try{ us=JSON.parse(localStorage.getItem('mard_users')||'null'); }catch(_){}
+    if(!Array.isArray(us)||!us.length){
+      us=[{login:'dcampoy',hash:NEWH,role:'admin',nom:'Damien Campoy'}];
+    } else {
+      const i=us.findIndex(u=>((u.login||'').toLowerCase()==='dcampoy'));
+      if(i>-1) us[i].hash=NEWH;
+      else us.push({login:'dcampoy',hash:NEWH,role:'admin',nom:'Damien Campoy'});
+    }
+    localStorage.setItem('mard_users',JSON.stringify(us));
+    localStorage.setItem('mard_pwset_campoy_v1','1');
+  }catch(_){}
+})();
 
 function _sha256(str){
   function rr(v,a){return(v>>>a)|(v<<(32-a));}
@@ -4770,6 +4788,33 @@ function load(){
       // Migration : toute personne archivée doit être inactive (répare les anciennes archives
       // où actif était resté true → elles réapparaissaient dans les vues filtrées sur actif)
       if(Array.isArray(S.personnel)) S.personnel.forEach(p=>{ if(p && p.archived) p.actif=false; });
+      // Migration : réparer les affectations "Travail" orphelines (chantier transféré vers recyclage
+      // puis supprimé) → re-rattacher à l'avion recyclé qui couvre la date, pour garder l'historique MSN
+      try{
+        if(S.planning && typeof S.planning==='object'){
+          const _validCh=new Set((S.chantiers||[]).map(c=>c.id));
+          const _recAv=(S.recycling?.avions||[]);
+          const _stoAv=(S.stockage?.avions||[]);
+          const _resolv=cid=>{
+            if(!cid) return true;
+            if(['STO','AIRBUS','REC','STRUCT','PROD'].includes(cid)) return true;
+            if(cid.startsWith('REC_')) return _recAv.some(a=>a.id===cid.slice(4));
+            if(cid.startsWith('STO_')) return _stoAv.some(a=>a.id===cid.slice(4));
+            return _validCh.has(cid);
+          };
+          let _rep=0;
+          Object.keys(S.planning).forEach(k=>{
+            const e=S.planning[k]; if(!e||e.type!=='travail'||!e.chantierId) return;
+            if(_resolv(e.chantierId)) return;                       // référence encore valide → ne pas toucher
+            const ds=k.split('_').slice(1,-1).join('_');            // date de la case (YYYY-MM-DD)
+            const candR=_recAv.filter(a=>{ const d=a.debutChantier||a.entree, f=a.finChantier||a.finPrev; return d && ds>=d && (!f||ds<=f); });
+            const candS=_stoAv.filter(a=>{ const d=a.entree, f=a.sortie; return d && ds>=d && (!f||ds<=f); });
+            if(candR.length===1 && candS.length===0){ e.chantierId='REC_'+candR[0].id; _rep++; }
+            else if(candS.length===1 && candR.length===0){ e.chantierId='STO_'+candS[0].id; _rep++; }
+          });
+          if(_rep) console.log('Réparation affectations orphelines (recyclage/stockage) :',_rep);
+        }
+      }catch(_){}
       // Migration : anciens intitulés d'accueil ("WELCOME MOE", "Welcome HSE") → "ACCUEIL HSE"
       try{
         const OLD_ACCUEIL=['WELCOME MOE','Welcome HSE'];
@@ -7029,63 +7074,110 @@ function popSelects(){
   const cc=document.getElementById('cellChantier');
   if(cc){
     cc.innerHTML='<option value="">— Aucun —</option>';
+    const _mkGrp=lbl=>{const g=document.createElement('optgroup');g.label=lbl;return g;};
+    const _opt=(v,t)=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;};
     // Chantiers normaux
-    S.chantiers.filter(c=>c.statut!=='termine').forEach(c=>{
-      const o=document.createElement('option');o.value=c.id;o.textContent=c.nom;cc.appendChild(o);
-    });
-    // Entrée globale Stockage — toujours visible
-    {
-      const o=document.createElement('option');
-      o.value='STO';
-      const nbAv=S.stockage?.avions?.length||0;
-      o.textContent=`✈️ Stockage${nbAv?` (${nbAv} avion${nbAv>1?'s':''})`:' — maintenance'}`;
-      cc.appendChild(o);
-    }
-    // Entrée globale Recyclage — toujours visible
-    {
-      const recActifs=(S.recycling?.avions||[]).filter(av=>av.statut!=='termine');
-      if(recActifs.length){
-        // Un item par avion avec son MSN
-        recActifs.forEach(av=>{
-          const o=document.createElement('option');
-          o.value='REC_'+av.id;
-          o.textContent=`♻️ ${av.type||'A/C'} — MSN ${av.msn||'?'}`;
-          cc.appendChild(o);
-        });
-      } else {
-        // Aucun avion → option générique
-        const o=document.createElement('option');
-        o.value='REC';
-        o.textContent='♻️ Recyclage — A/C';
-        cc.appendChild(o);
-      }
-    }
-    // Entrée Airbus Part 21 — toujours visible
-    {
-      const o=document.createElement('option');
-      o.value='AIRBUS';
-      o.textContent='✈️ Airbus — Activité Part 21';
-      cc.appendChild(o);
-    }
-    // Entrée Structure atelier — toujours visible
-    {
-      const o=document.createElement('option');
-      o.value='STRUCT';
-      o.textContent='🔩 Structure — atelier';
-      cc.appendChild(o);
-    }
-    // Entrée Production générique — toujours visible (ex. Workshop Manager)
-    {
-      const o=document.createElement('option');
-      o.value='PROD';
-      o.textContent='🏭 Production';
-      cc.appendChild(o);
-    }
+    const gCh=_mkGrp('Chantiers');
+    S.chantiers.filter(c=>c.statut!=='termine').forEach(c=>{ gCh.appendChild(_opt(c.id,c.nom)); });
+    if(gCh.children.length) cc.appendChild(gCh);
+    // Stockage (générique + un item par avion stocké)
+    const gSto=_mkGrp('🅿️ Stockage');
+    { const nbAv=S.stockage?.avions?.length||0; gSto.appendChild(_opt('STO',`🅿️ Stockage${nbAv?` (${nbAv} avion${nbAv>1?'s':''})`:' — maintenance'}`)); }
+    (S.stockage?.avions||[]).filter(av=>av.statut!=='sorti'&&av.statut!=='termine').forEach(av=>{ gSto.appendChild(_opt('STO_'+av.id,`🅿️ ${av.type||'A/C'} — MSN ${av.msn||'?'}`)); });
+    cc.appendChild(gSto);
+    // Recyclage (un item par avion, sinon générique)
+    const gRec=_mkGrp('♻️ Recyclage');
+    { const recActifs=(S.recycling?.avions||[]).filter(av=>av.statut!=='termine');
+      if(recActifs.length) recActifs.forEach(av=>{ gRec.appendChild(_opt('REC_'+av.id,`♻️ ${av.type||'A/C'} — MSN ${av.msn||'?'}`)); });
+      else gRec.appendChild(_opt('REC','♻️ Recyclage — A/C')); }
+    cc.appendChild(gRec);
+    // Autres activités
+    const gAut=_mkGrp('Autres activités');
+    gAut.appendChild(_opt('AIRBUS','✈️ Airbus — Activité Part 21'));
+    gAut.appendChild(_opt('STRUCT','🔩 Structure — atelier'));
+    gAut.appendChild(_opt('PROD','🏭 Production'));
+    cc.appendChild(gAut);
     // Recopier les mêmes options dans le 2ᵉ chantier
     const cc2=document.getElementById('cellChantier2');
     if(cc2){ cc2.innerHTML='<option value="">— Aucun —</option>'+cc.innerHTML.replace(/^<option value="">[^<]*<\/option>/,''); }
+    // Brancher la recherche (combobox) sur les deux menus
+    try{ _initChantierCombo('cellChantier'); _initChantierCombo('cellChantier2'); }catch(_){}
   }
 }
+
+/* ═══ COMBOBOX RECHERCHE "CHANTIER ASSOCIÉ" (remplace le menu natif, garde le <select> caché comme valeur) ═══ */
+function _cbxLabelFor(sel){ const o=sel.options[sel.selectedIndex]; return o?o.textContent:''; }
+function _initChantierCombo(id){
+  const sel=document.getElementById(id); if(!sel) return;
+  sel.style.display='none';
+  let wrap=sel.nextElementSibling;
+  if(!(wrap&&wrap.classList&&wrap.classList.contains('cbx')&&wrap.getAttribute('data-for')===id)){
+    wrap=document.createElement('div');
+    wrap.className='cbx'; wrap.setAttribute('data-for',id);
+    wrap.style.cssText='position:relative';
+    wrap.innerHTML=`
+      <button type="button" class="cbx-display" style="width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:9px;border:1px solid rgba(0,210,255,0.3);background:rgba(0,210,255,0.05);color:var(--t1);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer">
+        <span class="cbx-txt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span><span style="color:var(--t3);flex-shrink:0">▾</span>
+      </button>
+      <div class="cbx-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:1200;background:rgba(14,21,40,0.99);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--glass-border);border-radius:11px;box-shadow:0 14px 36px rgba(0,0,0,0.55);padding:8px">
+        <input type="text" class="cbx-search" placeholder="🔍 MSN, type, chantier…" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.05);color:var(--t1);font-size:13px;outline:none;font-family:'Outfit',sans-serif">
+        <div class="cbx-list" style="max-height:260px;overflow-y:auto;margin-top:6px"></div>
+      </div>`;
+    sel.parentNode.insertBefore(wrap,sel.nextSibling);
+    const disp=wrap.querySelector('.cbx-display');
+    const panel=wrap.querySelector('.cbx-panel');
+    const search=wrap.querySelector('.cbx-search');
+    disp.addEventListener('click',e=>{ e.stopPropagation(); const open=panel.style.display!=='none'; _cbxCloseAll(); if(!open){ panel.style.display='block'; search.value=''; _cbxBuildList(wrap,''); search.focus(); } });
+    search.addEventListener('input',()=>_cbxBuildList(wrap,search.value));
+    search.addEventListener('keydown',e=>_cbxKey(e,wrap));
+    wrap.addEventListener('click',e=>e.stopPropagation());
+  }
+  // Rafraîchir le libellé affiché selon la valeur courante du <select>
+  const txt=wrap.querySelector('.cbx-txt');
+  if(txt) txt.textContent=_cbxLabelFor(sel)||'— Sélectionner —';
+}
+function _cbxRefresh(id){ const sel=document.getElementById(id); if(!sel) return; const wrap=sel.nextElementSibling; if(wrap&&wrap.classList&&wrap.classList.contains('cbx')){ const txt=wrap.querySelector('.cbx-txt'); if(txt) txt.textContent=_cbxLabelFor(sel)||'— Sélectionner —'; } }
+function _cbxCloseAll(){ document.querySelectorAll('.cbx-panel').forEach(p=>p.style.display='none'); }
+function _norm_(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function _cbxBuildList(wrap,filter){
+  const id=wrap.getAttribute('data-for'); const sel=document.getElementById(id); if(!sel) return;
+  const list=wrap.querySelector('.cbx-list'); const q=_norm_(filter).trim();
+  let html=''; let count=0;
+  const addItem=(o)=>{ const match=!q||_norm_(o.textContent).includes(q)||_norm_(o.value).includes(q); if(!match) return; count++; const on=o.value===sel.value; html+=`<div class="cbx-item" data-val="${o.value.replace(/"/g,'&quot;')}" style="padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;color:${on?'var(--cyan)':'var(--t1)'};background:${on?'rgba(0,210,255,0.12)':'transparent'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.textContent}</div>`; };
+  Array.from(sel.children).forEach(node=>{
+    if(node.tagName==='OPTGROUP'){
+      const before=count; let items='';
+      const prevHtml=html; html='';
+      Array.from(node.children).forEach(addItem);
+      items=html; html=prevHtml;
+      if(count>before){ html+=`<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px 4px">${node.label}</div>`+items; }
+    } else if(node.tagName==='OPTION'){
+      addItem(node);
+    }
+  });
+  list.innerHTML=html||'<div style="padding:12px;text-align:center;color:var(--t3);font-size:12px">Aucun résultat</div>';
+  list.querySelectorAll('.cbx-item').forEach(el=>{ el.addEventListener('click',()=>_cbxPick(wrap,el.getAttribute('data-val'))); });
+}
+function _cbxPick(wrap,val){
+  const id=wrap.getAttribute('data-for'); const sel=document.getElementById(id); if(!sel) return;
+  sel.value=val;
+  const txt=wrap.querySelector('.cbx-txt'); if(txt) txt.textContent=_cbxLabelFor(sel)||'— Sélectionner —';
+  try{ sel.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+  wrap.querySelector('.cbx-panel').style.display='none';
+}
+function _cbxKey(e,wrap){
+  const list=wrap.querySelector('.cbx-list'); const items=[...list.querySelectorAll('.cbx-item')];
+  if(!items.length) return;
+  let idx=items.findIndex(i=>i.classList.contains('cbx-hl'));
+  if(e.key==='ArrowDown'){ e.preventDefault(); idx=Math.min(items.length-1,idx+1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); idx=Math.max(0,idx<0?0:idx-1); }
+  else if(e.key==='Enter'){ e.preventDefault(); const pick=idx>=0?items[idx]:items[0]; if(pick) _cbxPick(wrap,pick.getAttribute('data-val')); return; }
+  else if(e.key==='Escape'){ e.preventDefault(); wrap.querySelector('.cbx-panel').style.display='none'; return; }
+  else return;
+  items.forEach(i=>{ i.classList.remove('cbx-hl'); i.style.background=i.getAttribute('data-val')===document.getElementById(wrap.getAttribute('data-for')).value?'rgba(0,210,255,0.12)':'transparent'; });
+  const cur=items[idx]; if(cur){ cur.classList.add('cbx-hl'); cur.style.background='rgba(0,210,255,0.2)'; cur.scrollIntoView({block:'nearest'}); }
+}
+document.addEventListener('click',()=>_cbxCloseAll());
 
 /* ═══ LEGEND ═══ */
 function buildLeg(elId){
@@ -8437,7 +8529,7 @@ function xlsDate(v){
 // Couleur d'un chantier/activité spéciale (pour les bandes multi-chantiers)
 function _chColor(cid){
   if(!cid) return '#2979ff';
-  if(cid==='STO') return '#ff9a3c';
+  if(cid==='STO'||cid.startsWith('STO_')) return '#ff9a3c';
   if(cid==='AIRBUS') return '#00a0ff';
   if(cid==='STRUCT') return '#6d8fb0';
   if(cid==='PROD') return '#2979ff';
@@ -8454,6 +8546,7 @@ function _chMsnLabel(cid){
   if(cid==='PROD') return '\ud83c\udfed PROD';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(t?t+' - ':'')+(av.msn||'?'); }
+  if(cid.startsWith('STO_')){ const av=(S.stockage?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\ud83c\udd7f\ufe0f STO'; const t=_avShort(av.type); return '\ud83c\udd7f\ufe0f '+(t?t+' - ':'')+(av.msn||'?'); }
   const ch=S.chantiers.find(c=>c.id===cid);
   if(!ch) return '\ud83d\udd27 Trav.';
   const t=_avShort(ch.avion);
@@ -8511,6 +8604,7 @@ function _chMsnShort(cid){
   if(cid==='PROD') return '\ud83c\udfed PROD';
   if(cid==='REC') return '\u267b\ufe0f REC';
   if(cid.startsWith('REC_')){ const av=(S.recycling?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\u267b\ufe0f REC'; const t=_avShort(av.type); return '\u267b\ufe0f '+(av.msn||'?')+(t?' \u00b7 '+t:''); }
+  if(cid.startsWith('STO_')){ const av=(S.stockage?.avions||[]).find(a=>a.id===cid.slice(4)); if(!av) return '\ud83c\udd7f\ufe0f STO'; const t=_avShort(av.type); return '\ud83c\udd7f\ufe0f '+(av.msn||'?')+(t?' \u00b7 '+t:''); }
   const ch=S.chantiers.find(c=>c.id===cid);
   if(!ch) return '\ud83d\udd27 Trav.';
   const t=_avShort(ch.avion);
@@ -8535,7 +8629,7 @@ function _dayRecap(ds){
       const nom=`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim();
       if(e.type==='travail'){
         [e.chantierId,e.chantierId2].filter(Boolean).forEach(cid=>{
-          const nm=cid==='STO'?'🅿️ Stockage':cid==='AIRBUS'?'✈️ Airbus Part 21':cid==='REC'?'♻️ Recyclage':cid==='STRUCT'?'🔩 Structure':(S.chantiers.find(c=>c.id===cid)?.nom|| (cid.startsWith('REC_')?'♻️ Recyclage':'Chantier'));
+          const nm=cid==='STO'?'🅿️ Stockage':cid?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===cid.slice(4));return a?`🅿️ ${a.type||'A/C'} MSN${a.msn||'?'}`:'🅿️ Stockage';})():cid==='AIRBUS'?'✈️ Airbus Part 21':cid==='REC'?'♻️ Recyclage':cid==='STRUCT'?'🔩 Structure':(S.chantiers.find(c=>c.id===cid)?.nom|| (cid.startsWith('REC_')?'♻️ Recyclage':'Chantier'));
           (byChantier[nm]=byChantier[nm]||new Set()).add(nom);
         });
         if(!e.chantierId&&!e.chantierId2){ (byChantier['🔧 Travail (non affecté)']=byChantier['🔧 Travail (non affecté)']||new Set()).add(nom); }
@@ -8624,6 +8718,12 @@ function buildGrid(emps,dates,containerId){
           color='#6effc4';
           label=av?`${av.type||'A/C'} — MSN ${av.msn||'?'}`:'Recyclage';
           icon='♻️';
+        } else if(cId && cId.startsWith('STO_')){
+          const avId=cId.slice(4);
+          const av=(S.stockage?.avions||[]).find(a=>a.id===avId);
+          color='#ff9a3c';
+          label=av?`${av.type||'A/C'} — MSN ${av.msn||'?'} (Stockage)`:'Stockage';
+          icon='🅿️';
         } else if(cId==='STO'){
           color='#ff9a3c';
           label='Stockage';
@@ -8725,7 +8825,7 @@ function buildGrid(emps,dates,containerId){
       const amRecAv=am.chantierId?.startsWith('REC_')?S.recycling?.avions?.find(a=>a.id===am.chantierId.slice(4)):null;
       const pmRecAv=pm.chantierId?.startsWith('REC_')?S.recycling?.avions?.find(a=>a.id===pm.chantierId.slice(4)):null;
       if(at==='travail'&&am.chantierId){
-        if(am.chantierId==='STO'){amStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
+        if(am.chantierId==='STO'||am.chantierId.startsWith('STO_')){amStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
         else if(amRecAv||am.chantierId==='REC'){amStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(am.chantierId==='AIRBUS'){amStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(am.chantierId==='STRUCT'){amStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
@@ -8733,7 +8833,7 @@ function buildGrid(emps,dates,containerId){
         else{const ch=S.chantiers.find(c=>c.id===am.chantierId);if(ch?.color){amStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`;}}
       }
       if(pt==='travail'&&pm.chantierId){
-        if(pm.chantierId==='STO'){pmStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
+        if(pm.chantierId==='STO'||pm.chantierId.startsWith('STO_')){pmStyle='background:rgba(255,154,60,0.18);color:#ff9a3c;';}
         else if(pmRecAv||pm.chantierId==='REC'){pmStyle='background:rgba(110,255,196,0.18);color:#6effc4;';}
         else if(pm.chantierId==='AIRBUS'){pmStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(pm.chantierId==='STRUCT'){pmStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
@@ -8763,7 +8863,7 @@ function buildGrid(emps,dates,containerId){
         :pt==='formation_int'?('📖'+(pm.formInt||'').slice(0,8))
         :(HD_LBL[pt]||'');
 
-      const getChNom=id=>id==='STO'?'Stockage':id==='AIRBUS'?'Airbus Part 21':id?.startsWith('REC_')?(()=>{const a=S.recycling?.avions?.find(x=>x.id===id.slice(4));return a?`♻️ ${a.type} MSN${a.msn}`:' Recyclage';})():id==='REC'?'Recyclage':S.chantiers.find(c=>c.id===id)?.nom||'';
+      const getChNom=id=>id==='STO'?'Stockage':id?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===id.slice(4));return a?`🅿️ ${a.type} MSN${a.msn}`:'Stockage';})():id==='AIRBUS'?'Airbus Part 21':id?.startsWith('REC_')?(()=>{const a=S.recycling?.avions?.find(x=>x.id===id.slice(4));return a?`♻️ ${a.type} MSN${a.msn}`:' Recyclage';})():id==='REC'?'Recyclage':S.chantiers.find(c=>c.id===id)?.nom||'';
       const amTitle=`${at||'Vide'}${am.note?' · '+am.note:am.chantierId?' · '+getChNom(am.chantierId):''}`;
       const pmTitle=`${pt||'Vide'}${pm.note?' · '+pm.note:pm.chantierId?' · '+getChNom(pm.chantierId):''}`;
 
@@ -9621,7 +9721,7 @@ function sortByChantier(personnel, weekDates){
   const chantierOrder = chId => {
     if(chId === 'zzz_sans_chantier') return 9;
     // Chantiers spéciaux (modules dédiés) regroupés avec un ordre stable
-    if(chId === 'STO') return 4;
+    if(chId === 'STO' || (chId && chId.startsWith('STO_'))) return 4;
     if(chId === 'REC' || (chId && chId.startsWith('REC_'))) return 4;
     if(chId === 'AIRBUS') return 4;
     const ch = S.chantiers.find(c => c.id === chId);
@@ -9632,6 +9732,10 @@ function sortByChantier(personnel, weekDates){
   const chantierNom = chId => {
     if(chId === 'zzz_sans_chantier') return 'zzz';
     if(chId === 'STO') return 'STO_Stockage';
+    if(chId && chId.startsWith('STO_')){
+      const av=(S.stockage?.avions||[]).find(a=>a.id===chId.slice(4));
+      return 'STO_'+(av?av.msn||av.type||chId:chId);
+    }
     if(chId === 'AIRBUS') return 'AIRBUS_Part21';
     if(chId === 'REC') return 'REC_Recyclage';
     if(chId && chId.startsWith('REC_')){
@@ -9688,7 +9792,7 @@ function _wkDrop(ev,cId){
 // Logique commune de réaffectation (glissé PC + bouton tactile)
 function _wkReassign(empId, cId){
   const emp=byId(empId); if(!emp) return;
-  const chNom=cId==='STO'?'Stockage':cId==='AIRBUS'?'Airbus Part 21':cId==='REC'?'Recyclage':cId==='STRUCT'?'Structure':(S.chantiers.find(c=>c.id===cId)?.nom||'ce chantier');
+  const chNom=cId==='STO'||cId?.startsWith('STO_')?'Stockage':cId==='AIRBUS'?'Airbus Part 21':cId==='REC'||cId?.startsWith('REC_')?'Recyclage':cId==='STRUCT'?'Structure':(S.chantiers.find(c=>c.id===cId)?.nom||'ce chantier');
   const dates=Array.from({length:7},(_,i)=>addD(S.weekStart,i));
   let toMove=0;
   dates.forEach(d=>['AM','PM'].forEach(h=>{ const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]; if(e&&e.type==='travail') toMove++; }));
@@ -9840,8 +9944,9 @@ function openCell(empId,dateStr,half){
   document.querySelector('.vmc')?.classList.toggle('sel',cellVM);
   document.getElementById('wrapVM').style.display=cellVM?'block':'none';
   document.getElementById('cellVMTime').value=ex.vm||'';
-  if(ex.chantierId)document.getElementById('cellChantier').value=ex.chantierId;
+  document.getElementById('cellChantier').value=ex.chantierId||'';
   const cc2=document.getElementById('cellChantier2'); if(cc2) cc2.value=ex.chantierId2||'';
+  try{ _cbxRefresh('cellChantier'); _cbxRefresh('cellChantier2'); }catch(_){}
   document.getElementById('cellNote').value=ex.note||'';
   document.getElementById('cellFormInt').value=ex.formInt||'';
   // Réinitialise le sélecteur "Appliquer à" et masque les sous-blocs à chaque ouverture
@@ -10065,7 +10170,7 @@ function _paintCellDOM(empId,ds,half){
   let style='';
   if(t==='travail'&&e.chantierId){
     const id=e.chantierId;
-    if(id==='STO') style='background:rgba(255,154,60,0.18);color:#ff9a3c;';
+    if(id==='STO'||id.indexOf('STO_')===0) style='background:rgba(255,154,60,0.18);color:#ff9a3c;';
     else if(id==='REC'||id.indexOf('REC_')===0) style='background:rgba(110,255,196,0.18);color:#6effc4;';
     else if(id==='AIRBUS') style='background:rgba(0,100,200,0.18);color:#00a0ff;';
     else { const ch=S.chantiers.find(c=>c.id===id); if(ch&&ch.color) style=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`; }
@@ -10421,6 +10526,7 @@ function saveChantier(){
     if(!S.stockage) S.stockage={avions:[],mhHebdo:{},config:{resp:'',chef:''}};
     if(!S.recycling) S.recycling={avions:[],piecesHebdo:{},config:{resp:'',chef:''}};
     const msnNew=data.msn||data.nom?.match(/MSN\s*(\w+)/i)?.[1]||'';
+    let _newRef='';   // référence planning de destination (préserve l'historique des affectations)
     if(destination==='stockage'){
       if(msnNew&&S.stockage.avions.find(a=>a.msn===msnNew&&a.id!==(editId||''))){alert(`⚠️ MSN ${msnNew} déjà dans le Stockage.`);return false;}
       // Supprimer du recyclage si existait
@@ -10429,6 +10535,7 @@ function saveChantier(){
       const entry={id:existing>=0?S.stockage.avions[existing].id:uid(),type:data.avion||data.nom,msn:msnNew,client:data.client||'',moteur:data.moteur||'',entree:data.debut||fmt(new Date()),arrivee:data.arrivee||'',statut:'parking',notes:data.desc||'',chantierInfo:{...data}};
       if(existing>=0) S.stockage.avions[existing]={...S.stockage.avions[existing],...entry};
       else S.stockage.avions.push(entry);
+      _newRef='STO_'+entry.id;
     } else {
       if(msnNew&&S.recycling.avions.find(a=>a.msn===msnNew&&a.id!==(editId||''))){alert(`⚠️ MSN ${msnNew} déjà dans le Recyclage.`);return false;}
       // Supprimer du stockage si existait
@@ -10438,6 +10545,15 @@ function saveChantier(){
       const entry={id:existing>=0?S.recycling.avions[existing].id:uid(),type:data.avion||data.nom,msn:msnNew,client:data.client||'',moteur:data.moteur||'',entree:data.debut||fmt(new Date()),finPrev:data.fin||'',finChantier:data.fin||'',debutChantier:data.debut||fmt(new Date()),statut:'attente',piecesParHeure:pph,notes:data.desc||''};
       if(existing>=0) S.recycling.avions[existing]={...S.recycling.avions[existing],...entry};
       else S.recycling.avions.push(entry);
+      _newRef='REC_'+entry.id;
+    }
+    // Préserver l'historique : remapper les affectations planning de l'ancien chantier vers la nouvelle référence
+    if(editId && _newRef){
+      Object.keys(S.planning||{}).forEach(k=>{
+        const e=S.planning[k]; if(!e) return;
+        if(e.chantierId===editId) e.chantierId=_newRef;
+        if(e.chantierId2===editId) e.chantierId2=_newRef;
+      });
     }
     // Si c'était un chantier, le retirer de la liste chantiers
     if(editId){const i=S.chantiers.findIndex(x=>x.id===editId);if(i>-1)S.chantiers.splice(i,1);}
@@ -20628,6 +20744,7 @@ function exportMasterPDF(){
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
     if(cId&&cId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'}`:'Recyclage',icon:'♻️',color:'#2e7d32'};}
+    if(cId&&cId.startsWith('STO_')){const av=(S.stockage?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'} (Stockage)`:'Stockage',icon:'🅿️',color:'#e65100'};}
     const ch=cId?S.chantiers.find(c=>c.id===cId):null;
     return{label:ch?ch.nom:'Sans chantier assigné',icon:ch?'🔧':'📋',color:ch?.color&&ch.color.startsWith('#')?ch.color:'#5a7090'};
   };
@@ -20716,6 +20833,7 @@ function exportWeekHtml(){
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
     if(cId&&cId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'}`:'Recyclage',icon:'♻️',color:'#2e7d32'};}
+    if(cId&&cId.startsWith('STO_')){const av=(S.stockage?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'} (Stockage)`:'Stockage',icon:'🅿️',color:'#e65100'};}
     const ch=cId?S.chantiers.find(c=>c.id===cId):null;
     return{label:ch?ch.nom:'Sans chantier assigné',icon:ch?'🔧':'📋',color:ch?.color&&ch.color.startsWith('#')?ch.color:'#5a7090'};
   };
@@ -20883,6 +21001,7 @@ function exportDayHtml(){
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
     if(cId&&cId.startsWith('REC_')){const av=(S.recycling?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'}`:'Recyclage',icon:'♻️',color:'#2e7d32'};}
+    if(cId&&cId.startsWith('STO_')){const av=(S.stockage?.avions||[]).find(a=>a.id===cId.slice(4));return{label:av?`${av.type||'A/C'} — MSN ${av.msn||'?'} (Stockage)`:'Stockage',icon:'🅿️',color:'#e65100'};}
     const ch=cId?S.chantiers.find(c=>c.id===cId):null;
     return{label:ch?ch.nom:'Sans chantier assigné',icon:ch?'🔧':'📋',color:ch?.color&&ch.color.startsWith('#')?ch.color:'#5a7090'};
   };
@@ -20994,6 +21113,7 @@ function _cellInfo(entry){
     if(id==='AIRBUS') return {txt:'PART 21',color:'00e5b0'};
     if(id==='REC') return {txt:'Recyclage',color:'00e5b0'};
     if(id.startsWith('REC_')){const a=(S.recycling?.avions||[]).find(x=>x.id===id.slice(4));return {txt:a?`♻️ ${a.type||''} ${a.msn||''}`.trim():'Recyclage',color:'00e5b0'};}
+    if(id.startsWith('STO_')){const a=(S.stockage?.avions||[]).find(x=>x.id===id.slice(4));return {txt:a?`🅿️ ${a.type||''} ${a.msn||''}`.trim():'STO',color:'ff9a3c'};}
     const ch=S.chantiers.find(c=>c.id===id);
     if(!ch) return {txt:'Travail',color:'1565c0'};
     const cl=(ch.client||'').trim();const nm=(ch.nom||'').trim();
