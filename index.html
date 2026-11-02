@@ -557,6 +557,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 /* Types */
 .ht{background:rgba(41,121,255,0.18);color:#82b1ff}
 .hco{background:rgba(0,229,176,0.16);color:var(--mint)}
+.hcop{background:repeating-linear-gradient(45deg,rgba(0,229,176,0.14),rgba(0,229,176,0.14) 5px,rgba(0,229,176,0.04) 5px,rgba(0,229,176,0.04) 10px);color:#7fffd4;border:1px dashed rgba(0,229,176,0.5)!important}
 .hm{background:rgba(255,77,109,0.16);color:var(--rose)}
 .hfo{background:rgba(255,208,96,0.32);color:var(--gold)}
 .hfi{background:rgba(224,168,46,0.32);color:#e0a82e}
@@ -2865,6 +2866,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="type-grid" id="typeGrid">
     <button class="tc" data-t="travail"    onclick="pickType(this)">✈️<br>Travail</button>
     <button class="tc" data-t="conge"      onclick="pickType(this)">🏖️<br>Congé</button>
+    <button class="tc" data-t="conge_prev" onclick="pickType(this)">📝<br>Congé prévis.</button>
     <button class="tc" data-t="maladie"    onclick="pickType(this)">🏥<br>Maladie</button>
     <button class="tc" data-t="formation"  onclick="pickType(this)">📚<br>Formation ext.</button>
     <button class="tc" data-t="formation_int"  onclick="pickType(this)">📖<br>Formation interne</button>
@@ -3050,8 +3052,29 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-cell')">Annuler</button>
     <button class="btn btn-ghost" onclick="armBrush()">🖌 Copier vers d'autres</button>
-    <button class="btn btn-cyan" onclick="saveCellEdit()">Valider</button>
+    <button class="btn btn-sm" id="cellValiderCongeBtn" onclick="validerCongePrevCell()" style="display:none;background:linear-gradient(135deg,#00c98a,#34d399);color:#06251b;border:none;font-weight:800">✓ Valider le congé</button>
+    <button class="btn btn-cyan" id="cellSaveBtn" onclick="saveCellEdit()">Valider</button>
   </div>
+</div>
+</div>
+
+<!-- Demandes de congé prévisionnel -->
+<div class="mbg" id="m-conge-prev">
+<div class="modal" style="max-width:560px">
+  <div class="modal-title">📝 Demandes de congé à valider</div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Valide (→ congé ferme) ou refuse chaque demande, à l'unité.</div>
+  <div id="conge-prev-list" style="max-height:60vh;overflow-y:auto"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-conge-prev')">Fermer</button></div>
+</div>
+</div>
+
+<!-- Seuils de congés par catégorie -->
+<div class="mbg" id="m-conge-seuils">
+<div class="modal" style="max-width:460px">
+  <div class="modal-title">⚙️ Seuils de congés par catégorie</div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Nombre max de personnes en congé (validé + demandé) la même semaine. Laisse vide = pas de limite. Une alerte s'affiche si dépassé.</div>
+  <div id="conge-seuils-list" style="max-height:55vh;overflow-y:auto"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-conge-seuils')">Annuler</button><button class="btn btn-cyan" onclick="saveCongeSeuils()">Enregistrer</button></div>
 </div>
 </div>
 
@@ -3855,8 +3878,8 @@ const CATS = {
   iq:         {lbl:'Insp. Qualité',         col:'#00a0ff', b:'b-iq'},
 };
 const SBADGE = {valid:'<span class="badge bv">✓ Valide</span>',warning:'<span class="badge bw">⚠ Bientôt</span>',expired:'<span class="badge be">✗ Expiré</span>',na:'<span class="badge bn">∞ Illimité</span>'};
-const HD_CSS = {travail:'ht',conge:'hco',maladie:'hm',formation:'hfo',formation_int:'hfi',absence:'hab',deplacement:'hdp',we:'hwe',ferie:'hfe',''  :''};
-const HD_LBL = {travail:'Travail',conge:'Congé',maladie:'Maladie',formation:'Form. ext.',formation_int:'Form. interne',absence:'Absence',deplacement:'Dépl.',we:'W-E',ferie:'Férié','':''};
+const HD_CSS = {travail:'ht',conge:'hco',conge_prev:'hcop',maladie:'hm',formation:'hfo',formation_int:'hfi',absence:'hab',deplacement:'hdp',we:'hwe',ferie:'hfe',''  :''};
+const HD_LBL = {travail:'Travail',conge:'Congé',conge_prev:'Congé ?',maladie:'Maladie',formation:'Form. ext.',formation_int:'Form. interne',absence:'Absence',deplacement:'Dépl.',we:'W-E',ferie:'Férié','':''};
 
 /* ═══ STATE ═══ */
 let S = {
@@ -3880,7 +3903,7 @@ let S = {
   realBreak:{},        // {chantierId_YYYY-MM-DD: {w:{wp:h}, s:{spec:h}, m:{nature:h}, o:{wo:h}}}
   woLbl:{},            // {wo: {j:libellé, w:workpack}} — dictionnaire partagé des ordres de travail
 };
-let cellCtx=null, cellType='', cellVM=false;
+let cellCtx=null, cellType='', cellVM=false, cellOrigType='';
 
 /* ═══ UTILS ═══ */
 const uid   = ()=>'x'+Date.now()+Math.random().toString(36).slice(2,5);
@@ -7185,6 +7208,7 @@ function buildLeg(elId){
   const items=[
     {bg:"rgba(41,121,255,0.18)",  fg:"#82b1ff",  l:"Travail"},
     {bg:"rgba(0,229,176,0.16)",   fg:"var(--mint)",l:"Congé"},
+    {bg:"repeating-linear-gradient(45deg,rgba(0,229,176,0.14),rgba(0,229,176,0.14) 4px,rgba(0,229,176,0.03) 4px,rgba(0,229,176,0.03) 8px)", fg:"#7fffd4",l:"Congé prévis. (demande)"},
     {bg:"rgba(255,77,109,0.16)",  fg:"var(--rose)",l:"Maladie"},
     {bg:"rgba(255,208,96,0.18)",  fg:"var(--gold)",l:"Formation"},
     {bg:"rgba(255,154,60,0.16)",  fg:"var(--orange)",l:"Absence"},
@@ -9272,7 +9296,7 @@ function _plCopy(){
 }
 // Garde-fou copier/coller : ces événements ponctuels sont prioritaires et ne doivent jamais
 // être écrasés par un collage/remplissage (ils restent modifiables en cliquant la case).
-const PL_PROTECT=new Set(['conge','maladie','formation','formation_int','absence','deplacement']);
+const PL_PROTECT=new Set(['conge','conge_prev','maladie','formation','formation_int','absence','deplacement']);
 function _plIsProtected(k){ const e=S.planning[k]; return !!(e&&PL_PROTECT.has(e.type)); }
 // Garde-fou contrat : vrai si la date est hors de la période de contrat de l'employé (avant début ou après fin)
 function _plHorsContrat(empId, ds){
@@ -9908,8 +9932,38 @@ function _renderWeekSummary(dates, wlist){
     else if(vide>0 && travail>0) partiels.push({nom,vide});
   });
 
+  // ── Congés de la semaine par catégorie (validés + prévisionnels) avec seuil ──
+  const _seuils=S.congeSeuils||{};
+  const _byCat={};
+  (S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&_presentSemaine(p,_wStart,_wEnd)).forEach(p=>{
+    let hasVal=false, hasPrev=false;
+    dates.forEach(d=>['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${fmt(d)}_${h}`]; if(e&&e.type==='conge')hasVal=true; if(e&&e.type==='conge_prev')hasPrev=true; }));
+    if(hasVal||hasPrev){ const c=p.categorie||'autre'; (_byCat[c]=_byCat[c]||{val:0,prev:0}); if(hasVal)_byCat[c].val++; if(hasPrev)_byCat[c].prev++; }
+  });
+  const _catOrder=(typeof CATS!=='undefined')?Object.keys(CATS):[];
+  const _catsPresent=Object.keys(_byCat).sort((a,b)=>{const ia=_catOrder.indexOf(a),ib=_catOrder.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return a.localeCompare(b);});
+  let _anyAlert=false;
+  const _congeLines=_catsPresent.map(c=>{
+    const o=_byCat[c]; const tot=o.val+o.prev; const seuil=parseInt(_seuils[c]); const over=!isNaN(seuil)&&seuil>0&&tot>seuil;
+    if(over)_anyAlert=true;
+    const lbl=(typeof _dayExtractCatLbl==='function')?_dayExtractCatLbl(c):c;
+    return `<div style="font-size:11px;line-height:1.7;color:#cfe0f5">${over?'⚠ ':''}<b style="color:${over?'#ff6b85':'#cfe0f5'}">${lbl}</b> : <b style="color:#34c759">${o.val}</b> validé${o.val>1?'s':''} + <b style="color:#7fffd4">${o.prev}</b> demandé${o.prev>1?'s':''}${!isNaN(seuil)&&seuil>0?` <span style="color:#8090a8">/ max ${seuil}</span>`:''}</div>`;
+  }).join('');
+  const _congeBorder=_anyAlert?'#ff6b85':'#7fffd4';
+  const congeCard=`<div style="background:rgba(255,255,255,0.04);border:1px solid ${_congeBorder}44;border-left:3px solid ${_congeBorder};border-radius:10px;padding:11px 14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px">
+      <div style="font-size:11px;font-weight:800;color:${_congeBorder};text-transform:uppercase;letter-spacing:.4px">🏖️ Congés de la semaine</div>
+      <div style="display:flex;gap:4px">
+        <button onclick="openCongePrevList()" title="Demandes de congé à valider" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);border-radius:7px;color:var(--cyan);padding:3px 7px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📝 Demandes</button>
+        <button onclick="openCongeSeuils()" title="Régler les seuils par catégorie" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:7px;color:var(--t2);padding:3px 7px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">⚙️</button>
+      </div>
+    </div>
+    ${_congeLines||'<div style="font-size:11px;color:#8090a8">Aucun congé ni demande cette semaine</div>'}
+  </div>`;
+
   const tensionCol=manque===0?'#34c759':manque<=2?'#ffb45c':'#ff6b85';
   host.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px">
+    ${congeCard}
     <div style="background:rgba(255,255,255,0.04);border:1px solid ${tensionCol}44;border-left:3px solid ${tensionCol};border-radius:10px;padding:11px 14px">
       <div style="font-size:11px;font-weight:800;color:${tensionCol};text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">📊 Tension de la semaine</div>
       <div style="font-size:12px;color:#cfe0f5;line-height:1.6"><b style="color:#34c759">${complet}</b> chantier(s) bien staffé(s) · <b style="color:${manque?'#ff6b85':'#8090a8'}">${manque}</b> en manque</div>
@@ -9926,6 +9980,85 @@ function _renderWeekSummary(dates, wlist){
   </div>`;
 }
 
+/* ═══ CONGÉ PRÉVISIONNEL : demandes + seuils ═══ */
+// Regroupe les demi-journées conge_prev en demandes (par personne, plages de jours contiguës, week-ends/fériés pontés)
+function _collectCongePrev(){
+  const byEmp={};
+  Object.keys(S.planning||{}).forEach(k=>{ const e=S.planning[k]; if(!e||e.type!=='conge_prev')return; const parts=k.split('_'); const id=parts[0]; const ds=parts.slice(1,-1).join('_'); (byEmp[id]=byEmp[id]||new Set()).add(ds); });
+  const reqs=[];
+  Object.keys(byEmp).forEach(id=>{
+    const days=[...byEmp[id]].sort(); if(!days.length) return;
+    let start=days[0], prev=days[0];
+    for(let i=1;i<days.length;i++){
+      const d=parseLocal(days[i]), pd=parseLocal(prev);
+      let bridge=true; let probe=addD(pd,1);
+      while(probe<d){ const wd=probe.getDay(); if(wd!==0&&wd!==6&&!isHol(fmt(probe))){bridge=false;break;} probe=addD(probe,1); }
+      if(bridge){ prev=days[i]; } else { reqs.push({empId:id,from:start,to:prev}); start=days[i]; prev=days[i]; }
+    }
+    reqs.push({empId:id,from:start,to:prev});
+  });
+  // tri par date de début puis nom
+  reqs.sort((a,b)=> a.from<b.from?-1:a.from>b.from?1:((byId(a.empId)?.nom||'').localeCompare(byId(b.empId)?.nom||'')));
+  return reqs;
+}
+function _congeJoursOuvres(from,to){ let n=0,c=parseLocal(from),f=parseLocal(to); while(c<=f){ const wd=c.getDay(); if(wd!==0&&wd!==6&&!isHol(fmt(c)))n++; c=addD(c,1); } return n; }
+function openCongePrevList(){
+  const el=document.getElementById('conge-prev-list'); if(!el) return;
+  const reqs=_collectCongePrev();
+  if(!reqs.length){ el.innerHTML='<div style="padding:24px;text-align:center;color:var(--t4);font-size:13px">Aucune demande de congé en attente ✅</div>'; }
+  else{
+    el.innerHTML=reqs.map(r=>{
+      const p=byId(r.empId); const nom=p?`${p.nom} ${p.prenom}`:'?'; const cat=(typeof _dayExtractCatLbl==='function')?_dayExtractCatLbl(p?.categorie):'';
+      const nj=_congeJoursOuvres(r.from,r.to);
+      const same=r.from===r.to;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--t1)">${nom} <span style="font-size:10px;color:var(--t4);font-weight:500">${cat}</span></div>
+          <div style="font-size:11px;color:#7fffd4;margin-top:1px">📝 ${same?disp(r.from):`${disp(r.from)} → ${disp(r.to)}`} <span style="color:#8090a8">· ${nj} j ouvré${nj>1?'s':''}</span></div>
+        </div>
+        <button onclick="_congePrevApply('${r.empId}','${r.from}','${r.to}','valid')" title="Valider" style="background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.4);border-radius:8px;color:#34d399;padding:6px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap">✓ Valider</button>
+        <button onclick="_congePrevApply('${r.empId}','${r.from}','${r.to}','refuse')" title="Refuser" style="background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.3);border-radius:8px;color:#ff6b85;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap">✗</button>
+      </div>`;
+    }).join('');
+  }
+  openM('m-conge-prev');
+}
+function _congePrevApply(empId,from,to,action,reopen){
+  let n=0;
+  Object.keys(S.planning||{}).forEach(k=>{ const e=S.planning[k]; if(!e||e.type!=='conge_prev')return; const parts=k.split('_'); if(parts[0]!==empId)return; const ds=parts.slice(1,-1).join('_'); if(ds<from||ds>to)return; if(action==='valid'){ e.type='conge'; } else { delete S.planning[k]; } n++; });
+  save();
+  try{ if(typeof renderWeekly==='function') renderWeekly(); if(typeof renderMaster==='function') renderMaster(); }catch(_){}
+  if(reopen!==false) openCongePrevList();
+  try{ toast(action==='valid'?`✅ Congé validé (${n} demi-j.)`:`✗ Demande refusée`); }catch(_){}
+}
+function openCongeSeuils(){
+  const el=document.getElementById('conge-seuils-list'); if(!el) return;
+  if(!S.congeSeuils) S.congeSeuils={};
+  const cats=[...new Set((S.personnel||[]).filter(p=>p.actif!==false).map(p=>p.categorie||'autre'))];
+  const ref=(typeof CATS!=='undefined')?Object.keys(CATS):[];
+  cats.sort((a,b)=>{const ia=ref.indexOf(a),ib=ref.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return a.localeCompare(b);});
+  el.innerHTML=cats.map(c=>{
+    const lbl=(typeof _dayExtractCatLbl==='function')?_dayExtractCatLbl(c):c;
+    const val=(S.congeSeuils[c]!=null&&S.congeSeuils[c]!=='')?S.congeSeuils[c]:'';
+    const nb=(S.personnel||[]).filter(p=>p.actif!==false&&(p.categorie||'autre')===c).length;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="flex:1;font-size:13px;color:var(--t1)">${lbl} <span style="font-size:10px;color:var(--t4)">(${nb} pers.)</span></div>
+      <input type="number" min="0" data-cat="${c}" value="${val}" placeholder="—" style="width:70px;padding:6px 8px;border-radius:8px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.05);color:var(--t1);font-size:13px;text-align:center">
+    </div>`;
+  }).join('')||'<div style="color:var(--t4);font-size:12px">Aucune catégorie</div>';
+  openM('m-conge-seuils');
+}
+function saveCongeSeuils(){
+  if(!S.congeSeuils) S.congeSeuils={};
+  document.querySelectorAll('#conge-seuils-list input[data-cat]').forEach(inp=>{
+    const c=inp.getAttribute('data-cat'); const v=inp.value.trim();
+    if(v==='') delete S.congeSeuils[c]; else S.congeSeuils[c]=parseInt(v)||0;
+  });
+  save(); closeM('m-conge-seuils');
+  try{ if(typeof renderWeekly==='function') renderWeekly(); }catch(_){}
+  try{ toast('✅ Seuils enregistrés'); }catch(_){}
+}
+
 /* ═══ CELL EDIT ═══ */
 function openCell(empId,dateStr,half){
   if(window.PLSEL&&PLSEL.active) return; // mode sélection : le tap gère la sélection, pas l'édition
@@ -9933,7 +10066,7 @@ function openCell(empId,dateStr,half){
   cellCtx={empId,dateStr,half};
   try{popSelects();}catch(e){console.warn('popSelects openCell:',e);} // options à jour (stockage/recyclage/chantiers)
   const k=`${empId}_${dateStr}_${half}`;const ex=S.planning[k]||{};
-  cellType=ex.type||'';
+  cellType=ex.type||''; cellOrigType=ex.type||'';
   const emp=byId(empId);const isH=isHol(dateStr);const isW=isWE(dateStr);
   document.getElementById('cellTitle').textContent=`${emp?.trigramme||'?'} · ${disp(dateStr)} · ${half==='AM'?'☀ Matin':'🌤 Après-midi'}${isH?' 🎉':isW?' 📅':''}`;
   document.querySelectorAll('.tc:not(.vmc)').forEach(b=>b.classList.toggle('sel',b.dataset.t===cellType));
@@ -9955,7 +10088,15 @@ function openCell(empId,dateStr,half){
   const _rs=document.getElementById('cellRangeStart'), _re=document.getElementById('cellRangeEnd');
   if(_rs) _rs.value=''; if(_re) _re.value='';
   toggleCellApplyOptions('one');
+  _syncCongePrevBtn();
   openM('m-cell');
+}
+function _syncCongePrevBtn(){
+  // La case a été ouverte sur une demande déjà enregistrée ET on est toujours sur "congé prévisionnel"
+  // → uniquement le bouton vert "Valider le congé" (on masque le "Valider" bleu, inutile ici).
+  const onlyValider = (cellOrigType==='conge_prev' && cellType==='conge_prev');
+  const g=document.getElementById('cellValiderCongeBtn'); if(g) g.style.display=onlyValider?'':'none';
+  const s=document.getElementById('cellSaveBtn'); if(s) s.style.display=onlyValider?'none':'';
 }
 function pickType(btn){
   cellType=btn.dataset.t;
@@ -9964,6 +10105,21 @@ function pickType(btn){
   document.getElementById('wrapNote').style.display=(['formation','absence','deplacement'].includes(cellType))?'block':'none';
   document.getElementById('wrapFormInt').style.display=cellType==='formation_int'?'block':'none';
   if(!cellType){ cellVM=false; document.querySelector('.vmc')?.classList.remove('sel'); document.getElementById('wrapVM').style.display='none'; document.getElementById('cellVMTime').value=''; }
+  _syncCongePrevBtn();
+}
+// Valide TOUTE la demande de congé contiguë qui contient la case ouverte : conge_prev → conge
+function validerCongePrevCell(){
+  if(!cellCtx){ return; }
+  const {empId,dateStr}=cellCtx;
+  const req=_collectCongePrev().find(r=>r.empId===empId && r.from<=dateStr && r.to>=dateStr);
+  closeM('m-cell'); cellCtx=null;
+  if(req){ _congePrevApply(empId, req.from, req.to, 'valid', false); }
+  else {
+    // repli : valider au moins la case ouverte (AM+PM du jour)
+    ['AM','PM'].forEach(h=>{ const k=`${empId}_${dateStr}_${h}`; const e=S.planning[k]; if(e&&e.type==='conge_prev') e.type='conge'; });
+    save(); try{ if(typeof renderWeekly==='function') renderWeekly(); if(typeof renderMaster==='function') renderMaster(); }catch(_){}
+    try{ toast('✅ Congé validé'); }catch(_){}
+  }
 }
 function toggleVM(btn){
   cellVM=!cellVM;
@@ -10025,7 +10181,7 @@ function saveCellEdit(){
     const avant  = cStart && dateStr < cStart;   // avant le début de contrat (pas encore là)
     const apres  = cEnd   && dateStr > cEnd;      // après la fin de contrat (parti)
     if(emp && (avant||apres)){
-      const actLbl = cellType==='formation_int'||cellType==='formation' ? 'former' : (['conge','maladie','absence','deplacement'].includes(cellType) ? 'poser une absence à' : 'affecter');
+      const actLbl = cellType==='formation_int'||cellType==='formation' ? 'former' : (['conge','conge_prev','maladie','absence','deplacement'].includes(cellType) ? 'poser une absence à' : 'affecter');
       const periode = (cStart&&cEnd) ? `du ${disp(cStart)} au ${disp(cEnd)}` : (cEnd?`jusqu'au ${disp(cEnd)}`:`à partir du ${disp(cStart)}`);
       const quand = avant ? `avant le début de son contrat (${disp(cStart)})` : `après la fin de son contrat (${disp(cEnd)})`;
       confirmDel(
@@ -20718,9 +20874,9 @@ function exportMasterPDF(){
   if(!empF) emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
   if(!empF){ const hid=Array.isArray(S.masterHiddenCats)?S.masterHiddenCats:[]; if(hid.length) emps=emps.filter(p=>!hid.includes(p.categorie||'autre')); }
   const D1=['L','M','M','J','V','S','D'];
-  const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',formation_int:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
-  const LBL={conge:'C',maladie:'M',formation:'F',formation_int:'Fi',absence:'A',deplacement:'D',ferie:'♦',we:''};
-  const LBL_FULL={conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'Week-end'};
+  const COLS={travail:'#1565c0',conge:'#2e7d32',conge_prev:'#1a9e7a',maladie:'#c62828',formation:'#6a1b9a',formation_int:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
+  const LBL={conge:'C',conge_prev:'C?',maladie:'M',formation:'F',formation_int:'Fi',absence:'A',deplacement:'D',ferie:'♦',we:''};
+  const LBL_FULL={conge:'Congé',conge_prev:'Congé (demande)',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'Week-end'};
 
   // libellé complet + couleur d'une demi-journée
   const cellLabel=(e,isW,isH)=>{
@@ -20801,8 +20957,8 @@ function exportWeekHtml(){
   const JOURS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   let emps=sortByChantier(S.personnel.filter(p=>p.actif!==false),dates).concat(sortPersonnel(_inactifsAvecPlanning(dates)));
   { const whid=Array.isArray(S.weeklyHiddenCats)?S.weeklyHiddenCats:[]; if(whid.length) emps=emps.filter(p=>!whid.includes(p.categorie||'autre')); }
-  const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
-  const LBL={conge:'Congé',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'};
+  const COLS={travail:'#1565c0',conge:'#2e7d32',conge_prev:'#1a9e7a',maladie:'#c62828',formation:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
+  const LBL={conge:'Congé',conge_prev:'Congé ?',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'};
 
   // Libellé d'une cellule selon le chantier/type
   const cellLabel=(e,isW,isH)=>{
@@ -20973,8 +21129,8 @@ function exportDayHtml(){
   const _hid=Array.isArray(S.dayExtractHidden)?S.dayExtractHidden:[];
   const _catOk=p=>!_hid.includes(p.categorie||'autre');
   const emps=sortByChantier(S.personnel.filter(p=>p.actif!==false&&_catOk(p)),[d]).concat(sortPersonnel(_inactifsAvecPlanning([d]).filter(_catOk)));
-  const COLS={travail:'#1565c0',conge:'#2e7d32',maladie:'#c62828',formation:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
-  const LBL={conge:'Congé',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'};
+  const COLS={travail:'#1565c0',conge:'#2e7d32',conge_prev:'#1a9e7a',maladie:'#c62828',formation:'#6a1b9a',absence:'#e65100',deplacement:'#0277bd',ferie:'#f9a825',we:'#90a4ae'};
+  const LBL={conge:'Congé',conge_prev:'Congé ?',maladie:'Maladie',formation:'Formation',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'};
 
   const cellLabel=(e,isW,isH)=>{
     const t=e.type||(isH?'ferie':isW?'we':'');
@@ -21032,7 +21188,7 @@ function exportDayHtml(){
   // ── Synthèse enrichie de la journée ──
   const actifs=S.personnel.filter(p=>p.actif!==false&&!p.archived);
   let nbTravail=0; const absParMotif={}; const vmList=[]; const chStaff={};
-  const ABSL={conge:'Congé',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',absence:'Absence',deplacement:'Déplacement'};
+  const ABSL={conge:'Congé',conge_prev:'Congé (demande)',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',absence:'Absence',deplacement:'Déplacement'};
   actifs.forEach(p=>{
     let works=false;
     ['AM','PM'].forEach(h=>{
@@ -21099,7 +21255,7 @@ function exportWeekXls(){
 // Récupère le libellé + la couleur d'une demi-journée (comme dans le planning)
 function _cellInfo(entry){
   if(!entry||!entry.type) return {txt:'',color:null};
-  const COLS={conge:'2e7d32',maladie:'c62828',formation:'6a1b9a',formation_int:'6a1b9a',absence:'e65100',deplacement:'0277bd',ferie:'f9a825',we:'90a4ae'};
+  const COLS={conge:'2e7d32',conge_prev:'1a9e7a',maladie:'c62828',formation:'6a1b9a',formation_int:'6a1b9a',absence:'e65100',deplacement:'0277bd',ferie:'f9a825',we:'90a4ae'};
   if(entry.type==='travail'){
     const id=entry.chantierId;
     if(!id) return {txt:'Travail',color:'1565c0'};
@@ -21126,7 +21282,7 @@ function _cellInfo(entry){
   }
   if(entry.type==='formation_int') return {txt:(entry.formInt||'Formation'),color:'6a1b9a'};
   if(entry.type==='formation') return {txt:(entry.note||'Formation'),color:'6a1b9a'};
-  const lbl={conge:'Congé',maladie:'Maladie',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'}[entry.type]||entry.type;
+  const lbl={conge:'Congé',conge_prev:'Congé ?',maladie:'Maladie',absence:'Absence',deplacement:'Déplacement',ferie:'Férié',we:'W-E'}[entry.type]||entry.type;
   return {txt:entry.note||lbl,color:COLS[entry.type]||null};
 }
 
