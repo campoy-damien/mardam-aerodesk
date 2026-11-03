@@ -1199,6 +1199,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <button class="fam-btn" id="fam-avions" onclick="selectFamily('avions')">✈️ Activité avions</button>
   <button class="fam-btn" id="fam-personnel" onclick="selectFamily('personnel')">👥 Personnel</button>
   <button class="fam-btn" id="fam-outils" onclick="selectFamily('outils')">🔧 Outils</button>
+  <span class="fam-sep"></span>
+  <button class="fam-btn" id="fam-guide" onclick="openGuideForCurrentTab()" title="Guide pas à pas de l'onglet affiché" style="margin-left:auto;border-color:rgba(124,92,255,0.55);color:#c7b8ff">❓ Aide</button>
 </div>
 <div class="tab-scroll" id="tabScroll">
   <button class="tab active" id="tb-dashboard" data-fam="home" onclick="goTab('dashboard')">🏠 Tableau de bord</button>
@@ -1244,6 +1246,15 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="gc-head">
       <div class="gc-title">⚠️ Alertes actives</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <div style="position:relative;display:inline-block">
+          <button class="btn btn-ghost btn-sm" id="alert-cats-btn" onclick="_toggleAlertCatsPanel(event)" title="Filtrer les alertes formations/autorisations par catégorie">👥 Catégories ▾</button>
+          <div id="alert-cats-panel" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:400;min-width:250px;max-height:340px;overflow-y:auto;background:rgba(14,21,40,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.45);padding:10px">
+            <div style="font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Catégories à afficher</div>
+            <div id="alert-cats-chips" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+            <div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_alertCatsAll(true)">Tout</button><button type="button" class="btn btn-ghost btn-xs" style="flex:1" onclick="event.stopPropagation();_alertCatsAll(false)">Aucun</button></div>
+            <div style="font-size:10px;color:var(--t4);margin-top:8px;line-height:1.5">Ne filtre que les alertes formations, autorisations et licences. Les tâches restent affichées.</div>
+          </div>
+        </div>
         <button class="btn btn-ghost btn-sm" onclick="_exportAlertsPdf()" title="Exporter les alertes en PDF">📄 PDF</button>
         <button class="btn btn-ghost btn-sm" onclick="_exportAlertsXls()" title="Exporter les alertes en Excel">📊 Excel</button>
         <button class="btn btn-ghost btn-sm" onclick="goTab('formations')">Voir formations →</button>
@@ -2995,10 +3006,6 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div><!-- /pg-notice -->
 
 </div><!-- /body -->
-
-<!-- Bouton d'aide flottant : ouvre le guide sur l'onglet courant -->
-<button id="guide-fab" onclick="openGuideForCurrentTab()" title="Guide pas à pas de cet onglet"
-  style="position:fixed;right:18px;bottom:18px;z-index:9998;width:48px;height:48px;border-radius:50%;border:1px solid rgba(96,180,255,0.5);background:linear-gradient(135deg,#2979ff,#00a0ff);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif">?</button>
 
 <!-- ═══════════ MODALS ═══════════ -->
 
@@ -7933,14 +7940,14 @@ function renderDash(){
   _dedupeByEmpType(S.formations||[]).forEach(f=>{
     const st=tSt(f.dateExpiration); const emp=byId(f.empId); if(!emp)return;
     if(_empHorsEffectif(f.empId))return; // plus dans les effectifs → pas de rappel
-    if(st==='expired') alerts.push({cls:'red',ic:'🚨',t:`Formation expirée : ${f.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});
-    else if(st==='warning'){const d=Math.ceil((new Date(f.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'⏰',t:`Formation expire dans ${d}j : ${f.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`});}
+    if(st==='expired') alerts.push({cls:'red',ic:'🚨',t:`Formation expirée : ${f.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`,cat:emp.categorie});
+    else if(st==='warning'){const d=Math.ceil((new Date(f.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'⏰',t:`Formation expire dans ${d}j : ${f.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(f.dateExpiration)}`,action:`goFormUpdate('${f.id}')`,cat:emp.categorie});}
   });
   _dedupeByEmpType(S.autorisations||[]).forEach(a=>{
     const st=tSt(a.dateExpiration); const emp=byId(a.empId); if(!emp)return;
     if(_empHorsEffectif(a.empId))return; // plus dans les effectifs → pas de rappel
-    if(st==='expired') alerts.push({cls:'red',ic:'🛡',t:`Autorisation expirée : ${a.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`});
-    else if(st==='warning'){const d=Math.ceil((new Date(a.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'🛡',t:`Autorisation expire dans ${d}j : ${a.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`});}
+    if(st==='expired') alerts.push({cls:'red',ic:'🛡',t:`Autorisation expirée : ${a.type}`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`,cat:emp.categorie});
+    else if(st==='warning'){const d=Math.ceil((new Date(a.dateExpiration)-T)/86400000);alerts.push({cls:'gold',ic:'🛡',t:`Autorisation expire dans ${d}j : ${a.type}`,s:`${emp.prenom} ${emp.nom} · ${disp(a.dateExpiration)}`,action:`goAutoUpdate('${a.id}')`,cat:emp.categorie});}
   });
   // Licence Part 66 (Certifying Staff)
   (S.certifiants||[]).forEach(c=>{
@@ -7948,8 +7955,8 @@ function renderDash(){
     const emp=byId(c.empId); if(!emp) return;
     if(_empHorsEffectif(c.empId)) return;
     const st=tSt(c.licExp);
-    if(st==='expired') alerts.push({cls:'red',ic:'🛫',t:`Licence Part 66 expirée`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`});
-    else if(st==='warning'){const d=Math.ceil((new Date(c.licExp)-T)/86400000);alerts.push({cls:'gold',ic:'🛫',t:`Licence Part 66 expire dans ${d}j`,s:`${emp.prenom} ${emp.nom} · ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`});}
+    if(st==='expired') alerts.push({cls:'red',ic:'🛫',t:`Licence Part 66 expirée`,s:`${emp.prenom} ${emp.nom} · depuis le ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`,cat:emp.categorie});
+    else if(st==='warning'){const d=Math.ceil((new Date(c.licExp)-T)/86400000);alerts.push({cls:'gold',ic:'🛫',t:`Licence Part 66 expire dans ${d}j`,s:`${emp.prenom} ${emp.nom} · ${disp(c.licExp)}`,action:`openCertifFiche('${c.empId}')`,cat:emp.categorie});}
   });
   S.todos.filter(t=>!t.done).forEach(t=>{
     const dueVal=t.dueDate||t.due;
@@ -7988,9 +7995,17 @@ function renderDash(){
     });
     if(over){
       const lbl={travail:'affecté',formation:'en formation',formation_int:'en formation',conge:'en congé',maladie:'en arrêt',absence:'absent',deplacement:'en déplacement'}[overType]||'planifié';
-      alerts.push({cls:'red',ic:'⏳',t:`${emp.prenom} ${emp.nom} planifié après fin de contrat`,s:`${emp.contrat||'Contrat'} jusqu'au ${disp(finStr)} · ${lbl} dès le ${disp(over)}`});
+      alerts.push({cls:'red',ic:'⏳',t:`${emp.prenom} ${emp.nom} planifié après fin de contrat`,s:`${emp.contrat||'Contrat'} jusqu'au ${disp(finStr)} · ${lbl} dès le ${disp(over)}`,cat:emp.categorie});
     }
   });
+  // Compteurs par catégorie (alertes liées à une personne) — pour le sélecteur
+  window._alertCatCounts={};
+  alerts.forEach(a=>{ if(a.cat){ window._alertCatCounts[a.cat]=(window._alertCatCounts[a.cat]||0)+1; } });
+  // Filtrer selon les catégories masquées (les alertes sans catégorie, ex. tâches, restent toujours visibles)
+  if(!Array.isArray(S.alertHiddenCats)) S.alertHiddenCats=[];
+  const _alHidden=new Set(S.alertHiddenCats);
+  const alertsF = alerts.filter(a=> !a.cat || !_alHidden.has(a.cat));
+
   // Grouper les alertes par catégorie
   const groups={
     formations_exp:   {ic:'🚨',title:'Formations expirées',       col:'#ff4d6d',bg:'rgba(255,77,109,0.08)',  items:[]},
@@ -8004,7 +8019,7 @@ function renderDash(){
     todos_pending:    {ic:'📋',title:'Tâches en attente (+7j)',   col:'#82b1ff',bg:'rgba(130,177,255,0.08)',items:[]},
     contrat_fin:      {ic:'⏳',title:'Planifiés après fin de contrat',col:'#ff4d6d',bg:'rgba(255,77,109,0.08)',items:[]},
   };
-  alerts.forEach(a=>{
+  alertsF.forEach(a=>{
     if(a.ic==='⏳') groups.contrat_fin.items.push(a);
     else if(a.ic==='🚨') groups.formations_exp.items.push(a);
     else if(a.ic==='⏰') groups.formations_warn.items.push(a);
@@ -8026,6 +8041,8 @@ function renderDash(){
 
   if(!alerts.length){
     document.getElementById('alertsBox').innerHTML='<div class="empty"><div class="empty-ico">✅</div><p>Aucune alerte — tout est à jour !</p></div>';
+  } else if(!alertsF.length){
+    document.getElementById('alertsBox').innerHTML='<div class="empty"><div class="empty-ico">🔍</div><p>Aucune alerte pour les catégories sélectionnées.</p><p style="font-size:11px;color:var(--t4)">Ajuste le filtre « 👥 Catégories » pour en afficher davantage.</p></div>';
   } else {
     window._alertOpen = window._alertOpen || {}; // mémorise quels groupes sont ouverts entre deux rendus
     const sectionsHtml=Object.entries(groups).filter(([k,g])=>g.items.length>0).map(([k,g])=>{
@@ -8051,6 +8068,9 @@ function renderDash(){
     }).join('');
     document.getElementById('alertsBox').innerHTML=`<div style="padding:4px 0">${sectionsHtml}</div>`;
   }
+
+  // Rafraîchir le sélecteur de catégories des alertes
+  try{_renderAlertCats();}catch(e){console.warn('_renderAlertCats:',e);}
 
   // Widget avancement chantiers
   try{renderAvancement();}catch(e){console.warn('renderAvancement:',e);}
@@ -9356,7 +9376,38 @@ function buildGrid(emps,dates,containerId){
   window.PLGRIDS=window.PLGRIDS||{}; window.PLGRIDS[containerId]=_grid;
   window.PLGRID=_grid;
   if(typeof _plInit==='function') _plInit();
+  if(typeof _wheelHorizInit==='function') _wheelHorizInit();
   if(typeof _plApplyHighlight==='function') _plApplyHighlight();
+}
+
+/* ═══ DÉFILEMENT : geste vertical du pad → défilement horizontal des grands tableaux larges ═══ */
+/* Sur un trackpad, un balayage vertical ne fait rien quand le tableau ne déborde pas en hauteur
+   mais déborde en largeur. On convertit alors le deltaY en défilement horizontal. */
+function _wheelHorizInit(){
+  if(window._wheelHReady) return; window._wheelHReady=true;
+  window.addEventListener('wheel', function(e){
+    if(e.ctrlKey || e.shiftKey) return;               // zoom / défilement horizontal explicite : on ne touche pas
+    if(!e.deltaY) return;
+    let el=e.target, hops=0;
+    while(el && el.nodeType===1 && hops<9){
+      hops++;
+      if(el.scrollWidth>el.clientWidth+2){             // débordement horizontal ?
+        const cs=getComputedStyle(el), ox=cs.overflowX;
+        if(ox==='auto'||ox==='scroll'){
+          const oy=cs.overflowY, scrollY=(oy==='auto'||oy==='scroll')&&el.scrollHeight>el.clientHeight+2;
+          const atTop=el.scrollTop<=0, atBot=el.scrollTop+el.clientHeight>=el.scrollHeight-1;
+          const vCanConsume=scrollY && !((e.deltaY<0&&atTop)||(e.deltaY>0&&atBot));
+          if(!vCanConsume){                            // rien à faire verticalement → on défile horizontalement
+            const before=el.scrollLeft;
+            el.scrollLeft+=e.deltaY;
+            if(el.scrollLeft!==before) e.preventDefault();
+          }
+          return;                                      // 1er conteneur scrollable-x trouvé : on s'arrête
+        }
+      }
+      el=el.parentElement;
+    }
+  }, {passive:false});
 }
 
 /* ═══ MOTEUR SÉLECTION COPIER/COLLER PLANNING ═══ */
@@ -10025,6 +10076,42 @@ function _weeklyCatsAll(on){
   renderWeekly();
 }
 document.addEventListener('click',e=>{ if(!e.target.closest('#weekly-cats-panel')&&!e.target.closest('#weekly-cats-btn')){ const p=document.getElementById('weekly-cats-panel'); if(p) p.style.display='none'; } });
+
+// ── Sélecteur de catégories des Alertes actives (tableau de bord) ──
+function _toggleAlertCatsPanel(ev){ if(ev) ev.stopPropagation(); const p=document.getElementById('alert-cats-panel'); if(p) p.style.display=(p.style.display==='none')?'block':'none'; }
+function _renderAlertCats(){
+  const box=document.getElementById('alert-cats-chips'); if(!box) return;
+  if(!Array.isArray(S.alertHiddenCats)) S.alertHiddenCats=[];
+  const counts=window._alertCatCounts||{};
+  const cats=Object.keys(counts);
+  const ref=(typeof CAT_ORDER!=='undefined')?CAT_ORDER:{};
+  cats.sort((a,b)=>{const ia=ref[a]||99,ib=ref[b]||99;if(ia!==ib)return ia-ib;return _dayExtractCatLbl(a).localeCompare(_dayExtractCatLbl(b));});
+  const btn=document.getElementById('alert-cats-btn');
+  if(!cats.length){ box.innerHTML='<span style="color:var(--t3);font-size:11px">Aucune alerte formation/autorisation à filtrer</span>'; if(btn){btn.style.color='';btn.textContent='👥 Catégories ▾';} return; }
+  box.innerHTML=cats.map(c=>{
+    const on=!S.alertHiddenCats.includes(c);
+    const col=_dayExtractCatColor(c);
+    const sty=on?`background:${col}26;border:1.5px solid ${col};color:#eef3ff`:`background:rgba(255,255,255,0.03);border:1.5px solid var(--glass-border);color:var(--t3);opacity:.6`;
+    const mark=on?`<span style="color:${col};font-weight:900;font-size:13px">✓</span>`:`<span style="color:var(--t4);font-weight:900;font-size:13px">○</span>`;
+    return `<div data-cat="${c}" onclick="event.stopPropagation();_toggleAlertCat('${c}')" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;border-radius:9px;padding:6px 10px;cursor:pointer;user-select:none;${sty}">${mark}<span>${_dayExtractCatLbl(c)}</span><span style="font-weight:500;opacity:.75">(${counts[c]})</span></div>`;
+  }).join('');
+  if(btn){ const hiddenActive=S.alertHiddenCats.filter(c=>cats.includes(c)).length; const act=hiddenActive>0; btn.style.color=act?'var(--cyan)':''; btn.textContent=act?`👥 Catégories (${cats.length-hiddenActive}/${cats.length}) ▾`:'👥 Catégories ▾'; }
+}
+function _toggleAlertCat(cat){
+  if(!Array.isArray(S.alertHiddenCats)) S.alertHiddenCats=[];
+  if(S.alertHiddenCats.includes(cat)) S.alertHiddenCats=S.alertHiddenCats.filter(c=>c!==cat);
+  else S.alertHiddenCats.push(cat);
+  try{save();}catch(_){}
+  renderDash();
+}
+function _alertCatsAll(on){
+  if(!Array.isArray(S.alertHiddenCats)) S.alertHiddenCats=[];
+  const cats=Object.keys(window._alertCatCounts||{});
+  S.alertHiddenCats = on ? [] : cats.slice();
+  try{save();}catch(_){}
+  renderDash();
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('#alert-cats-panel')&&!e.target.closest('#alert-cats-btn')){ const p=document.getElementById('alert-cats-panel'); if(p) p.style.display='none'; } });
 
 // Recopie la semaine précédente vers la semaine courante — NON DESTRUCTIF : ne remplit que les cases vides.
 // Ne recopie QUE les affectations de travail : formations, congés, maladies, absences et déplacements sont
