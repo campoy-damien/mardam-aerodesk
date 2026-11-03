@@ -274,6 +274,9 @@ body::before{
 }
 .alert-pill.on{display:flex}
 @keyframes throb{0%,100%{opacity:1}50%{opacity:.65}}
+@keyframes clpulse{0%,100%{box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 0 0 rgba(52,199,89,.55)}50%{box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 0 12px rgba(52,199,89,0)}}
+#cl-alert-stack{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;width:min(92vw,460px);pointer-events:none}
+.cl-alert{pointer-events:auto;width:100%;background:linear-gradient(135deg,#00c98a,#34d399);color:#06251b;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;animation:clpulse 1.6s infinite;font-family:'Outfit',sans-serif}
 
 /* Drive indicator */
 .drive-pill{
@@ -485,6 +488,14 @@ select option{background:#0e1628;color:var(--t1)}
 textarea{resize:vertical;min-height:64px}
 input[type=color]{padding:4px 8px;height:40px;cursor:pointer}
 input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5) brightness(2)}
+/* Sélecteurs date/heure : thème sombre natif (icônes propres, pas de carré blanc) */
+input[type=date],input[type=time],input[type=datetime-local]{color-scheme:dark}
+input[type=time]::-webkit-calendar-picker-indicator{filter:invert(0.6) brightness(1.8);cursor:pointer}
+/* Case à cocher nette (pleine quand cochée) — check-list */
+.cl-chk{-webkit-appearance:none;appearance:none;width:22px;height:22px;min-width:22px;border:2px solid #34d399;border-radius:6px;background:transparent;cursor:pointer;position:relative;flex-shrink:0;transition:background .12s}
+.cl-chk:checked{background:#34d399;border-color:#34d399}
+.cl-chk:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#06251b;font-weight:900;font-size:14px}
+.cl-chk:not(:checked){border-color:rgba(255,255,255,0.35)}
 /* Cases à cocher de l'équipe assignée */
 .eq-row{transition:background .15s}
 .eq-row:hover{background:rgba(255,255,255,0.04)}
@@ -1210,6 +1221,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <button class="tab" id="tb-autorisations" data-fam="personnel" onclick="goTab('autorisations')">🛡 Autorisations<span class="tab-notif" id="nt-auto"></span></button>
 
   <button class="tab" id="tb-todo"      data-fam="outils" onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
+  <button class="tab" id="tb-checklist" data-fam="outils" onclick="goTab('checklist')">🗒️ Check-list<span class="tab-notif" id="nt-checklist"></span></button>
   <button class="tab" id="tb-ai" data-fam="outils" onclick="goTab('ai')">✦ Assistant IA</button>
   <button class="tab" id="tb-simulation" data-fam="outils" onclick="goTab('simulation')">🧪 Simulation</button>
   <button class="tab" id="tb-notice" data-fam="outils" onclick="goTab('notice')">📖 Notice</button>
@@ -1750,6 +1762,71 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="ftab" onclick="filterTodo('done',this)">✅ Terminées</button>
   </div>
   <div id="todoList"></div>
+</div>
+
+<!-- CHECK-LIST QUOTIDIENNE -->
+<div class="page" id="pg-checklist">
+  <div class="sh">
+    <div class="sh-title">Check-list <em>du jour</em></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" id="cl-notif-btn" onclick="clRequestNotif()" title="Autoriser les notifications du navigateur">🔔 Activer les notifications</button>
+      <button class="btn btn-cyan btn-sm" onclick="openClManage()">⚙️ Gérer la check-list</button>
+    </div>
+  </div>
+  <div id="cl-today-head" style="font-size:12px;color:var(--t3);margin:2px 2px 12px"></div>
+  <div id="cl-today"></div>
+</div>
+
+<!-- Gestion de la check-list -->
+<div class="mbg" id="m-cl-manage">
+<div class="modal" style="max-width:640px">
+  <div class="modal-title">⚙️ Gérer la check-list</div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Ajoute, modifie, réordonne ou supprime tes tâches récurrentes. Chaque tâche a un horaire et une récurrence.</div>
+  <div id="cl-manage-list" style="max-height:52vh;overflow-y:auto"></div>
+  <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" onclick="openClTaskEdit('')">+ Ajouter une tâche</button>
+  <div class="mfooter"><button class="btn btn-cyan" onclick="closeM('m-cl-manage')">Fermer</button></div>
+</div>
+</div>
+
+<!-- Édition d'une tâche de check-list -->
+<div class="mbg" id="m-cl-task">
+<div class="modal" style="max-width:520px">
+  <div class="modal-title" id="cl-task-title">Nouvelle tâche</div>
+  <input type="hidden" id="cl-task-id">
+  <div class="field"><label>Intitulé de la tâche *</label><input type="text" id="cl-task-label" placeholder="Ex. Contrôle du hangar"></div>
+  <div class="fgrid" style="align-items:start">
+    <div class="field"><label>Heure de début *</label><input type="time" id="cl-task-time" style="width:100%"></div>
+    <div class="field"><label>Heure de fin <span style="font-size:9px;color:var(--t4);font-weight:400">(optionnel)</span></label><input type="time" id="cl-task-end" style="width:100%"><div style="font-size:9px;color:var(--t4);margin-top:4px">🔔 2ᵉ rappel à cette heure si non validée</div></div>
+  </div>
+  <div class="field">
+    <label>Récurrence</label>
+    <select id="cl-task-recur" onchange="clRecurUI()">
+      <option value="daily">Tous les jours</option>
+      <option value="weekdays">Jours ouvrés (lun→ven)</option>
+      <option value="weekly">Jours de la semaine choisis</option>
+      <option value="monthly">Mensuel (jour du mois)</option>
+      <option value="once">Date précise</option>
+    </select>
+  </div>
+  <div class="field" id="cl-wrap-weekly" style="display:none">
+    <label>Jours actifs</label>
+    <div id="cl-weekdays" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+  <div class="field" id="cl-wrap-monthly" style="display:none">
+    <label>Jour du mois</label>
+    <select id="cl-task-dom" style="max-width:200px"></select>
+  </div>
+  <div class="field" id="cl-wrap-once" style="display:none">
+    <label>Date</label>
+    <input type="date" id="cl-task-date">
+  </div>
+  <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2);margin-top:4px;cursor:pointer;padding:9px 11px;border:1px solid var(--glass-border);border-radius:9px;background:rgba(255,255,255,0.03)"><input type="checkbox" id="cl-task-remind" class="cl-chk" checked> 🔔 Me rappeler à l'heure de début</label>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-cl-task')">Annuler</button>
+    <button class="btn btn-rose btn-sm" id="cl-task-del" onclick="delClTask()" style="display:none">🗑 Supprimer</button>
+    <button class="btn btn-cyan" onclick="saveClTask()">Enregistrer</button>
+  </div>
+</div>
 </div>
 
 <!-- AUTORISATIONS -->
@@ -2360,7 +2437,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 <div class="page" id="pg-notice">
   <div class="sh">
     <div class="sh-title">📖 Notice <em>d'utilisation</em></div>
-    <span style="font-size:12px;color:var(--t4)">MARDAM AeroDesk Pro — Guide complet</span>
+    <button class="btn btn-cyan btn-sm" onclick="openGuide()" style="background:linear-gradient(135deg,#7c5cff,#a78bfa);border:none;font-weight:800">🎓 Guide pas à pas</button>
   </div>
   <div style="padding:0 16px 12px">
     <input id="notice-search" type="text" placeholder="🔍 Rechercher dans la notice…" oninput="noticeFilter(this.value)"
@@ -2371,6 +2448,9 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button onclick="scrollNotice('n-formations')" class="btn btn-ghost btn-sm">📋 Formations</button>
     <button onclick="scrollNotice('n-master')" class="btn btn-ghost btn-sm">📅 Master Planning</button>
     <button onclick="scrollNotice('n-weekly')" class="btn btn-ghost btn-sm">🗓 Planning Hebdo</button>
+    <button onclick="scrollNotice('n-checklist')" class="btn btn-ghost btn-sm" style="border-color:rgba(52,211,153,0.4);color:#34d399">🗒️ Check-list</button>
+    <button onclick="scrollNotice('n-congeprev')" class="btn btn-ghost btn-sm" style="border-color:rgba(127,255,212,0.4);color:#7fffd4">🏖️ Congés prévis.</button>
+    <button onclick="scrollNotice('n-nouveautes')" class="btn btn-ghost btn-sm" style="border-color:rgba(255,208,96,0.4);color:#ffd060">✨ Nouveautés</button>
     <button onclick="scrollNotice('n-chantiers')" class="btn btn-ghost btn-sm">🔧 Chantiers</button>
     <button onclick="scrollNotice('n-rex')" class="btn btn-ghost btn-sm">📋 Fiche REX</button>
     <button onclick="scrollNotice('n-import-point')" class="btn btn-ghost btn-sm">⏱ Import pointage</button>
@@ -2395,6 +2475,65 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <div style="font-size:11px;color:var(--t3)">Gestion du personnel aéronautique — by Damien Campoy</div></div>
       </div>
       <div style="font-size:13px;color:var(--t2);line-height:1.7">Application tout-en-un centralisant plannings, formations, chantiers, autorisations, certifications avions (Certifying Staff Part 66) et recyclage d'aéronefs. Données sauvegardées localement (<strong style="color:#ffd060">localStorage</strong>) et synchronisables via <strong style="color:#ffd060">Google Drive</strong>.</div>
+    </div>
+
+    <!-- NOUVEAUTÉS -->
+    <div class="notice-section" id="n-nouveautes" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,208,96,0.25);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">✨</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:#ffd060">Nouveautés récentes</div><div style="font-size:11px;color:var(--t4)">Ce qui a été ajouté/amélioré</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        <div style="padding-top:12px">
+        • <strong style="color:#34d399">🗒️ Check-list du jour</strong> — nouvel onglet (Outils) : tâches récurrentes avec horaires, récurrence (quotidien, jours ouvrés, jours choisis, mensuel, date précise) et rappels. Voir la section dédiée.<br>
+        • <strong style="color:#7fffd4">🏖️ Congés prévisionnels</strong> — statut « demande » sur le planning, visu par catégorie avec seuils, validation à l'unité. Voir la section dédiée.<br>
+        • <strong style="color:#ffd060">🔎 Recherche « Chantier associé »</strong> — dans l'éditeur de case du planning, le menu chantier a une barre de recherche (par MSN, type d'avion ou nom), avec regroupement par section.<br>
+        • <strong style="color:#ffd060">🅿️♻️ Historique avions conservé</strong> — quand un avion passe de maintenance vers Stockage ou Recyclage, ses affectations gardent le MSN (plus de « Travail » générique).<br>
+        • <strong style="color:#ffd060">👥 Sélecteur de catégories</strong> — Master Planning, Planning Hebdo et extrait du jour : choisis quelles catégories afficher (bouton « 👥 Catégories »), avec report dans les exports PDF/Excel.<br>
+        • <strong style="color:#ffd060">🧭 Planning Responsables/Chefs</strong> — filtre Les deux / Responsables / Chefs d'équipe ; les alertes de conflits suivent la sélection.<br>
+        • <strong style="color:#ffd060">🖱️ Copier-coller & sélection</strong> — glisser pour sélectionner une plage (planning et Slot Hangar), copier/coller (Ctrl+C / Ctrl+V), défilement automatique au bord. Les congés/formations et les cases hors contrat intérimaire ne sont jamais écrasés.<br>
+        • <strong style="color:#ffd060">🛫 Tractage (push back)</strong> — ajout manuel possible de l'habilitation Tractage avion dans Autorisations.<br>
+        • <strong style="color:#ffd060">🎉 Jours fériés automatiques</strong> — fériés français générés pour toutes les années (y compris Pâques/Ascension/Pentecôte), jusqu'en 2060. Bouton de régénération dans la fenêtre Jours fériés.<br>
+        • <strong style="color:#ffd060">⏳ Garde-fou intérimaire</strong> — avertissement si on affecte une personne hors de sa période de contrat (début ou fin), sur la case, l'affectation permanente et le copier-coller.
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECK-LIST -->
+    <div class="notice-section" id="n-checklist" style="background:rgba(16,23,38,0.90);border:1px solid rgba(52,211,153,0.25);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">🗒️</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:#34d399">Check-list du jour</div><div style="font-size:11px;color:var(--t4)">Tâches récurrentes, horaires et rappels</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        <div style="padding-top:12px">
+        Onglet <strong>🗒️ Check-list</strong> (famille Outils). Il affiche les tâches du jour, avec case à cocher.<br><br>
+        • <strong style="color:#34d399">La check-list du jour</strong> — n'affiche que les tâches dont la récurrence tombe aujourd'hui, triées par heure. Coche une tâche quand elle est faite (barrée + heure de réalisation). Une tâche non cochée dont l'heure de début est passée apparaît <strong style="color:#ff6b85">en retard</strong> ; un badge rouge apparaît sur l'onglet.<br>
+        • <strong style="color:#34d399">⚙️ Gérer la check-list</strong> — ajouter / modifier / supprimer / réordonner (▲▼). Pour chaque tâche : intitulé, heure de début, heure de fin (optionnelle), récurrence et rappel.<br>
+        • <strong style="color:#34d399">Récurrence</strong> — Tous les jours · Jours ouvrés (lun→ven) · Jours de la semaine choisis · <strong>Mensuel</strong> (jour du mois, ou « dernier jour ») · Date précise.<br>
+        • <strong style="color:#34d399">Rappels</strong> — si « 🔔 Me rappeler » est coché : à l'heure de <strong>début</strong>, bandeau vert pulsant + son + notification navigateur. Si une <strong>heure de fin</strong> est renseignée et la tâche n'est pas validée, un <strong>2ᵉ rappel</strong> orange (« dernière limite ») se déclenche. Le titre de l'onglet navigateur clignote si tu es sur une autre fenêtre.<br>
+        • <strong style="color:#ffd060">⚠ Important</strong> — les rappels ne se déclenchent que si <strong>l'application est ouverte</strong> (onglet ou PWA en arrière-plan) : une page web sans serveur ne peut pas envoyer de notification quand elle est fermée. Clique une fois sur <strong>🔔 Activer les notifications</strong> pour les autoriser.<br>
+        • <strong style="color:#34d399">Historique</strong> — ce qui est coché est conservé par date ; la liste repart à zéro chaque jour.
+        </div>
+      </div>
+    </div>
+
+    <!-- CONGÉS PRÉVISIONNELS -->
+    <div class="notice-section" id="n-congeprev" style="background:rgba(16,23,38,0.90);border:1px solid rgba(127,255,212,0.25);border-radius:14px;overflow:hidden">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
+        <span style="font-size:20px">🏖️</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:#7fffd4">Congés prévisionnels</div><div style="font-size:11px;color:var(--t4)">Demandes de congé avant validation</div></div>
+        <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
+      </div>
+      <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
+        <div style="padding-top:12px">
+        Pour recueillir les souhaits de congés avant de les valider.<br><br>
+        • <strong style="color:#7fffd4">Saisir une demande</strong> — dans l'éditeur de case du planning, choisis le statut <strong>📝 Congé prévis.</strong> La case s'affiche <strong>hachurée vert pâle « Congé ? »</strong>, distincte du congé validé (vert plein).<br>
+        • <strong style="color:#7fffd4">Visu par catégorie</strong> — dans le Planning Hebdo, la carte « 🏖️ Congés de la semaine » montre, par catégorie, le nombre de congés validés + demandés, avec une <strong style="color:#ff6b85">alerte ⚠</strong> si le seuil de la catégorie est dépassé.<br>
+        • <strong style="color:#7fffd4">Seuils</strong> — bouton ⚙️ sur cette carte : nombre max de personnes en congé (validé + demandé) la même semaine, par catégorie (vide = pas de limite).<br>
+        • <strong style="color:#7fffd4">Validation</strong> — bouton <strong>📝 Demandes</strong> (liste de toutes les demandes, ✓ valider / ✗ refuser à l'unité) ou directement sur la case (bouton <strong>✓ Valider le congé</strong>). La validation couvre <strong>toute la période</strong> de la demande, pas seulement un jour.<br>
+        • Le prévisionnel ne réduit pas la DISPO/capacité tant qu'il n'est pas validé. Protégé du copier-coller.
+        </div>
+      </div>
     </div>
     <div class="notice-section" id="n-dashboard" style="background:rgba(16,23,38,0.90);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
@@ -2857,7 +2996,27 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 
 </div><!-- /body -->
 
+<!-- Bouton d'aide flottant : ouvre le guide sur l'onglet courant -->
+<button id="guide-fab" onclick="openGuideForCurrentTab()" title="Guide pas à pas de cet onglet"
+  style="position:fixed;right:18px;bottom:18px;z-index:9998;width:48px;height:48px;border-radius:50%;border:1px solid rgba(96,180,255,0.5);background:linear-gradient(135deg,#2979ff,#00a0ff);color:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif">?</button>
+
 <!-- ═══════════ MODALS ═══════════ -->
+
+<!-- GUIDE PAS À PAS -->
+<div class="mbg" id="m-guide">
+<div class="modal" style="max-width:740px">
+  <div class="modal-title">🎓 Guide pas à pas</div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Choisis un thème, puis avance étape par étape.</div>
+  <div id="guide-themes" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+  <div id="guide-step" style="min-height:230px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:14px;padding:18px"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px">
+    <button class="btn btn-ghost btn-sm" id="guide-prev" onclick="guidePrev()">← Précédent</button>
+    <div id="guide-progress" style="font-size:12px;color:var(--t3);font-weight:700"></div>
+    <button class="btn btn-cyan btn-sm" id="guide-next" onclick="guideNext()">Suivant →</button>
+  </div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-guide')">Fermer</button></div>
+</div>
+</div>
 
 <!-- Cell edit -->
 <div class="mbg" id="m-cell">
@@ -3487,6 +3646,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border)">
     <p style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Présélections</p>
     <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-gold btn-sm" onclick="genFeriesRange(new Date().getFullYear(),2060)">🎉 Générer tous les fériés (→ 2060)</button>
       <button class="btn btn-ghost btn-sm" onclick="loadFR2026()">Fériés France 2026</button>
       <button class="btn btn-ghost btn-sm" onclick="loadFR2025()">Fériés France 2025</button>
       <button class="btn btn-rose btn-sm" onclick="clearHolidays()">🗑 Tout effacer</button>
@@ -4811,6 +4971,14 @@ function load(){
       // Migration : toute personne archivée doit être inactive (répare les anciennes archives
       // où actif était resté true → elles réapparaissaient dans les vues filtrées sur actif)
       if(Array.isArray(S.personnel)) S.personnel.forEach(p=>{ if(p && p.archived) p.actif=false; });
+      // Jours fériés : générer automatiquement toutes les années (2025 → 2060) une seule fois
+      try{
+        if(!localStorage.getItem('mard_feries_auto_v1')){
+          let _fa=0; for(let _y=2025;_y<=2060;_y++) _fa+=ensureFeries(_y);
+          localStorage.setItem('mard_feries_auto_v1','1');
+          if(_fa){ try{ _safeStorage.setItem('asp4',JSON.stringify(S)); }catch(_){}; console.log('Fériés générés jusqu\'en 2060 :',_fa); }
+        }
+      }catch(_){}
       // Migration : réparer les affectations "Travail" orphelines (chantier transféré vers recyclage
       // puis supprimé) → re-rattacher à l'avion recyclé qui couvre la date, pour garder l'historique MSN
       try{
@@ -4945,6 +5113,44 @@ function loadFR2025(){
 }
 function clearHolidays(){S.holidays=[];renderHolTags();save();toast('Jours fériés effacés');}
 
+// Calcul des jours fériés français pour N'IMPORTE QUELLE année (fériés mobiles inclus : Pâques/Ascension/Pentecôte)
+function _easterSunday(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  return new Date(y,month-1,day);
+}
+function _feriesFR(y){
+  const E=_easterSunday(y);
+  const list=[
+    {date:`${y}-01-01`,name:"Jour de l'an"},
+    {date:fmt(addD(E,1)),name:'Lundi de Pâques'},
+    {date:`${y}-05-01`,name:'Fête du Travail'},
+    {date:`${y}-05-08`,name:'Victoire 1945'},
+    {date:fmt(addD(E,39)),name:'Ascension'},
+    {date:fmt(addD(E,50)),name:'Lundi de Pentecôte'},
+    {date:`${y}-07-14`,name:'Fête Nationale'},
+    {date:`${y}-08-15`,name:'Assomption'},
+    {date:`${y}-11-01`,name:'Toussaint'},
+    {date:`${y}-11-11`,name:'Armistice'},
+    {date:`${y}-12-25`,name:'Noël'},
+  ];
+  return list.sort((a,b)=>a.date.localeCompare(b.date));
+}
+// Ajoute les fériés standards manquants d'une année (sans écraser ceux déjà présents). Retourne le nb ajouté.
+function ensureFeries(y){
+  if(!Array.isArray(S.holidays)) S.holidays=[];
+  let added=0;
+  _feriesFR(y).forEach(f=>{ if(!S.holidays.some(h=>h.date===f.date)){ S.holidays.push(f); added++; } });
+  if(added) S.holidays.sort((a,b)=>a.date.localeCompare(b.date));
+  return added;
+}
+// Génère les fériés de toutes les années d'une plage
+function genFeriesRange(fromY,toY,silent){
+  let added=0; for(let y=fromY;y<=toY;y++) added+=ensureFeries(y);
+  if(added){ renderHolTags(); save(); }
+  if(!silent) toast(added?`✅ ${added} jour(s) férié(s) ajouté(s) (jusqu'en ${toY})`:'Fériés déjà à jour');
+  return added;
+}
+
 function renderHolTags(){
   const el=document.getElementById('holTags'); if(!el)return;
   if(!S.holidays.length){el.innerHTML='<span style="font-size:12px;color:var(--t4)">Aucun jour férié configuré</span>';return;}
@@ -4968,7 +5174,7 @@ function addHoliday(){
 function removeHol(i){S.holidays.splice(i,1);renderHolTags();save();}
 
 /* ═══ TABS ═══ */
-const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,autorisations:renderAutorisations,certif:renderCertif,programme:renderProgramme,kpi:renderKPI,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
+const RENDERS={dashboard:renderDash,formations:renderForms,master:renderMaster,weekly:renderWeekly,chantiers:renderChantiers,stockage:renderStockage,recycling:renderRecycling,slot:renderSlot,personnel:renderPersonnel,todo:renderTodo,checklist:renderChecklist,autorisations:renderAutorisations,certif:renderCertif,programme:renderProgramme,kpi:renderKPI,ai:renderAI,airbus:renderAirbus,simulation:initSimulation,notice:()=>{}};
 
 /* ═══ SLOT HANGAR ═══ */
 const SLOT_POSITIONS=[
@@ -6802,6 +7008,158 @@ function toggleNotice(header){
   body.style.display=open?'none':'block';
   if(chev) chev.style.transform=open?'':'rotate(180deg)';
 }
+
+/* ═══════════ GUIDE PAS À PAS (données faciles à mettre à jour : il suffit d'éditer GUIDE_DATA) ═══════════ */
+/* Chaque thème = { icon, color, steps:[ {t:titre, d:description HTML, ill:illustration HTML optionnelle} ] } */
+const GUIDE_DATA = {
+  "Planning Hebdo": { icon:"🗓️", color:"#60b4ff", steps:[
+    {t:"À quoi ça sert", d:"Le <b>Planning Hebdo</b> montre une semaine, chaque personne sur une ligne, avec <b>matin</b> et <b>après-midi</b> pour chaque jour. Tu y renseignes ce que fait chacun.", ill:"grid"},
+    {t:"Renseigner une case", d:"Clique sur une demi-journée → une fenêtre s'ouvre. Choisis un <b>statut</b> : ✈️ Travail, 🏖️ Congé, 📝 Congé prévis., 🏥 Maladie, 📚 Formation, ❌ Absence, 🚗 Déplacement…", ill:"types"},
+    {t:"Choisir le chantier", d:"Pour un <b>Travail</b>, choisis le <b>chantier associé</b>. Le menu a une <b>barre de recherche</b> : tape un <b>MSN</b>, un <b>type d'avion</b> ou un <b>nom de chantier</b> pour le trouver vite. Un 2ᵉ chantier est possible sur la même demi-journée.", ill:"search"},
+    {t:"Appliquer à plusieurs jours", d:"Dans la fenêtre de case, le menu « Appliquer à » te permet de remplir d'un coup : juste cette case, toute la <b>journée</b>, ou une <b>période</b> (dates de début/fin).", ill:null},
+    {t:"Sélection & copier-coller", d:"<b>Glisse</b> la souris sur plusieurs cases pour les sélectionner, puis <b>Copier</b> / <b>Coller</b> (ou Ctrl+C / Ctrl+V). Quand tu atteins le bord, le tableau <b>défile tout seul</b>. Les <b>congés/formations</b> et les cases <b>hors contrat</b> d'un intérimaire ne sont jamais écrasés.", ill:null},
+    {t:"Filtrer par catégorie", d:"Bouton <b>👥 Catégories</b> : affiche seulement les catégories voulues (ex. que les chefs + responsables) pour alléger l'affichage. Le choix est mémorisé et repris dans les exports.", ill:null},
+    {t:"Lire la synthèse", d:"En bas : <b>tension de la semaine</b> (chantiers staffés / en manque), <b>personnes disponibles</b>, et la carte <b>🏖️ Congés de la semaine</b> (validés + demandés par catégorie, avec alerte si seuil dépassé).", ill:null},
+    {t:"Exporter", d:"Boutons <b>📊 Export Excel</b> et <b>📄 Export PDF</b> : génèrent la semaine en couleur, en respectant le filtre de catégories actif.", ill:null},
+  ]},
+  "Congés prévisionnels": { icon:"🏖️", color:"#7fffd4", steps:[
+    {t:"Le principe", d:"Avant de valider les congés, tu enregistres les <b>demandes</b> des gens pour voir la concentration (ex. tout le monde la même semaine).", ill:null},
+    {t:"Poser une demande", d:"Clique une case du planning → statut <b>📝 Congé prévis.</b> La case apparaît <b>hachurée « Congé ? »</b>, distincte du congé validé (vert plein).", ill:null},
+    {t:"Voir la concentration", d:"Dans le Planning Hebdo, carte <b>🏖️ Congés de la semaine</b> : par catégorie, nombre de congés <b>validés + demandés</b>, avec <b>⚠ alerte</b> si le seuil est dépassé.", ill:null},
+    {t:"Régler les seuils", d:"Bouton <b>⚙️</b> sur la carte : fixe le <b>max de personnes</b> en congé la même semaine, <b>par catégorie</b> (vide = pas de limite).", ill:null},
+    {t:"Valider / refuser", d:"Bouton <b>📝 Demandes</b> → liste de toutes les demandes avec <b>✓ Valider</b> / <b>✗</b>, à l'unité. Ou sur la case : bouton <b>✓ Valider le congé</b>. La validation couvre <b>toute la période</b> demandée.", ill:null},
+  ]},
+  "Check-list du jour": { icon:"🗒️", color:"#34d399", steps:[
+    {t:"À quoi ça sert", d:"Onglet <b>🗒️ Check-list</b> (Outils) : tes tâches quotidiennes avec <b>cases à cocher</b>, <b>horaires</b> et <b>rappels</b>.", ill:null},
+    {t:"Créer une tâche", d:"Bouton <b>⚙️ Gérer la check-list</b> → <b>+ Ajouter une tâche</b>. Renseigne l'intitulé, l'<b>heure de début</b> et, si besoin, l'<b>heure de fin</b>.", ill:null},
+    {t:"Récurrence", d:"Choisis quand la tâche revient : <b>Tous les jours</b>, <b>Jours ouvrés</b>, <b>Jours choisis</b>, <b>Mensuel</b> (jour du mois ou « dernier jour »), ou une <b>date précise</b>.", ill:null},
+    {t:"Rappels", d:"Coche <b>🔔 Me rappeler</b> : à l'heure de début → bandeau + son + notification. Si une <b>heure de fin</b> est mise et la tâche non faite → <b>2ᵉ rappel</b>. ⚠ Les rappels ne marchent que si <b>l'app est ouverte</b>. Clique une fois <b>🔔 Activer les notifications</b>.", ill:null},
+    {t:"Cocher au quotidien", d:"Chaque jour, la liste n'affiche que les tâches du jour. Coche-les quand c'est fait (barré + heure). Non faite + heure passée = <b>en retard</b> (badge rouge sur l'onglet).", ill:null},
+  ]},
+  "Chantiers": { icon:"🔧", color:"#ff9a3c", steps:[
+    {t:"Créer un chantier", d:"Onglet <b>Chantiers</b> → <b>+ Nouveau</b>. Renseigne client, <b>type d'avion + MSN</b>, dates début/fin, <b>responsable</b> et <b>chef d'équipe</b>, et les <b>ressources</b> (nb techniciens requis).", ill:null},
+    {t:"Suivi responsables/chefs", d:"Le <b>Planning Responsables & Chefs</b> montre leur occupation sur l'année. Filtre <b>Les deux / Responsables / Chefs</b> en haut ; les <b>alertes de conflits</b> suivent la sélection.", ill:null},
+    {t:"Transférer un avion", d:"Depuis la fiche chantier, tu peux faire passer l'avion en <b>Stockage</b> ou <b>Recyclage</b>. Les affectations déjà saisies gardent le <b>MSN</b> (l'historique est conservé).", ill:null},
+  ]},
+  "Stockage / Recyclage / Slot": { icon:"🅿️", color:"#ff9a3c", steps:[
+    {t:"Ajouter un avion", d:"Onglets <b>Stockage</b> ou <b>A/C Recyclage</b> → ajoute l'avion (type, MSN, dates). Le recyclage suit l'avancement du démantèlement.", ill:null},
+    {t:"Marquer terminé (recyclage)", d:"Quand un avion est démantelé, passe-le en <b>Terminé</b> : il compte alors dans le KPI <b>avions recyclés</b> de l'année.", ill:null},
+    {t:"Slot Hangar — copier/coller", d:"Dans <b>🏭 Slot Hangar</b> : <b>glisse</b> sur une ligne de position pour sélectionner une plage, puis <b>Copier</b> un MSN et <b>Coller</b> ailleurs (Ctrl+C / Ctrl+V). <b>Libérer</b> retire l'occupation.", ill:null},
+  ]},
+  "Formations & Autorisations": { icon:"📋", color:"#ffd060", steps:[
+    {t:"Ajouter / mettre à jour", d:"Onglets <b>Formations</b> et <b>Autorisations</b> : ajoute une qualification à une personne avec sa <b>date d'expiration</b>. Les expirations proches sont signalées.", ill:null},
+    {t:"Import RH", d:"Bouton <b>📡 Import mise à jour</b> : charge 1 à 4 fichiers RH (formations, autorisations, tractage, certifying staff) — le format est détecté automatiquement.", ill:null},
+    {t:"Tractage (push back)", d:"Dans <b>Autorisations → + Ajouter</b>, une puce <b>🛫 Tractage avion (push back)</b> permet d'ajouter l'habilitation manuellement, avec sa date d'expiration.", ill:null},
+  ]},
+  "Jours fériés & Sauvegarde": { icon:"💾", color:"#6effc4", steps:[
+    {t:"Jours fériés", d:"Les fériés français sont <b>générés automatiquement</b> pour toutes les années (jusqu'en 2060), Pâques/Ascension/Pentecôte inclus. Bouton <b>🎉 Jours fériés</b> pour les voir ou en ajouter.", ill:null},
+    {t:"Sauvegarde", d:"Les données sont enregistrées <b>localement</b> (dans le navigateur) et synchronisables sur <b>Google Drive</b>. Pense à faire un <b>Export JSON</b> de temps en temps comme copie de secours.", ill:null},
+  ]},
+  "Tableau de bord": { icon:"🏠", color:"#60b4ff", steps:[
+    {t:"À quoi ça sert", d:"Le <b>Tableau de bord</b> est la page d'accueil : vue d'ensemble de l'activité du jour, raccourcis et <b>alertes</b> (expirations proches, chantiers en manque d'effectif, congés à valider).", ill:null},
+    {t:"Naviguer", d:"Les <b>familles d'onglets</b> en haut (Pilotage, Planning, Avions, Personnel, Outils) regroupent les pages. Clique une famille puis le sous-onglet voulu.", ill:null},
+    {t:"Besoin d'aide", d:"Sur n'importe quelle page, le bouton flottant <b>?</b> en bas à droite ouvre ce guide <b>directement sur l'onglet où tu es</b>.", ill:null},
+  ]},
+  "Master Planning": { icon:"📅", color:"#60b4ff", steps:[
+    {t:"À quoi ça sert", d:"Le <b>Master Planning</b> montre <b>un mois entier</b>, chaque personne sur une ligne, pour une vue large (congés, formations, charge).", ill:null},
+    {t:"Choisir la période", d:"Sélecteurs <b>année</b> et <b>mois</b> en haut. La <b>barre de recherche</b> permet de cibler une personne.", ill:null},
+    {t:"Filtrer par catégorie", d:"Bouton <b>👥 Catégories</b> : n'affiche que les catégories voulues pour réduire le nombre de lignes. Le filtre est aussi repris dans les exports.", ill:null},
+    {t:"Copier-coller", d:"Comme dans le Planning Hebdo : <b>glisse</b> pour sélectionner, <b>Ctrl+C / Ctrl+V</b>, défilement auto au bord. Congés, formations et cases hors contrat protégés.", ill:null},
+  ]},
+  "Personnel": { icon:"👥", color:"#c792ff", steps:[
+    {t:"Ajouter une personne", d:"Onglet <b>Personnel</b> → <b>+ Ajouter</b>. Renseigne nom, prénom, <b>catégorie</b> (technicien, chef d'équipe, responsable…) et le <b>type de contrat</b>.", ill:null},
+    {t:"Intérimaires", d:"Pour un contrat <b>intérim</b>, indique les <b>dates de début et de fin</b>. L'app <b>bloque / alerte</b> si tu affectes la personne <b>avant le début</b> ou <b>après la fin</b> du contrat (saisie, période, copier-coller).", ill:null},
+    {t:"Catégories", d:"Les catégories pilotent les <b>filtres</b> du planning, des exports et des <b>seuils de congés</b>. Garde-les cohérentes.", ill:null},
+  ]},
+  "Certifying Staff": { icon:"🎖️", color:"#c792ff", steps:[
+    {t:"À quoi ça sert", d:"L'onglet <b>Certifying Staff</b> recense le personnel <b>certifiant</b> et leurs habilitations (B1, B2, etc.) avec les <b>dates d'expiration</b>.", ill:null},
+    {t:"Mettre à jour", d:"Ajoute ou modifie une habilitation pour une personne. Les <b>échéances proches</b> sont signalées pour anticiper les renouvellements.", ill:null},
+    {t:"Import RH", d:"Le bouton <b>📡 Import mise à jour</b> (onglet Autorisations) peut charger le fichier <b>certifying staff</b> : le format est détecté automatiquement.", ill:null},
+  ]},
+  "To-Do / Tâches": { icon:"✅", color:"#34d399", steps:[
+    {t:"À quoi ça sert", d:"L'onglet <b>To-Do</b> est ta liste de tâches ponctuelles liées à la gestion (à ne pas confondre avec la <b>Check-list</b> quotidienne récurrente).", ill:null},
+    {t:"Gérer les tâches", d:"Ajoute une tâche, coche-la quand elle est faite, supprime celles qui ne servent plus.", ill:null},
+    {t:"Check-list vs To-Do", d:"Pour des tâches <b>récurrentes avec horaires et rappels</b>, utilise plutôt l'onglet <b>🗒️ Check-list du jour</b>.", ill:null},
+  ]},
+  "Programme Activité": { icon:"📈", color:"#ffd060", steps:[
+    {t:"À quoi ça sert", d:"Le <b>Programme Activité</b> (famille Pilotage) donne la vue <b>prévisionnelle de la charge</b> : chantiers et avions planifiés sur la période.", ill:null},
+    {t:"Lire le programme", d:"Repère les <b>arrivées / sorties</b> d'avions et les <b>pics d'activité</b> pour anticiper les besoins en personnel.", ill:null},
+    {t:"Lien avec le planning", d:"Les chantiers créés alimentent cette vue : garde les <b>dates début/fin</b> à jour pour une prévision fiable.", ill:null},
+  ]},
+  "Tableau KPI": { icon:"📊", color:"#ffd060", steps:[
+    {t:"À quoi ça sert", d:"Le <b>Tableau KPI</b> (famille Pilotage) regroupe les <b>indicateurs</b> : avions recyclés, en stockage, en maintenance, taux d'occupation, etc.", ill:null},
+    {t:"KPI avions recyclés", d:"Un avion n'est compté comme <b>recyclé</b> qu'une fois passé en <b>Terminé</b> dans l'onglet Recyclage. C'est l'action qui incrémente le compteur de l'année.", ill:null},
+    {t:"Lecture", d:"Les chiffres se recalculent automatiquement à chaque modification des chantiers, du stockage et du recyclage.", ill:null},
+  ]},
+  "Airbus Activité": { icon:"🛩️", color:"#ff9a3c", steps:[
+    {t:"À quoi ça sert", d:"L'onglet <b>Airbus Activité</b> (famille Avions) suit spécifiquement l'<b>activité liée aux avions Airbus</b> du site.", ill:null},
+    {t:"Suivi", d:"Renseigne et consulte les mouvements et interventions associés. Les données remontent dans les indicateurs généraux.", ill:null},
+  ]},
+  "Assistant IA": { icon:"🤖", color:"#60ffd0", steps:[
+    {t:"À quoi ça sert", d:"L'<b>Assistant IA</b> (famille Outils) t'aide à <b>interroger tes données</b> et à obtenir des synthèses rapides sans fouiller chaque onglet.", ill:null},
+    {t:"Poser une question", d:"Écris ta demande en langage naturel (ex. « qui est en congé la semaine prochaine ? ») et lis la réponse.", ill:null},
+    {t:"Bon réflexe", d:"L'assistant s'appuie sur les données <b>déjà saisies</b> : plus le planning et les chantiers sont à jour, plus les réponses sont justes.", ill:null},
+  ]},
+  "Simulation": { icon:"🧪", color:"#60ffd0", steps:[
+    {t:"À quoi ça sert", d:"La <b>Simulation</b> (famille Outils) permet de <b>tester un scénario</b> (charge, affectations) sans toucher au planning réel.", ill:null},
+    {t:"Utiliser", d:"Monte un scénario, observe l'impact (tension, effectifs), puis reviens au planning officiel quand tu as tranché.", ill:null},
+    {t:"Sans risque", d:"Rien n'est écrasé dans tes données réelles : c'est un bac à sable pour préparer tes décisions.", ill:null},
+  ]},
+};
+// Correspondance onglet → thème du guide (pour l'accès direct depuis chaque page)
+const GUIDE_TAB = {
+  weekly:"Planning Hebdo", checklist:"Check-list du jour", chantiers:"Chantiers",
+  stockage:"Stockage / Recyclage / Slot", recycling:"Stockage / Recyclage / Slot", slot:"Stockage / Recyclage / Slot",
+  formations:"Formations & Autorisations", autorisations:"Formations & Autorisations",
+  dashboard:"Tableau de bord", master:"Master Planning", personnel:"Personnel", certif:"Certifying Staff",
+  todo:"To-Do / Tâches", programme:"Programme Activité", kpi:"Tableau KPI", airbus:"Airbus Activité",
+  ai:"Assistant IA", simulation:"Simulation"
+};
+function openGuideForCurrentTab(){
+  const cur=[...document.body.classList].find(c=>c.startsWith('tab-'))?.slice(4);
+  openGuide(GUIDE_TAB[cur]||null);
+}
+let _guideTheme=null, _guideIdx=0;
+function openGuide(theme){ _guideTheme=theme||Object.keys(GUIDE_DATA)[0]; _guideIdx=0; _guideRenderThemes(); _guideRenderStep(); openM('m-guide'); }
+function _guideRenderThemes(){
+  const box=document.getElementById('guide-themes'); if(!box) return;
+  box.innerHTML=Object.keys(GUIDE_DATA).map(k=>{ const g=GUIDE_DATA[k]; const on=k===_guideTheme;
+    return `<button onclick="_guidePick('${k.replace(/'/g,"\\'")}')" style="padding:6px 11px;border-radius:99px;border:1px solid ${on?g.color:'var(--glass-border)'};background:${on?g.color+'22':'transparent'};color:${on?g.color:'var(--t3)'};font-size:12px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">${g.icon} ${k}</button>`;
+  }).join('');
+}
+function _guidePick(k){ _guideTheme=k; _guideIdx=0; _guideRenderThemes(); _guideRenderStep(); }
+function _guideRenderStep(){
+  const g=GUIDE_DATA[_guideTheme]; if(!g) return;
+  const steps=g.steps; const i=Math.max(0,Math.min(_guideIdx,steps.length-1)); _guideIdx=i;
+  const s=steps[i];
+  const el=document.getElementById('guide-step');
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:34px;height:34px;border-radius:50%;background:${g.color}22;border:2px solid ${g.color};display:flex;align-items:center;justify-content:center;color:${g.color};font-weight:900;flex-shrink:0">${i+1}</div>
+      <div style="font-size:16px;font-weight:800;color:var(--t1)">${s.t}</div>
+    </div>
+    <div style="font-size:13.5px;color:var(--t2);line-height:1.8">${s.d}</div>
+    ${s.ill?`<div style="margin-top:14px">${_guideIll(s.ill,g.color)}</div>`:''}`;
+  document.getElementById('guide-progress').textContent=`Étape ${i+1} / ${steps.length}`;
+  const pv=document.getElementById('guide-prev'); if(pv) pv.style.visibility=i===0?'hidden':'';
+  const nx=document.getElementById('guide-next'); if(nx) nx.textContent=(i===steps.length-1)?'Terminé ✓':'Suivant →';
+}
+function guideNext(){ const g=GUIDE_DATA[_guideTheme]; if(!g) return; if(_guideIdx>=g.steps.length-1){ closeM('m-guide'); return; } _guideIdx++; _guideRenderStep(); }
+function guidePrev(){ if(_guideIdx>0){ _guideIdx--; _guideRenderStep(); } }
+// Petites illustrations (mock visuel) pour certaines étapes
+function _guideIll(kind,col){
+  if(kind==='grid'){
+    const cell=(bg,t)=>`<td style="border:1px solid rgba(255,255,255,0.1);padding:5px 7px;text-align:center;font-size:10px;color:#cfe0f5;background:${bg}">${t}</td>`;
+    return `<table style="border-collapse:collapse;font-size:10px"><tr><td style="padding:5px 8px;color:var(--t3);font-size:10px">DUPONT M.</td>${cell('rgba(41,121,255,0.2)','✈️ MSN')}${cell('rgba(41,121,255,0.2)','✈️ MSN')}${cell('rgba(0,229,176,0.2)','🏖️')}${cell('rgba(255,255,255,0.03)','—')}</tr><tr><td style="padding:5px 8px;color:var(--t3);font-size:10px">MARTIN S.</td>${cell('rgba(41,121,255,0.2)','✈️ MSN')}${cell('rgba(106,27,154,0.25)','📚')}${cell('rgba(41,121,255,0.2)','✈️ MSN')}${cell('rgba(41,121,255,0.2)','✈️ MSN')}</tr></table>`;
+  }
+  if(kind==='types'){
+    const b=(e,t,c)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:8px;border:1px solid ${c}44;background:${c}18;color:${c};font-size:11px;font-weight:700;margin:3px">${e} ${t}</span>`;
+    return `<div>${b('✈️','Travail','#60b4ff')}${b('🏖️','Congé','#34d399')}${b('📝','Congé prévis.','#7fffd4')}${b('🏥','Maladie','#ff6b85')}${b('📚','Formation','#b388ff')}${b('❌','Absence','#ffb45c')}</div>`;
+  }
+  if(kind==='search'){
+    return `<div style="max-width:320px"><div style="padding:8px 12px;border-radius:9px;border:1px solid rgba(0,210,255,0.3);background:rgba(0,210,255,0.05);color:var(--t3);font-size:12px">🔍 MSN, type, chantier…</div><div style="margin-top:6px;border:1px solid var(--glass-border);border-radius:9px;overflow:hidden"><div style="padding:6px 10px;font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase">Chantiers</div><div style="padding:7px 10px;font-size:12px;color:#eef3ff;background:rgba(0,210,255,0.1)">easyJet A320 — MSN 5618</div><div style="padding:7px 10px;font-size:12px;color:#cfe0f5">Air France — MSN 2341</div></div></div>`;
+  }
+  return '';
+}
 function scrollNotice(id){
   const el=document.getElementById(id);
   if(!el) return;
@@ -6861,7 +7219,7 @@ var TAB_FAMILY={
   master:'planning', weekly:'planning', slot:'planning',
   stockage:'avions', recycling:'avions', airbus:'avions',
   personnel:'personnel', certif:'personnel', formations:'personnel', autorisations:'personnel',
-  todo:'outils', ai:'outils', simulation:'outils', notice:'outils'
+  todo:'outils', checklist:'outils', ai:'outils', simulation:'outils', notice:'outils'
 };
 // Affiche les sous-onglets d'une famille et ouvre son premier onglet
 function _showFamilyTabs(fam){
@@ -15131,6 +15489,274 @@ function delPersonnel(id){
 /* ═══ TODO ═══ */
 let tfilt='all';
 function filterTodo(f,el){document.querySelectorAll('#pg-todo .ftabs .ftab').forEach(b=>b.classList.remove('on'));el.classList.add('on');tfilt=f;renderTodo();}
+/* ═══════════ CHECK-LIST QUOTIDIENNE ═══════════ */
+const CL_JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const CL_JOURS_C=['D','L','M','M','J','V','S'];
+function _clInit(){ if(!S.checklist) S.checklist={tasks:[],done:{}}; if(!Array.isArray(S.checklist.tasks)) S.checklist.tasks=[]; if(!S.checklist.done) S.checklist.done={}; return S.checklist; }
+// Une tâche est-elle active pour une date donnée ?
+function _clActiveOn(t, d){
+  const dow=d.getDay();                 // 0=dim..6=sam
+  const ds=fmt(d);
+  const r=t.recur||{type:'daily'};
+  if(r.type==='daily') return true;
+  if(r.type==='weekdays') return dow>=1&&dow<=5;
+  if(r.type==='weekly') return Array.isArray(r.days)&&r.days.includes(dow);
+  if(r.type==='monthly'){
+    const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    const dom=(r.dom==='last')?last:parseInt(r.dom);
+    // si le mois est plus court (ex. 31 en février) → caler sur le dernier jour
+    const eff=(dom>last)?last:dom;
+    return d.getDate()===eff;
+  }
+  if(r.type==='once') return r.date===ds;
+  return true;
+}
+function _clRecurLabel(t){
+  const r=t.recur||{type:'daily'};
+  if(r.type==='daily') return 'Tous les jours';
+  if(r.type==='weekdays') return 'Jours ouvrés';
+  if(r.type==='weekly') return 'Chaque '+((r.days||[]).slice().sort().map(n=>CL_JOURS[n].toLowerCase()).join(', ')||'—');
+  if(r.type==='monthly') return 'Le '+(r.dom==='last'?'dernier jour':r.dom)+' du mois';
+  if(r.type==='once') return 'Le '+(r.date?disp(r.date):'—');
+  return '';
+}
+function _clTodayTasks(dateObj){
+  _clInit();
+  const d=dateObj||new Date();
+  return S.checklist.tasks.filter(t=>_clActiveOn(t,d)).slice().sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')||(a.order||0)-(b.order||0));
+}
+function _clDoneMap(ds){ _clInit(); return (S.checklist.done[ds]=S.checklist.done[ds]||{}); }
+function renderChecklist(){
+  _clInit();
+  const now=new Date(); const ds=fmt(now);
+  const head=document.getElementById('cl-today-head');
+  const el=document.getElementById('cl-today'); if(!el) return;
+  // état du bouton notifications
+  const nb=document.getElementById('cl-notif-btn');
+  if(nb){ const st=('Notification'in window)?Notification.permission:'unsupported'; if(st==='granted'){ nb.textContent='🔔 Notifications activées'; nb.style.opacity='.7'; } else if(st==='unsupported'){ nb.style.display='none'; } else { nb.textContent='🔔 Activer les notifications'; nb.style.opacity=''; } }
+  const tasks=_clTodayTasks(now);
+  if(head) head.textContent=`${CL_JOURS[now.getDay()]} ${disp(ds)} · ${tasks.length} tâche${tasks.length>1?'s':''}`;
+  if(!tasks.length){ el.innerHTML='<div style="padding:28px;text-align:center;color:var(--t4);font-size:13px">Aucune tâche prévue aujourd\'hui.<br><span style="font-size:11px">Clique sur « ⚙️ Gérer la check-list » pour en ajouter.</span></div>'; _clUpdateBadge(); return; }
+  const dmap=_clDoneMap(ds);
+  const curMin=now.getHours()*60+now.getMinutes();
+  el.innerHTML=tasks.map(t=>{
+    const done=!!dmap[t.id];
+    const tmin=t.time?(parseInt(t.time.slice(0,2))*60+parseInt(t.time.slice(3,5))):null;
+    const late=!done && tmin!=null && curMin>tmin;
+    const col=done?'#34c759':late?'#ff6b85':'var(--t1)';
+    const plage=t.time?(t.time+(t.timeEnd?(' → '+t.timeEnd):'')):'';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.05);border-left:3px solid ${done?'#34c759':late?'#ff6b85':'rgba(255,255,255,0.12)'};background:${done?'rgba(52,199,89,0.05)':late?'rgba(255,77,109,0.05)':'transparent'}">
+      <input type="checkbox" class="cl-chk" ${done?'checked':''} onchange="clToggle('${t.id}')">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;color:${col};${done?'text-decoration:line-through;opacity:.65':''}">${t.label||'—'}</div>
+        <div style="font-size:11px;color:var(--t4);margin-top:2px">${plage?`🕒 ${plage}`:''}${plage?' · ':''}${_clRecurLabel(t)}${late?' · <span style="color:#ff6b85;font-weight:700">⚠ en retard</span>':''}${t.remind!==false&&t.time?' · 🔔':''}</div>
+      </div>
+      ${done?`<span style="font-size:10px;color:#34c759;font-weight:700;white-space:nowrap">✓ ${dmap[t.id].at||'fait'}</span>`:''}
+    </div>`;
+  }).join('');
+  _clUpdateBadge();
+}
+function clToggle(id){
+  const ds=fmt(new Date()); const dmap=_clDoneMap(ds);
+  if(dmap[id]) delete dmap[id];
+  else dmap[id]={at:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})};
+  save(); renderChecklist();
+}
+// Badge onglet : nb de tâches non faites et déjà dues aujourd'hui
+function _clUpdateBadge(){
+  try{
+    const now=new Date(); const ds=fmt(now); const dmap=(S.checklist?.done?.[ds])||{};
+    const curMin=now.getHours()*60+now.getMinutes();
+    let n=0;
+    _clTodayTasks(now).forEach(t=>{ if(dmap[t.id]) return; const tmin=t.time?(parseInt(t.time.slice(0,2))*60+parseInt(t.time.slice(3,5))):null; if(tmin!=null&&curMin>=tmin) n++; });
+    const b=document.getElementById('nt-checklist'); if(b) b.classList.toggle('on',n>0);
+  }catch(_){}
+}
+
+/* ── Gestion (éditeur) ── */
+function openClManage(){ _clRenderManage(); openM('m-cl-manage'); }
+function _clRenderManage(){
+  _clInit();
+  const el=document.getElementById('cl-manage-list'); if(!el) return;
+  const tasks=S.checklist.tasks.slice().sort((a,b)=>(a.order||0)-(b.order||0)||(a.time||'').localeCompare(b.time||''));
+  if(!tasks.length){ el.innerHTML='<div style="padding:16px;text-align:center;color:var(--t4);font-size:12px">Aucune tâche. Ajoute-en une ci-dessous.</div>'; return; }
+  el.innerHTML=tasks.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 8px;border-bottom:1px solid rgba(255,255,255,0.05)">
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <button onclick="clMove('${t.id}',-1)" ${i===0?'disabled':''} style="background:none;border:none;color:${i===0?'var(--t4)':'var(--t2)'};cursor:${i===0?'default':'pointer'};font-size:11px;line-height:1">▲</button>
+      <button onclick="clMove('${t.id}',1)" ${i===tasks.length-1?'disabled':''} style="background:none;border:none;color:${i===tasks.length-1?'var(--t4)':'var(--t2)'};cursor:${i===tasks.length-1?'default':'pointer'};font-size:11px;line-height:1">▼</button>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;color:var(--t1)">${t.label||'—'}</div>
+      <div style="font-size:11px;color:var(--t4)">${t.time?`🕒 ${t.time}${t.timeEnd?(' → '+t.timeEnd):''} · `:''}${_clRecurLabel(t)}${t.remind!==false&&t.time?' · 🔔':''}</div>
+    </div>
+    <button onclick="openClTaskEdit('${t.id}')" style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.25);border-radius:7px;color:var(--cyan);padding:5px 9px;cursor:pointer;font-size:12px;font-weight:700">✏️</button>
+    <button onclick="delClTask('${t.id}')" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:7px;color:#ff4d6d;padding:5px 8px;cursor:pointer;font-size:12px">🗑</button>
+  </div>`).join('');
+}
+function clMove(id,dir){
+  _clInit();
+  const arr=S.checklist.tasks.slice().sort((a,b)=>(a.order||0)-(b.order||0)||(a.time||'').localeCompare(b.time||''));
+  const i=arr.findIndex(t=>t.id===id); if(i<0) return; const j=i+dir; if(j<0||j>=arr.length) return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  arr.forEach((t,k)=>{ const orig=S.checklist.tasks.find(x=>x.id===t.id); if(orig) orig.order=k; });
+  save(); _clRenderManage();
+}
+function openClTaskEdit(id){
+  _clInit();
+  const t=id?S.checklist.tasks.find(x=>x.id===id):null;
+  document.getElementById('cl-task-title').textContent=t?'Modifier la tâche':'Nouvelle tâche';
+  document.getElementById('cl-task-id').value=id||'';
+  document.getElementById('cl-task-label').value=t?.label||'';
+  document.getElementById('cl-task-time').value=t?.time||'';
+  document.getElementById('cl-task-end').value=t?.timeEnd||'';
+  document.getElementById('cl-task-remind').checked=t?(t.remind!==false):true;
+  const r=t?.recur||{type:'daily'};
+  document.getElementById('cl-task-recur').value=r.type||'daily';
+  // jours de la semaine
+  const wd=document.getElementById('cl-weekdays');
+  wd.innerHTML=[1,2,3,4,5,6,0].map(n=>{ const on=(r.type==='weekly'&&(r.days||[]).includes(n)); return `<button type="button" data-dow="${n}" onclick="this.classList.toggle('on');this.style.background=this.classList.contains('on')?'rgba(0,210,255,0.2)':'transparent';this.style.color=this.classList.contains('on')?'var(--cyan)':'var(--t3)'" class="${on?'on':''}" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--glass-border);background:${on?'rgba(0,210,255,0.2)':'transparent'};color:${on?'var(--cyan)':'var(--t3)'};font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">${CL_JOURS_C[n]}</button>`; }).join('');
+  // jour du mois
+  const dom=document.getElementById('cl-task-dom');
+  let o='';for(let k=1;k<=31;k++)o+=`<option value="${k}">${k}</option>`; o+='<option value="last">Dernier jour</option>';
+  dom.innerHTML=o; dom.value=(r.type==='monthly'&&r.dom)?String(r.dom):'1';
+  document.getElementById('cl-task-date').value=(r.type==='once'&&r.date)?r.date:fmt(new Date());
+  document.getElementById('cl-task-del').style.display=id?'inline-flex':'none';
+  clRecurUI();
+  openM('m-cl-task');
+}
+function clRecurUI(){
+  const v=document.getElementById('cl-task-recur').value;
+  document.getElementById('cl-wrap-weekly').style.display=v==='weekly'?'block':'none';
+  document.getElementById('cl-wrap-monthly').style.display=v==='monthly'?'block':'none';
+  document.getElementById('cl-wrap-once').style.display=v==='once'?'block':'none';
+}
+function saveClTask(){
+  _clInit();
+  const label=document.getElementById('cl-task-label').value.trim();
+  if(!label){ toast('⚠️ Indique un intitulé'); return; }
+  const time=document.getElementById('cl-task-time').value;
+  const type=document.getElementById('cl-task-recur').value;
+  const recur={type};
+  if(type==='weekly'){ recur.days=[...document.querySelectorAll('#cl-weekdays button.on')].map(b=>parseInt(b.dataset.dow)); if(!recur.days.length){ toast('⚠️ Choisis au moins un jour'); return; } }
+  if(type==='monthly'){ const dv=document.getElementById('cl-task-dom').value; recur.dom=(dv==='last')?'last':parseInt(dv); }
+  if(type==='once'){ recur.date=document.getElementById('cl-task-date').value; if(!recur.date){ toast('⚠️ Choisis une date'); return; } }
+  const data={label,time,timeEnd:document.getElementById('cl-task-end').value||'',recur,remind:document.getElementById('cl-task-remind').checked};
+  const id=document.getElementById('cl-task-id').value;
+  if(id){ const t=S.checklist.tasks.find(x=>x.id===id); if(t) Object.assign(t,data); }
+  else { data.id=uid(); data.order=S.checklist.tasks.length; S.checklist.tasks.push(data); }
+  save(); closeM('m-cl-task'); _clRenderManage(); renderChecklist();
+  toast('✅ Tâche enregistrée');
+}
+function delClTask(id){
+  _clInit();
+  const tid=id||document.getElementById('cl-task-id').value; if(!tid) return;
+  const t=S.checklist.tasks.find(x=>x.id===tid);
+  confirmDel('Supprimer la tâche',`Supprimer « ${t?.label||'?'} » de la check-list ?`,()=>{
+    S.checklist.tasks=S.checklist.tasks.filter(x=>x.id!==tid);
+    Object.keys(S.checklist.done||{}).forEach(d=>{ if(S.checklist.done[d]) delete S.checklist.done[d][tid]; });
+    save(); closeM('m-cl-task'); _clRenderManage(); renderChecklist();
+    toast('Tâche supprimée');
+  });
+}
+
+/* ── Rappels (l'app doit être ouverte) ── */
+function clRequestNotif(){
+  if(!('Notification'in window)){ toast('⚠️ Notifications non supportées par ce navigateur'); return; }
+  // Déjà autorisé → test immédiat
+  if(Notification.permission==='granted'){
+    try{ new Notification('✅ Notifications déjà activées',{body:'Tu recevras les rappels de la check-list.'}); }catch(_){}
+    toast('✅ Notifications déjà activées — test envoyé');
+    renderChecklist(); return;
+  }
+  // Déjà bloqué → le navigateur ne redemande pas : expliquer comment débloquer
+  if(Notification.permission==='denied'){
+    try{ confirmDel('Notifications bloquées','Ton navigateur a bloqué les notifications pour ce site. Pour les réactiver : clique sur le 🔒 (cadenas) à gauche de l\'adresse du site → Notifications → Autoriser, puis recharge la page.',()=>{},{btn:'Compris',icon:'🔔',safe:true}); }
+    catch(_){ toast('🔕 Notifications bloquées — autorise-les via le cadenas 🔒 dans la barre d\'adresse'); }
+    return;
+  }
+  // Sinon : demander
+  Notification.requestPermission().then(perm=>{
+    renderChecklist();
+    if(perm==='granted'){ try{ new Notification('🔔 Notifications activées',{body:'Tu recevras les rappels de la check-list, même sur un autre onglet.'}); }catch(_){}; toast('✅ Notifications activées'); }
+    else if(perm==='denied'){ toast('🔕 Tu as refusé les notifications (tu auras quand même le bandeau + son dans l\'app)'); }
+    else { toast('Notifications non activées — tu peux réessayer'); }
+  }).catch(()=>{ toast('Impossible d\'activer les notifications ici'); });
+}
+let _clFired={};   // {dateStr: Set(taskId)}
+function _clCheckReminders(){
+  try{
+    _clInit();
+    const now=new Date(); const ds=fmt(now);
+    if(!_clFired[ds]) _clFired={[ds]:new Set()};   // nouveau jour → reset
+    const fired=_clFired[ds];
+    const dmap=(S.checklist.done[ds])||{};
+    const curMin=now.getHours()*60+now.getMinutes();
+    _clTodayTasks(now).forEach(t=>{
+      if(t.remind===false) return;
+      if(dmap[t.id]) return;                               // déjà validée → aucun rappel
+      // 1er rappel : heure de début
+      if(t.time && !fired.has(t.id)){
+        const tmin=parseInt(t.time.slice(0,2))*60+parseInt(t.time.slice(3,5));
+        if(curMin>=tmin && curMin<=tmin+1){ fired.add(t.id); _clNotify(t,'start'); }
+      }
+      // 2e rappel : heure de fin (dernière limite) si la tâche n'est toujours pas validée
+      if(t.timeEnd && !fired.has(t.id+'_end')){
+        const emin=parseInt(t.timeEnd.slice(0,2))*60+parseInt(t.timeEnd.slice(3,5));
+        if(curMin>=emin && curMin<=emin+1){ fired.add(t.id+'_end'); _clNotify(t,'end'); }
+      }
+    });
+    _clUpdateBadge();
+  }catch(_){}
+}
+function _clNotify(t,kind){
+  const isEnd = kind==='end';
+  const msg = isEnd
+    ? `⏰ Dernière limite : ${t.label}${t.timeEnd?' ('+t.timeEnd+')':''} — pas encore validée`
+    : `C'est l'heure : ${t.label}${t.time?' ('+t.time+')':''}`;
+  const titre = isEnd ? '⏰ Dernière limite — '+t.label : '🔔 Check-list — '+t.label;
+  const corps = isEnd ? ('À terminer avant '+(t.timeEnd||'')) : (t.time?('Prévu à '+t.time):'À faire maintenant');
+  try{ if(('Notification'in window)&&Notification.permission==='granted'){ new Notification(titre,{body:corps,tag:'cl-'+t.id+(isEnd?'-end':''),requireInteraction:true}); } }catch(_){}
+  try{ _clBeep(); }catch(_){}
+  // bandeau in-app PERSISTANT, pulsant, au-dessus de tout (reste jusqu'à action)
+  try{
+    let stack=document.getElementById('cl-alert-stack');
+    if(!stack){ stack=document.createElement('div'); stack.id='cl-alert-stack'; document.body.appendChild(stack); }
+    const card=document.createElement('div'); card.className='cl-alert';
+    if(isEnd){ card.style.background='linear-gradient(135deg,#ff8f3c,#ffb45c)'; }   // orange = dernière limite
+    card.innerHTML=`<span style="font-size:22px;flex-shrink:0">${isEnd?'⏰':'🔔'}</span>
+      <div style="flex:1;min-width:0;font-weight:800;font-size:14px;line-height:1.3">${isEnd?msg.replace(/^⏰ /,''):msg}</div>
+      <button class="cl-a-go" style="background:rgba(0,0,0,0.18);border:none;border-radius:9px;color:#06251b;font-weight:800;padding:7px 12px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;white-space:nowrap">Voir ✓</button>
+      <button class="cl-a-x" title="Fermer" style="background:none;border:none;color:#06251b;font-weight:900;font-size:16px;cursor:pointer;opacity:.75;flex-shrink:0">✕</button>`;
+    card.querySelector('.cl-a-go').onclick=()=>{ try{goTab('checklist');}catch(_){}; card.remove(); _clClearTitleFlash(); };
+    card.querySelector('.cl-a-x').onclick=()=>{ card.remove(); if(!stack.children.length)_clClearTitleFlash(); };
+    stack.appendChild(card);
+  }catch(_){}
+  _clFlashTitle();
+}
+// Clignotement du titre de l'onglet navigateur (visible même sur une autre fenêtre)
+let _clTitleBase=null, _clTitleTimer=null, _clPending=0;
+function _clFlashTitle(){
+  _clPending++;
+  if(_clTitleBase===null) _clTitleBase=document.title;
+  if(!_clTitleTimer){
+    _clTitleTimer=setInterval(()=>{ document.title = (document.title.indexOf('🔔')===0) ? _clTitleBase : `🔔 Rappel (${_clPending}) — check-list`; },1000);
+  } else {
+    // mettre à jour le compteur affiché
+  }
+}
+function _clClearTitleFlash(){
+  _clPending=0;
+  if(_clTitleTimer){ clearInterval(_clTitleTimer); _clTitleTimer=null; }
+  if(_clTitleBase!==null){ document.title=_clTitleBase; }
+}
+// Revenir sur l'onglet → arrêter le clignotement du titre
+try{ window.addEventListener('focus',_clClearTitleFlash); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _clClearTitleFlash(); }); }catch(_){}
+function _clBeep(){
+  try{ const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.value=880; g.gain.setValueAtTime(0.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.25,ctx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }catch(_){}
+}
+// moteur de rappel : vérifie toutes les 20 s tant que l'app est ouverte
+try{ if(!window._clTimer) window._clTimer=setInterval(_clCheckReminders,20000); setTimeout(_clCheckReminders,1500); }catch(_){}
+
 function renderTodo(){
   const T=new Date();
   const pC={high:'var(--rose)',medium:'var(--gold)',low:'var(--mint)'};
