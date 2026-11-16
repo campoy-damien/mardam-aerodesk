@@ -1271,6 +1271,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="form-search" placeholder="Nom, prénom ou trigramme…" oninput="renderForms()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
+      <button class="btn btn-ghost btn-sm" onclick="openFormTypesMgr()" title="Gérer la liste des formations proposées et leur validité">⚙️ Gérer les formations</button>
       <button class="btn btn-ghost btn-sm" onclick="_previewDedupeForms()" title="Fusionner les formations et autorisations en double (même personne + même type)">🧹 Nettoyer les doublons</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()" title="Formations · Autorisations · Tractage · Certifying Staff — 1 à 4 fichiers, format détecté automatiquement">📡 Import mise à jour</button>
       <button class="btn btn-mint btn-sm" onclick="exportFormXls()">📤 Export Excel</button>
@@ -3045,26 +3046,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   </div>
   <div id="wrapFormInt" style="display:none;margin-bottom:11px">
     <div class="field">
-      <label style="color:#a16207">📖 Intitulé de la formation <span style="color:var(--rose);font-weight:700">*</span></label>
+      <label style="color:#a16207;display:flex;align-items:center;justify-content:space-between">
+        <span>📖 Intitulé de la formation <span style="color:var(--rose);font-weight:700">*</span></span>
+        <button type="button" onclick="openFormTypesMgr()" title="Gérer la liste des formations et leur validité" style="background:rgba(161,98,7,0.12);border:1px solid rgba(161,98,7,0.4);color:#e0b050;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">⚙️ Gérer</button>
+      </label>
       <select id="cellFormInt" style="border-color:rgba(161,98,7,0.3);background:rgba(161,98,7,0.05)">
         <option value="">— Sélectionner la formation —</option>
-        <option value="Global Refresh">🔄 Global Refresh (met à jour EWIS + CDCCL + Safety Training + MOE/PART 145)</option>
-        <option value="EWIS">EWIS</option>
-        <option value="CDCCL">CDCCL</option>
-        <option value="Safety Training">SAFETY TRAINING</option>
-        <option value="MOE/PART 145">MOE/PART 145</option>
-        <option value="Competencies">COMPETENCIES</option>
-        <option value="CACES CHARIOT">CACES CHARIOT</option>
-        <option value="CACES TRACMA">CACES TRACMA</option>
-        <option value="CACES NACELLE">CACES NACELLE</option>
-        <option value="CACES TELESCO">CACES TELESCO</option>
-        <option value="CACES GERBEUR">CACES GERBEUR</option>
-        <option value="TRAVAIL EN HAUTEUR">TRAVAIL EN HAUTEUR</option>
-        <option value="RISQUE CHIMIQUE">RISQUE CHIMIQUE</option>
-        <option value="ACCUEIL HSE">ACCUEIL HSE</option>
-        <option value="AIRE DE TRAFFIC">AIRE DE TRAFFIC</option>
-        <option value="NEW ARRIVAL TRAINING">NEW ARRIVAL TRAINING</option>
-        <option value="Aircraft Dismantling Process">AIRCRAFT DISMANTLING PROCESS</option>
       </select>
       <div style="font-size:10px;color:var(--t4);margin-top:5px">📅 Le lendemain de la formation, l'app vous demandera confirmation pour mettre la formation à jour.</div>
     </div>
@@ -3252,21 +3239,34 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="fgrid">
     <div class="field" style="grid-column:1/-1"><label>Employé *</label><select id="f-emp"></select></div>
     <div class="field" style="grid-column:1/-1"><label>Type de formation *</label>
-      <select id="f-type">
-        <option>CACES NACELLE</option><option>CACES CHARIOT</option><option>CACES TRACMA</option><option>CACES TELESCO</option><option>CACES GERBEUR</option><option>EWIS</option><option>CDCCL</option><option>SAFETY TRAINING</option>
-        <option>English Test</option><option>MOE / PART 145</option><option>ACCUEIL HSE</option>
-        <option>Travail en hauteur</option>
-        <option>Risque chimiques</option><option>Compétences</option>
-        <option>Licence Part 66</option><option>Pushback</option><option>Autre</option>
+      <select id="f-type" onchange="_formAutoExp(true)">
+        <option>Autre</option>
       </select>
     </div>
-    <div class="field"><label>Obtention</label><input type="date" id="f-obt"></div>
-    <div class="field"><label>Expiration</label><input type="date" id="f-exp"></div>
+    <div class="field"><label>Obtention</label><input type="date" id="f-obt" onchange="_formAutoExp(true)"></div>
+    <div class="field"><label>Expiration <span id="f-exp-hint" style="font-size:9px;color:var(--t4)"></span></label><input type="date" id="f-exp"></div>
     <div class="field" style="grid-column:1/-1"><label>Notes / Référence</label><input type="text" id="f-notes" placeholder="Organisme, niveau, référence..."></div>
   </div>
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-form')">Annuler</button>
     <button class="btn btn-cyan" onclick="saveFormation()">Sauvegarder</button>
+  </div>
+</div>
+</div>
+
+<!-- Gestionnaire de la liste des formations -->
+<div class="mbg" id="m-formtypes">
+<div class="modal" style="max-width:640px">
+  <div class="modal-title">⚙️ Gérer les formations</div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.5">
+    Ajoute ici les formations proposées dans toute l'app. La <b>validité</b> sert à calculer automatiquement la date d'expiration quand tu inscris une formation à quelqu'un (planning confirmé ou saisie manuelle). Décoche <b>« expire »</b> pour une formation d'accueil sans échéance.
+  </div>
+  <div id="ft-list" style="max-height:52vh;overflow-y:auto;margin-bottom:10px"></div>
+  <button class="btn btn-ghost btn-sm" onclick="_ftAddRow()" style="width:100%">+ Ajouter une formation</button>
+  <div style="font-size:10px;color:var(--t4);margin-top:10px;line-height:1.5">🔄 <b>Global Refresh</b> est une formation spéciale (met à jour EWIS + CDCCL + Safety Training + MOE/PART 145). Elle reste disponible et n'est pas modifiable ici.</div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-formtypes')">Annuler</button>
+    <button class="btn btn-cyan" onclick="saveFormTypes()">💾 Enregistrer</button>
   </div>
 </div>
 </div>
@@ -8092,7 +8092,7 @@ function renderFormMatrix(){
   const rows=_sortByNom(S.personnel.filter(p=>!_empHorsEffectif(p.id))).map(p=>{
     const mF={}; S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
     const cat=CATS[p.categorie]||{};
-    const cells=TRAININGS.map(t=>{
+    const cells=_allFormNames().map(t=>{
       const f=mF[t]; if(!f) return`<td style="text-align:center;vertical-align:middle"><span style="color:var(--t4);font-size:13px">—</span></td>`;
       const s=tSt(f.dateExpiration);
       const cl={valid:'bv',warning:'bw',expired:'be',na:'bn'}[s]||'bn';
@@ -8109,7 +8109,7 @@ function renderFormMatrix(){
   box.innerHTML=`<div class="mwrap" style="padding:6px 4px 4px;overflow:auto;max-height:70vh"><table class="mtable"><thead><tr>
     <th class="mx-sticky-name mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 12px;text-align:left;min-width:150px;font-size:11px">Employé</th>
     <th class="mx-sticky-tri mx-head" style="writing-mode:horizontal-tb;transform:none;height:auto;padding:9px 8px;text-align:center;min-width:44px;font-size:11px">TRI</th>
-    ${TRAININGS.map(t=>{
+    ${_allFormNames().map(t=>{
       const MAP={
         'CACES NACELLE':  'CACES<br>NACELLE',
         'CACES CHARIOT':  'CACES<br>CHARIOT',
@@ -8306,16 +8306,13 @@ function _formToggleEmp(key){
 }
 function openFormModal(id){
   document.getElementById('fi').value=id||'';
+  try{_fillFTypeSelect(id?(S.formations.find(x=>x.id===id)||{}).type:'');}catch(_){}
   if(id){const f=S.formations.find(x=>x.id===id);if(f){
     document.getElementById('f-emp').value=f.empId;
-    // S'assurer que le type existe dans les options (sinon l'ajouter) pour un chargement fidèle
-    const tSel=document.getElementById('f-type');
-    if(tSel && f.type && !Array.from(tSel.options).some(o=>o.value===f.type)){
-      const o=document.createElement('option'); o.value=f.type; o.textContent=f.type; tSel.appendChild(o);
-    }
     document.getElementById('f-type').value=f.type;
     document.getElementById('f-obt').value=f.dateObtention||'';document.getElementById('f-exp').value=f.dateExpiration||'';document.getElementById('f-notes').value=f.notes||'';}}
   else{['f-obt','f-exp','f-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-emp').value='';}
+  try{_formAutoExp();}catch(_){}
   openM('m-form');
 }
 function editForm(id){openFormModal(id);}
@@ -8375,7 +8372,7 @@ function exportFormMatrixXls(){
       title:'Matrice des formations & certifications',
       sheetName:'Matrice formations',
       fileName:'AeroStaff_Matrice_Formations.xlsx',
-      staff, cols:TRAININGS, colLabel:t=>t.toUpperCase(),
+      staff, cols:_allFormNames(), colLabel:t=>t.toUpperCase(),
       records:S.formations||[], recField:'type'
     }).then(()=>toast('✅ Matrice formations colorée ✓'))
       .catch(e=>{ console.error(e); toast('❌ Erreur export: '+e.message); });
@@ -8387,11 +8384,11 @@ function exportFormMatrixPDF(){
   if(!staff.length){ toast('Aucun personnel à exporter'); return; }
   const ic={valid:'✓',warning:'⚠',expired:'✗',na:'∞'};
   const clr={valid:'#1e8f4e',warning:'#b8790a',expired:'#c0392b',na:'#8a93a5'};
-  const th=TRAININGS.map(t=>`<th class="rot" title="${t}">${t.toUpperCase()}</th>`).join('');
+  const th=_allFormNames().map(t=>`<th class="rot" title="${t}">${t.toUpperCase()}</th>`).join('');
   const trs=staff.map(p=>{
     const mF={};
     S.formations.filter(f=>f.empId===p.id).forEach(f=>mF[f.type]=f);
-    const tds=TRAININGS.map(t=>{
+    const tds=_allFormNames().map(t=>{
       const f=mF[t];
       if(!f) return `<td class="c muted">—</td>`;
       const s=tSt(f.dateExpiration);
@@ -8410,7 +8407,7 @@ function exportFormMatrixPDF(){
   th.rot>*{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto}
   .legend{margin-top:14px;font-size:11px;color:#444}.foot{margin-top:20px;display:flex;align-items:center;gap:8px}</style></head><body>
   <h1>Matrice des formations &amp; certifications</h1>
-  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${TRAININGS.length} formation(s)</div>
+  <div class="sub">Site LFBF · Établi le ${disp(fmt(new Date()))} · ${staff.length} personne(s) · ${_allFormNames().length} formation(s)</div>
   <table><thead><tr><th class="emp">Employé</th><th class="tri">TRI</th>${th}</tr></thead><tbody>${trs}</tbody></table>
   <div class="legend"><b>Légende :</b> <span style="color:${clr.valid}">✓ valide</span> · <span style="color:${clr.warning}">⚠ expire bientôt</span> · <span style="color:${clr.expired}">✗ expiré</span> · <span style="color:${clr.na}">∞ sans limite</span> · — non détenue</div>
   <div class="foot"><img src="${PDF_LOGO_B64}" width="22" height="22" style="object-fit:contain"><span style="font-weight:800;font-size:13px">MARDAM AeroDesk Pro</span></div>
@@ -9803,8 +9800,8 @@ function _plKey(e){
 }
 
 /* ═══ MASTER ═══ */
-function chMonth(dir){S.masterMonth+=dir;if(S.masterMonth>11){S.masterMonth=0;S.masterYear++;}if(S.masterMonth<0){S.masterMonth=11;S.masterYear--;}renderMaster();}
-function goToday(){S.masterMonth=new Date().getMonth();S.masterYear=new Date().getFullYear();renderMaster();}
+function chMonth(dir){S.masterMonth+=dir;if(S.masterMonth>11){S.masterMonth=0;S.masterYear++;}if(S.masterMonth<0){S.masterMonth=11;S.masterYear--;}const _yr=document.getElementById('mp-year');if(_yr)_yr.value=String(S.masterYear);renderMaster();}
+function goToday(){S.masterMonth=new Date().getMonth();S.masterYear=new Date().getFullYear();const _yr=document.getElementById('mp-year');if(_yr)_yr.value=String(S.masterYear);renderMaster();}
 
 /* ═══ AFFECTATION PERMANENTE SUR L'ANNÉE ═══ */
 // Liste des activités affectables (chantiers actifs + activités globales)
@@ -10535,6 +10532,7 @@ function openCell(empId,dateStr,half){
   const cc2=document.getElementById('cellChantier2'); if(cc2) cc2.value=ex.chantierId2||'';
   try{ _cbxRefresh('cellChantier'); _cbxRefresh('cellChantier2'); }catch(_){}
   document.getElementById('cellNote').value=ex.note||'';
+  try{_fillFormIntSelect();}catch(_){}
   document.getElementById('cellFormInt').value=ex.formInt||'';
   // Réinitialise le sélecteur "Appliquer à" et masque les sous-blocs à chaque ouverture
   const _ap=document.getElementById('cellApply');
@@ -10723,7 +10721,7 @@ function saveCellEdit(){
 
   // Enregistrer le suivi des formations internes planifiées
   // (sauf les formations "présentation / accueil" qui n'ont pas de suivi)
-  if(cellType==='formation_int'&&formInt&&formIntDates.size&&!(typeof FORM_NO_TRACKING!=='undefined'&&FORM_NO_TRACKING.has(formInt))){
+  if(cellType==='formation_int'&&formInt&&formIntDates.size&&(typeof _formHasTracking!=='function'||_formHasTracking(formInt))){
     if(!S.formTracking) S.formTracking=[];
     formIntDates.forEach(key=>{
       const [eid,ds]=key.split('|');
@@ -17120,8 +17118,10 @@ const AI_SUGGESTIONS={
     'Combien de dispo la semaine prochaine ?',
     'Quel est l\'écart capacité / besoin cette semaine ?',
     'Sommes-nous en sous-effectif cette semaine ?',
-    'Compare cette semaine et la semaine prochaine',
-    'Y a-t-il assez de monde la semaine prochaine ?'
+    'Sommes-nous en sous-effectif la semaine prochaine ?',
+    'Quelles semaines seront en tension ?',
+    'Quelles semaines manquent de monde dans les 8 prochaines semaines ?',
+    'Compare cette semaine et la semaine prochaine'
   ],
   '🏖 Présence':[
     'Qui est en congé cette semaine ?',
@@ -17133,19 +17133,34 @@ const AI_SUGGESTIONS={
     'Quels chefs d\'équipe sont présents cette semaine ?',
     'Quels techniciens sont présents la semaine prochaine ?'
   ],
-  '🔧 Activité':[
+  '🔧 Chantiers & flotte':[
     'État des chantiers',
-    'Que se passe-t-il ce mois-ci ?',
     'Chantiers actifs ce mois-ci',
-    'Avions en recyclage ce mois-ci',
     'Quels chantiers manquent de monde ?',
     'Quels chantiers sont en retard ?',
     'État du recyclage',
     'Avancement du recyclage',
     'Stockage cette semaine',
-    'Charge Airbus Part 21 cette semaine'
+    'Combien d\'avions en stockage ?',
+    'Combien d\'avions recyclés cette année ?'
   ],
-  '🛡 Formations':[
+  '🏗 Un chantier':[
+    'Qui travaille sur le chantier … cette semaine ?',
+    'Qui travaille sur le MSN … ?',
+    'Combien de personnes sur le chantier … ?',
+    'Quand commence et finit le chantier … ?',
+    'Qui est le responsable du chantier … ?',
+    'Qui est le chef d\'équipe du chantier … ?'
+  ],
+  '📚 Formations planifiées':[
+    'Quelles sont les prochaines formations planifiées ?',
+    'Calendrier des formations à venir',
+    'Montre les prochaines sessions de formation',
+    'Quand est la prochaine formation Global Refresh ?',
+    'Qui est planifié sur la prochaine formation Global Refresh ?',
+    'Qui est planifié sur la prochaine formation EWIS ?'
+  ],
+  '🛡 Échéances':[
     'État global des formations',
     'Formations qui expirent dans 3 mois',
     'Qui doit renouveler une formation ?',
@@ -17158,17 +17173,26 @@ const AI_SUGGESTIONS={
   ],
   '🔎 Recherche croisée':[
     'Qui a le CACES nacelle et est dispo cette semaine ?',
-    'Quels techniciens ont l\'EWIS valide ?',
+    'Qui a l\'EWIS ?',
     'Qui a l\'habilitation CDCCL et est présent cette semaine ?',
     'Qui a le CACES nacelle et le CACES chariot ?',
     'Quels techniciens ont l\'EWIS et sont dispo la semaine prochaine ?'
   ],
-  '👥 Effectif':[
+  '👤 Une personne':[
+    'Que fait … cette semaine ?',
+    'Où est affecté … cette semaine ?',
+    'Sur quel chantier est … ?',
+    'Quand revient … de congé ?',
+    'Quand expire l\'EWIS de … ?',
+    'Formations de …'
+  ],
+  '👥 Effectif & contrats':[
     'Répartition de l\'effectif',
     'Combien de techniciens au total ?',
     'Combien d\'intérimaires ?',
     'Combien de chefs d\'équipe ?',
-    'Infos sur une personne (tape un nom)'
+    'Quels intérimaires ont leur contrat qui se termine bientôt ?',
+    'Quels contrats se terminent dans 2 mois ?'
   ],
   '✦ Simulation & actions':[
     'Puis-je accepter un nouveau chantier ?',
@@ -17179,7 +17203,8 @@ const AI_SUGGESTIONS={
     'Affecte … sur le chantier …'
   ]
 };
-const AI_SUGG_FILL=new Set(['✦ Simulation & actions']); // ces thèmes pré-remplissent (à compléter)
+// Thèmes dont les puces sont des MODÈLES À COMPLÉTER (un « … » à remplacer) : clic = pré-remplissage
+const AI_SUGG_FILL=new Set(['🏗 Un chantier','👤 Une personne','✦ Simulation & actions']);
 let _aiSuggTheme=0;
 function aiRenderSuggestions(idx){
   const themesEl=document.getElementById('ai-sugg-themes');
@@ -18022,11 +18047,306 @@ const AI_LEX = {
   compare:['compare','comparer','comparaison','comparatif','versus','difference','différence','par rapport a','par rapport à','ecart entre','écart entre','mettre en regard','face a face','face à face']
 };
 
+/* ════════════ MOTEUR GÉNÉRIQUE ASSISTANT — extraction d'entités + résolveurs ════════════ */
+function _aiNorm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+
+// Ensemble des noms de formations connus (planning + types + sélecteur)
+function _aiFormationNames(){
+  const names=new Set();
+  Object.values(S.planning||{}).forEach(e=>{ if(e&&e.type==='formation_int'&&e.formInt) names.add(e.formInt); });
+  (S.formations||[]).forEach(f=>{ if(f.type) names.add(f.type); });
+  ['Global Refresh','EWIS','CDCCL','Safety Training','MOE/PART 145','Competencies','CACES CHARIOT','CACES TRACMA','CACES NACELLE','CACES TELESCO','CACES GERBEUR','TRAVAIL EN HAUTEUR','English','Welcome','Visite Médicale','Risques Chimiques','Welcome SSE']
+    .forEach(x=>names.add(x));
+  return [...names];
+}
+function _aiMatchFormation(n){
+  const names=_aiFormationNames(); let cited=null,best=0;
+  names.forEach(nm=>{ const k=_aiNorm(nm); if(k.length>=3 && n.includes(k) && k.length>best){best=k.length;cited=nm;} });
+  if(!cited){ names.forEach(nm=>{ const toks=_aiNorm(nm).split(/[^a-z0-9]+/).filter(w=>w.length>=4); const kl=_aiNorm(nm).length; if(toks.length && toks.every(w=>new RegExp('\\b'+w+'\\b').test(n)) && kl>best){best=kl;cited=nm;} }); }
+  return cited;
+}
+// Chantier / avion cité (MSN, client ou nom). Renvoie {kind,obj,refs,label}
+function _aiMatchChantier(n){
+  let best=null,bestLen=0;
+  const consider=(len,cand)=>{ if(len>bestLen){bestLen=len;best=cand;} };
+  (S.chantiers||[]).forEach(c=>{
+    const msn=_aiNorm(c.msn); const cli=_aiNorm(c.client); const av=_aiNorm(c.avion);
+    if(msn&&msn.length>=3&&n.includes(msn)) consider(msn.length+5,{kind:'chantier',obj:c,refs:[c.id],label:`MSN ${c.msn}${c.avion?' '+c.avion:''}${c.client?' ('+c.client+')':''}`});
+    else if(cli&&cli.length>=4&&n.includes(cli)) consider(cli.length,{kind:'chantier',obj:c,refs:[c.id],label:`${c.client}${c.msn?' · MSN '+c.msn:''}`});
+  });
+  ((S.recycling&&S.recycling.avions)||[]).forEach(a=>{ const msn=_aiNorm(a.msn); if(msn&&msn.length>=3&&n.includes(msn)) consider(msn.length+5,{kind:'recycling',obj:a,refs:['REC_'+a.id,'REC'],label:`MSN ${a.msn}${a.type?' '+a.type:''} (recyclage)`}); });
+  ((S.stockage&&S.stockage.avions)||[]).forEach(a=>{ const msn=_aiNorm(a.msn); if(msn&&msn.length>=3&&n.includes(msn)) consider(msn.length+5,{kind:'stockage',obj:a,refs:['STO_'+a.id,'STO'],label:`MSN ${a.msn}${a.type?' '+a.type:''} (stockage)`}); });
+  return best;
+}
+// Période citée → {mon(Date lundi), wk, dateStr|null, month, next, label}
+function _aiPeriod(n){
+  const curWk=wkN(getMon(new Date())); let wk=null;
+  const mE=n.match(/semaine\s*(\d{1,2})|\bs\s?(\d{1,2})\b|\bsem\s?(\d{1,2})/);
+  if(mE) wk=parseInt(mE[1]||mE[2]||mE[3]);
+  else if(/semaine\s+prochaine|prochaine\s+semaine|semaine\s+suivante/.test(n)) wk=curWk+1;
+  else if(/semaine\s+derniere|derniere\s+semaine|semaine\s+precedente|semaine\s+passee/.test(n)) wk=curWk-1;
+  else { const md=n.match(/dans\s+(\d{1,2})\s+semaines?/); if(md) wk=curWk+parseInt(md[1]); }
+  if(wk==null && /cette\s+semaine|semaine\s+en\s+cours|semaine\s+actuelle/.test(n)) wk=curWk;
+  let dateStr=null;
+  const mD=n.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+  if(mD){ const d=+mD[1],mo=+mD[2]; let y=mD[3]?(+mD[3]<100?2000+(+mD[3]):+mD[3]):(new Date().getFullYear()); if(d>=1&&d<=31&&mo>=1&&mo<=12) dateStr=`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+  if(/aujourd/.test(n)) dateStr=fmt(new Date());
+  else if(/\bdemain\b/.test(n)) dateStr=fmt(addD(new Date(),1));
+  const MOIS=[['janvier',0],['fevrier',1],['mars',2],['avril',3],['mai',4],['juin',5],['juillet',6],['aout',7],['septembre',8],['octobre',9],['novembre',10],['decembre',11]];
+  let month=-1; for(const [m,i] of MOIS){ if(new RegExp('\\b'+m).test(n)){month=i;break;} }
+  const next=/prochain|a venir|futur|suivant/.test(n);
+  const mon = dateStr? getMon(dateStr) : _weekMon(wk!=null?wk:undefined);
+  return {wk, mon, dateStr, month, next, label: wk!=null?('semaine '+wkN(mon)):(dateStr?disp(dateStr):'semaine '+wkN(mon))};
+}
+
+function _aiExtract(n,q){
+  const E={};
+  const P=_aiPeriod(n); E.period=P;
+  try{ E.person=aiFindPerson(q); }catch(_){ E.person=null; }
+  const CATS={technicien:['technicien','tech ','mecano','mecanicien'],chef:['chef d equipe','chef equipe',' chefs',' chef'],expert:['expert'],responsable:['responsable','chef de projet','resp projet'],interimaire:['interim','interimaire'],workshop:['workshop'],sheetmetal:['sheet metal','chaudronnier'],alternant:['alternant','apprenti'],stagiaire:['stagiaire']};
+  E.cat=null; for(const c in CATS){ if(CATS[c].some(w=>n.includes(_aiNorm(w)))){E.cat=c;break;} }
+  E.formation=_aiMatchFormation(n);
+  E.chantier=_aiMatchChantier(n);
+  return E;
+}
+
+// Libellé d'une case planning
+function _aiCellLbl(e){
+  if(!e||!e.type) return '—';
+  if(e.type==='travail') return _chMsnLabel(e.chantierId)+(e.chantierId2?(' + '+_chMsnLabel(e.chantierId2)):'');
+  if(e.type==='formation_int') return '📖 '+(e.formInt||'Formation interne');
+  if(e.type==='formation') return '📚 '+(e.note||'Formation ext.');
+  return (typeof HD_LBL!=='undefined'&&HD_LBL[e.type])?HD_LBL[e.type]:e.type;
+}
+const _AI_JOURS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+/* ── Emploi du temps d'une personne ── */
+function _aiResPersonSchedule(E,n){
+  if(!E.person) return null;
+  const cue=/que\s+fait|que\s+fais|planning|emploi du temps|agenda|sur quoi|occupation|fait quoi|quoi fait|va faire|affect|est[- ]il (ou|affecte)|est[- ]elle (ou|affecte)|programme de|programme d /.test(n);
+  const periodCue = (E.period.wk!=null||E.period.dateStr) && /\b(fait|travaille|bosse|planning|agenda|occupe|affect|est)\b/.test(n);
+  if(!cue && !periodCue) return null;
+  const p=E.person, mon=E.period.mon;
+  const days = E.period.dateStr ? [{ds:E.period.dateStr,idx:(parseLocal(E.period.dateStr).getDay()||7)-1}] : [0,1,2,3,4].map(i=>({ds:fmt(addD(mon,i)),idx:i}));
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>emploi du temps de ${p.prenom} ${p.nom}</em> (${E.period.dateStr?disp(E.period.dateStr):'semaine '+wkN(mon)}).</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">🗓 ${p.nom} ${p.prenom} <span style="color:#8090a8;font-size:11px">(${_catLabel(p.categorie)})</span></div>`;
+  let any=false;
+  h+=days.map(({ds,idx})=>{
+    const am=S.planning&&S.planning[`${p.id}_${ds}_AM`], pm=S.planning&&S.planning[`${p.id}_${ds}_PM`];
+    if((am&&am.type)||(pm&&pm.type)) any=true;
+    const d=parseLocal(ds);
+    return `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px">
+      <span style="width:70px;color:#8090a8;flex-shrink:0">${_AI_JOURS[idx]||''} ${disp(ds).slice(0,5)}</span>
+      <span style="flex:1">AM : ${_aiCellLbl(am)}</span>
+      <span style="flex:1">PM : ${_aiCellLbl(pm)}</span>
+    </div>`;
+  }).join('');
+  if(!any) h+=`<div style="color:#8090a8;margin-top:4px">Rien de planifié sur cette période.</div>`;
+  return h;
+}
+
+/* ── Où est affecté X (chantiers de la période) ── */
+function _aiResPersonWhere(E,n){
+  if(!E.person) return null;
+  if(!/ou (est|travaille|bosse|affect)|sur quel chantier|quel chantier|affecte (sur|a)|affectation de|sur quoi (travaille|bosse)/.test(n)) return null;
+  const p=E.person, mon=E.period.mon;
+  const refs={};
+  for(let i=0;i<7;i++){ const ds=fmt(addD(mon,i)); ['AM','PM'].forEach(hh=>{ const e=S.planning&&S.planning[`${p.id}_${ds}_${hh}`]; if(e&&e.type==='travail'){ [e.chantierId,e.chantierId2].filter(Boolean).forEach(cid=>{ (refs[cid]=refs[cid]||new Set()).add(ds); }); } }); }
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>où est affecté ${p.prenom} ${p.nom}</em> (semaine ${wkN(mon)}).</div>`;
+  const keys=Object.keys(refs);
+  if(!keys.length) return h+`<div style="color:#ffd060">Aucune affectation chantier pour ${p.nom} ${p.prenom} en semaine ${wkN(mon)}.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">🔧 ${p.nom} ${p.prenom} — semaine ${wkN(mon)}</div>`;
+  h+=keys.map(cid=>`<div style="margin-bottom:2px">• ${_chMsnLabel(cid)} <span style="color:#8090a8;font-size:11px">(${refs[cid].size} demi-jour.)</span></div>`).join('');
+  return h;
+}
+
+/* ── Qui travaille sur un chantier / MSN ── */
+function _aiResChantierPeople(E,n){
+  if(!E.chantier) return null;
+  if(!(/\bqui\b/.test(n) || /personnes?|effectif|equipe|monde/.test(n))) return null;
+  if(/combien/.test(n)) return null; // → compte (autre résolveur)
+  const C=E.chantier, mon=E.period.mon, refset=new Set(C.refs);
+  const people={};
+  for(let i=0;i<7;i++){ const ds=fmt(addD(mon,i)); (S.personnel||[]).forEach(p=>{ if(_empHorsEffectif(p.id))return; ['AM','PM'].forEach(hh=>{ const e=S.planning&&S.planning[`${p.id}_${ds}_${hh}`]; if(e&&e.type==='travail'&&([e.chantierId,e.chantierId2].some(r=>refset.has(r)))){ (people[p.id]=people[p.id]||new Set()).add(ds); } }); }); }
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>qui travaille sur ${C.label}</em> (semaine ${wkN(mon)}).</div>`;
+  const ids=Object.keys(people);
+  if(!ids.length) return h+`<div style="color:#ffd060">Personne n'est affecté à ${C.label} en semaine ${wkN(mon)}.</div>`;
+  const list=ids.map(id=>byId(id)).filter(Boolean).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">👷 ${C.label} — ${list.length} personne(s), semaine ${wkN(mon)}</div>`;
+  h+=list.map(p=>`<div style="margin-bottom:2px">• ${_aiChip(p)} <span style="color:#8090a8;font-size:11px">(${_catLabel(p.categorie)}, ${people[p.id].size} dj)</span></div>`).join('');
+  return h;
+}
+
+/* ── Combien de techniciens sur un chantier ── */
+function _aiResChantierStaffCount(E,n){
+  if(!E.chantier || !/combien/.test(n)) return null;
+  const C=E.chantier, mon=E.period.mon, refset=new Set(C.refs);
+  const ids=new Set();
+  for(let i=0;i<7;i++){ const ds=fmt(addD(mon,i)); (S.personnel||[]).forEach(p=>{ if(_empHorsEffectif(p.id))return; ['AM','PM'].forEach(hh=>{ const e=S.planning&&S.planning[`${p.id}_${ds}_${hh}`]; if(e&&e.type==='travail'&&[e.chantierId,e.chantierId2].some(r=>refset.has(r))) ids.add(p.id); }); }); }
+  const besoin = (C.kind==='chantier') ? (parseInt(C.obj.ressources)||null) : (parseInt(C.obj.techsRequis)||null);
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>combien de personnes sur ${C.label}</em> (semaine ${wkN(mon)}).</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff">👷 ${ids.size} personne(s) affectée(s) à ${C.label} en semaine ${wkN(mon)}`+(besoin!=null?` <span style="color:#8090a8;font-size:12px">(besoin : ${besoin})</span>`:'')+`</div>`;
+  if(besoin!=null){ const d=ids.size-besoin; h+=`<div style="margin-top:4px;color:${d>=0?'#34c759':'#ff8090'}">${d>=0?'✅ Besoin couvert ('+d+' en marge)':'⚠ Manque '+Math.abs(d)+' personne(s)'}</div>`; }
+  return h;
+}
+
+/* ── Dates début/fin d'un chantier ── */
+function _aiResChantierDates(E,n){
+  if(!E.chantier) return null;
+  if(!/quand|date|debut|commence|demarre|debute|\bfin\b|termine|se termine|calendrier/.test(n)) return null;
+  const C=E.chantier, o=C.obj;
+  const deb=o.debut||o.entree||''; const fin=o.fin||o.finChantier||o.finPrev||'';
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>dates de ${C.label}</em>.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:4px">📅 ${C.label}</div>`;
+  h+=`<div style="font-size:13px">Début : <b>${deb?disp(deb):'—'}</b> · Fin ${fin&&(o.finPrev&&!o.fin)?'prévue':''} : <b>${fin?disp(fin):'—'}</b></div>`;
+  if(o.statut) h+=`<div style="font-size:11px;color:#8090a8;margin-top:3px">Statut : ${({encours:'En cours',futur:'À venir',termine:'Terminé'})[o.statut]||o.statut}</div>`;
+  return h;
+}
+
+/* ── Responsable / chef d'un chantier ── */
+function _aiResChantierLead(E,n){
+  if(!E.chantier || E.chantier.kind!=='chantier') return null;
+  if(!/qui est (le )?(resp|responsable|chef)|responsable (du|de|sur)|\bchef\b|encadr|chef d equipe/.test(n)) return null;
+  const o=E.chantier.obj;
+  const resp=o.resp?byId(o.resp):null, chef=o.chef?byId(o.chef):null;
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>encadrement de ${E.chantier.label}</em>.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:4px">🎖 ${E.chantier.label}</div>`;
+  h+=`<div style="font-size:13px">Responsable projet : <b>${resp?resp.nom+' '+resp.prenom:'— non défini —'}</b></div>`;
+  h+=`<div style="font-size:13px">Chef d'équipe : <b>${chef?chef.nom+' '+chef.prenom:'— non défini —'}</b></div>`;
+  return h;
+}
+
+/* ── Calendrier des formations planifiées (prochaines sessions) ── */
+function _aiResFormationCalendar(E,n){
+  const cue=/prochaine?s? formation|prochaine?s? session|formations? (a venir|planifi|prevu|programm)|calendrier.*formation|sessions? de formation|quand (est|aura|a lieu|sont).*(formation|session)|planning (des )?formation/.test(n);
+  // Formation nommée + contexte "session/à venir" — mais PAS un simple « semaine prochaine »
+  const whenNamed = E.formation && /prochaine (formation|session)|(formation|session) (a venir|prochaine)|quand (est|aura|a lieu|sont)|calendrier|planifi/.test(n);
+  if(!cue && !whenNamed) return null;
+  if(/expir|echeance|renouvel|a jour/.test(n)) return null;                 // → échéances
+  if(/\bont\b|qui a |n a pas|\bvalide\b|habilitation|detien|possed/.test(n)) return null; // → détenteurs
+  const today=new Date(); today.setHours(0,0,0,0); const todayStr=fmt(today);
+  const cited=E.formation;
+  const map={}; // "formInt||date" → {formInt,date,emps:Set}
+  Object.entries(S.planning||{}).forEach(([k,e])=>{
+    if(!e) return; let label='';
+    if(e.type==='formation_int') label=e.formInt||''; else if(e.type==='formation') label=e.note||''; else return;
+    if(!label) return; if(cited && _aiNorm(label)!==_aiNorm(cited)) return;
+    const parts=k.split('_'); const empId=parts[0]; const ds=parts.slice(1,-1).join('_');
+    if(!ds||ds<todayStr) return;
+    const key=label+'||'+ds; (map[key]=map[key]||{formInt:label,date:ds,emps:new Set()}).emps.add(empId);
+  });
+  const sessions=Object.values(map).sort((a,b)=> a.date<b.date?-1:a.date>b.date?1:a.formInt.localeCompare(b.formInt));
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>${cited?'prochaines sessions de « '+cited+' »':'formations planifiées à venir'}</em> (d'après le planning).</div>`;
+  if(!sessions.length) return h+`<div style="color:#ffd060">Aucune formation ${cited?'« '+cited+' » ':''}n'est planifiée à venir dans le planning.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">📚 ${cited?'Sessions « '+cited+' »':'Prochaines formations planifiées'}</div>`;
+  h+=sessions.slice(0,14).map(s=>{
+    const dj=Math.round((parseLocal(s.date)-today)/86400000);
+    const names=[...s.emps].map(id=>byId(id)).filter(Boolean).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+    const who=names.slice(0,8).map(p=>p.nom+' '+p.prenom).join(', ')+(names.length>8?` +${names.length-8}`:'');
+    return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="font-size:12.5px"><b style="color:#9ecbff">${s.formInt}</b> — ${disp(s.date)} <span style="color:#8090a8;font-size:11px">(${dj===0?"aujourd'hui":dj===1?'demain':'dans '+dj+' j'})</span> · ${names.length} pers.</div>
+      <div style="font-size:11px;color:#8090a8">${who||'—'}</div>
+    </div>`;
+  }).join('');
+  if(sessions.length>14) h+=`<div style="font-size:11px;color:#8090a8;margin-top:4px">… +${sessions.length-14} autre(s) session(s)</div>`;
+  h+=`<div style="margin-top:8px;font-size:11px;color:#8090a8">💡 Pour inscrire quelqu'un : planning → case → Formation interne → choisir la formation à cette date.</div>`;
+  return h;
+}
+
+/* ── Quand expire la formation X de Y ── */
+function _aiResFormationExpiryPerson(E,n){
+  if(!E.person || !E.formation) return null;
+  if(/\bqui\b|\bquels?\b|\bquelles?\b|\bont\b|n a pas|n ont pas/.test(n)) return null;   // détenteurs → cross/suivi
+  if(/prochaine|planifi|calendrier|\bsession\b|a venir/.test(n)) return null;            // calendrier → autre résolveur
+  if(!/quand|expir|echeance|jusqu|\bdate\b/.test(n)) return null;
+  const p=E.person, f=_aiNorm(E.formation);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const rows=(S.formations||[]).concat(S.autorisations||[]).filter(x=>{ const t=_aiNorm(x.type||x.nom); return x.empId===p.id && t===f; });
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>échéance « ${E.formation} » de ${p.prenom} ${p.nom}</em>.</div>`;
+  if(!rows.length) return h+`<div style="color:#ffd060">Aucune ligne « ${E.formation} » enregistrée pour ${p.nom} ${p.prenom}.</div>`;
+  h+=rows.map(x=>{ const exp=x.dateExpiration; if(!exp) return `<div>${E.formation} : <b>date non renseignée</b></div>`; const d=Math.round((parseLocal(exp)-today)/86400000); const col=d<0?'#ff8090':d<=60?'#ffd060':'#34c759'; return `<div style="font-size:13px">${E.formation} : <b style="color:${col}">${disp(exp)}</b> <span style="color:#8090a8;font-size:11px">(${d<0?'expiré depuis '+Math.abs(d)+' j':'dans '+d+' j'})</span></div>`; }).join('');
+  return h;
+}
+
+/* ── Quand revient X (de congé/absence) ── */
+function _aiResPersonReturn(E,n){
+  if(!E.person) return null;
+  if(!/revient|de retour|retour de|rentre|quand.*(revient|rentre|retour)/.test(n)) return null;
+  const p=E.person; const ABS=['conge','conge_prev','maladie','absence'];
+  let d=new Date(); d.setHours(0,0,0,0);
+  const isAbs=(ds)=>['AM','PM'].some(hh=>{ const e=S.planning&&S.planning[`${p.id}_${ds}_${hh}`]; return e&&ABS.includes(e.type); });
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>quand revient ${p.prenom} ${p.nom}</em>.</div>`;
+  if(!isAbs(fmt(d))){ return h+`<div style="color:#34c759">${p.nom} ${p.prenom} n'est pas absent(e) aujourd'hui.</div>`; }
+  let guard=0, cur=new Date(d);
+  while(guard<120){ cur=addD(cur,1); const dow=cur.getDay(); if(dow===0||dow===6){ guard++; continue; } if(!isAbs(fmt(cur))) break; guard++; }
+  return h+`<div style="font-weight:800;color:#c0e0ff">↩️ ${p.nom} ${p.prenom} revient le <b>${disp(fmt(cur))}</b> <span style="color:#8090a8;font-size:11px">(${_AI_JOURS[(cur.getDay()||7)-1]})</span></div>`;
+}
+
+/* ── Intérimaires / contrats qui se terminent bientôt ── */
+function _aiResContractsEnding(E,n){
+  if(!/(contrat|interim|cdd).*(fin|termin|expir|bientot|court)|fin de contrat|contrats? qui (se )?(termine|finisse)|qui (part|quitte|finit)|interimaires? (bientot|qui finisse|en fin)/.test(n)) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  let horizon=90; const mM=n.match(/(\d{1,2})\s*mois/), mS=n.match(/(\d{1,2})\s*semaines?/), mJ=n.match(/(\d{1,3})\s*jours?/);
+  if(mM) horizon=parseInt(mM[1])*30; else if(mS) horizon=parseInt(mS[1])*7; else if(mJ) horizon=parseInt(mJ[1]);
+  const rows=(S.personnel||[]).filter(p=>p.actif!==false && p.dateFin).map(p=>({p,d:Math.round((parseLocal(p.dateFin)-today)/86400000)}))
+    .filter(x=>x.d>=-7 && x.d<=horizon).sort((a,b)=>a.d-b.d);
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>contrats qui se terminent (≤ ${horizon} j)</em>.</div>`;
+  if(!rows.length) return h+`<div style="color:#34c759">✅ Aucun contrat ne se termine dans les ${horizon} prochains jours.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">⏳ Fins de contrat — ${rows.length}</div>`;
+  h+=rows.map(({p,d})=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>${_aiChip(p)} <span style="color:#8090a8;font-size:11px">(${_catLabel(p.categorie)}${p.contrat?' · '+p.contrat:''})</span></span><span style="color:${d<0?'#ff8090':d<=14?'#ffd060':'#c0d0e8'};font-size:11px;white-space:nowrap">${d<0?'terminé':disp(p.dateFin)+' · '+d+'j'}</span></div>`).join('');
+  return h;
+}
+
+/* ── Combien d'avions recyclés / en stockage / en maintenance ── */
+function _aiResFleetCount(E,n){
+  if(!/combien d avions|combien d avion|nombre d avions|combien.*(stock|recycl|maintenance|chantier)/.test(n)) return null;
+  const y=new Date().getFullYear();
+  if(/recycl|demantel/.test(n)){
+    const av=(S.recycling&&S.recycling.avions)||[];
+    const fini=av.filter(a=>a.statut==='termine');
+    const finiY=fini.filter(a=>{ const d=a.dateReelleFin||a.finChantier||a.finPrev; return d&&(''+d).slice(0,4)==String(y); });
+    const enCours=av.filter(a=>a.statut!=='termine');
+    return `<div style="font-weight:800;color:#c0e0ff">♻️ Recyclage</div><div style="font-size:13px;margin-top:4px">En cours : <b>${enCours.length}</b> · Terminés ${y} : <b>${finiY.length}</b> · Terminés (total) : <b>${fini.length}</b></div>`;
+  }
+  if(/stock/.test(n)){
+    const av=(S.stockage&&S.stockage.avions)||[];
+    return `<div style="font-weight:800;color:#c0e0ff">🅿️ Stockage</div><div style="font-size:13px;margin-top:4px"><b>${av.length}</b> avion(s) en stockage.</div>`;
+  }
+  const ch=(S.chantiers||[]); const enc=ch.filter(c=>c.statut==='encours').length, fut=ch.filter(c=>c.statut==='futur').length, ter=ch.filter(c=>c.statut==='termine').length;
+  return `<div style="font-weight:800;color:#c0e0ff">🔧 Chantiers</div><div style="font-size:13px;margin-top:4px">En cours : <b>${enc}</b> · À venir : <b>${fut}</b> · Terminés : <b>${ter}</b></div>`;
+}
+
+/* ── Quelles semaines seront en tension (sous-effectif) ── */
+function _aiResTensionWeeks(E,n){
+  if(!/(semaines?|periodes?).*(tension|sous[- ]?effectif|manque|charge|critiques?|a risque|chargees?)|tension.*(venir|prochaine)|quand.*(manque|sous[- ]?effectif|tension)/.test(n)) return null;
+  if(typeof _aiDispoSemaine!=='function'||typeof _aiBesoinSemaine!=='function') return null;
+  let nbWeeks=8; const mS=n.match(/(\d{1,2})\s*semaines?/), mM=n.match(/(\d{1,2})\s*mois/);
+  if(mS) nbWeeks=Math.min(26,parseInt(mS[1])); else if(mM) nbWeeks=Math.min(26,parseInt(mM[1])*4);
+  let mon=getMon(new Date()); const rows=[];
+  for(let i=0;i<nbWeeks;i++){ const {dispo}=_aiDispoSemaine(mon); const b=_aiBesoinSemaine(mon); const ec=Math.round((dispo-b.total)*10)/10; rows.push({wk:wkN(mon),mon:fmt(mon),dispo,besoin:b.total,ec}); mon=addD(mon,7); }
+  const tense=rows.filter(r=>r.ec<0);
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>semaines en tension sur ${nbWeeks} semaines</em>.</div>`;
+  if(!tense.length) return h+`<div style="color:#34c759">✅ Aucune semaine en sous-effectif sur les ${nbWeeks} prochaines semaines.</div>`;
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">⚠ Semaines en tension — ${tense.length}/${nbWeeks}</div>`;
+  h+=tense.map(r=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span>Semaine <b>${r.wk}</b> <span style="color:#8090a8;font-size:11px">(dès ${disp(r.mon)})</span></span><span style="color:#ff8090;font-size:12px;white-space:nowrap">${r.dispo} dispo / ${r.besoin} besoin · ${r.ec}</span></div>`).join('');
+  return h;
+}
+
+// Aiguilleur des résolveurs génériques
+function _aiGeneric(n,q){
+  let E; try{ E=_aiExtract(n,q); }catch(e){ console.warn('aiExtract',e); return null; }
+  const chain=[_aiResContractsEnding,_aiResFormationExpiryPerson,_aiResFormationCalendar,_aiResChantierStaffCount,_aiResChantierLead,_aiResChantierDates,_aiResChantierPeople,_aiResFleetCount,_aiResTensionWeeks,_aiResPersonReturn,_aiResPersonWhere,_aiResPersonSchedule];
+  for(const fn of chain){ try{ const r=fn(E,n); if(r) return r; }catch(e){ console.warn('resolver',fn.name,e); } }
+  return null;
+}
+
 function aiAnswer(q){
   const t=(q||'').toLowerCase().trim();
   const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const n=norm(t);
-  const has=(...words)=>words.some(w=>n.includes(norm(w)));
+  // Version sans apostrophe/tiret (pour que « d'intérimaires » matche « d interimaire »)
+  const _nap=n.replace(/['’\-]/g,' ').replace(/\s+/g,' ').trim();
+  const has=(...words)=>words.some(w=>{ const k=norm(w); return n.includes(k)||_nap.includes(k); });
   // Tolérance aux fautes de frappe : correspondance approchée (Levenshtein) mot à mot
   const tokens=n.split(/[^a-z0-9]+/).filter(Boolean);
   const near=(kw)=>{ const k=norm(kw); if(k.length<4) return false; const md=k.length<=5?1:2; return tokens.some(tk=>{ if(Math.abs(tk.length-k.length)>md) return false; return _lev(tk,k)<=md; }); };
@@ -18116,18 +18436,28 @@ function aiAnswer(q){
     return aiSimulationGuide(q);
   }
 
+  // ── Moteur générique (personnel, formations, chantiers, flotte, tension) ──
+  { const _g=_aiGeneric(n,q); if(_g) return _g; }
+
   // ── Expirations / échéances (PRIORITÉ sur "qui est en formation") ──
   // "formation/autorisation qui expire" ≠ "qui est en formation"
   if(!actionVerb && (fhas(...AI_LEX.expir) || /\bexpir/.test(n) || has('arrive a echeance','arrivent a echeance','plus a jour','pas a jour','pas à jour','plus valable','bientot perime'))){
     return aiAnswerExpirations(n);
   }
 
+  // ── Qui est planifié sur une formation nommée (prochaine session) — ex. « Global Refresh » ──
+  // (les phrases d'action « mets X en formation » sont déjà traitées plus haut)
+  { const _fp=aiFormationPlanned(n,q); if(_fp) return _fp; }
+
   // ── Suivi Formations & Autorisations (manquant / état global) — jamais le planning ──
   { const _fs=aiFormationSuivi(n,q); if(_fs) return _fs; }
 
   // ── Recherche croisée : qualification (valide) + dispo/présence (+ catégorie) ──
   if(isQuestion){
-    const hasQualCue = fhas('caces','habilitation','autorisation','qualif','certif','habilite') || /\bqui (a|ont|possede|possedent|detient|detiennent)\b/.test(n);
+    const hasQualCue = fhas('caces','habilitation','autorisation','qualif','certif','habilite')
+      || /\bqui (a|ont|possede|possedent|detient|detiennent)\b/.test(n)
+      || /\b(qui|quels?|quelles?)\b[\s\S]{0,40}\b(ont|possede|possedent|detient|detiennent|ayant|avec)\b/.test(n)
+      || /\b(ont|possedent|detiennent|ayant|avec)\b[\s\S]{0,30}\b(valide|valides|a jour)\b/.test(n);
     if(hasQualCue){ const cross=aiCrossQuery(n, effWeek); if(cross) return cross; }
   }
 
@@ -18498,25 +18828,106 @@ function aiHelpMessage(){
   <strong style="color:#82b1ff">🏖 Présence & absences</strong><br>
   • <em>« Qui est en congé en semaine 30 ? »</em> · <em>« Qui est en maladie cette semaine ? »</em><br>
   • <em>« Quels chefs d'équipe sont présents semaine 30 ? »</em><br><br>
-  <strong style="color:#82b1ff">🔧 Activité</strong><br>
+  <strong style="color:#82b1ff">🔧 Chantiers & flotte</strong><br>
   • <em>« État des chantiers »</em> · <em>« Quels chantiers manquent de monde ? »</em><br>
-  • <em>« État du recyclage »</em> · <em>« Stockage cette semaine »</em><br>
-  • <em>« Chantiers actifs au mois d'août »</em> · <em>« Que se passe-t-il ce mois-ci ? »</em><br><br>
-  <strong style="color:#82b1ff">🛡 Formations & personnel</strong><br>
-  • <em>« Quelles formations expirent dans les 6 mois ? »</em> · <em>« Autorisations à renouveler cette année »</em><br>
-  • <em>« Infos sur Dupont »</em> · <em>« Répartition de l'effectif »</em><br><br>
+  • <em>« État du recyclage »</em> · <em>« Combien d'avions en stockage ? »</em> · <em>« Combien d'avions recyclés cette année ? »</em><br><br>
+  <strong style="color:#82b1ff">🏗 Un chantier précis</strong><br>
+  • <em>« Qui travaille sur le MSN 2341 ? »</em> · <em>« Combien de personnes sur le chantier 2341 ? »</em><br>
+  • <em>« Quand commence et finit le chantier 2341 ? »</em> · <em>« Qui est le responsable du chantier 2341 ? »</em><br><br>
+  <strong style="color:#82b1ff">📚 Formations planifiées (dans le planning)</strong><br>
+  • <em>« Quelles sont les prochaines formations planifiées ? »</em> · <em>« Calendrier des formations à venir »</em><br>
+  • <em>« Qui est planifié sur la prochaine formation Global Refresh ? »</em><br><br>
+  <strong style="color:#82b1ff">🛡 Échéances formations & autorisations</strong><br>
+  • <em>« Quelles formations expirent dans les 6 mois ? »</em> · <em>« Qui n'a pas le CACES nacelle à jour ? »</em><br>
+  • <em>« Quand expire l'EWIS de Dupont ? »</em><br><br>
+  <strong style="color:#82b1ff">👤 Une personne</strong><br>
+  • <em>« Que fait Dupont cette semaine ? »</em> · <em>« Où est affecté Dupont ? »</em> · <em>« Quand revient Dupont de congé ? »</em><br>
+  • <em>« Infos sur Dupont »</em> · <em>« Répartition de l'effectif »</em> · <em>« Quels intérimaires finissent bientôt ? »</em><br><br>
   <strong style="color:#82b1ff">🔎 Recherche croisée</strong><br>
   • <em>« Qui a le CACES nacelle ET est dispo en semaine 30 ? »</em><br>
   • <em>« Quels techniciens ont l'habilitation EWIS valide ? »</em><br><br>
   <strong style="color:#82b1ff">✦ Simulation & actions</strong><br>
   • <em>« Simulation : 5 techniciens du 01/09 au 30/09 »</em><br>
   • <em>« Mets Dupont en formation QT A320 du 01 au 31 août »</em><br><br>
-  <span style="color:#8090a8;font-size:11px">💡 Les noms sont cliquables (ouvre la fiche), et un bouton ouvre directement le planning de la semaine concernée.</span>`;
+  <span style="color:#8090a8;font-size:11px">💡 Utilisez les onglets de thèmes en haut pour des exemples cliquables. Les noms sont cliquables (ouvre la fiche).</span>`;
 }
 
 // ── Formations/autorisations qui expirent ──
 // ── Suivi Formations & Autorisations : "qui n'a pas X" (manquant) + "état global" ──
 // Renvoie du HTML, ou null si la question ne relève pas de ce cas (laisse le routeur continuer).
+// ── Qui est PLANIFIÉ sur une formation nommée (prochaine session, par ex. « Global Refresh ») ──
+function aiFormationPlanned(n,q){
+  const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  n=norm(n);
+  // PAS « qui A/connaît <qualif> » (détenteurs/compétence → géré ailleurs), PAS une question d'échéance
+  if(/\bqui\s+(a|ont|possed|detien|dispose|detienne|connai|sait|savent|maitris)/.test(n)) return null;
+  if(/expir|echeance|perim|renouvel|\ba jour\b|\bvalidite\b|caduc/.test(n)) return null;
+  const whoCue = /\bqui\b/.test(n) || /\bliste\b|\bnom(s)?\b|\bpersonnes?\b|\binscrit/.test(n);
+  if(!whoCue) return null;
+
+  // Noms de formations candidats : ceux réellement planifiés + types connus + options du sélecteur
+  const names=new Set();
+  Object.values(S.planning||{}).forEach(e=>{ if(e&&e.type==='formation_int'&&e.formInt) names.add(e.formInt); });
+  (S.formations||[]).forEach(f=>{ if(f.type) names.add(f.type); });
+  ['Global Refresh','EWIS','CDCCL','Safety Training','MOE/PART 145','Competencies','CACES CHARIOT','CACES TRACMA','CACES NACELLE','CACES TELESCO','CACES GERBEUR','TRAVAIL EN HAUTEUR','English','Welcome','Visite Médicale','Risques Chimiques','Welcome SSE','Travail en Hauteur']
+    .forEach(x=>names.add(x));
+
+  // Meilleure correspondance : plus long nom normalisé présent dans la question
+  let cited=null, best=0;
+  names.forEach(nm=>{ const k=norm(nm); if(k.length>=3 && n.includes(k) && k.length>best){ best=k.length; cited=nm; } });
+  if(!cited){ // repli : tous les mots significatifs du nom présents (ex. « global refresh »)
+    names.forEach(nm=>{ const toks=norm(nm).split(/[^a-z0-9]+/).filter(w=>w.length>=4); const kl=norm(nm).length;
+      if(toks.length && toks.every(w=>new RegExp('\\b'+w+'\\b').test(n)) && kl>best){ best=kl; cited=nm; } });
+  }
+  if(!cited) return null;
+  // Un nom de formation connu est cité + intention « qui/liste/personnes », et ce n'est ni un détenteur
+  // ni une échéance → on répond « qui est planifié sur cette formation ».
+
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayStr=fmt(today);
+  const futByDate={}, pastByDate={};
+  Object.entries(S.planning||{}).forEach(([k,e])=>{
+    if(!e) return;
+    let label='';
+    if(e.type==='formation_int') label=e.formInt||'';
+    else if(e.type==='formation') label=e.note||'';
+    else return;
+    if(!label || norm(label)!==norm(cited)) return;
+    const parts=k.split('_'); const empId=parts[0]; const ds=parts.slice(1,-1).join('_');
+    if(!ds) return;
+    const bucket = (ds>=todayStr)?futByDate:pastByDate;
+    (bucket[ds]=bucket[ds]||new Set()).add(empId);
+  });
+  const futDates=Object.keys(futByDate).sort();
+  const pastDates=Object.keys(pastByDate).sort();
+
+  let h=`<div style="font-size:11px;color:#8090a8;margin-bottom:6px">🧭 J'ai compris : <em>qui est planifié sur la formation « ${cited} »</em>.</div>`;
+
+  if(!futDates.length){
+    h+=`<div style="color:#ffd060;margin-bottom:4px">Aucune session de « ${cited} » n'est planifiée à venir dans le planning.</div>`;
+    if(pastDates.length){
+      const ld=pastDates[pastDates.length-1];
+      const ppl=[...pastByDate[ld]].map(id=>byId(id)).filter(Boolean).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+      h+=`<div style="font-size:11px;color:#8090a8">Dernière session passée : ${disp(ld)} — ${ppl.map(p=>p.nom+' '+p.prenom).join(', ')}</div>`;
+    }
+    h+=`<div style="margin-top:8px;font-size:11px;color:#8090a8">💡 Pour planifier : ouvre une case du planning → <em>Formation interne</em> → « ${cited} ».</div>`;
+    return h;
+  }
+
+  const nextD=futDates[0];
+  const dd=Math.round((parseLocal(nextD)-today)/86400000);
+  const ppl=[...futByDate[nextD]].map(id=>byId(id)).filter(Boolean).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
+  h+=`<div style="font-weight:800;color:#c0e0ff;margin-bottom:6px">🎓 Prochaine session « ${cited} » — ${disp(nextD)} <span style="color:#8090a8;font-size:11px">(${dd===0?"aujourd'hui":dd===1?'demain':'dans '+dd+' j'})</span> · ${ppl.length} personne(s)</div>`;
+  h+=ppl.length? ppl.map(p=>`<div style="margin-bottom:2px">• ${_aiChip(p)} <span style="color:#8090a8;font-size:11px">(${_catLabel(p.categorie)})</span></div>`).join('')
+              : `<div style="color:#8090a8">(aucune personne sur cette date)</div>`;
+  if(futDates.length>1){
+    h+=`<div style="font-weight:700;color:#a0b8d8;margin:9px 0 3px">Autres sessions à venir</div>`;
+    h+=futDates.slice(1,7).map(d=>{ const dj=Math.round((parseLocal(d)-today)/86400000); return `<div style="padding:2px 0;color:#a0b8d8;font-size:12px">• ${disp(d)} <span style="color:#8090a8">(dans ${dj} j)</span> — ${futByDate[d].size} personne(s)</div>`; }).join('');
+    if(futDates.length>7) h+=`<div style="font-size:11px;color:#8090a8">… +${futDates.length-7} autre(s) date(s)</div>`;
+  }
+  return h;
+}
+
 function aiFormationSuivi(n,q){
   const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   n=(n||'').replace(/['’]/g,' '); // apostrophes → espace ("n'a pas" → "n a pas")
@@ -22320,11 +22731,146 @@ function calcExpiration(dateObtention, years){
   d.setDate(d.getDate()-1); // la veille du jour anniversaire
   return fmt(d);
 }
+// Expiration générique : N années OU N mois après obtention, moins 1 jour
+function calcExpirationMU(dateObtention, num, unit){
+  if(!dateObtention||!num) return '';
+  const d=parseLocal(dateObtention);
+  if(unit==='mois') d.setMonth(d.getMonth()+parseInt(num));
+  else d.setFullYear(d.getFullYear()+parseInt(num));
+  d.setDate(d.getDate()-1);
+  return fmt(d);
+}
+
+/* ═══════════ GESTION DES FORMATIONS (liste éditable + validités) ═══════════ */
+const _FT_NORM=s=>(s||'').toUpperCase().replace(/[·.]/g,'').replace(/S\b/g,'').replace(/\s+/g,'').trim();
+// Amorce S.formTypes depuis les listes existantes (une seule fois), sans rien perdre
+function ensureFormTypes(){
+  if(Array.isArray(S.formTypes) && S.formTypes.length) return S.formTypes;
+  const base=[
+    'EWIS','CDCCL','Safety Training','MOE/PART 145','Competencies','English Test',
+    'CACES CHARIOT','CACES TRACMA','CACES NACELLE','CACES TELESCO','CACES GERBEUR',
+    'TRAVAIL EN HAUTEUR','RISQUE CHIMIQUE','ACCUEIL HSE','AIRE DE TRAFFIC',
+    'NEW ARRIVAL TRAINING','Aircraft Dismantling Process'
+  ];
+  // Ajoute aussi les types présents dans TRAININGS et dans les profils existants
+  (typeof TRAININGS!=='undefined'?TRAININGS:[]).forEach(t=>{ if(t && !base.some(b=>_FT_NORM(b)===_FT_NORM(t))) base.push(t); });
+  (S.formations||[]).forEach(f=>{ if(f.type && !base.some(b=>_FT_NORM(b)===_FT_NORM(f.type))) base.push(f.type); });
+  S.formTypes=base.map(nom=>{
+    const yrs=FORM_VALIDITY_YEARS[nom];
+    const suivi=!FORM_NO_TRACKING.has(nom);
+    return { id:uid(), nom, valNum: suivi?(yrs||2):null, valUnit:'ans', suivi };
+  });
+  return S.formTypes;
+}
+// Entrée formType par nom (normalisé)
+function _formTypeByName(nom){ ensureFormTypes(); return S.formTypes.find(t=>_FT_NORM(t.nom)===_FT_NORM(nom))||null; }
+// Validité {num,unit,suivi} d'une formation (Global Refresh et repli inclus)
+function _formValidity(nom){
+  if(nom==='Global Refresh') return {num:(FORM_VALIDITY_YEARS['Global Refresh']||2),unit:'ans',suivi:true};
+  const t=_formTypeByName(nom);
+  if(t) return {num:t.valNum, unit:t.valUnit||'ans', suivi:t.suivi!==false && !!t.valNum};
+  return {num:(FORM_VALIDITY_YEARS[nom]||2),unit:'ans',suivi:!FORM_NO_TRACKING.has(nom)};
+}
+// Cette formation crée-t-elle une ligne d'expiration au profil ?
+function _formHasTracking(nom){
+  if(nom==='Global Refresh') return true;
+  if(FORM_NO_TRACKING.has(nom)) return false;
+  const t=_formTypeByName(nom);
+  if(t) return t.suivi!==false;
+  return true;
+}
+// Libellé validité lisible
+function _formValidityLbl(nom){ const v=_formValidity(nom); if(!v.suivi||!v.num) return 'sans expiration'; return v.num+' '+(v.unit==='mois'?'mois':(v.num>1?'ans':'an')); }
+// Liste fusionnée des noms de formations (colonnes matrice / exports)
+function _allFormNames(){
+  ensureFormTypes();
+  const out=[]; const seen=new Set();
+  (typeof TRAININGS!=='undefined'?TRAININGS:[]).forEach(t=>{ const k=_FT_NORM(t); if(t && !seen.has(k)){seen.add(k);out.push(t);} });
+  S.formTypes.forEach(t=>{ const k=_FT_NORM(t.nom); if(t.nom && !seen.has(k)){seen.add(k);out.push(t.nom);} });
+  return out;
+}
+
+// Remplit le menu "Intitulé de la formation" du planning
+function _fillFormIntSelect(){
+  const sel=document.getElementById('cellFormInt'); if(!sel) return;
+  ensureFormTypes();
+  const cur=sel.value;
+  let html='<option value="">— Sélectionner la formation —</option>';
+  html+='<option value="Global Refresh">🔄 Global Refresh (met à jour EWIS + CDCCL + Safety Training + MOE/PART 145)</option>';
+  S.formTypes.forEach(t=>{ if(!t.nom) return; const vl=t.suivi&&t.valNum?` · ${t.valNum} ${t.valUnit==='mois'?'mois':(t.valNum>1?'ans':'an')}`:' · sans exp.'; html+=`<option value="${String(t.nom).replace(/"/g,'&quot;')}">${t.nom}${vl}</option>`; });
+  sel.innerHTML=html;
+  if(cur && !Array.from(sel.options).some(o=>o.value===cur)){ const o=document.createElement('option'); o.value=cur; o.textContent=cur; sel.appendChild(o); }
+  sel.value=cur;
+}
+// Remplit le menu "Type de formation" de la fiche
+function _fillFTypeSelect(keep){
+  const sel=document.getElementById('f-type'); if(!sel) return;
+  ensureFormTypes();
+  const cur=keep||sel.value;
+  const names=_allFormNames();
+  let html=names.map(nm=>`<option value="${String(nm).replace(/"/g,'&quot;')}">${nm}</option>`).join('');
+  html+='<option value="Autre">Autre…</option>';
+  sel.innerHTML=html;
+  if(cur){ if(!Array.from(sel.options).some(o=>o.value===cur)){ const o=document.createElement('option'); o.value=cur; o.textContent=cur; sel.insertBefore(o, sel.firstChild); } sel.value=cur; }
+}
+// Calcule l'expiration auto dans la fiche selon la validité du type choisi
+function _formAutoExp(force){
+  const tSel=document.getElementById('f-type'), obt=document.getElementById('f-obt'), exp=document.getElementById('f-exp'), hint=document.getElementById('f-exp-hint');
+  if(!tSel||!obt||!exp) return;
+  const v=_formValidity(tSel.value);
+  if(hint) hint.textContent = (v.suivi&&v.num)?`(validité ${v.num} ${v.unit==='mois'?'mois':(v.num>1?'ans':'an')})`:'(sans expiration)';
+  if(!v.suivi||!v.num) return;                     // sans expiration : on ne force rien
+  if(!obt.value) return;                           // besoin d'une date d'obtention
+  if(exp.value && !force) return;                  // ne pas écraser une date déjà saisie (ouverture en édition)
+  exp.value=calcExpirationMU(obt.value, v.num, v.unit);
+}
+
+// ── Modal gestionnaire ──
+let _ftDraft=[];
+function openFormTypesMgr(){ ensureFormTypes(); _ftDraft=S.formTypes.map(t=>({...t})); _ftRender(); openM('m-formtypes'); }
+function _ftAddRow(){ _ftDraft.push({id:uid(), nom:'', valNum:2, valUnit:'ans', suivi:true}); _ftRender(); }
+function _ftDelRow(i){ _ftDraft.splice(i,1); _ftRender(); }
+function _ftRender(){
+  const box=document.getElementById('ft-list'); if(!box) return;
+  if(!_ftDraft.length){ box.innerHTML='<div style="color:var(--t4);font-size:12px;padding:10px">Aucune formation. Clique « + Ajouter une formation ».</div>'; return; }
+  box.innerHTML=`<div style="display:flex;gap:6px;font-size:10px;color:var(--t4);font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:0 4px 4px">
+    <span style="flex:1">Nom de la formation</span><span style="width:64px;text-align:center">Validité</span><span style="width:70px;text-align:center">Unité</span><span style="width:52px;text-align:center">Expire</span><span style="width:30px"></span></div>`
+  + _ftDraft.map((t,i)=>`<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${String(t.nom||'').replace(/"/g,'&quot;')}" oninput="_ftSet(${i},'nom',this.value)" placeholder="Intitulé…" style="flex:1;padding:6px 9px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px">
+      <input type="number" min="1" max="120" value="${t.valNum!=null?t.valNum:''}" oninput="_ftSet(${i},'valNum',this.value)" ${t.suivi?'':'disabled'} style="width:64px;padding:6px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;text-align:center;${t.suivi?'':'opacity:.4'}">
+      <select onchange="_ftSet(${i},'valUnit',this.value)" ${t.suivi?'':'disabled'} style="width:70px;padding:6px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;${t.suivi?'':'opacity:.4'}"><option value="ans"${t.valUnit!=='mois'?' selected':''}>ans</option><option value="mois"${t.valUnit==='mois'?' selected':''}>mois</option></select>
+      <label style="width:52px;display:flex;justify-content:center" title="La formation a une date d'expiration"><input type="checkbox" class="cl-chk" ${t.suivi?'checked':''} onchange="_ftSet(${i},'suivi',this.checked)"></label>
+      <button type="button" onclick="_ftDelRow(${i})" title="Supprimer" style="width:30px;background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:15px">🗑</button>
+    </div>`).join('');
+}
+function _ftSet(i,key,val){
+  if(!_ftDraft[i]) return;
+  if(key==='suivi'){ _ftDraft[i].suivi=!!val; if(!val){_ftDraft[i].valNum=null;} else if(_ftDraft[i].valNum==null){_ftDraft[i].valNum=2;} _ftRender(); return; }
+  if(key==='valNum'){ _ftDraft[i].valNum = val===''?null:(parseInt(val)||null); return; }
+  _ftDraft[i][key]=val;
+}
+function saveFormTypes(){
+  // Nettoyage : noms non vides, dédoublonnés
+  const seen=new Set(); const clean=[];
+  for(const t of _ftDraft){
+    const nom=(t.nom||'').trim(); if(!nom) continue;
+    const k=_FT_NORM(nom); if(seen.has(k)) continue; seen.add(k);
+    const suivi=t.suivi!==false;
+    clean.push({ id:t.id||uid(), nom, valNum: suivi?(parseInt(t.valNum)||2):null, valUnit:(t.valUnit==='mois'?'mois':'ans'), suivi });
+  }
+  S.formTypes=clean;
+  save();
+  try{_fillFormIntSelect();}catch(_){}
+  try{_fillFTypeSelect();}catch(_){}
+  try{renderForms();}catch(_){}
+  closeM('m-formtypes');
+  toast('✅ Liste des formations enregistrée');
+}
 
 // Aperçu de la date d'expiration pour l'affichage en direct dans le modal
-function _fmtExpPreview(dateObt, years){
-  const y=parseInt(years)||2;
-  return disp(calcExpiration(dateObt,y));
+function _fmtExpPreview(dateObt, num, unit){
+  const nnum=parseInt(num)||2;
+  return disp(calcExpirationMU(dateObt,nnum,unit==='mois'?'mois':'ans'));
 }
 
 // Vérifie les formations planifiées dont la date est passée et non confirmées
@@ -22343,7 +22889,7 @@ function getPendingFormConfirmations(){
   };
   let pruned=false;
   S.formTracking=S.formTracking.filter(t=>{
-    if(t.status==='planned' && (FORM_NO_TRACKING.has(t.formInt) || !stillPlanned(t))){ pruned=true; return false; }
+    if(t.status==='planned' && (!_formHasTracking(t.formInt) || !stillPlanned(t))){ pruned=true; return false; }
     return true;
   });
   if(pruned){ try{ save(); }catch(_){} }
@@ -22351,11 +22897,11 @@ function getPendingFormConfirmations(){
 }
 
 // Applique la mise à jour d'une formation confirmée faite
-function confirmFormDone(trackId,done,customYears){
+function confirmFormDone(trackId,done,customNum,customUnit){
   const t=(S.formTracking||[]).find(x=>x.id===trackId);
   if(!t) return;
-  // Formation "présentation / accueil" : aucune ligne de suivi, on referme simplement l'entrée
-  if(FORM_NO_TRACKING.has(t.formInt)){
+  // Formation "présentation / accueil" ou sans suivi : aucune ligne de suivi, on referme simplement l'entrée
+  if(!_formHasTracking(t.formInt)){
     t.status=done?'done':'skipped';
     t.confirmedDate=fmt(new Date());
     save();
@@ -22370,8 +22916,10 @@ function confirmFormDone(trackId,done,customYears){
       // Normalisation : ignore espaces, casse, points ET le « s » final de chaque mot (pluriels)
       const _norm=s=>(s||'').toUpperCase().replace(/[·.]/g,'').replace(/S\b/g,'').replace(/\s+/g,'').trim();
       formsToUpdate.forEach(formType=>{
-        const years=customYears||FORM_VALIDITY_YEARS[formType]||2;
-        const dateExp=calcExpiration(formDate,years);
+        if(!_formHasTracking(formType)) return; // formation sans suivi d'expiration : pas de ligne au profil
+        let dateExp;
+        if(customNum){ dateExp=calcExpirationMU(formDate,customNum,customUnit||'ans'); }
+        else { const v=_formValidity(formType); dateExp = (v.suivi&&v.num) ? calcExpirationMU(formDate,v.num,v.unit) : ''; }
         // Correspondance normalisée : « MOE / PART 145 » == « MOE/PART 145 » (espaces/casse ignorés)
         let f=(S.formations||[]).find(x=>x.empId===t.empId && _norm(x.type)===_norm(formType));
         if(f){
@@ -22401,8 +22949,8 @@ function showFormConfirmations(){
   const list=pending.map(t=>{
     const emp=byId(t.empId);
     const isGR=t.formInt==='Global Refresh';
-    const years=FORM_VALIDITY_YEARS[t.formInt]||2;
-    const expDate=calcExpiration(t.date,years);
+    const _v=_formValidity(t.formInt);
+    const expDate=(_v.suivi&&_v.num)?calcExpirationMU(t.date,_v.num,_v.unit):'';
     return `<div style="background:rgba(161,98,7,0.08);border:1px solid rgba(161,98,7,0.25);border-radius:12px;padding:14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <span style="font-size:18px">${isGR?'🔄':'📖'}</span>
@@ -22412,14 +22960,15 @@ function showFormConfirmations(){
       ${isGR?`<div style="font-size:10px;color:#d4a017;margin-bottom:8px">Met à jour : ${GLOBAL_REFRESH_FORMS.join(', ')}</div>`:''}
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <label style="font-size:11px;color:var(--t3)">Validité :</label>
-        <input type="number" id="fv-${t.id}" value="${years}" min="1" max="10" step="1"
-          oninput="document.getElementById('fexp-${t.id}').textContent=_fmtExpPreview('${t.date}',this.value)"
+        <input type="number" id="fv-${t.id}" value="${_v.num||2}" min="1" max="120" step="1"
+          oninput="document.getElementById('fexp-${t.id}').textContent=_fmtExpPreview('${t.date}',this.value,document.getElementById('fu-${t.id}').value)"
           style="width:56px;padding:5px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(161,98,7,0.4);border-radius:7px;color:#fff;font-family:'Outfit',sans-serif;font-size:13px;text-align:center">
-        <span style="font-size:11px;color:var(--t3)">ans → expire le</span>
+        <select id="fu-${t.id}" onchange="document.getElementById('fexp-${t.id}').textContent=_fmtExpPreview('${t.date}',document.getElementById('fv-${t.id}').value,this.value)" style="padding:5px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(161,98,7,0.4);border-radius:7px;color:#fff;font-family:'Outfit',sans-serif;font-size:12px"><option value="ans"${_v.unit!=='mois'?' selected':''}>ans</option><option value="mois"${_v.unit==='mois'?' selected':''}>mois</option></select>
+        <span style="font-size:11px;color:var(--t3)">→ expire le</span>
         <strong id="fexp-${t.id}" style="font-size:12px;color:#e0a82e">${disp(expDate)}</strong>
       </div>
       <div style="display:flex;gap:8px;margin-top:4px">
-        <button onclick="confirmFormDone('${t.id}',true,parseInt(document.getElementById('fv-${t.id}').value)||2);refreshFormConfirmModal()" style="flex:1;padding:9px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.4);border-radius:9px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">✅ Faite</button>
+        <button onclick="confirmFormDone('${t.id}',true,parseInt(document.getElementById('fv-${t.id}').value)||2,document.getElementById('fu-${t.id}').value);refreshFormConfirmModal()" style="flex:1;padding:9px;background:rgba(52,199,89,0.2);border:1px solid rgba(52,199,89,0.4);border-radius:9px;color:#34c759;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">✅ Faite</button>
         <button onclick="confirmFormDone('${t.id}',false);refreshFormConfirmModal()" style="flex:1;padding:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:9px;color:#a0b0c8;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px">⏭ Non / Reportée</button>
       </div>
     </div>`;
