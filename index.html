@@ -18529,11 +18529,24 @@ function openSessionPlanner(formName,ds){
   _sessRows=[]; _sessCompute(); openM('m-session');
 }
 function _sessTargets(name){ return name==='Global Refresh'?GLOBAL_REFRESH_FORMS.slice():[name]; }
+// Intérimaires : EWIS, CDCCL et Safety Training sont à la charge de l'agence d'intérim → pas proposés.
+// Seul le MOE/PART 145 leur est dispensé par la société.
+const _SESS_AGENCE=new Set(['GLOBALREFRESH','EWIS','CDCCL','SAFETYTRAINING'].map(x=>x));
+function _sessIsInterim(p){ return !!p && (p.categorie==='interimaire' || /int[ée]rim/i.test(p.contrat||'')); }
+function _sessAgence(name){ return _SESS_AGENCE.has(String(name||'').toUpperCase().replace(/[^A-Z0-9]/g,'')); }
 function _sessCompute(){
   const name=document.getElementById('sess-form').value, ds=document.getElementById('sess-date').value;
   const half=document.getElementById('sess-half').value, hor=parseInt(document.getElementById('sess-hor').value)||6;
-  const withMiss=document.getElementById('sess-miss').checked;
+  // Global Refresh = recyclage de ceux qui ont déjà eu les formations initiales (EWIS, CDCCL, Safety Training, MOE/PART 145).
+  // Ces 4 intitulés pris séparément = formation INITIALE (première fois).
+  const isGR=(name==='Global Refresh');
+  const isInit=!isGR && GLOBAL_REFRESH_FORMS.map(_FT_NORM).includes(_FT_NORM(name));
+  const missBox=document.getElementById('sess-miss');
+  if(isGR){ missBox.checked=false; missBox.disabled=true; } else if(isInit){ missBox.checked=true; missBox.disabled=true; } else { missBox.disabled=false; }
+  if(missBox.parentElement) missBox.parentElement.style.opacity=missBox.disabled?'.45':'1';
+  const withMiss=missBox.checked;
   const box=document.getElementById('sess-list'), info=document.getElementById('sess-info');
+  let nViaGR=0, nSansInit=0;
   _sessRows=[];
   if(!name||!ds){ box.innerHTML='<div style="color:var(--t3);font-size:12px;padding:14px 4px">Choisis une formation et une date pour voir les personnes à inscrire.</div>'; info.textContent=''; _sessCount(); return; }
   const lim=parseLocal(ds); lim.setMonth(lim.getMonth()+hor); const limStr=fmt(lim);
@@ -18543,16 +18556,21 @@ function _sessCompute(){
   const already={};
   Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e||e.type!=='formation_int'||_FT_NORM(e.formInt)!==_FT_NORM(name)) return; const pp=k.split('_'); const dd=pp.slice(1,-1).join('_'); if(dd>=todayStr){ if(!already[pp[0]]||dd<already[pp[0]]) already[pp[0]]=dd; } });
   const halves=half==='J'?['AM','PM']:[half];
+  const agence=_sessAgence(name); let nInterim=0;
   _sortByNom((S.personnel||[]).filter(p=>!_empHorsEffectif(p.id))).forEach(p=>{
+    if(agence && _sessIsInterim(p)){ nInterim++; return; }      // formation payée par l'agence d'intérim
     const recs=(S.formations||[]).filter(f=>f.empId===p.id&&targets.includes(_FT_NORM(f.type)));
-    let st, exp='';
-    if(!recs.length){ if(!withMiss) return; st='missing'; }
+    let st, exp='', extra='';
+    const interim=_sessIsInterim(p);
+    if(!recs.length){ if(isGR){ nSansInit++; return; } if(!withMiss) return; st='missing'; }
+    else if(isInit && !interim){ nViaGR++; return; }               // embauché déjà formé : son renouvellement passe par le Global Refresh
     else{
       const dated=recs.filter(r=>r.dateExpiration).map(r=>r.dateExpiration).sort();
       const incomplete=recs.length<targets.length;                 // Global Refresh : une des formations manque
       if(!dated.length && !incomplete) return;                     // sans limite → rien à faire
       exp=dated[0]||'';
       if(exp && exp<ds) st='expired'; else if(exp && exp<=limStr) st='soon'; else if(incomplete && withMiss) st='missing'; else return;
+      if(isGR && incomplete){ const have=recs.map(r=>_FT_NORM(r.type)); const manq=GLOBAL_REFRESH_FORMS.filter(t=>!have.includes(_FT_NORM(t))); if(manq.length) extra='initiale non enregistrée : '+manq.join(', '); }
     }
     // conflits le jour de la session
     let block='', note='';
@@ -18564,12 +18582,16 @@ function _sessCompute(){
       if(prot) block=(HD_LBL[prot]||prot)+' ce jour-là';
       else if(types.includes('travail')) note='remplace son affectation du jour';
     }
-    _sessRows.push({p,st,exp,block,note,on:!block&&st!=='missing'});
+    if(extra) note=note?note+' · '+extra:extra;
+    _sessRows.push({p,st,exp,block,note,on:!block&&(st!=='missing'||isInit)});
   });
   const rank={expired:0,soon:1,missing:2};
   _sessRows.sort((a,b)=>(rank[a.st]-rank[b.st])||((a.exp||'9')<(b.exp||'9')?-1:1));
   const nE=_sessRows.filter(r=>r.st==='expired').length, nS=_sessRows.filter(r=>r.st==='soon').length, nM=_sessRows.filter(r=>r.st==='missing').length;
-  info.innerHTML=`<b style="color:#ff7088">${nE}</b> expirée(s) à la date de la session · <b style="color:#ffb340">${nS}</b> expirant dans les ${hor} mois qui suivent`+(withMiss?` · <b>${nM}</b> jamais suivie`:'')+((isWE(ds)||isHol(ds))?' · <span style="color:#ffb340">⚠ cette date est un week-end ou un jour férié</span>':'');
+  info.innerHTML=`<b style="color:#ff7088">${nE}</b> expirée(s) à la date de la session · <b style="color:#ffb340">${nS}</b> expirant dans les ${hor} mois qui suivent`+(withMiss?` · <b>${nM}</b> jamais suivie`:'')+((isWE(ds)||isHol(ds))?' · <span style="color:#ffb340">⚠ cette date est un week-end ou un jour férié</span>':'')
+    +(isGR?`<br><span style="color:var(--t4)">Recyclage : seules les personnes ayant déjà suivi les formations initiales sont proposées${nSansInit?' ('+nSansInit+' sans formation initiale, à inscrire d\'abord en EWIS / CDCCL / Safety Training / MOE/PART 145)':''}.</span>`:'')
+    +(isInit?`<br><span style="color:var(--t4)">Formation initiale : personnes qui ne l'ont jamais suivie${_FT_NORM(name)===_FT_NORM('MOE/PART 145')?', plus les intérimaires à renouveler':''}${nViaGR?'. '+nViaGR+' embauché(s) déjà formé(s) non proposé(s) : leur renouvellement passe par le Global Refresh':''}.</span>`:'')
+    +(agence?`<br><span style="color:var(--t4)">Embauchés uniquement : ${nInterim} intérimaire(s) non proposé(s), cette formation est à la charge de l'agence d'intérim${name==='Global Refresh'?' (pour eux, planifie une session MOE/PART 145)':''}.</span>`:'');
   if(!_sessRows.length){ box.innerHTML='<div style="color:#34d399;font-size:12.5px;padding:14px 4px">✅ Personne à inscrire : tout le monde est à jour sur cette période.</div>'; _sessCount(); return; }
   const lbl={expired:['Expirée','#ff7088'],soon:['Expire bientôt','#ffb340'],missing:['Jamais suivie','#9db0cc']};
   box.innerHTML=_sessRows.map((r,i)=>`<label style="display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.05);${r.block?'opacity:.55':'cursor:pointer'}">
