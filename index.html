@@ -491,6 +491,19 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5) brightnes
 /* Sélecteurs date/heure : thème sombre natif (icônes propres, pas de carré blanc) */
 input[type=date],input[type=time],input[type=datetime-local]{color-scheme:dark}
 input[type=time]::-webkit-calendar-picker-indicator{filter:invert(0.6) brightness(1.8);cursor:pointer}
+/* Brief du jour */
+.bf .bf-date{font-size:18px;font-weight:800;text-transform:capitalize}
+.bf .bf-mut{color:var(--t3);font-weight:400}
+.bf .bf-kpis{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 2px}
+.bf .bf-kpi{background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:12px;padding:8px 16px;text-align:center;min-width:92px}
+.bf .bf-kpi b{display:block;font-size:21px;color:#fff}.bf .bf-kpi span{font-size:10.5px;color:var(--t3)}
+.bf .bf-sec{margin-top:14px}
+.bf .bf-h{font-weight:800;font-size:13px;color:#cfe0ff;border-bottom:1px solid var(--glass-border);padding-bottom:5px;margin-bottom:5px}
+.bf .bf-row{display:flex;gap:12px;padding:4px 0;font-size:12.5px;line-height:1.45}
+.bf .bf-k{flex:0 0 210px;font-weight:700;color:var(--t1)}
+.bf .bf-bad{color:#ff7088;font-weight:800}.bf .bf-ok{color:#34d399}
+.bf .bf-warn{margin-top:6px;color:#ffb340;font-weight:700;font-size:12px}
+@media(max-width:640px){.bf .bf-row{flex-direction:column;gap:1px}.bf .bf-k{flex:none}}
 /* Case à cocher nette (pleine quand cochée) — check-list */
 .cl-chk{-webkit-appearance:none;appearance:none;width:22px;height:22px;min-width:22px;border:2px solid #34d399;border-radius:6px;background:transparent;cursor:pointer;position:relative;flex-shrink:0;transition:background .12s}
 .cl-chk:checked{background:#34d399;border-color:#34d399}
@@ -1237,11 +1250,16 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 <div class="page on" id="pg-dashboard">
   <div class="sh">
     <div class="sh-title">Tableau de <em>Bord</em></div>
-    <span id="todayLbl" style="font-size:13px;color:var(--t3);font-weight:500"></span>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span id="todayLbl" style="font-size:13px;color:var(--t3);font-weight:500"></span>
+      <button class="btn btn-cyan btn-sm" onclick="openBrief()" title="Le point du jour prêt pour ton brief d'équipe">☀️ Brief du jour</button>
+      <button class="btn btn-ghost btn-sm" onclick="openForecast()" title="Capacité, besoin, congés prévisionnels et fins de contrat sur 13 semaines">📈 Prévision 3 mois</button>
+    </div>
   </div>
   <div class="stats" id="statsGrid"></div>
   <div id="ratioWidget"></div>
   <div id="avancementWidget"></div>
+  <div id="critWidget"></div>
   <div class="gc" style="margin-bottom:14px">
     <div class="gc-head">
       <div class="gc-title">⚠️ Alertes actives</div>
@@ -1271,6 +1289,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:13px;pointer-events:none">🔍</span><input type="search" id="form-search" placeholder="Nom, prénom ou trigramme…" oninput="renderForms()" style="padding:7px 12px 7px 30px;border-radius:99px;border:1px solid var(--glass-border);background:var(--glass-1);color:var(--t1);font-size:12px;width:200px;outline:none" onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--glass-border)'"></div>
       <button class="btn btn-cyan btn-sm" onclick="openFormModal()">+ Ajouter</button>
+      <button class="btn btn-ghost btn-sm" onclick="openSessionPlanner()" title="Choisir une formation et une date : l'app propose les personnes à inscrire">🗓 Planifier une session</button>
       <button class="btn btn-ghost btn-sm" onclick="openFormTypesMgr()" title="Gérer la liste des formations proposées et leur validité">⚙️ Gérer les formations</button>
       <button class="btn btn-ghost btn-sm" onclick="_previewDedupeForms()" title="Fusionner les formations et autorisations en double (même personne + même type)">🧹 Nettoyer les doublons</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('xlsRhIn').click()" title="Formations · Autorisations · Tractage · Certifying Staff — 1 à 4 fichiers, format détecté automatiquement">📡 Import mise à jour</button>
@@ -1948,6 +1967,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="btn-row">
       <label style="font-size:10px;color:#8090a8;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Année du programme</label>
       <select id="gantt-year" onchange="renderProgramme()" title="Année affichée dans le Gantt des chantiers" style="height:34px;border-radius:99px;padding:0 14px;width:100px"></select>
+      <button class="btn btn-ghost btn-sm" onclick="openForecast()" title="Capacité, besoin, congés prévisionnels et fins de contrat sur 13 semaines">📈 Prévision 3 mois</button>
       <button class="btn btn-ghost btn-sm" onclick="exportGanttPDF()" title="Choisir une période, puis exporter en PDF ou en Excel">📤 Export data</button>
     </div>
   </div>
@@ -2497,6 +2517,15 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
+        • <strong style="color:#60b4ff">☀️ Brief du jour</strong> — bouton sur le Tableau de bord : absents, retours, formations, visites médicales, chantiers en manque, échéances sous 30 jours et tâches du jour, imprimable en PDF.<br>
+        • <strong style="color:#60b4ff">🎯 Compétences critiques</strong> — carte du Tableau de bord : nombre de détenteurs valides présents, semaine par semaine sur 8 semaines, avec alerte sous le seuil. Compétences et seuils au choix (⚙️).<br>
+        • <strong style="color:#60b4ff">📈 Prévision 3 mois</strong> — capacité contre besoin sur 13 semaines, avec l'effet des congés prévisionnels et des fins de contrat, et des pistes d'arbitrage.<br>
+        • <strong style="color:#ffd060">🗓 Planifier une session de formation</strong> — onglet Formations : l'app propose les personnes à inscrire (expirée ou expirant bientôt) et les inscrit au planning.<br>
+        • <strong style="color:#ffd060">⚙️ Gestionnaire de formations</strong> — liste des formations modifiable, avec validité en ans ou en mois ; l'expiration se calcule toute seule.<br>
+        • <strong style="color:#ffd060">↩ Retour arrière multiple</strong> — la flèche annule jusqu'à 20 actions de suite.<br>
+        • <strong style="color:#ffd060">👥 Filtre des alertes par catégorie</strong> — sur les Alertes actives, repris dans les exports.<br>
+        • <strong style="color:#ffd060">🧹 Matrice des autorisations</strong> — libellés de conduite unifiés, plus de colonnes en double.<br>
+        • <strong style="color:#c7b8ff">🎓 Guide pas à pas</strong> — toutes ces nouveautés y sont expliquées étape par étape ; le bouton ❓ Aide l'ouvre sur l'onglet affiché.<br>
         • <strong style="color:#34d399">🗒️ Check-list du jour</strong> — nouvel onglet (Outils) : tâches récurrentes avec horaires, récurrence (quotidien, jours ouvrés, jours choisis, mensuel, date précise) et rappels. Voir la section dédiée.<br>
         • <strong style="color:#7fffd4">🏖️ Congés prévisionnels</strong> — statut « demande » sur le planning, visu par catégorie avec seuils, validation à l'unité. Voir la section dédiée.<br>
         • <strong style="color:#ffd060">🔎 Recherche « Chantier associé »</strong> — dans l'éditeur de case du planning, le menu chantier a une barre de recherche (par MSN, type d'avion ou nom), avec regroupement par section.<br>
@@ -3054,6 +3083,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         <option value="">— Sélectionner la formation —</option>
       </select>
       <div style="font-size:10px;color:var(--t4);margin-top:5px">📅 Le lendemain de la formation, l'app vous demandera confirmation pour mettre la formation à jour.</div>
+      <button type="button" onclick="sessFromCell()" style="margin-top:7px;background:none;border:none;color:var(--cyan);font-size:11.5px;font-weight:700;cursor:pointer;padding:0;font-family:'Outfit',sans-serif;text-decoration:underline">👥 Inscrire d'autres personnes à cette session…</button>
     </div>
   </div>
   <div id="wrapVM" style="display:none;margin-bottom:11px">
@@ -3250,6 +3280,74 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-form')">Annuler</button>
     <button class="btn btn-cyan" onclick="saveFormation()">Sauvegarder</button>
+  </div>
+</div>
+</div>
+
+<!-- Planifier une session de formation -->
+<div class="mbg" id="m-session">
+<div class="modal" style="max-width:720px">
+  <div class="modal-title">🗓 Planifier une session de formation</div>
+  <div class="fgrid">
+    <div class="field" style="grid-column:1/-1"><label>Formation *</label><select id="sess-form" onchange="_sessCompute()"></select></div>
+    <div class="field"><label>Date de la session *</label><input type="date" id="sess-date" onchange="_sessCompute()"></div>
+    <div class="field"><label>Durée</label><select id="sess-half" onchange="_sessCompute()"><option value="J">Journée</option><option value="AM">Matin</option><option value="PM">Après-midi</option></select></div>
+    <div class="field"><label>Proposer ceux qui expirent dans</label><select id="sess-hor" onchange="_sessCompute()"><option value="3">les 3 mois suivants</option><option value="6">les 6 mois suivants</option><option value="12">les 12 mois suivants</option></select></div>
+    <div class="field" style="display:flex;align-items:flex-end"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:12px"><input type="checkbox" class="cl-chk" id="sess-miss" onchange="_sessCompute()"> Proposer aussi ceux qui ne l'ont jamais suivie</label></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin:4px 0 6px;flex-wrap:wrap">
+    <div id="sess-info" style="flex:1;font-size:11.5px;color:var(--t3)"></div>
+    <button class="btn btn-ghost btn-xs" onclick="_sessAll(true)">Tout cocher</button><button class="btn btn-ghost btn-xs" onclick="_sessAll(false)">Tout décocher</button>
+  </div>
+  <div id="sess-list" style="max-height:40vh;overflow-y:auto"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-session')">Annuler</button>
+    <button class="btn btn-cyan" id="sess-go" onclick="sessApply()">Inscrire</button>
+  </div>
+</div>
+</div>
+<!-- Prévision de charge 3 mois -->
+<div class="mbg" id="m-forecast">
+<div class="modal" style="max-width:940px">
+  <div class="modal-title">📈 Prévision de charge — 13 semaines</div>
+  <div id="fc-body" class="bf" style="max-height:66vh;overflow-y:auto"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-forecast')">Fermer</button></div>
+</div>
+</div>
+<!-- Brief du jour -->
+<div class="mbg" id="m-brief">
+<div class="modal" style="max-width:860px">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    <div class="modal-title" style="margin:0;flex:1">☀️ Brief du jour</div>
+    <button class="btn btn-ghost btn-sm" onclick="_briefShift(-1)" title="Jour précédent">◀</button>
+    <input type="date" id="brief-date" onchange="if(this.value){_briefDs=this.value;_briefRender();}" style="width:150px;height:34px;padding:0 10px">
+    <button class="btn btn-ghost btn-sm" onclick="_briefShift(1)" title="Jour suivant">▶</button>
+    <button class="btn btn-ghost btn-sm" onclick="openBrief()">Aujourd'hui</button>
+  </div>
+  <div id="brief-body" class="bf" style="max-height:64vh;overflow-y:auto;padding-right:4px"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-brief')">Fermer</button>
+    <button class="btn btn-cyan" onclick="briefPrint()">🖨 Imprimer / PDF</button>
+  </div>
+</div>
+</div>
+<!-- Compétences critiques : détail d'une semaine -->
+<div class="mbg" id="m-crit-detail">
+<div class="modal" style="max-width:620px">
+  <div class="modal-title" id="crit-d-title">🎯 Compétence</div>
+  <div id="crit-d-body" style="max-height:60vh;overflow-y:auto"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-crit-detail')">Fermer</button></div>
+</div>
+</div>
+<!-- Compétences critiques : réglage -->
+<div class="mbg" id="m-crit-cfg">
+<div class="modal" style="max-width:620px">
+  <div class="modal-title">⚙️ Compétences critiques à surveiller</div>
+  <div style="font-size:11px;color:var(--t3);line-height:1.5">Coche les compétences dont tu veux surveiller la couverture, et le nombre minimum de détenteurs valides présents. En dessous, la semaine passe en alerte sur le tableau de bord.</div>
+  <div id="crit-cfg-list" style="max-height:54vh;overflow-y:auto;margin-top:6px"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-crit-cfg')">Annuler</button>
+    <button class="btn btn-cyan" onclick="saveCritCfg()">💾 Enregistrer</button>
   </div>
 </div>
 </div>
@@ -4289,6 +4387,7 @@ function handleRhImport(ev){
             r.nameDiffs.forEach(d=>{ if(!tot.nameDiffs.some(x=>x.k===d.k)) tot.nameDiffs.push(d); });
           }catch(err){ console.error('hr flat',err); toast('❌ Erreur import: '+err.message); }
         });
+        try{ _dedupeConduiteAutos(); }catch(_){}
         save();
         ['renderForms','renderAutorisations','renderCertif','renderDash','renderPersonnel'].forEach(fn=>{ if(typeof window[fn]==='function') try{window[fn]();}catch(_){} });
         _showHrReport(tot);
@@ -4301,6 +4400,7 @@ function handleRhImport(ev){
           .catch(e=>{ toast('❌ Erreur lecture: '+e.message); console.error(e); });
         let aUpd=0,aCre=0,dUpd=0,dCre=0;
         legacy.forEach(wb=>{ try{ const r=_importAutoFromWb(wb); aUpd+=r.upd; aCre+=r.cre; const d=_importDrivingFromWb(wb); dUpd+=d.upd; dCre+=d.cre; }catch(err){console.error('wb direct',err);} });
+        try{ _dedupeConduiteAutos(); }catch(_){}
         if(aUpd||aCre||dUpd||dCre){ save(); if(typeof renderAutorisations==='function')renderAutorisations(); if(typeof renderForms==='function')renderForms(); if(typeof renderDash==='function')renderDash();
           const t=[]; if(aUpd||aCre) t.push(`🛡 Autos : ${aUpd} maj · ${aCre} créées`); if(dUpd||dCre) t.push(`🚜 Conduite : ${dUpd} maj · ${dCre} créées`); toast(t.join('   |   ')); }
       }
@@ -4835,56 +4935,81 @@ function schedDriveSync(){
   },2000);
 }
 
-// ── Annulation (undo) d'un cran : mémorise l'état AVANT chaque sauvegarde ──
-let _undoSnapshot=null;   // état précédent (chaîne JSON) restaurable par la flèche ↩️
-let _undoLabel='';        // libellé indicatif de la dernière action
+// ── Annulation (undo) multi-crans : mémorise l'état AVANT chaque action réelle ──
+let _undoStack=[];            // états précédents (chaînes JSON), le plus récent en dernier
+const _UNDO_MAX=20;
+let _undoLastT=0;             // horodatage du dernier enregistrement (regroupe les sauvegardes d'une même action)
 let _undoInProgress=false;
-function _captureUndo(){
+// Signature « données » : ignore l'horodatage, la synchro et les réglages d'affichage (semaine/mois affichés, filtres)
+function _undoSig(js){
+  return String(js||'')
+    .replace(/"(lastModified|lastSync|weekStart)":"[^"]*",?/g,'')
+    .replace(/"(lastPushOk)":(true|false),?/g,'')
+    .replace(/"(masterMonth|masterYear)":-?\d+,?/g,'')
+    .replace(/"(weeklyHiddenCats|masterHiddenCats|alertHiddenCats)":\[[^\]]*\],?/g,'');
+}
+function _captureUndo(next){
   if(_undoInProgress) return;                 // ne pas snapshoter pendant une restauration
   if(window._archiveMode) return;
   try{
     const prev=_safeStorage.getItem('asp4');  // ce qui est en base = l'état d'AVANT la modif en cours
-    if(prev){ _undoSnapshot=prev; }
+    if(!prev) return;
+    if(next && _undoSig(prev)===_undoSig(next)) return;       // rien de réel n'a changé (navigation, filtre…)
+    const now=Date.now();
+    const burst=(now-_undoLastT)<400 && _undoStack.length;    // 2e sauvegarde de la même action : on garde le 1er état
+    _undoLastT=now;
+    if(burst) return;
+    _undoStack.push(prev);
+    if(_undoStack.length>_UNDO_MAX) _undoStack.shift();
   }catch(_){}
   try{ _refreshUndoBtn(); }catch(_){}
 }
 function _refreshUndoBtn(){
   const b=document.getElementById('undoBtn'); if(!b) return;
-  const on=!!_undoSnapshot;
+  const n=_undoStack.length, on=n>0;
   b.style.opacity=on?'1':'0.35';
   b.style.pointerEvents=on?'auto':'none';
-  b.title=on?'Annuler la dernière action':'Rien à annuler';
+  b.title=on?('Annuler la dernière action ('+n+' retour'+(n>1?'s':'')+' possible'+(n>1?'s':'')+')'):'Rien à annuler';
 }
 function undoLast(){
-  if(!_undoSnapshot){ toast('Rien à annuler'); return; }
-  const snap=_undoSnapshot;
+  if(!_undoStack.length){ toast('Rien à annuler'); return; }
+  const snap=_undoStack.pop();
   _undoInProgress=true;
   try{
     const restored=JSON.parse(snap);
+    // On garde l'affichage courant (semaine / mois / filtres) et la config de synchro : seul le contenu revient en arrière
+    const cur=S;
+    ['weekStart','masterMonth','masterYear','weeklyHiddenCats','masterHiddenCats','alertHiddenCats'].forEach(k=>{ if(cur[k]!==undefined) restored[k]=cur[k]; });
+    if(cur.gdrive) restored.gdrive=Object.assign({},restored.gdrive||{},cur.gdrive);
     S=restored;
-    _safeStorage.setItem('asp4', snap);       // réécrit l'état restauré
+    // weekStart redevient une chaîne après JSON → le reconvertir en Date
+    if(S.weekStart && !(S.weekStart instanceof Date)) S.weekStart=new Date(S.weekStart);
+    if(!S.weekStart || isNaN(S.weekStart)) S.weekStart=getMon(new Date());
     if(S.gdrive){ S.gdrive.lastModified=new Date().toISOString(); }
+    _safeStorage.setItem('asp4', JSON.stringify(S));          // réécrit l'état restauré
     if(S.gdrive?.connected && S.gdrive?.gasUrl){ try{ schedDriveSync(); }catch(_){} }
-    _undoSnapshot=null;                        // undo d'un seul cran
+    try{ if(window.PLUNDO){ PLUNDO=null; } }catch(_){}
     _rerenderAll();
-    toast('↩️ Dernière action annulée');
-  }catch(e){ toast('⚠️ Annulation impossible'); }
+    const n=_undoStack.length;
+    toast('↩️ Dernière action annulée'+(n?' — encore '+n+' retour'+(n>1?'s':'')+' possible'+(n>1?'s':''):''));
+  }catch(e){ console.error('undo',e); toast('⚠️ Annulation impossible'); }
   _undoInProgress=false;
   try{ _refreshUndoBtn(); }catch(_){}
 }
 // Re-rend toutes les vues après une restauration
 function _rerenderAll(){
-  ['renderDash','renderPersonnel','renderForms','renderAutorisations','renderCertif','renderChantiers','renderMaster','renderWeekly','renderStockage','renderRecycling','renderProgramme','renderKPI','popSelects','refreshStoragePill'].forEach(fn=>{ if(typeof window[fn]==='function'){ try{ window[fn](); }catch(_){} } });
+  ['renderDash','renderPersonnel','renderForms','renderAutorisations','renderCertif','renderChantiers','renderMaster','renderWeekly','renderStockage','renderRecycling','renderSlot','renderTodo','renderChecklist','renderAirbus','renderProgramme','renderKPI','popSelects','refreshStoragePill'].forEach(fn=>{ if(typeof window[fn]==='function'){ try{ window[fn](); }catch(_){} } });
 }
 function save(){
   // Mode consultation d'archive : lecture seule stricte — on n'écrit RIEN.
   if(window._archiveMode){ try{toast('📁 Lecture seule — archive non modifiable');}catch(_){} return; }
-  _captureUndo();                // photo de l'état précédent AVANT d'écraser
   // Horodater la sauvegarde locale : sans ça, le pull Drive considère le distant
   // comme "plus récent" et écrase les modifications locales (perte de données).
   if(S.gdrive){ S.gdrive.lastModified=new Date().toISOString(); }
-  let ok=false;
-  try{ ok=_safeStorage.setItem('asp4',JSON.stringify(S)); }catch(e){ ok=false; }
+  let ok=false, _js=null;
+  try{ _js=JSON.stringify(S); }catch(e){ _js=null; }
+  _captureUndo(_js);             // photo de l'état précédent AVANT d'écraser (si quelque chose a réellement changé)
+  try{ ok=_js!=null && _safeStorage.setItem('asp4',_js); }catch(e){ ok=false; }
   if(!ok){                       // quota dépassé → l'écriture n'a PAS eu lieu sur le disque
     _storageKO=true;
     try{ _storageAlert(); }catch(_){}
@@ -4978,6 +5103,8 @@ function load(){
       // Migration : toute personne archivée doit être inactive (répare les anciennes archives
       // où actif était resté true → elles réapparaissaient dans les vues filtrées sur actif)
       if(Array.isArray(S.personnel)) S.personnel.forEach(p=>{ if(p && p.archived) p.actif=false; });
+      // Autorisations de conduite : unifier les libellés en double (ancien import SSE / import RH)
+      try{ const _dc=_dedupeConduiteAutos(); if(_dc){ try{ _safeStorage.setItem('asp4',JSON.stringify(S)); }catch(_){}; console.log('Autorisations de conduite unifiées :',_dc); } }catch(_){}
       // Jours fériés : générer automatiquement toutes les années (2025 → 2060) une seule fois
       try{
         if(!localStorage.getItem('mard_feries_auto_v1')){
@@ -7047,6 +7174,7 @@ const GUIDE_DATA = {
     {t:"Créer un chantier", d:"Onglet <b>Chantiers</b> → <b>+ Nouveau</b>. Renseigne client, <b>type d'avion + MSN</b>, dates début/fin, <b>responsable</b> et <b>chef d'équipe</b>, et les <b>ressources</b> (nb techniciens requis).", ill:null},
     {t:"Suivi responsables/chefs", d:"Le <b>Planning Responsables & Chefs</b> montre leur occupation sur l'année. Filtre <b>Les deux / Responsables / Chefs</b> en haut ; les <b>alertes de conflits</b> suivent la sélection.", ill:null},
     {t:"Transférer un avion", d:"Depuis la fiche chantier, tu peux faire passer l'avion en <b>Stockage</b> ou <b>Recyclage</b>. Les affectations déjà saisies gardent le <b>MSN</b> (l'historique est conservé).", ill:null},
+    {t:"Heures prévues / consommées", d:"Renseigne le <b>volume Man/Hours</b> d'un chantier : le tableau de bord compare alors les heures <b>consommées</b> (d'après le planning, 3,5 h par demi-journée de technicien) au volume prévu, et projette la <b>date de fin</b> au rythme actuel.", ill:null},
   ]},
   "Stockage / Recyclage / Slot": { icon:"🅿️", color:"#ff9a3c", steps:[
     {t:"Ajouter un avion", d:"Onglets <b>Stockage</b> ou <b>A/C Recyclage</b> → ajoute l'avion (type, MSN, dates). Le recyclage suit l'avancement du démantèlement.", ill:null},
@@ -7057,6 +7185,11 @@ const GUIDE_DATA = {
     {t:"Ajouter / mettre à jour", d:"Onglets <b>Formations</b> et <b>Autorisations</b> : ajoute une qualification à une personne avec sa <b>date d'expiration</b>. Les expirations proches sont signalées.", ill:null},
     {t:"Import RH", d:"Bouton <b>📡 Import mise à jour</b> : charge 1 à 4 fichiers RH (formations, autorisations, tractage, certifying staff) — le format est détecté automatiquement.", ill:null},
     {t:"Tractage (push back)", d:"Dans <b>Autorisations → + Ajouter</b>, une puce <b>🛫 Tractage avion (push back)</b> permet d'ajouter l'habilitation manuellement, avec sa date d'expiration.", ill:null},
+    {t:"Gérer la liste des formations", d:"Bouton <b>⚙️ Gérer les formations</b> : ajoute une formation, donne-lui une <b>validité</b> (en ans ou en mois) et dis si elle <b>expire</b>. Elle apparaît aussitôt dans le planning, la fiche et la matrice.", ill:null},
+    {t:"Expiration calculée toute seule", d:"Dans <b>+ Ajouter</b>, choisis le type et la date d'obtention : la <b>date d'expiration se remplit</b> selon la validité. Pareil quand tu confirmes « réalisée » une formation planifiée.", ill:null},
+    {t:"Planifier une session", d:"Bouton <b>🗓 Planifier une session</b> : choisis la formation et la date. L'app liste les personnes dont elle est <b>expirée</b> ou <b>expire bientôt</b>, signale celles qui sont absentes ce jour-là, et les inscrit au planning en un clic.", ill:null},
+    {t:"Depuis le planning", d:"Dans une case « Formation interne », le lien <b>👥 Inscrire d'autres personnes à cette session…</b> ouvre le même écran, déjà réglé sur la formation et la date.", ill:null},
+    {t:"Matrice sans doublons", d:"Les autorisations de conduite (chariots, plateformes, tracteur de piste…) sont regroupées sous un <b>libellé unique</b> : plus de colonnes en double après un import.", ill:null},
   ]},
   "Jours fériés & Sauvegarde": { icon:"💾", color:"#6effc4", steps:[
     {t:"Jours fériés", d:"Les fériés français sont <b>générés automatiquement</b> pour toutes les années (jusqu'en 2060), Pâques/Ascension/Pentecôte inclus. Bouton <b>🎉 Jours fériés</b> pour les voir ou en ajouter.", ill:null},
@@ -7065,7 +7198,12 @@ const GUIDE_DATA = {
   "Tableau de bord": { icon:"🏠", color:"#60b4ff", steps:[
     {t:"À quoi ça sert", d:"Le <b>Tableau de bord</b> est la page d'accueil : vue d'ensemble de l'activité du jour, raccourcis et <b>alertes</b> (expirations proches, chantiers en manque d'effectif, congés à valider).", ill:null},
     {t:"Naviguer", d:"Les <b>familles d'onglets</b> en haut (Pilotage, Planning, Avions, Personnel, Outils) regroupent les pages. Clique une famille puis le sous-onglet voulu.", ill:null},
-    {t:"Besoin d'aide", d:"Sur n'importe quelle page, le bouton flottant <b>?</b> en bas à droite ouvre ce guide <b>directement sur l'onglet où tu es</b>.", ill:null},
+    {t:"Brief du jour", d:"Le bouton <b>☀️ Brief du jour</b> ouvre le point du jour prêt pour ton brief d'équipe : absents, retours, formations, visites médicales, chantiers en manque, échéances sous 30 jours, tâches. Flèches pour changer de jour, <b>🖨 Imprimer / PDF</b> pour le partager.", ill:null},
+    {t:"Compétences critiques", d:"La carte <b>🎯 Compétences critiques</b> compte, pour chaque compétence choisie, combien de détenteurs valides sont présents le pire jour de chaque semaine, sur 8 semaines. <b>Rouge</b> = personne, <b>orange</b> = sous le seuil. Clique un chiffre pour le détail, <b>⚙️</b> pour choisir les compétences et les seuils.", ill:null},
+    {t:"Besoin d'aide", d:"Sur n'importe quelle page, le bouton <b>❓ Aide</b> de la barre d'onglets ouvre ce guide <b>directement sur l'onglet où tu es</b>.", ill:null},
+    {t:"Prévision 3 mois", d:"Le bouton <b>📈 Prévision 3 mois</b> compare, semaine par semaine sur 13 semaines, les techniciens <b>disponibles</b> au <b>besoin</b>. Deux écarts : l'actuel, et celui obtenu <b>si tous les congés prévisionnels sont validés</b>. Les fins de contrat sont listées, et l'app propose quoi arbitrer ou qui prolonger.", ill:null},
+    {t:"Flèche de retour ↩", d:"En haut de l'écran, la flèche <b>↩</b> annule la dernière action, jusqu'à <b>20 fois</b> de suite. Elle garde ton affichage (semaine, mois, filtres). L'historique repart de zéro quand tu recharges l'app.", ill:null},
+    {t:"Filtrer les alertes", d:"Dans <b>Alertes actives</b>, le bouton <b>👥 Catégories</b> limite les alertes formations/autorisations aux catégories cochées. Les exports PDF et Excel suivent ce filtre.", ill:null},
   ]},
   "Master Planning": { icon:"📅", color:"#60b4ff", steps:[
     {t:"À quoi ça sert", d:"Le <b>Master Planning</b> montre <b>un mois entier</b>, chaque personne sur une ligne, pour une vue large (congés, formations, charge).", ill:null},
@@ -8083,6 +8221,7 @@ function renderDash(){
 
   // Widget avancement chantiers
   try{renderAvancement();}catch(e){console.warn('renderAvancement:',e);}
+  try{renderCritWidget();}catch(e){console.warn('renderCritWidget:',e);}
 }
 
 // Matrice des formations & compétences — désormais en bas de l'onglet Formations
@@ -8575,7 +8714,7 @@ const HR_AUTH_CONDUITE={
   "CHARIOT ELEVATEUR JUSQU'A 6T":'Conduite — Chariot élévateur ≤ 6T',
   'CHARIOT ELEVATEUR 10T':'Conduite — Chariot élévateur 10T',
   'CHARIOT ELEVATEUR 12T':'Conduite — Chariot élévateur 12T',
-  'CHARIOT DE MANUTENTION TOUT TERRAIN':'Conduite — Chariot tout terrain'
+  'CHARIOT DE MANUTENTION TOUT TERRAIN':'Conduite — Chariot télescopique'
 };
 // Autorisations globales par personne (hors conduite)
 const HR_AUTH_GLOBAL={
@@ -8814,7 +8953,7 @@ function _importDrivingFromWb(wb){
       if(_isWeightCol(type)) return;                                   // Weight & Balance : supprimé, non importé
       if(_isTaxiCol(type)){ S._taxiEmps[emp.id]=dexp; return; }        // Taxi : récupéré pour Certifying Staff, hors Autorisations
       const isTract=_isPushback(type);
-      const canonType=isTract?TRACTAGE_LABEL:type;                     // toutes variantes push back -> libellé unique
+      const canonType=isTract?TRACTAGE_LABEL:_canonAutoType(type);                     // toutes variantes push back -> libellé unique
       const grp=isTract?'tractage':'conduite';
       const ex=S.autorisations.find(a=>a.empId===emp.id&&norm(a.type)===norm(canonType));
       if(ex){ ex.grp=grp; if(ex.dateExpiration!==dexp){ ex.dateExpiration=dexp; upd++; } }
@@ -16147,6 +16286,7 @@ function _showPushbackList(){
 function _pbWeekNav(dir){ _pbWeekMon=addD(_pbWeekMon||getMon(new Date()),dir*7); _showPushbackList(); }
 function _pbWeekToday(){ _pbWeekMon=getMon(new Date()); _showPushbackList(); }
 function renderAutorisations(){
+  try{ _dedupeConduiteAutos(); }catch(_){} // données arrivées après le chargement (synchro Drive)
   const eF=document.getElementById('auto-flt-emp')?.value||'';
   const tF=document.getElementById('auto-flt-type')?.value||'';
   const sF=document.getElementById('auto-flt-status')?.value||'';
@@ -16228,6 +16368,54 @@ function _autoToggleEmp(key){
   let show=false;
   rows.forEach(r=>{ const s=r.style.display==='none'; r.style.display=s?'table-row':'none'; if(s)show=true; });
   const t=document.getElementById('autoemptog-'+key); if(t) t.textContent=show?'▾':'▸';
+}
+
+// ── Libellé canonique des autorisations de conduite (évite les colonnes en double) ──
+const _CONDUITE_CANON={
+  PLATEFORMEVERTICALE:'Conduite — Plateforme verticale',
+  PLATEFORMEMULTIDIRECTIONNELLE:'Conduite — Plateforme multidirectionnelle',
+  TRACTEURDEPISTE:'Conduite — Tracteur de piste',
+  CHARIOTELEVATEUR6T:'Conduite — Chariot élévateur ≤ 6T',
+  CHARIOTELEVATEUR10T:'Conduite — Chariot élévateur 10T',
+  CHARIOTELEVATEUR12T:'Conduite — Chariot élévateur 12T',
+  CHARIOTELEVATEUR18T:'Conduite — Chariot élévateur 18T',
+  // télescopique et tout terrain = même engin
+  CHARIOTELEVATEURTELESCOPIQUE:'Conduite — Chariot télescopique',
+  CHARIOTTELESCOPIQUE:'Conduite — Chariot télescopique',
+  CHARIOTTOUTTERRAIN:'Conduite — Chariot télescopique',
+  CHARIOTELEVATEURTOUTTERRAIN:'Conduite — Chariot télescopique',
+  CHARIOTTELESCOPIQUETOUTTERRAIN:'Conduite — Chariot télescopique',
+  CHARIOTELEVATEURTELESCOPIQUETOUTTERRAIN:'Conduite — Chariot télescopique',
+  GERBEUR:'Conduite — Gerbeur'
+};
+function _conduiteKey(t){
+  return (t==null?'':String(t)).replace(/[\u2018\u2019\u02BC\u00B4`]/g,"'")
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()
+    .replace(/^\s*CONDUITE[\s—–\-]*/,'')
+    .replace(/\([^)]*\)/g,'')
+    .replace(/JUSQU'?A|MOINS DE|<=|≤|</g,'')
+    .replace(/DE MANUTENTION/g,'')
+    .replace(/[^A-Z0-9]/g,'');
+}
+function _canonAutoType(t){ const c=_CONDUITE_CANON[_conduiteKey(t)]; return c||t; }
+// Renomme les variantes vers le libellé canonique puis fusionne les doublons (même personne + même type).
+// Garde la date d'expiration la plus lointaine. Renvoie le nombre de lignes modifiées/fusionnées.
+function _dedupeConduiteAutos(){
+  if(!Array.isArray(S.autorisations)) return 0;
+  let changed=0; const keep=[]; const idx={};
+  S.autorisations.forEach(a=>{
+    if(!a) return;
+    if(_autoGroup(a)!=='tractage'){ const c=_canonAutoType(a.type); if(c!==a.type){ a.type=c; changed++; } }
+    const k=a.empId+'|'+String(a.type||'').trim().toUpperCase();
+    const ex=idx[k];
+    if(!ex){ idx[k]=a; keep.push(a); return; }
+    changed++;
+    if((a.dateExpiration||'')>(ex.dateExpiration||'')){ ex.dateExpiration=a.dateExpiration; if(a.dateObtention) ex.dateObtention=a.dateObtention; }
+    if(!ex.dateObtention && a.dateObtention) ex.dateObtention=a.dateObtention;
+    if(a.notes && !(ex.notes||'').includes(a.notes)) ex.notes=ex.notes?ex.notes+' · '+a.notes:a.notes;
+  });
+  if(changed) S.autorisations=keep;
+  return changed;
 }
 
 // Libellé de colonne compact (retire le préfixe « Conduite — » pour l'en-tête, garde le type complet en tooltip)
@@ -18046,6 +18234,436 @@ const AI_LEX = {
   resume:['resume','résumé','bilan','synthese','synthèse','recapitulatif','récapitulatif','etat des lieux','état des lieux','topo','overview','vue d ensemble','vue d\'ensemble','tour d horizon','tour d\'horizon','le point','fais le point','point de la semaine','point sur la semaine','situation de la semaine','ou en est la semaine','où en est la semaine','etat de la semaine','où on en est','ou on en est'],
   compare:['compare','comparer','comparaison','comparatif','versus','difference','différence','par rapport a','par rapport à','ecart entre','écart entre','mettre en regard','face a face','face à face']
 };
+
+/* ════════════ COMPÉTENCES CRITIQUES + BRIEF DU JOUR ════════════ */
+const _CRIT_ABS=new Set(['conge','conge_prev','maladie','absence','deplacement','formation','formation_int']);
+const _BRIEF_ABS=new Set(['conge','conge_prev','maladie','absence','deplacement']);
+const _bfEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const _bfNom=p=>p?((p.nom||'')+' '+(p.prenom||'')).trim():'?';
+
+// Catalogue des compétences sélectionnables
+function _critCatalog(){
+  const out=[]; const seen=new Set();
+  const add=(key,label,grp)=>{ if(seen.has(key)) return; seen.add(key); out.push({key,label,grp}); };
+  if((S.autorisations||[]).some(a=>_autoGroup(a)==='tractage')) add('T:tractage',TRACTAGE_LABEL,'Tractage');
+  if((S.certifiants||[]).length) add('C:licence','Certifying Staff (licence Part 66)','Certifying Staff');
+  const aut=[...new Set((S.autorisations||[]).filter(a=>_autoGroup(a)!=='tractage').map(a=>(a.type||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
+  aut.forEach(t=>add('A:'+t.toUpperCase(), (typeof _autoColLabel==='function'?_autoColLabel(t):t), /^conduite/i.test(t)?'Conduite d\'engins':'Autorisations'));
+  const frm=[...new Set((S.formations||[]).map(f=>(f.type||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
+  const fseen=new Set();
+  frm.forEach(t=>{ const k=_FT_NORM(t); if(fseen.has(k)) return; fseen.add(k); add('F:'+k,t,'Formations'); });
+  return out;
+}
+function _critLabel(key){ const c=_critCatalog().find(x=>x.key===key); return c?c.label:key.slice(2); }
+// Amorce : tractage + tracteur de piste + certifying staff (seuil 2), si présents dans les données
+function _critInit(){
+  if(Array.isArray(S.critSkills)) return S.critSkills;
+  const cat=_critCatalog(); const want=['T:tractage','A:CONDUITE — TRACTEUR DE PISTE','C:licence'];
+  S.critSkills=want.filter(k=>cat.some(c=>c.key===k)).map(k=>({key:k,min:2}));
+  return S.critSkills;
+}
+// Détenteurs d'une compétence : [{emp, exp}] (exp '' = sans limite), une ligne par personne (meilleure échéance)
+function _critHolders(key){
+  const best={};
+  const put=(empId,exp)=>{ if(!empId||_empHorsEffectif(empId)) return; const e=exp||''; if(!(empId in best)){ best[empId]=e; return; } if(best[empId]==='') return; if(e===''||e>best[empId]) best[empId]=e; };
+  const kind=key[0], val=key.slice(2);
+  if(kind==='T') (S.autorisations||[]).forEach(a=>{ if(_autoGroup(a)==='tractage') put(a.empId,a.dateExpiration); });
+  else if(kind==='A') (S.autorisations||[]).forEach(a=>{ if(_autoGroup(a)!=='tractage' && (a.type||'').trim().toUpperCase()===val) put(a.empId,a.dateExpiration); });
+  else if(kind==='F') (S.formations||[]).forEach(f=>{ if(_FT_NORM(f.type)===val) put(f.empId,f.dateExpiration); });
+  else if(kind==='C') (S.certifiants||[]).forEach(c=>put(c.empId,c.licExp));
+  return Object.keys(best).map(id=>({emp:byId(id),exp:best[id]})).filter(x=>x.emp);
+}
+// Absence d'une personne un jour donné : null si présente (au moins une demi-journée), sinon le motif
+function _critAbsWhy(p,ds){
+  const d=parseLocal(ds);
+  if(!_presentSemaine(p,d,d)) return 'hors contrat';
+  const am=(S.planning[`${p.id}_${ds}_AM`]||{}).type||'', pm=(S.planning[`${p.id}_${ds}_PM`]||{}).type||'';
+  if(_CRIT_ABS.has(am)&&_CRIT_ABS.has(pm)) return am===pm?(HD_LBL[am]||am):((HD_LBL[am]||am)+' / '+(HD_LBL[pm]||pm));
+  return null;
+}
+function _critDay(key,ds,holders){
+  const present=[], absent=[];
+  (holders||_critHolders(key)).forEach(h=>{
+    if(h.exp && h.exp<ds){ absent.push({emp:h.emp,why:'expirée le '+disp(h.exp)}); return; }
+    const why=_critAbsWhy(h.emp,ds);
+    if(why) absent.push({emp:h.emp,why}); else present.push(h.emp);
+  });
+  return {ds,present,absent};
+}
+// Pire jour ouvré de la semaine (lun→ven, hors fériés)
+function _critWeek(key,mon,holders){
+  const hs=holders||_critHolders(key); const days=[];
+  for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds)) continue; days.push(_critDay(key,ds,hs)); }
+  if(!days.length) return null;
+  let worst=days[0]; days.forEach(d=>{ if(d.present.length<worst.present.length) worst=d; });
+  return {min:worst.present.length,worst,days};
+}
+const _CRIT_WEEKS=8;
+function renderCritWidget(){
+  const el=document.getElementById('critWidget'); if(!el) return;
+  const list=_critInit();
+  const head=`<div class="gc-head"><div class="gc-title">🎯 Compétences critiques <span style="font-size:11px;font-weight:500;color:var(--t3)">· détenteurs valides présents, pire jour de chaque semaine</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="openCritCfg()">⚙️ Choisir les compétences</button></div>`;
+  if(!list.length){ el.innerHTML=`<div class="gc" style="margin-bottom:14px">${head}<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucune compétence suivie. Clique « ⚙️ Choisir les compétences » pour sélectionner celles dont tu veux surveiller la couverture (tractage, tracteur de piste, certifying staff…).</div></div>`; return; }
+  const mon0=getMon(new Date()); const mons=[]; for(let w=0;w<_CRIT_WEEKS;w++) mons.push(addD(mon0,w*7));
+  let nbAlert=0;
+  const rows=list.map((sk,i)=>{
+    const hs=_critHolders(sk.key); const min=parseInt(sk.min)||1;
+    const tds=mons.map(m=>{
+      const r=_critWeek(sk.key,m,hs);
+      if(!r) return `<td style="text-align:center;color:var(--t4);padding:6px 4px">férié</td>`;
+      const n=r.min; const bad=n<min; if(bad) nbAlert++;
+      const col=n===0?'#ff5d73':bad?'#ffb340':'#34d399';
+      const bg=n===0?'rgba(255,93,115,0.18)':bad?'rgba(255,179,64,0.16)':'rgba(52,211,153,0.07)';
+      const tip=`${disp(r.worst.ds)} : ${n} présent(s)`+(r.worst.present.length?' — '+r.worst.present.map(_bfNom).join(', '):'');
+      return `<td style="text-align:center;padding:5px 4px"><span onclick="openCritDetail(${i},'${fmt(m)}')" title="${_bfEsc(tip)}" style="display:inline-block;min-width:34px;padding:4px 8px;border-radius:8px;background:${bg};color:${col};font-weight:800;font-size:13px;cursor:pointer;border:1px solid ${bad?col:'transparent'}">${n}</span></td>`;
+    }).join('');
+    return `<tr><td style="padding:6px 12px;font-size:12px;font-weight:700;white-space:nowrap">${_bfEsc(_critLabel(sk.key))} <span style="color:var(--t4);font-weight:500;font-size:10px">· ${hs.length} détenteur(s) · seuil ${min}</span></td>${tds}</tr>`;
+  }).join('');
+  const ths=mons.map((m,w)=>`<th style="padding:6px 4px;font-size:10px;text-align:center;color:var(--t3);font-weight:700" title="Semaine du ${disp(fmt(m))}">S${wkN(m)}${w===0?'<br><span style="font-weight:500;color:var(--cyan)">en cours</span>':''}</th>`).join('');
+  const sum=nbAlert?`<span style="color:#ffb340;font-weight:800">⚠ ${nbAlert} semaine(s) sous le seuil</span>`:`<span style="color:#34d399;font-weight:700">✅ Couverture suffisante sur ${_CRIT_WEEKS} semaines</span>`;
+  el.innerHTML=`<div class="gc" style="margin-bottom:14px">${head}
+    <div style="padding:4px 14px 2px;font-size:11.5px">${sum}</div>
+    <div style="overflow-x:auto;padding:4px 6px 10px"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:6px 12px;font-size:10px;color:var(--t3)">Compétence</th>${ths}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div style="padding:0 14px 12px;font-size:10px;color:var(--t4)">Clique un chiffre pour voir le détail jour par jour. Rouge = personne · orange = sous le seuil. Une personne compte comme présente si elle l'est au moins une demi-journée ; les congés prévisionnels comptent comme absences.</div></div>`;
+}
+function openCritDetail(i,monStr){
+  const sk=_critInit()[i]; if(!sk) return;
+  const mon=parseLocal(monStr); const r=_critWeek(sk.key,mon); const min=parseInt(sk.min)||1;
+  const J=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  const body=!r?'<div style="color:var(--t3)">Semaine entièrement fériée.</div>':r.days.map(d=>{
+    const n=d.present.length; const col=n===0?'#ff5d73':n<min?'#ffb340':'#34d399';
+    const wd=(parseLocal(d.ds).getDay()||7)-1;
+    return `<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-weight:800;font-size:13px">${J[wd]} ${disp(d.ds)} <span style="color:${col};margin-left:6px">${n} présent(s)</span></div>
+      <div style="font-size:12px;color:var(--t2);margin-top:3px">${d.present.length?d.present.map(p=>_bfEsc(_bfNom(p))).join(' · '):'<span style="color:#ff5d73">Personne</span>'}</div>
+      ${d.absent.length?`<div style="font-size:11px;color:var(--t4);margin-top:3px">Indisponibles : ${d.absent.map(a=>_bfEsc(_bfNom(a.emp))+' ('+_bfEsc(a.why)+')').join(' · ')}</div>`:''}
+    </div>`; }).join('');
+  document.getElementById('crit-d-title').textContent='🎯 '+_critLabel(sk.key)+' — semaine '+wkN(mon);
+  document.getElementById('crit-d-body').innerHTML=`<div style="font-size:11px;color:var(--t3);margin-bottom:4px">Seuil d'alerte : moins de ${min} détenteur(s) présent(s)</div>`+body;
+  openM('m-crit-detail');
+}
+// ── Réglage des compétences suivies ──
+let _critDraft={};
+function openCritCfg(){
+  _critDraft={}; _critInit().forEach(s=>{ _critDraft[s.key]=parseInt(s.min)||2; });
+  _critCfgRender(); openM('m-crit-cfg');
+}
+function _critCfgRender(){
+  const box=document.getElementById('crit-cfg-list'); if(!box) return;
+  const cat=_critCatalog();
+  if(!cat.length){ box.innerHTML='<div style="color:var(--t3);font-size:12px;padding:10px">Aucune autorisation ni formation enregistrée pour l\'instant.</div>'; return; }
+  let grp=''; let h='';
+  cat.forEach((c,idx)=>{
+    if(c.grp!==grp){ grp=c.grp; h+=`<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 5px">${_bfEsc(grp)}</div>`; }
+    const on=(c.key in _critDraft); const nb=_critHolders(c.key).length;
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:4px 2px">
+      <input type="checkbox" class="cl-chk" ${on?'checked':''} onchange="_critCfgToggle(${idx},this.checked)">
+      <span style="flex:1;font-size:12.5px;${on?'font-weight:700':'color:var(--t2)'}">${_bfEsc(c.label)} <span style="color:var(--t4);font-size:10px;font-weight:500">· ${nb} détenteur(s)</span></span>
+      ${on?`<span style="font-size:10px;color:var(--t3)">alerte si moins de</span><input type="number" min="1" max="20" value="${_critDraft[c.key]}" oninput="_critCfgMin(${idx},this.value)" style="width:56px;padding:5px;text-align:center;border-radius:8px;font-size:12px">`:''}
+    </div>`;
+  });
+  box.innerHTML=h;
+}
+function _critCfgToggle(idx,on){ const c=_critCatalog()[idx]; if(!c) return; if(on) _critDraft[c.key]=2; else delete _critDraft[c.key]; _critCfgRender(); }
+function _critCfgMin(idx,v){ const c=_critCatalog()[idx]; if(!c||!(c.key in _critDraft)) return; _critDraft[c.key]=Math.max(1,parseInt(v)||1); }
+function saveCritCfg(){
+  const order=_critCatalog().map(c=>c.key);
+  S.critSkills=order.filter(k=>k in _critDraft).map(k=>({key:k,min:_critDraft[k]}));
+  save(); closeM('m-crit-cfg'); try{renderCritWidget();}catch(_){}
+  toast('✅ Compétences critiques enregistrées');
+}
+
+/* ── BRIEF DU JOUR ── */
+let _briefDs=null;
+function _bfPrevWork(ds,dir){ let d=parseLocal(ds); for(let i=0;i<10;i++){ d=addD(d,dir); const s=fmt(d); if(!isWE(s)&&!isHol(s)) return s; } return fmt(d); }
+function _bfBesoin(c){ const r=c&&c.ressources; if(r==null||r==='') return null; if(typeof r==='object'){ const t=Object.values(r).reduce((a,b)=>a+(parseInt(b)||0),0); return t||null; } return parseInt(r)||null; }
+function _briefData(ds){
+  const d=parseLocal(ds);
+  const staff=_sortByNom((S.personnel||[]).filter(p=>!_empHorsEffectif(p.id)&&_presentSemaine(p,d,d)));
+  const cell=(p,s,h)=>S.planning[`${p.id}_${s}_${h}`]||{};
+  const fullAbs=(p,s)=>{ const a=cell(p,s,'AM').type||'', b=cell(p,s,'PM').type||''; return _BRIEF_ABS.has(a)&&_BRIEF_ABS.has(b); };
+  const R={ds,we:isWE(ds),hol:isHol(ds),total:staff.length,abs:{},nbAbsFull:0,form:{},nbForm:0,vm:[],retours:[],departs:[],sites:{},sansAff:[]};
+  const prev=_bfPrevWork(ds,-1), next=_bfPrevWork(ds,1);
+  staff.forEach(p=>{
+    const am=cell(p,ds,'AM'), pm=cell(p,ds,'PM'); const ta=am.type||'', tp=pm.type||'';
+    // absences
+    const aA=_BRIEF_ABS.has(ta), aP=_BRIEF_ABS.has(tp);
+    if(aA||aP){
+      if(aA&&aP&&ta===tp) (R.abs[ta]=R.abs[ta]||[]).push({p,when:''});
+      else { if(aA) (R.abs[ta]=R.abs[ta]||[]).push({p,when:'matin'}); if(aP) (R.abs[tp]=R.abs[tp]||[]).push({p,when:'après-midi'}); }
+      if(aA&&aP) R.nbAbsFull++;
+    }
+    // formations
+    const fl=c=>c.type==='formation_int'?(c.formInt||'Formation interne'):(c.type==='formation'?(c.note||'Formation externe'):null);
+    const fA=fl(am), fP=fl(pm);
+    if(fA||fP){ R.nbForm++; if(fA&&fP&&fA===fP) (R.form[fA]=R.form[fA]||[]).push({p,when:''}); else { if(fA) (R.form[fA]=R.form[fA]||[]).push({p,when:'matin'}); if(fP) (R.form[fP]=R.form[fP]||[]).push({p,when:'après-midi'}); } }
+    // visites médicales
+    [am,pm].forEach(c=>{ if(c.vm && !R.vm.some(v=>v.p===p&&v.t===c.vm)) R.vm.push({p,t:c.vm}); });
+    // retours / départs
+    const absToday=aA&&aP;
+    if(!absToday && fullAbs(p,prev)) R.retours.push(p);
+    if(!absToday && fullAbs(p,next)) R.departs.push({p,why:HD_LBL[cell(p,next,'AM').type]||''});
+    // affectations
+    let aff=false;
+    [am,pm].forEach(c=>{ if(c.type==='travail'){ [c.chantierId,c.chantierId2].filter(Boolean).forEach(ref=>{ (R.sites[ref]=R.sites[ref]||new Set()).add(p.id); aff=true; }); } });
+    if(!aff && !aA && !aP && !fA && !fP && !R.we && !R.hol) R.sansAff.push(p);
+  });
+  R.vm.sort((a,b)=>String(a.t).localeCompare(String(b.t)));
+  // chantiers
+  R.chantiers=[];
+  const seenRef=new Set();
+  (S.chantiers||[]).forEach(c=>{
+    const actif=c.statut==='encours' && (!c.debut||c.debut<=ds) && (!c.fin||c.fin>=ds);
+    const n=(R.sites[c.id]||new Set()).size; if(!actif && !n) return;
+    seenRef.add(c.id);
+    const b=_bfBesoin(c);
+    R.chantiers.push({label:_chMsnLabel(c.id)+(c.client?' · '+String(c.client).trim():''),n,besoin:b,manque:(b!=null&&n<b)?b-n:0});
+  });
+  Object.keys(R.sites).forEach(ref=>{ if(seenRef.has(ref)) return; R.chantiers.push({label:_chMsnLabel(ref),n:R.sites[ref].size,besoin:null,manque:0}); });
+  R.chantiers.sort((a,b)=>(b.manque-a.manque)||(b.n-a.n));
+  // échéances
+  const al=(typeof _collectAlertsData==='function')?_collectAlertsData():[];
+  R.nbExpired=al.filter(x=>x.statut==='expired').length;
+  R.ech=al.filter(x=>x.days>=0&&x.days<=30);
+  const t0=parseLocal(ds);
+  R.contrats=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&p.dateFin).map(p=>({p,j:Math.round((parseLocal(p.dateFin)-t0)/86400000)})).filter(x=>x.j>=0&&x.j<=30).sort((a,b)=>a.j-b.j);
+  // tâches
+  const dueOf=t=>{ const v=t.dueDate||t.due; if(!v) return ''; try{ const dd=(typeof parseAny==='function')?parseAny(v):parseLocal(v); return (dd&&!isNaN(dd))?fmt(dd):''; }catch(_){ return ''; } };
+  const open=(S.todos||[]).filter(t=>!t.done);
+  R.todoLate=open.filter(t=>{ const x=dueOf(t); return x&&x<ds; });
+  R.todoDay=open.filter(t=>dueOf(t)===ds);
+  R.cl=null;
+  if(ds===fmt(new Date()) && S.checklist && Array.isArray(S.checklist.tasks) && S.checklist.tasks.length){
+    const tasks=_clTodayTasks(new Date()); const dm=(S.checklist.done||{})[ds]||{};
+    R.cl={total:tasks.length,left:tasks.filter(t=>!dm[t.id])};
+  }
+  // compétences critiques
+  R.crit=_critInit().map(sk=>{ const r=_critDay(sk.key,ds); const min=parseInt(sk.min)||1; return {label:_critLabel(sk.key),n:r.present.length,min,present:r.present,bad:r.present.length<min}; });
+  return R;
+}
+function _briefHtml(R){
+  const J=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const d=parseLocal(R.ds);
+  const who=(arr)=>arr.map(x=>_bfEsc(_bfNom(x.p))+(x.when?` <span class="bf-mut">(${x.when})</span>`:'')).join(' · ');
+  const sec=(ic,title,body,cls)=>`<div class="bf-sec ${cls||''}"><div class="bf-h">${ic} ${title}</div>${body}</div>`;
+  const none=t=>`<div class="bf-mut">${t}</div>`;
+  let h=`<div class="bf-top"><div class="bf-date">${J[d.getDay()]} ${disp(R.ds)} <span class="bf-mut">· semaine ${wkN(getMon(d))}</span></div>`;
+  if(R.we||R.hol) h+=`<div class="bf-warn">${R.hol?'Jour férié':'Week-end'} — les rubriques ci-dessous reflètent ce qui est saisi au planning.</div>`;
+  const pres=R.total-R.nbAbsFull;
+  h+=`<div class="bf-kpis"><div class="bf-kpi"><b>${pres}</b><span>présents</span></div><div class="bf-kpi"><b>${R.nbAbsFull}</b><span>absents (journée)</span></div><div class="bf-kpi"><b>${R.nbForm}</b><span>en formation</span></div><div class="bf-kpi"><b>${R.total}</b><span>effectif actif</span></div></div></div>`;
+  // absents
+  const ak=Object.keys(R.abs);
+  h+=sec('🏖','Absents du jour', ak.length?ak.map(k=>`<div class="bf-row"><span class="bf-k">${_bfEsc(HD_LBL[k]||k)} (${R.abs[k].length})</span><span>${who(R.abs[k])}</span></div>`).join(''):none('Aucun absent saisi.'));
+  // mouvements
+  let mv='';
+  if(R.retours.length) mv+=`<div class="bf-row"><span class="bf-k">Retours (${R.retours.length})</span><span>${R.retours.map(p=>_bfEsc(_bfNom(p))).join(' · ')}</span></div>`;
+  if(R.departs.length) mv+=`<div class="bf-row"><span class="bf-k">Absents dès demain (${R.departs.length})</span><span>${R.departs.map(x=>_bfEsc(_bfNom(x.p))+(x.why?` <span class="bf-mut">(${_bfEsc(x.why)})</span>`:'')).join(' · ')}</span></div>`;
+  h+=sec('🔁','Retours et départs',mv||none('Aucun mouvement.'));
+  // formations & VM
+  const fk=Object.keys(R.form); let fm='';
+  fk.forEach(k=>{ fm+=`<div class="bf-row"><span class="bf-k">${_bfEsc(k)} (${R.form[k].length})</span><span>${who(R.form[k])}</span></div>`; });
+  if(R.vm.length) fm+=`<div class="bf-row"><span class="bf-k">🩺 Visite médicale (${R.vm.length})</span><span>${R.vm.map(v=>_bfEsc(_bfNom(v.p))+' <span class="bf-mut">('+_bfEsc(v.t)+')</span>').join(' · ')}</span></div>`;
+  h+=sec('📚','Formations et visites médicales',fm||none('Rien de prévu.'));
+  // chantiers
+  let ch=R.chantiers.map(c=>`<div class="bf-row"><span class="bf-k">${_bfEsc(c.label)}</span><span><b>${c.n}</b> personne(s)${c.besoin!=null?` <span class="bf-mut">/ besoin ${c.besoin}</span>`:''}${c.manque?` <span class="bf-bad">⚠ manque ${c.manque}</span>`:''}</span></div>`).join('');
+  if(R.sansAff.length) ch+=`<div class="bf-row"><span class="bf-k">Sans affectation (${R.sansAff.length})</span><span class="bf-mut">${R.sansAff.slice(0,14).map(p=>_bfEsc(_bfNom(p))).join(' · ')}${R.sansAff.length>14?' … +'+(R.sansAff.length-14):''}</span></div>`;
+  h+=sec('🔧','Chantiers et affectations',ch||none('Aucune affectation saisie pour ce jour.'));
+  // compétences critiques
+  if(R.crit.length) h+=sec('🎯','Compétences critiques',R.crit.map(c=>`<div class="bf-row"><span class="bf-k">${_bfEsc(c.label)}</span><span><b class="${c.bad?'bf-bad':'bf-ok'}">${c.n} présent(s)</b> <span class="bf-mut">· seuil ${c.min}${c.present.length?' · '+c.present.map(p=>_bfEsc(_bfNom(p))).join(', '):''}</span></span></div>`).join(''));
+  // échéances
+  let ec='';
+  if(R.nbExpired) ec+=`<div class="bf-row"><span class="bf-k bf-bad">Déjà expirées</span><span><b class="bf-bad">${R.nbExpired}</b> <span class="bf-mut">(détail dans les Alertes actives)</span></span></div>`;
+  R.ech.slice(0,12).forEach(x=>{ ec+=`<div class="bf-row"><span class="bf-k">${_bfEsc(_bfNom(x.emp))}</span><span>${_bfEsc(x.type)} <span class="bf-mut">· ${disp(x.exp)} · dans ${x.days} j</span></span></div>`; });
+  if(R.ech.length>12) ec+=none('… +'+(R.ech.length-12)+' autre(s) échéance(s) sous 30 jours');
+  R.contrats.forEach(x=>{ ec+=`<div class="bf-row"><span class="bf-k">${_bfEsc(_bfNom(x.p))}</span><span>Fin de contrat <span class="bf-mut">· ${disp(x.p.dateFin)} · dans ${x.j} j</span></span></div>`; });
+  h+=sec('⏰','Échéances sous 30 jours',ec||none('Aucune échéance dans les 30 jours.'));
+  // tâches
+  let tk='';
+  if(R.todoLate.length) tk+=`<div class="bf-row"><span class="bf-k bf-bad">En retard (${R.todoLate.length})</span><span>${R.todoLate.slice(0,6).map(t=>_bfEsc(t.text||t.titre||'')).join(' · ')}${R.todoLate.length>6?' …':''}</span></div>`;
+  if(R.todoDay.length) tk+=`<div class="bf-row"><span class="bf-k">Pour ce jour (${R.todoDay.length})</span><span>${R.todoDay.map(t=>_bfEsc(t.text||t.titre||'')).join(' · ')}</span></div>`;
+  if(R.cl) tk+=`<div class="bf-row"><span class="bf-k">Check-list</span><span>${R.cl.left.length?`<b>${R.cl.left.length}</b> restante(s) sur ${R.cl.total} <span class="bf-mut">· ${R.cl.left.slice(0,5).map(t=>(t.time?t.time+' ':'')+_bfEsc(t.label)).join(' · ')}</span>`:`<b class="bf-ok">terminée</b> (${R.cl.total})`}</span></div>`;
+  h+=sec('✅','Tâches',tk||none('Rien en attente.'));
+  return h;
+}
+function openBrief(ds){ _briefDs=ds||fmt(new Date()); _briefRender(); openM('m-brief'); }
+function _briefShift(n){ _briefDs=fmt(addD(parseLocal(_briefDs),n)); _briefRender(); }
+function _briefRender(){
+  const box=document.getElementById('brief-body'); if(!box) return;
+  const inp=document.getElementById('brief-date'); if(inp) inp.value=_briefDs;
+  try{ box.innerHTML=_briefHtml(_briefData(_briefDs)); }catch(e){ console.error('brief',e); box.innerHTML='<div style="color:#ff8090">Impossible de générer le brief : '+_bfEsc(e.message)+'</div>'; }
+}
+function briefPrint(){
+  const R=_briefData(_briefDs);
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Brief du ${disp(R.ds)}</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#0f1e3d;margin:0;padding:26px;font-size:11.5px}
+    .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #2979ff;padding-bottom:11px;margin-bottom:12px}.hd img{width:30px;height:30px;object-fit:contain}
+    .brand{font-size:15px;font-weight:800}.brand em{font-style:normal;color:#2979ff}
+    .bf-date{font-size:18px;font-weight:800;text-transform:capitalize}.bf-mut{color:#6b7c96;font-weight:400}
+    .bf-kpis{display:flex;gap:10px;margin:10px 0 4px}.bf-kpi{border:1px solid #dde6f0;border-radius:8px;padding:6px 14px;text-align:center}.bf-kpi b{display:block;font-size:19px}.bf-kpi span{font-size:10px;color:#6b7c96}
+    .bf-sec{margin-top:11px;break-inside:avoid}.bf-h{font-weight:800;font-size:12.5px;border-bottom:1px solid #dde6f0;padding-bottom:3px;margin-bottom:4px}
+    .bf-row{display:flex;gap:10px;padding:2.5px 0}.bf-k{flex:0 0 190px;font-weight:700}.bf-bad{color:#c62828;font-weight:800}.bf-ok{color:#1b8a4b}
+    .bf-warn{margin-top:6px;color:#b26a00;font-weight:700}
+    .ft{margin-top:18px;border-top:1px solid #dde6f0;padding-top:9px;color:#8094ad;font-size:10px}
+  </style></head><body>
+    <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div><div style="margin-left:auto;font-weight:700">☀️ Brief du jour · Site LFBF</div></div>
+    ${_briefHtml(R)}
+    <div class="ft">Édité le ${disp(fmt(new Date()))} · d'après le planning et les données saisies dans l'application</div>
+  </body></html>`;
+  openPrintView(html,'PDF — Brief du jour');
+}
+
+/* ════════════ SESSION DE FORMATION (inscriptions suggérées) + PRÉVISION DE CHARGE 3 MOIS ════════════ */
+let _sessRows=[];
+function openSessionPlanner(formName,ds){
+  ensureFormTypes();
+  const sel=document.getElementById('sess-form');
+  let o='<option value="">— Choisir la formation —</option><option value="Global Refresh">🔄 Global Refresh (EWIS + CDCCL + Safety Training + MOE/PART 145)</option>';
+  S.formTypes.filter(t=>t.nom&&t.suivi!==false).forEach(t=>{ o+=`<option value="${_bfEsc(t.nom)}">${_bfEsc(t.nom)}</option>`; });
+  sel.innerHTML=o;
+  if(formName){ if(!Array.from(sel.options).some(x=>x.value===formName)){ const x=document.createElement('option'); x.value=formName; x.textContent=formName; sel.appendChild(x); } sel.value=formName; }
+  document.getElementById('sess-date').value=ds||'';
+  document.getElementById('sess-half').value='J';
+  document.getElementById('sess-hor').value='6';
+  document.getElementById('sess-miss').checked=false;
+  _sessRows=[]; _sessCompute(); openM('m-session');
+}
+function _sessTargets(name){ return name==='Global Refresh'?GLOBAL_REFRESH_FORMS.slice():[name]; }
+function _sessCompute(){
+  const name=document.getElementById('sess-form').value, ds=document.getElementById('sess-date').value;
+  const half=document.getElementById('sess-half').value, hor=parseInt(document.getElementById('sess-hor').value)||6;
+  const withMiss=document.getElementById('sess-miss').checked;
+  const box=document.getElementById('sess-list'), info=document.getElementById('sess-info');
+  _sessRows=[];
+  if(!name||!ds){ box.innerHTML='<div style="color:var(--t3);font-size:12px;padding:14px 4px">Choisis une formation et une date pour voir les personnes à inscrire.</div>'; info.textContent=''; _sessCount(); return; }
+  const lim=parseLocal(ds); lim.setMonth(lim.getMonth()+hor); const limStr=fmt(lim);
+  const todayStr=fmt(new Date());
+  const targets=_sessTargets(name).map(_FT_NORM);
+  // déjà inscrits à une session à venir de cette formation
+  const already={};
+  Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e||e.type!=='formation_int'||_FT_NORM(e.formInt)!==_FT_NORM(name)) return; const pp=k.split('_'); const dd=pp.slice(1,-1).join('_'); if(dd>=todayStr){ if(!already[pp[0]]||dd<already[pp[0]]) already[pp[0]]=dd; } });
+  const halves=half==='J'?['AM','PM']:[half];
+  _sortByNom((S.personnel||[]).filter(p=>!_empHorsEffectif(p.id))).forEach(p=>{
+    const recs=(S.formations||[]).filter(f=>f.empId===p.id&&targets.includes(_FT_NORM(f.type)));
+    let st, exp='';
+    if(!recs.length){ if(!withMiss) return; st='missing'; }
+    else{
+      const dated=recs.filter(r=>r.dateExpiration).map(r=>r.dateExpiration).sort();
+      const incomplete=recs.length<targets.length;                 // Global Refresh : une des formations manque
+      if(!dated.length && !incomplete) return;                     // sans limite → rien à faire
+      exp=dated[0]||'';
+      if(exp && exp<ds) st='expired'; else if(exp && exp<=limStr) st='soon'; else if(incomplete && withMiss) st='missing'; else return;
+    }
+    // conflits le jour de la session
+    let block='', note='';
+    if(already[p.id]) block='déjà inscrit(e) le '+disp(already[p.id]);
+    else if(typeof _plHorsContrat==='function' && _plHorsContrat(p.id,ds)) block='hors contrat à cette date';
+    else{
+      const types=halves.map(h=>(S.planning[`${p.id}_${ds}_${h}`]||{}).type||'');
+      const prot=types.find(t=>PL_PROTECT.has(t));
+      if(prot) block=(HD_LBL[prot]||prot)+' ce jour-là';
+      else if(types.includes('travail')) note='remplace son affectation du jour';
+    }
+    _sessRows.push({p,st,exp,block,note,on:!block&&st!=='missing'});
+  });
+  const rank={expired:0,soon:1,missing:2};
+  _sessRows.sort((a,b)=>(rank[a.st]-rank[b.st])||((a.exp||'9')<(b.exp||'9')?-1:1));
+  const nE=_sessRows.filter(r=>r.st==='expired').length, nS=_sessRows.filter(r=>r.st==='soon').length, nM=_sessRows.filter(r=>r.st==='missing').length;
+  info.innerHTML=`<b style="color:#ff7088">${nE}</b> expirée(s) à la date de la session · <b style="color:#ffb340">${nS}</b> expirant dans les ${hor} mois qui suivent`+(withMiss?` · <b>${nM}</b> jamais suivie`:'')+((isWE(ds)||isHol(ds))?' · <span style="color:#ffb340">⚠ cette date est un week-end ou un jour férié</span>':'');
+  if(!_sessRows.length){ box.innerHTML='<div style="color:#34d399;font-size:12.5px;padding:14px 4px">✅ Personne à inscrire : tout le monde est à jour sur cette période.</div>'; _sessCount(); return; }
+  const lbl={expired:['Expirée','#ff7088'],soon:['Expire bientôt','#ffb340'],missing:['Jamais suivie','#9db0cc']};
+  box.innerHTML=_sessRows.map((r,i)=>`<label style="display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.05);${r.block?'opacity:.55':'cursor:pointer'}">
+      <input type="checkbox" class="cl-chk" ${r.on?'checked':''} ${r.block?'disabled':''} onchange="_sessRows[${i}].on=this.checked;_sessCount()">
+      <span style="flex:1;font-size:12.5px;font-weight:700">${_bfEsc(_bfNom(r.p))} <span style="color:var(--t4);font-weight:500;font-size:10.5px">· ${_bfEsc(_catLabel(r.p.categorie))}</span>
+        ${r.block?`<span style="color:#ff9aa8;font-weight:600;font-size:11px"> — ${_bfEsc(r.block)}</span>`:(r.note?`<span style="color:var(--t3);font-weight:500;font-size:11px"> — ${_bfEsc(r.note)}</span>`:'')}</span>
+      <span style="font-size:11px;color:${lbl[r.st][1]};font-weight:700;white-space:nowrap">${lbl[r.st][0]}${r.exp?' · '+disp(r.exp):''}</span>
+    </label>`).join('');
+  _sessCount();
+}
+function _sessAll(on){ _sessRows.forEach(r=>{ if(!r.block) r.on=on; }); const ds=document.querySelectorAll('#sess-list input[type=checkbox]'); ds.forEach((c,i)=>{ if(!_sessRows[i].block) c.checked=on; }); _sessCount(); }
+function _sessCount(){ const n=_sessRows.filter(r=>r.on&&!r.block).length; const b=document.getElementById('sess-go'); if(b){ b.textContent=n?`✅ Inscrire ${n} personne${n>1?'s':''}`:'Inscrire'; b.disabled=!n; b.style.opacity=n?'1':'.45'; } }
+function sessApply(){
+  const name=document.getElementById('sess-form').value, ds=document.getElementById('sess-date').value, half=document.getElementById('sess-half').value;
+  const rows=_sessRows.filter(r=>r.on&&!r.block); if(!name||!ds||!rows.length) return;
+  const halves=half==='J'?['AM','PM']:[half];
+  rows.forEach(r=>{
+    halves.forEach(h=>{ const k=`${r.p.id}_${ds}_${h}`; const ex=S.planning[k]||{}; S.planning[k]={type:'formation_int',note:'',chantierId:'',chantierId2:'',formInt:name,vm:ex.vm||''}; });
+    if(_formHasTracking(name)){ if(!S.formTracking) S.formTracking=[]; if(!S.formTracking.find(t=>t.empId===r.p.id&&t.date===ds&&t.formInt===name)) S.formTracking.push({id:uid(),empId:r.p.id,date:ds,formInt:name,status:'planned'}); }
+  });
+  save(); closeM('m-session');
+  ['renderWeekly','renderMaster','renderForms','renderDash'].forEach(fn=>{ try{ window[fn](); }catch(_){} });
+  try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){}
+  toast(`✅ ${rows.length} personne${rows.length>1?'s':''} inscrite${rows.length>1?'s':''} à « ${name} » le ${disp(ds)}`);
+}
+function sessFromCell(){
+  const f=document.getElementById('cellFormInt').value; const ds=(typeof cellCtx!=='undefined'&&cellCtx)?cellCtx.dateStr:'';
+  try{ closeM('m-cell'); }catch(_){}
+  openSessionPlanner(f,ds);
+}
+
+/* ── Prévision de charge sur 13 semaines ── */
+const _FC_WEEKS=13;
+function _forecastData(){
+  const ABSENT=new Set(['conge','maladie','formation','absence','deplacement','ferie','we']);
+  const techs=(S.personnel||[]).filter(p=>(p.categorie==='technicien'||p.categorie==='interimaire'||p.categorie==='sheetmetal')&&!_isHorsP145(p)&&p.actif!==false);
+  const mon0=getMon(new Date()); const out=[];
+  for(let w=0;w<_FC_WEEKS;w++){
+    const mon=addD(mon0,w*7), wEnd=addD(mon,4), wSun=addD(mon,6);
+    let ferme=0, prevHalf=0, sousContrat=0; const prevWho=new Set(), fins=[];
+    techs.forEach(p=>{
+      if(p.dateFin){ const f=parseLocal(p.dateFin); if(f>=mon&&f<=wSun) fins.push(p); }
+      if(!_presentSemaine(p,mon,wEnd)) return;
+      sousContrat++;
+      for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds)) continue;
+        ['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`]; const t=e?e.type:'travail';
+          if(t==='conge_prev'){ prevHalf+=0.5; prevWho.add(p.id); ferme+=0.5; }
+          else if(!ABSENT.has(t)) ferme+=0.5; });
+      }
+    });
+    const capa=Math.round(ferme/5*10)/10, capaPrev=Math.round((ferme-prevHalf)/5*10)/10;
+    let besoin=0; try{ besoin=_aiBesoinSemaine(mon).total||0; }catch(_){}
+    besoin=Math.round(besoin*10)/10;
+    out.push({mon,wk:wkN(mon),sousContrat,capa,capaPrev,besoin,ec:Math.round((capa-besoin)*10)/10,ecPrev:Math.round((capaPrev-besoin)*10)/10,prevWho:[...prevWho].map(byId).filter(Boolean),fins});
+  }
+  return out;
+}
+function openForecast(){ _forecastRender(); openM('m-forecast'); }
+function _forecastRender(){
+  const box=document.getElementById('fc-body'); if(!box) return;
+  let D; try{ D=_forecastData(); }catch(e){ console.error('forecast',e); box.innerHTML='<div style="color:#ff8090">Calcul impossible : '+_bfEsc(e.message)+'</div>'; return; }
+  const cell=v=>{ const col=v<0?'#ff7088':v<1?'#ffb340':'#34d399'; const bg=v<0?'rgba(255,93,115,0.16)':v<1?'rgba(255,179,64,0.13)':'transparent'; return `<td style="text-align:center;padding:6px 8px;font-weight:800;color:${col};background:${bg}">${v>0?'+':''}${v}</td>`; };
+  const anyBesoin=D.some(r=>r.besoin>0);
+  const rows=D.map((r,i)=>`<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+      <td style="padding:6px 10px;font-weight:700;white-space:nowrap">S${r.wk} <span style="color:var(--t4);font-weight:500;font-size:10.5px">${disp(fmt(r.mon)).slice(0,5)}${i===0?' · en cours':''}</span></td>
+      <td style="text-align:center;padding:6px 8px">${r.sousContrat}</td>
+      <td style="text-align:center;padding:6px 8px">${r.capa}</td>
+      <td style="text-align:center;padding:6px 8px">${r.besoin}</td>
+      ${cell(r.ec)}
+      <td style="text-align:center;padding:6px 8px;color:${r.prevWho.length?'#7fffd4':'var(--t4)'}" title="${_bfEsc(r.prevWho.map(_bfNom).join(', '))}">${r.prevWho.length||'—'}</td>
+      ${cell(r.ecPrev)}
+      <td style="padding:6px 8px;font-size:11px;color:${r.fins.length?'#ffb340':'var(--t4)'}">${r.fins.length?r.fins.map(p=>_bfEsc(_bfNom(p))+' ('+disp(p.dateFin).slice(0,5)+')').join(', '):'—'}</td>
+    </tr>`).join('');
+  // Recommandations
+  const reco=[];
+  D.forEach((r,i)=>{
+    if(r.ecPrev>=0) return;
+    let t=`<b>Semaine ${r.wk}</b> (dès le ${disp(fmt(r.mon))}) : il manquerait <b style="color:#ff7088">${Math.abs(r.ecPrev)}</b> technicien(s)`;
+    const idées=[];
+    if(r.ec>=0 && r.prevWho.length) idées.push(`le manque vient des <b>${r.prevWho.length} congé(s) prévisionnel(s)</b> à arbitrer (${r.prevWho.slice(0,6).map(p=>_bfEsc(_bfNom(p))).join(', ')}${r.prevWho.length>6?'…':''})`);
+    else if(r.prevWho.length) idées.push(`${r.prevWho.length} congé(s) prévisionnel(s) aggravent le manque`);
+    const partis=[]; for(let j=Math.max(0,i-6);j<=i;j++) D[j].fins.forEach(p=>{ if(!partis.includes(p)) partis.push(p); });
+    if(partis.length) idées.push(`prolonger ${partis.slice(0,4).map(p=>'<b>'+_bfEsc(_bfNom(p))+'</b> (fin le '+disp(p.dateFin)+')').join(', ')} couvrirait jusqu'à ${partis.length} poste(s)`);
+    reco.push('• '+t+(idées.length?' — '+idées.join(' ; '):'')+'.');
+  });
+  const nbDef=D.filter(r=>r.ecPrev<0).length;
+  const head=!anyBesoin?`<div class="bf-warn" style="margin-bottom:8px">Aucun besoin n'est renseigné sur la période (effectif requis des chantiers, stockage, recyclage). Les écarts ci-dessous ne reflètent donc que la capacité.</div>`
+    :(nbDef?`<div style="color:#ffb340;font-weight:800;font-size:13px;margin-bottom:6px">⚠ ${nbDef} semaine(s) en manque sur ${_FC_WEEKS}</div>`:`<div style="color:#34d399;font-weight:800;font-size:13px;margin-bottom:6px">✅ Aucun manque prévu sur ${_FC_WEEKS} semaines, même si tous les congés prévisionnels sont validés</div>`);
+  box.innerHTML=head+(reco.length?`<div style="font-size:12.5px;line-height:1.7;margin-bottom:10px">${reco.join('<br>')}</div>`:'')+
+    `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">
+      <th style="text-align:left;padding:6px 10px">Semaine</th><th style="padding:6px 8px" title="Techniciens, intérimaires et sheet metal sous contrat cette semaine">Sous contrat</th><th style="padding:6px 8px" title="Équivalent personnes disponibles, absences fermes déduites">Dispo</th><th style="padding:6px 8px">Besoin</th><th style="padding:6px 8px">Écart</th>
+      <th style="padding:6px 8px" title="Personnes ayant un congé prévisionnel cette semaine">Congés prév.</th><th style="padding:6px 8px" title="Écart si tous les congés prévisionnels sont validés">Écart si validés</th><th style="text-align:left;padding:6px 8px">Fins de contrat</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div style="font-size:10px;color:var(--t4);margin-top:8px;line-height:1.5">Dispo et besoin sont calculés comme dans Programme Activité (techniciens, intérimaires, sheet metal ; besoin = chantiers + stockage + Part 21 + recyclage). Une case vide du planning compte comme du travail.</div>`;
+}
 
 /* ════════════ MOTEUR GÉNÉRIQUE ASSISTANT — extraction d'entités + résolveurs ════════════ */
 function _aiNorm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
