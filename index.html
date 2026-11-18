@@ -569,6 +569,12 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .ncol-inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:58px;gap:2px;width:100%;overflow:hidden;background:#000;border-radius:4px}
 .emp-tri{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:1px}
 .emp-name{font-size:10px;font-weight:700;line-height:1.2;color:#ffffff;white-space:normal;overflow-wrap:anywhere;max-width:100%}
+/* Planning hebdo : colonne des noms alignée à gauche, 3 lignes fixes (trigramme + ⇄ / nom / autorisations) */
+.ncol-l{align-items:stretch;text-align:left;justify-content:center;gap:3px;padding:0 2px}
+.ncol-l .emp-tri{line-height:20px;height:20px}
+.ncol-l .emp-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ncol-l .emp-auth{display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;min-height:14px;align-items:center}
+.ncol-l .emp-auth span{font-size:8.5px!important;padding:0 4px!important;line-height:1.5!important}
 
 /* Half-day cells */
 .hw{display:flex;flex-direction:column;height:58px}
@@ -2523,7 +2529,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
         • <strong style="color:#60b4ff">📅 Vue Semaine</strong> — Programme Activité : clic sur une semaine du tableau d'ajustement (ou 🔍 dans Charge / Capacité). Présents par population (nombre + ETP), seuls les chantiers concernés, besoin modifiable synchronisé avec le tableau d'ajustement, personnes affectées avec leurs noms. Le stockage s'y saisit en Man/Hours, synchronisé avec l'onglet Stockage.<br>
-        • <strong style="color:#00d2ff">🪪 Autorisation à côté du trigramme</strong> — Planning Hebdo, vue Semaine, listes de noms et exports PDF/Excel des plannings : la plus forte autorisation valide (mécanique IMEC › AMEC › ISTO › ASTO ; structure ISTR/ICOM › ASTR/ACOM ; électricité IELE › AELE), en orange si elle expire sous 30 jours.<br>
+        • <strong style="color:#00d2ff">🪪 Autorisation à côté du trigramme</strong> — Planning Hebdo, vue Semaine, listes de noms et exports PDF/Excel des plannings : la plus forte autorisation valide (mécanique IMEC › AMEC › ISTO › ASTO ; structure ISTR/ICOM › ASTR/ACOM ; électricité IELE › AELE), en orange avec ⏳ si elle expire sous 30 jours.<br>
         • <strong style="color:#60b4ff">👁 Ratio cliquable</strong> — Tableau de bord : la liste des noms derrière Techniciens, Intérimaires, Prestataires, Hors Part 145 et Improductifs.<br>
         • <strong style="color:#c792ff">📝 Type de contrat</strong> — nouveau champ dans la fiche personnel (CDI, CDD, Intérim, Alternance, Stage) ; un CDD affiche sa date de fin.<br>
         • <strong style="color:#ffd060">🎓 Sessions de formation</strong> — Global Refresh réservé aux embauchés déjà formés ; EWIS / CDCCL / Safety Training traités comme formations initiales ; MOE/PART 145 aussi pour les intérimaires.<br>
@@ -7191,7 +7197,7 @@ const GUIDE_DATA = {
     {t:"Filtrer par catégorie", d:"Bouton <b>👥 Catégories</b> : affiche seulement les catégories voulues (ex. que les chefs + responsables) pour alléger l'affichage. Le choix est mémorisé et repris dans les exports.", ill:null},
     {t:"Lire la synthèse", d:"En bas : <b>tension de la semaine</b> (chantiers staffés / en manque), <b>personnes disponibles</b>, et la carte <b>🏖️ Congés de la semaine</b> (validés + demandés par catégorie, avec alerte si seuil dépassé).", ill:null},
     {t:"Exporter", d:"Boutons <b>📊 Export Excel</b> et <b>📄 Export PDF</b> : génèrent la semaine en couleur, en respectant le filtre de catégories actif.", ill:null},
-    {t:"Autorisation affichée", d:"À côté du trigramme, un badge montre la <b>plus forte autorisation valide</b> : mécanique <b>IMEC › AMEC › ISTO › ASTO</b>, structure <b>ISTR/ICOM › ASTR/ACOM</b>, électricité <b>IELE › AELE</b> (un badge par famille détenue). Badge <b>orange</b> = expire sous 30 jours. Survole-le pour voir toutes ses autorisations.", ill:null},
+    {t:"Autorisation affichée", d:"À côté du trigramme, un badge montre la <b>plus forte autorisation valide</b> : mécanique <b>IMEC › AMEC › ISTO › ASTO</b>, structure <b>ISTR/ICOM › ASTR/ACOM</b>, électricité <b>IELE › AELE</b> (un badge par famille détenue). Badge <b>orange avec ⏳</b> (bordure pointillée) = expire sous 30 jours. Couleurs : mécanique bleu, structure gris, électricité vert. Survole-le pour voir toutes ses autorisations.", ill:null},
   ]},
   "Congés prévisionnels": { icon:"🏖️", color:"#7fffd4", steps:[
     {t:"Le principe", d:"Avant de valider les congés, tu enregistres les <b>demandes</b> des gens pour voir la concentration (ex. tout le monde la même semaine).", ill:null},
@@ -7925,7 +7931,7 @@ function _exportAlertsXls(){
 const _AUTH_LADDERS=[
   {fam:'meca',col:'#00d2ff',levels:[['IMEC'],['AMEC'],['ISTO'],['ASTO']]},
   {fam:'struct',col:'#a7c1de',levels:[['ISTR','ICOM'],['ASTR','ACOM']]},
-  {fam:'elec',col:'#ffd060',levels:[['IELE'],['AELE']]}
+  {fam:'elec',col:'#4ade80',levels:[['IELE'],['AELE']]}
 ];
 function _authBest(empId){
   const today=fmt(new Date()), lim=fmt(addD(new Date(),30));
@@ -7949,13 +7955,13 @@ function _authBest(empId){
 }
 function _authBadgeHtml(empId){
   const A=_authBest(empId); if(!A.groups.length) return '';
-  return A.groups.map(g=>`<span title="${_bfEsc(A.tip)}${g.warn?' — expire le '+disp(g.exp):''}" style="display:inline-block;font-size:9px;font-weight:900;letter-spacing:.3px;padding:0 5px;border-radius:5px;line-height:1.55;white-space:nowrap;color:${g.warn?'#ffb340':g.col};background:${g.warn?'rgba(255,179,64,0.14)':'rgba(255,255,255,0.07)'};border:1px solid ${g.warn?'rgba(255,179,64,0.55)':'rgba(255,255,255,0.18)'}">${g.lbl}</span>`).join(' ');
+  return A.groups.map(g=>`<span title="${_bfEsc(A.tip)}${g.warn?' — expire le '+disp(g.exp):''}" style="display:inline-block;font-size:9px;font-weight:900;letter-spacing:.3px;padding:0 5px;border-radius:5px;line-height:1.55;white-space:nowrap;color:${g.warn?'#ffb340':g.col};background:${g.warn?'rgba(255,179,64,0.14)':'rgba(255,255,255,0.07)'};border:1px ${g.warn?'dashed rgba(255,179,64,0.85)':'solid rgba(255,255,255,0.18)'}">${g.warn?'⏳ ':''}${g.lbl}</span>`).join(' ');
 }
 function _authBadgePrint(empId){
   const A=_authBest(empId); if(!A.groups.length) return '';
-  return ' '+A.groups.map(g=>`<span style="display:inline-block;font-size:8px;font-weight:900;padding:0 4px;border-radius:4px;border:1px solid ${g.warn?'#e08a00':'#8aa4c8'};color:${g.warn?'#b26a00':'#1d4f91'};background:${g.warn?'#fff4e0':'#eef4fc'};white-space:nowrap">${g.lbl}</span>`).join(' ');
+  return ' '+A.groups.map(g=>`<span style="display:inline-block;font-size:8px;font-weight:900;padding:0 4px;border-radius:4px;border:1px ${g.warn?'dashed #e08a00':'solid #8aa4c8'};color:${g.warn?'#b26a00':'#1d4f91'};background:${g.warn?'#fff4e0':'#eef4fc'};white-space:nowrap">${g.warn?'⏳ ':''}${g.lbl}</span>`).join(' ');
 }
-function _authText(empId){ const t=_authBest(empId).text; return t?' ['+t+']':''; }
+function _authText(empId){ const g=_authBest(empId).groups; return g.length?' ['+g.map(x=>x.lbl+(x.warn?' ⏳':'')).join(' · ')+']':''; }
 
 // ── Tâches : une seule définition partagée (tableau de bord, alertes, onglet To-Do) ──
 function _todoDue(t){
@@ -9582,9 +9588,10 @@ function buildGrid(emps,dates,containerId){
     }).join('');
     return separator + `<tr style="${inactive?'opacity:.6':''}">
       <td class="ncol" ${isWeekly&&!inactive?`draggable="true" ondragstart="_wkDragStart(event,'${emp.id}')" ondragend="_wkDragEnd(event)" style="cursor:grab;`:'style="'}background:linear-gradient(${cat.col||'#2979ff'}14,${cat.col||'#2979ff'}14),#000000;border-left:3px solid ${inactive?'#ff9a3c':(cat.col||'var(--glass-border)')}">
-        <div class="ncol-inner">
-          <div class="emp-tri" style="color:${cat.col||'var(--t3)'};display:flex;align-items:center;justify-content:space-between;gap:4px"><span style="display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap">${emp.trigramme}${isWeekly?_authBadgeHtml(emp.id):''}</span>${isWeekly&&!inactive?`<button onclick="event.stopPropagation();_wkMoveMenu(event,'${emp.id}')" title="Déplacer vers un chantier" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:5px;padding:0 5px;font-size:11px;font-weight:800;cursor:pointer;line-height:1.5;font-family:'Outfit',sans-serif">⇄</button>`:''}</div>
-          <div class="emp-name">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
+        <div class="ncol-inner${isWeekly?' ncol-l':''}">
+          <div class="emp-tri" style="color:${cat.col||'var(--t3)'};display:flex;align-items:center;justify-content:space-between;gap:4px"><span>${emp.trigramme}</span>${isWeekly&&!inactive?`<button onclick="event.stopPropagation();_wkMoveMenu(event,'${emp.id}')" title="Déplacer vers un chantier" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:5px;padding:0 5px;font-size:11px;font-weight:800;cursor:pointer;line-height:1.5;font-family:'Outfit',sans-serif">⇄</button>`:''}</div>
+          <div class="emp-name" title="${emp.nom} ${emp.prenom}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
+          ${isWeekly?`<div class="emp-auth">${_authBadgeHtml(emp.id)}</div>`:''}
         </div>
       </td>
       ${cells}
