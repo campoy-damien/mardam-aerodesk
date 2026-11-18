@@ -164,10 +164,10 @@ console.log('%c© 2025 Damien Campoy — MARDAM AeroDesk Pro','color:#00d2ff;fon
 
   /* Staff colors */
   --chef:      #ff5e00;
-  --responsable: #e040fb;
+  --responsable: #ff5fa2;
   --tech:      #a88c6a;
   --expert:    #2979ff;
-  --workshop:  #00c2a8;
+  --workshop:  #ef4444;
   --sheetmetal: #6d8fb0;
   --alt:       #00e5b0;
   --stag:      #84fab0;
@@ -450,13 +450,13 @@ body::before{
 .be{background:rgba(255,77,109,0.12);color:var(--rose);border:1px solid rgba(255,77,109,0.25)}
 .bn{background:rgba(90,112,144,0.15);color:var(--t3);border:1px solid var(--glass-border)}
 .b-chef{background:rgba(255,94,0,0.15);color:var(--chef);border:1px solid rgba(255,94,0,0.4)}
-.b-resp{background:rgba(224,64,251,0.12);color:var(--responsable);border:1px solid rgba(224,64,251,0.3)}
+.b-resp{background:rgba(255,95,162,0.12);color:var(--responsable);border:1px solid rgba(255,95,162,0.35)}
 .b-tech{background:rgba(168,140,106,0.12);color:var(--tech);border:1px solid rgba(168,140,106,0.25)}
 .b-rec{background:rgba(255,154,60,0.12);color:#ff9a3c;border:1px solid rgba(255,154,60,0.3)}
-.b-part21{background:rgba(0,100,200,0.12);color:#0064c8;border:1px solid rgba(0,160,255,0.3)}
-.b-iq{background:rgba(0,160,255,0.12);color:#00a0ff;border:1px solid rgba(0,160,255,0.3)}
+.b-part21{background:rgba(163,230,53,0.12);color:#a3e635;border:1px solid rgba(163,230,53,0.35)}
+.b-iq{background:rgba(203,213,225,0.12);color:#cbd5e1;border:1px solid rgba(203,213,225,0.35)}
 .b-exp{background:rgba(41,121,255,0.12);color:#82b1ff;border:1px solid rgba(41,121,255,0.25)}
-.b-workshop{background:rgba(0,194,168,0.14);color:#4de3cd;border:1px solid rgba(0,194,168,0.3)}
+.b-workshop{background:rgba(239,68,68,0.14);color:#ff7b7b;border:1px solid rgba(239,68,68,0.38)}
 .b-sheetmetal{background:rgba(109,143,176,0.16);color:#a7c1de;border:1px solid rgba(109,143,176,0.35)}
 .b-alt{background:rgba(0,229,176,0.12);color:var(--alt);border:1px solid rgba(0,229,176,0.25)}
 .b-stag{background:rgba(132,250,176,0.12);color:var(--stag);border:1px solid rgba(132,250,176,0.25)}
@@ -575,7 +575,78 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .ncol-l .emp-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ncol-l .emp-auth{display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;min-height:14px;align-items:center}
 .ncol-l .emp-auth span{font-size:8.5px!important;padding:0 4px!important;line-height:1.5!important}
+.ncol.ncol-fill .ncol-inner{background:transparent}
+.ncol.ncol-fill .emp-tri{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.ncol.ncol-fill .emp-name{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.ncol.ncol-fill .emp-auth span{background:rgba(5,8,16,.8)!important;text-shadow:none}
+.ncol.ncol-fill .emp-tri button{background:rgba(5,8,16,.7)!important;border-color:rgba(0,210,255,.5)!important;text-shadow:none}
 
+/* Créateur de planning automatique — « Composition des équipes » */
+#m-autoplan .ap-modal{max-width:1320px;width:97vw;height:calc(100vh - 175px);max-height:none;padding:0;overflow:hidden;background:linear-gradient(180deg,#0d1424,#0a0f1b)}
+.ap-top{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.ap-h1{font-size:18px;font-weight:800;color:#fff}.ap-wk{font-size:12px;color:#8fa3bf}
+.ap-seg{display:flex;background:rgba(255,255,255,.05);border-radius:10px;padding:3px}.ap-seg b{font-size:12px;padding:5px 11px;border-radius:8px;color:#9fb0c8;font-weight:700;cursor:pointer}.ap-seg b.on{background:#1c2a44;color:#fff}
+.ap-nav{width:34px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#cfd8e6;cursor:pointer;font-size:13px}
+#ap-sum{display:flex;align-items:center;gap:16px;padding:9px 18px;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;flex-wrap:wrap}
+.ap-g{flex:1;min-width:160px;height:10px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden;display:flex}.ap-g i{display:block;height:100%;transition:width .35s}
+.ap-k{font-size:12px;color:#8fa3bf;white-space:nowrap}.ap-k b{font-size:17px;color:#fff;margin-right:4px}
+.ap-main{display:grid;grid-template-columns:1fr 310px;flex:1;min-height:0}
+#ap-board{padding:6px 16px 16px;overflow-y:auto}
+.ap-sec{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin:12px 0 8px}.ap-sec:after{content:'';flex:1;height:1px;background:currentColor;opacity:.22}
+.ap-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px;align-items:start}
+.ap-card{border-radius:14px;background:#0f1729;border:1px solid rgba(255,255,255,.08);position:relative;transition:border-color .15s,box-shadow .15s,opacity .15s;padding-bottom:2px}
+.ap-card.ok,.ap-line.ok{border-color:rgba(110,255,196,.55);box-shadow:0 0 0 2px rgba(110,255,196,.12)}
+.ap-card.over,.ap-line.over,.ap-res.over{border-color:#6effc4!important;box-shadow:0 0 0 3px rgba(110,255,196,.22),0 0 30px rgba(110,255,196,.15)!important}
+.ap-card.no,.ap-line.no{opacity:.38}.ap-card.src,.ap-line.src{border-style:dashed}
+.ap-card.ok,.ap-line.ok{cursor:pointer}
+.ap-why{font-size:11px;color:#ff8fa3;font-weight:700;padding:0 12px}.ap-why:empty{display:none}.ap-card .ap-why{padding-bottom:8px}
+.ap-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:14px 0 0 14px}
+.ap-ch{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 8px 16px}
+.ap-tt{font-weight:800;font-size:14px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ap-st{font-size:11px;color:#7f90aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-cnt{margin-left:auto;text-align:right;flex-shrink:0}.ap-n{font-size:21px;font-weight:900;line-height:1}.ap-n small{font-size:13px;color:#7f90aa;font-weight:700}
+.ap-pill{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:1px 8px;margin-top:3px;white-space:nowrap}
+.ap-mix{display:flex;align-items:center;gap:10px;padding:0 12px 6px 16px;font-size:11px;font-weight:700}.ap-mixbar{flex:1;height:4px;border-radius:3px;background:rgba(192,132,252,.45);overflow:hidden;max-width:140px;margin-left:auto}.ap-mixbar i{display:block;height:100%;background:#a88c6a}
+.ap-slots{display:flex;gap:3px;padding:0 12px 8px 16px}.ap-slots i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s}
+.ap-chef{margin:0 12px 8px 16px;display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:10px;background:linear-gradient(90deg,rgba(255,94,0,.2),rgba(255,94,0,.04));border:1px solid rgba(255,94,0,.38);font-size:12.5px;color:#fff;cursor:pointer;position:relative}
+.ap-chef.ro{cursor:default}.ap-chef.nochef{background:rgba(255,94,0,.04);border-style:dashed;color:#9fb0c8}
+.ap-chef-l{margin-left:auto;font-size:10px;color:#ffa070;font-weight:800;letter-spacing:.4px}
+.ap-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;background:#121c31;border:1px solid rgba(255,255,255,.15);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:4px;max-height:240px;overflow-y:auto}
+.ap-pop>div{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:#e8eef8}.ap-pop>div:hover{background:rgba(255,255,255,.07)}.ap-pop>div.on{background:rgba(255,94,0,.15)}
+.ap-team{display:flex;flex-direction:column;gap:4px;padding:0 10px 8px 14px}
+.ap-tk{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);font-size:12px;position:relative;cursor:grab;transition:background .12s,transform .12s,box-shadow .12s;min-width:0;user-select:none;-webkit-user-select:none}
+.ap-tk:hover{background:rgba(255,255,255,.075)}.ap-tk:active{cursor:grabbing}
+.ap-tk.core{border-left:3px solid #6effc4}.ap-tk.new{border-left:3px dashed #ffd166}.ap-tk.saisi{border-left:3px solid #82b1ff;cursor:default;opacity:.9}
+.ap-tk.sel{background:rgba(110,255,196,.14);border-color:#6effc4;box-shadow:0 0 0 2px rgba(110,255,196,.3)}
+.ap-tk.dragging{opacity:.35;transform:scale(.97)}
+.ap-av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:800;flex-shrink:0;border:1px solid;letter-spacing:-.3px}
+.ap-nm{font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.ap-tk>span[style*="font-size:9px"]{flex-shrink:0;background:rgba(5,8,16,.85)!important}
+.ap-tag{font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;letter-spacing:.3px;border:1px solid rgba(255,255,255,.2);color:#b9c7dc;white-space:nowrap;flex-shrink:0}
+.ap-act{display:none;gap:3px;flex-shrink:0}.ap-tk:hover .ap-act,.ap-tk.sel .ap-act{display:flex}
+.ap-act button{width:22px;height:22px;border-radius:6px;border:none;background:rgba(255,255,255,.08);color:#cfd8e6;cursor:pointer;font-size:11px;display:grid;place-items:center;padding:0}.ap-act button:hover{background:rgba(255,255,255,.16)}.ap-act button.on{background:rgba(192,132,252,.25)}
+@media (hover:none){.ap-act{display:flex}}
+.ap-ghost{border:1.5px dashed rgba(255,143,163,.4);background:rgba(255,143,163,.04);color:#ff8fa3;border-radius:10px;padding:7px;text-align:center;font-size:11.5px;font-weight:700}
+.ap-rel{font-size:11px;color:#9aa8bd;padding:0 12px 8px 16px}
+.ap-lines{display:flex;flex-direction:column;gap:5px}
+.ap-line{display:grid;grid-template-columns:230px 120px 90px 1fr;align-items:center;gap:10px;padding:7px 10px 7px 14px;border-radius:10px;background:#0f1729;border:1px solid rgba(255,255,255,.08);position:relative;transition:border-color .15s,opacity .15s}
+.ap-line .ap-why{grid-column:1/-1;padding:0}
+.ap-ll{min-width:0}.ap-lc{display:flex;align-items:baseline;gap:4px}.ap-lc b{font-size:17px}.ap-lc small{color:#7f90aa;font-weight:700}.ap-lc .ap-pill{margin-left:4px}
+.ap-lchef{font-size:12px;color:#ffa070}
+.ap-lt{display:flex;flex-wrap:wrap;gap:4px}
+.ap-mt{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:800;padding:2px 6px;border-radius:6px;border:1px solid;background:#0b0f1a;cursor:grab;user-select:none}
+.ap-mt.core{box-shadow:inset 0 -2px 0 #6effc4}.ap-mt.new{box-shadow:inset 0 -2px 0 #ffd166}.ap-mt.saisi{box-shadow:inset 0 -2px 0 #82b1ff;cursor:default}
+.ap-mt.sel{outline:2px solid #6effc4}.ap-mt.ghost{color:#ff8fa3!important;border:1px dashed rgba(255,143,163,.5);cursor:default}
+.ap-res{border-left:1px solid rgba(255,255,255,.07);background:rgba(4,8,16,.55);padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0;border:1px solid transparent;transition:border-color .15s}
+.ap-res.ok{border-color:rgba(110,255,196,.35)}
+#ap-res-h{margin:0;font-size:13.5px;font-weight:800;color:#fff}
+#ap-q{height:32px!important;border-radius:9px!important;font-size:12px!important;padding:0 10px!important}
+#ap-fl{display:flex;gap:4px;flex-wrap:wrap}#ap-fl b{font-size:10.5px;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.15);color:#9fb0c8;font-weight:700;cursor:pointer}#ap-fl b.on{background:rgba(0,210,255,.14);border-color:rgba(0,210,255,.5);color:#7fd4ff}
+#ap-reslist{overflow-y:auto;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0;padding-right:2px}
+.ap-grp{font-size:10px;font-weight:900;letter-spacing:.8px;color:#7f90aa;text-transform:uppercase;margin-top:6px;display:flex;justify-content:space-between}.ap-grp span{color:#56657c}
+.ap-foot{display:flex;align-items:center;gap:10px;padding:11px 18px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;flex-wrap:wrap}
+#ap-hint{font-size:11.5px;color:#7f90aa;margin-right:auto;flex:1;min-width:200px}
+#ap-val{background:linear-gradient(135deg,#00e5b0,#00b4d8);color:#04121a;border:none;box-shadow:0 6px 20px rgba(0,229,176,.25);font-weight:900}
+@media (max-width:900px){.ap-main{grid-template-columns:1fr}.ap-res{max-height:40vh;border-left:none;border-top:1px solid rgba(255,255,255,.07)}.ap-cards{grid-template-columns:1fr}.ap-line{grid-template-columns:1fr auto;}.ap-lchef{display:none}}
 /* Half-day cells */
 .hw{display:flex;flex-direction:column;height:58px}
 .hd{
@@ -802,10 +873,10 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 }
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .sc.chef::before{background:linear-gradient(90deg,#ff5e00,#ff9a1a)}
-.sc.responsable::before{background:linear-gradient(90deg,#e040fb,#ea80fc)}
+.sc.responsable::before{background:linear-gradient(90deg,#ff5fa2,#ff9cc6)}
 .sc.technicien::before{background:linear-gradient(90deg,#a88c6a,#c9a87c)}
 .sc.expert::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
-.sc.workshop::before{background:linear-gradient(90deg,#00c2a8,#4de3cd)}
+.sc.workshop::before{background:linear-gradient(90deg,#ef4444,#ff7b7b)}
 .sc.sheetmetal::before{background:linear-gradient(90deg,#6d8fb0,#a7c1de)}
 .sc.alternant::before{background:linear-gradient(90deg,var(--mint),var(--lime))}
 .sc.stagiaire::before{background:linear-gradient(90deg,var(--stag),#b2fcc9)}
@@ -1405,6 +1476,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   </div>
   <div class="exprow">
     <button class="btn btn-sm" onclick="copyPrevWeek()" style="background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;border:none;font-weight:800" title="Recopie uniquement les affectations de travail dans les cases vides. Formations, congés et absences ne sont jamais recopiés.">📋 Recopier la semaine précédente</button>
+    <button class="btn btn-sm" onclick="openAutoPlan()" style="background:linear-gradient(135deg,#00b4d8,#00e5b0);color:#04121a;border:none;font-weight:900" title="Propose une composition d'équipes pour la semaine affichée (besoins, noyau dur, chefs, autorisations). Rien n'est écrit sans ta validation.">🪄 Proposer les équipes</button>
     <button class="btn btn-mint btn-sm" onclick="exportWeekXls()">📊 Export Excel</button>
     <button class="btn btn-cyan btn-sm" onclick="exportWeekHtml()">📄 PDF / Imprimer</button>
     <button class="btn btn-rose btn-sm" onclick="openDayExtract()">📧 Extrait du jour</button>
@@ -1778,11 +1850,11 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <button class="ftab" onclick="filterStaff('chef',this)">Chefs d'équipe</button>
     <button class="ftab" onclick="filterStaff('technicien',this)">Techniciens</button>
     <button class="ftab" onclick="filterStaff('expert',this)">Experts</button>
-    <button class="ftab" onclick="filterStaff('workshop',this)" style="color:#00c2a8;border-color:rgba(0,194,168,0.3)">🛠 Workshop Manager</button>
-    <button class="ftab" onclick="filterStaff('sheetmetal',this)" style="color:#6d8fb0;border-color:rgba(109,143,176,0.4)">🔩 Sheet Metal Worker</button>
-    <button class="ftab" onclick="filterStaff('recycling',this)" style="color:#ff9a3c;border-color:rgba(255,154,60,0.3)">♻️ A/C Recycling</button>
-    <button class="ftab" onclick="filterStaff('part21',this)" style="color:#0064c8;border-color:rgba(0,160,255,0.3)">✈️ Tech Part 21</button>
-    <button class="ftab" onclick="filterStaff('iq',this)" style="color:#00a0ff;border-color:rgba(0,160,255,0.3)">🔍 Insp. Qualité</button>
+    <button class="ftab" onclick="filterStaff('workshop',this)">🛠 Workshop Manager</button>
+    <button class="ftab" onclick="filterStaff('sheetmetal',this)">🔩 Sheet Metal Worker</button>
+    <button class="ftab" onclick="filterStaff('recycling',this)">♻️ A/C Recycling</button>
+    <button class="ftab" onclick="filterStaff('part21',this)">✈️ Tech Part 21</button>
+    <button class="ftab" onclick="filterStaff('iq',this)">🔍 Insp. Qualité</button>
     <button class="ftab" onclick="filterStaff('alternant',this)">Alternants</button>
     <button class="ftab" onclick="filterStaff('stagiaire',this)">Stagiaires</button>
     <button class="ftab" onclick="filterStaff('interimaire',this)">Intérimaires</button>
@@ -2658,6 +2730,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
         • <strong style="color:#ffd060">Clic sur une case</strong> — Travail, Congé, Formation, Maladie, Déplacement…<br>
         • <strong style="color:#ffd060">Affectation chantier</strong> — Travail → choisir le chantier associé (y compris Stockage, Part 21, ou un avion en recyclage)<br>
         • <strong style="color:#ffd060">2 chantiers par demi-journée</strong> — une demi-journée peut porter un 2ᵉ chantier optionnel (jusqu'à 4 chantiers/jour). Les 3,5 h sont alors divisées à parts égales (1,75 h chacun). La case s'affiche en 2 bandes de couleur avec le MSN de chaque avion.<br>
+        • <strong style="color:#ffd060">🪄 Proposer les équipes</strong> — propose une composition d'équipes pour la semaine affichée selon les <strong>besoins</strong>, les <strong>disponibilités</strong> et les <strong>autorisations</strong> : cases déjà remplies jamais touchées, <strong>chef d'équipe</strong> sur son chantier, <strong>noyau dur</strong> conservé d'une semaine à l'autre, derniers arrivés libérés si le besoin baisse, manque réparti proportionnellement, intérimaires affectés selon leur <strong>spécialité</strong>. Tout est modifiable par glisser-déposer (ou toucher-placer sur iPad), avec une réserve filtrable et une vue « Liste compacte » ; <strong style="color:#6effc4">rien n'est écrit avant « Valider »</strong>, et une bannière « Annuler » permet de revenir en arrière<br>
         • <strong style="color:#ffd060">📋 Recopier la semaine précédente</strong> — bouton violet : remplit uniquement les cases <strong>vides</strong> de la semaine affichée à partir de la précédente, et <strong>seulement les affectations de travail</strong>. Formations, congés, maladies, absences et déplacements sont des événements ponctuels : ils ne sont <strong style="color:#6effc4">jamais recopiés</strong>, ce qui évite de créer de fausses entrées. Une bannière « Annuler » apparaît après coup<br>
         • <strong style="color:#ffd060">🖌 Copier vers d'autres (pinceau)</strong> — depuis l'éditeur d'une case, arme son contenu (ex. une formation) puis tape les cases des autres personnes pour l'y appliquer, sans tout retaper. Compteur, Annuler et Terminer dans la barre du bas. <em>Marche sur iPad/iPhone et sur ordinateur.</em><br>
         • <strong style="color:#ffd060">🖱 Sélection multiple à la souris (ordinateur)</strong> — glisser pour sélectionner plusieurs cases, puis <strong>Copier / Coller / Vider</strong> (ou Ctrl+C / Ctrl+V, Échap pour quitter). Glisser sur les seuls après-midis (PM→PM) ne prend que les demi-journées PM ; AM→PM prend les journées entières. Coller remplit toute la sélection<br>
@@ -3333,6 +3406,27 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 </div>
 <!-- Vue Semaine : besoins par chantier -->
+<div class="mbg" id="m-autoplan">
+<div class="modal ap-modal">
+  <div class="ap-top"><span style="font-size:24px">🪄</span><div id="ap-title" style="flex:1;min-width:0"></div>
+    <div class="ap-seg" id="ap-seg"><b data-v="board" onclick="_apSetView('board')">Tableau</b><b data-v="list" onclick="_apSetView('list')">Liste compacte</b></div>
+    <button class="ap-nav" onclick="_apShift(-1)" title="Semaine précédente">◀</button><button class="ap-nav" onclick="_apShift(1)" title="Semaine suivante">▶</button></div>
+  <div id="ap-sum"></div>
+  <div class="ap-main">
+    <div id="ap-board"></div>
+    <div class="ap-res" data-zone="__res" ondragover="_apDragOver(event,'')" ondragleave="_apDragLeave(event)" ondrop="_apDrop(event,'')" onclick="_apTapZone('')">
+      <h3 id="ap-res-h">🙋 Réserve</h3>
+      <input id="ap-q" type="text" placeholder="🔍 Nom, trigramme…" oninput="_apSearch(this.value)" onclick="event.stopPropagation()">
+      <div id="ap-fl" onclick="event.stopPropagation()"></div>
+      <div id="ap-reslist"></div>
+    </div>
+  </div>
+  <div class="ap-foot"><span id="ap-hint"></span>
+    <button class="btn btn-ghost" onclick="closeM('m-autoplan')">Annuler</button>
+    <button class="btn btn-ghost" onclick="_apRecalc()" title="Recalcule en gardant les personnes que tu as placées ou verrouillées">↻ Recalculer</button>
+    <button class="btn" id="ap-val" onclick="_apValidate()">✅ Valider</button></div>
+</div>
+</div>
 <div class="mbg" id="m-weekview">
 <div class="modal" style="max-width:1080px;width:96vw;max-height:95vh">
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
@@ -4181,8 +4275,8 @@ const CATS = {
   interimaire:{lbl:'Intérimaire',         col:'var(--interim)',      b:'b-int'},
   prestataire:{lbl:'Prestataire',          col:'var(--prestataire)',  b:'b-prest'},
   recycling:  {lbl:'A/C Tech. Recycling', col:'#ff9a3c', b:'b-rec'},
-  part21:     {lbl:'Tech Part 21',         col:'#0064c8', b:'b-part21'},
-  iq:         {lbl:'Insp. Qualité',         col:'#00a0ff', b:'b-iq'},
+  part21:     {lbl:'Tech Part 21',         col:'#a3e635', b:'b-part21'},
+  iq:         {lbl:'Insp. Qualité',         col:'#cbd5e1', b:'b-iq'},
 };
 const SBADGE = {valid:'<span class="badge bv">✓ Valide</span>',warning:'<span class="badge bw">⚠ Bientôt</span>',expired:'<span class="badge be">✗ Expiré</span>',na:'<span class="badge bn">∞ Illimité</span>'};
 const HD_CSS = {travail:'ht',conge:'hco',conge_prev:'hcop',maladie:'hm',formation:'hfo',formation_int:'hfi',absence:'hab',deplacement:'hdp',we:'hwe',ferie:'hfe',''  :''};
@@ -7199,6 +7293,14 @@ const GUIDE_DATA = {
     {t:"Exporter", d:"Boutons <b>📊 Export Excel</b> et <b>📄 Export PDF</b> : génèrent la semaine en couleur, en respectant le filtre de catégories actif.", ill:null},
     {t:"Autorisation affichée", d:"À côté du trigramme, un badge montre la <b>plus forte autorisation valide</b> : mécanique <b>IMEC › AMEC › ISTO › ASTO</b>, structure <b>ISTR/ICOM › ASTR/ACOM</b>, électricité <b>IELE › AELE</b> (un badge par famille détenue). Badge <b>orange avec ⏳</b> (bordure pointillée) = expire sous 30 jours. Couleurs : mécanique bleu, structure gris, électricité vert. Survole-le pour voir toutes ses autorisations.", ill:null},
   ]},
+  "Proposer les équipes": { icon:"🪄", color:"#00e5b0", steps:[
+    {t:"À quoi ça sert", d:"Bouton <b>🪄 Proposer les équipes</b> du Planning Hebdo : l'app propose une composition d'équipes pour la semaine affichée, d'après les <b>besoins</b> (vue Semaine / tableau d'ajustement), les <b>disponibilités</b> et les <b>autorisations</b>. C'est <b>indicatif</b> : rien n'est écrit sans ta validation.", ill:null},
+    {t:"Comment elle est construite", d:"1) Les cases <b>déjà remplies</b> ne bougent jamais (📝). 2) Le <b>chef d'équipe</b> du chantier y est placé (🎖). 3) Le <b>noyau dur</b> reste sur son chantier des semaines précédentes (🔒). 4) Les manques sont comblés en priorité par ceux qui ont <b>déjà travaillé</b> sur le chantier (↩), puis par des nouveaux (➕), en <b>répartissant équitablement</b> les autorisations et en gardant sur chaque chantier la <b>même proportion embauchés / intérimaires</b> que l'effectif disponible (👔 / 🧑‍🔧 affichés sur chaque carte).", ill:null},
+    {t:"Besoin en baisse ou manque de monde", d:"Si le besoin baisse, les <b>derniers arrivés</b> sont libérés (✂). S'il n'y a pas assez de monde, le manque est <b>réparti proportionnellement</b> entre les chantiers (« cible »).", ill:null},
+    {t:"Chacun à sa place", d:"Chantiers et Stockage : techniciens et intérimaires Part 145. Structure : Sheet Metal. Airbus : Tech Part 21. Recyclage : A/C Recycling. Les <b>intérimaires</b> suivent leur <b>spécialité</b> (un intérimaire « Stockage » ne va qu'au stockage, un « Part 21 » qu'à Airbus…). Les IQ ne sont pas affectés.", ill:null},
+    {t:"Modifier la proposition", d:"<b>Glisse-dépose</b> une personne d'un chantier à l'autre, ou depuis/vers la <b>réserve</b> à droite (recherche + filtres Embauchés, Intérim, IMEC, AMEC…). Sur <b>iPad</b> : touche la personne puis le chantier. Pendant le déplacement, les chantiers compatibles s'allument et les autres s'estompent avec la raison. Au survol d'une personne : <b>📌</b> la verrouille, <b>✕</b> la remet en réserve. Clic sur le bandeau <b>🎖 chef d'équipe</b> pour le changer ou le retirer. <b>↻ Recalculer</b> refait la proposition en gardant tes choix. Bouton <b>Liste compacte</b> : une ligne par chantier pour tout voir d'un coup.", ill:null},
+    {t:"Valider", d:"<b>✅ Valider et remplir le planning</b> : seules les <b>demi-journées vides</b> du lundi au vendredi sont remplies (semaine entière par personne, jours fériés et hors contrat exclus). Une bannière <b>Annuler</b> permet de tout défaire d'un coup.", ill:null},
+  ]},
   "Congés prévisionnels": { icon:"🏖️", color:"#7fffd4", steps:[
     {t:"Le principe", d:"Avant de valider les congés, tu enregistres les <b>demandes</b> des gens pour voir la concentration (ex. tout le monde la même semaine).", ill:null},
     {t:"Poser une demande", d:"Clique une case du planning → statut <b>📝 Congé prévis.</b> La case apparaît <b>hachurée « Congé ? »</b>, distincte du congé validé (vert plein).", ill:null},
@@ -7507,7 +7609,7 @@ function _sortByNom(list){
 /* ═══ EXPORTS EXCEL COLORÉS — MATRICES (helpers partagés) ═══ */
 // Couleur ARGB d'une catégorie, résolue depuis les variables CSS (fallback pour catégories à couleur codée en dur)
 function _catColArgb(cat){
-  const hard={recycling:'ff9a3c',part21:'0064c8',iq:'00a0ff'};
+  const hard={recycling:'ff9a3c',part21:'a3e635',iq:'cbd5e1'};
   if(hard[cat]) return 'FF'+hard[cat];
   const map={responsable:'--responsable',chef:'--chef',technicien:'--tech',expert:'--expert',workshop:'--workshop',sheetmetal:'--sheetmetal',alternant:'--alt',stagiaire:'--stag',interimaire:'--interim',prestataire:'--prestataire'};
   const v=getComputedStyle(document.documentElement).getPropertyValue(map[cat]||'').trim();
@@ -7961,6 +8063,11 @@ function _authBadgePrint(empId){
   const A=_authBest(empId); if(!A.groups.length) return '';
   return ' '+A.groups.map(g=>`<span style="display:inline-block;font-size:8px;font-weight:900;padding:0 4px;border-radius:4px;border:1px ${g.warn?'dashed #e08a00':'solid #8aa4c8'};color:${g.warn?'#b26a00':'#1d4f91'};background:${g.warn?'#fff4e0':'#eef4fc'};white-space:nowrap">${g.warn?'⏳ ':''}${g.lbl}</span>`).join(' ');
 }
+// Remplissage des cases nom selon la couleur de catégorie (écran : teinte soutenue ; impression : teinte claire)
+function _ncolCol(c){ return _dayExtractCatColor(c); }
+function _ncolFillScreen(col){ return `background:linear-gradient(${hexRgba(col,0.42)},${hexRgba(col,0.42)}),#0a0d14`; }
+function _ncolFillPrint(col){ return `background:${hexRgba(col,0.2)};-webkit-print-color-adjust:exact;print-color-adjust:exact`; }
+function _authCellPrint(empId){ const s=_authBadgePrint(empId).trim(); return s||'<span style="color:#b8c4d6">—</span>'; }
 function _authText(empId){ const g=_authBest(empId).groups; return g.length?' ['+g.map(x=>x.lbl+(x.warn?' ⏳':'')).join(' · ')+']':''; }
 
 // ── Tâches : une seule définition partagée (tableau de bord, alertes, onglet To-Do) ──
@@ -8037,7 +8144,7 @@ function renderDash(){
   const improds=S.personnel.filter(p=>p.actif!==false&&IMPROD_CATS.includes(p.categorie));
   const nIP=improds.length;
   const _ipLbl={responsable:'👔 Responsable projet',chef:'🎖️ Chef d\'équipe',expert:'🔬 Expert',workshop:'🛠 Workshop Manager'};
-  const _ipCol={responsable:'#ff6b9d',chef:'#ffb347',expert:'#a78bfa',workshop:'#00c2a8'};
+  const _ipCol={responsable:'#ff5fa2',chef:'#ffb347',expert:'#a78bfa',workshop:'#ef4444'};
   const ipRows=IMPROD_CATS.map(c=>{const n=improds.filter(p=>p.categorie===c).length;return n>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>${_ipLbl[c]}</span><strong style="color:${_ipCol[c]}">${n}</strong></div>`:'';}).join('');
   const total  = nTech + nInt;
   const pctTech  = total > 0 ? Math.round(nTech / total * 100) : 0;
@@ -9587,10 +9694,10 @@ function buildGrid(emps,dates,containerId){
       </td>`;
     }).join('');
     return separator + `<tr style="${inactive?'opacity:.6':''}">
-      <td class="ncol" ${isWeekly&&!inactive?`draggable="true" ondragstart="_wkDragStart(event,'${emp.id}')" ondragend="_wkDragEnd(event)" style="cursor:grab;`:'style="'}background:linear-gradient(${cat.col||'#2979ff'}14,${cat.col||'#2979ff'}14),#000000;border-left:3px solid ${inactive?'#ff9a3c':(cat.col||'var(--glass-border)')}">
+      <td class="ncol ncol-fill" ${isWeekly&&!inactive?`draggable="true" ondragstart="_wkDragStart(event,'${emp.id}')" ondragend="_wkDragEnd(event)" style="cursor:grab;`:'style="'}${_ncolFillScreen(_ncolCol(emp.categorie))};border-left:3px solid ${inactive?'#ff9a3c':_ncolCol(emp.categorie)}">
         <div class="ncol-inner${isWeekly?' ncol-l':''}">
           <div class="emp-tri" style="color:${cat.col||'var(--t3)'};display:flex;align-items:center;justify-content:space-between;gap:4px"><span>${emp.trigramme}</span>${isWeekly&&!inactive?`<button onclick="event.stopPropagation();_wkMoveMenu(event,'${emp.id}')" title="Déplacer vers un chantier" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:5px;padding:0 5px;font-size:11px;font-weight:800;cursor:pointer;line-height:1.5;font-family:'Outfit',sans-serif">⇄</button>`:''}</div>
-          <div class="emp-name" title="${emp.nom} ${emp.prenom}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
+          <div class="emp-name" title="${emp.nom} ${emp.prenom}">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ffb36b;background:rgba(5,8,16,0.8);border:1px solid rgba(255,154,60,0.6);border-radius:4px;padding:0 3px;white-space:nowrap;text-shadow:none">HORS PROD</span>':''}</div>
           ${isWeekly?`<div class="emp-auth">${_authBadgeHtml(emp.id)}</div>`:''}
         </div>
       </td>
@@ -10433,6 +10540,334 @@ function copyPrevWeek(){
   save(); renderWeekly(); renderMaster();
   _bulkBanner(`${filled} affectation${filled>1?'s':''} recopiée${filled>1?'s':''} depuis S‑1${skipped?` · ${skipped} formation/congé/absence non recopié${skipped>1?'s':''}`:''}`, undo);
 }
+
+/* ═══ 🪄 CRÉATEUR DE PLANNING AUTOMATIQUE — proposition indicative, modifiable, écrite seulement à la validation ═══
+   Règles : cases déjà remplies jamais modifiées · chef d'équipe sur son chantier · noyau dur conservé (historique 3 sem.)
+   · comblement par l'historique puis répartition équitable des autorisations · manque réparti proportionnellement
+   · besoin en baisse → derniers arrivés libérés · chaque activité ne reçoit que sa population (spécialités intérim). */
+let _ap=null;
+const _AP_SEC=[{k:'p145',t:'🔧 Part 145 — Chantiers & Stockage',col:'#6effc4'},{k:'struct',t:'🔩 Structure — atelier',col:'#6d8fb0'},{k:'p21',t:'✈️ Airbus Part 21',col:'#00a0ff'},{k:'rec',t:'♻️ Recyclage',col:'#ff9a3c'}];
+function _apNormRef(r){ if(!r) return ''; if(r==='STO'||r.startsWith('STO_')) return 'STO'; return r; }
+function _apEmpty(e){ return !e || (!e.type && !e.note) || (e.type==='travail' && !e.chantierId && !e.chantierId2); }
+function _apInContract(p,ds){
+  const a=p.debutContrat||p.dateEmbauche; if(a && a>ds) return false;
+  if(p.dateFin && p.dateFin<ds) return false; return true;
+}
+// Rôle d'une personne pour un rang : 0 = non éligible, sinon score de spécialité (plus haut = plus adapté)
+function _apFit(p,row){
+  const cat=p.categorie, act=p.activite||'';
+  if(row.pool==='p21') return _isPart21Staff(p)?3:0;
+  if(row.pool==='rec') return _isRecyMecano(p)?3:0;
+  if(row.pool==='struct'){ if(cat==='sheetmetal'||(cat==='interimaire'&&act==='sheetmetal')) return 3; return 0; }
+  // Part 145 : chantiers + stockage
+  if(_isHorsP145(p)) return 0;
+  if(cat==='interimaire'){
+    if(act==='sheetmetal') return 0;
+    if(act==='stockage') return row.ref==='STO'?3:0;
+    return row.ref==='STO'?1:2;
+  }
+  if(cat==='technicien') return row.ref==='STO'?1:2;
+  return 0;
+}
+function _apAuthFlags(id){ const g=_authBest(id).groups; return {insp:g.some(x=>/^I/.test(x.lbl)), auth:g.length>0}; }
+// Historique : par personne → {ref: [demi-journées sur S-1, S-2, … S-8]}
+function _apHistory(mon){
+  const H={};
+  for(let w=1;w<=8;w++){ const m=addD(mon,-7*w);
+    for(let i=0;i<7;i++){ const ds=fmt(addD(m,i));
+      (S.personnel||[]).forEach(p=>['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`]; if(!e||e.type!=='travail') return;
+        [e.chantierId,e.chantierId2].forEach(r=>{ r=_apNormRef(r); if(!r||r==='REC') return; ((H[p.id]=H[p.id]||{})[r]=(H[p.id][r]||Array(9).fill(0)))[w]++; }); })); }
+  }
+  return H;
+}
+// Ancienneté continue sur un chantier (semaines consécutives en remontant depuis S-1)
+function _apSeniority(H,id,ref){ const a=H[id]?.[ref]; if(!a) return 0; let n=0; for(let w=1;w<=8;w++){ if(a[w]>0) n++; else break; } return n; }
+function _apWeeksOn(H,id,ref){ const a=H[id]?.[ref]; if(!a) return 0; let n=0; for(let w=1;w<=8;w++) if(a[w]>0) n++; return n; }
+// Chantier « maison » : celui le plus pratiqué sur la semaine travaillée la plus récente (3 dernières semaines)
+function _apHome(H,id){ const h=H[id]; if(!h) return null;
+  for(let w=1;w<=3;w++){ let best=null,bv=0; Object.entries(h).forEach(([r,a])=>{ if(a[w]>bv){bv=a[w];best=r;} }); if(best) return best; }
+  return null; }
+
+function _apCompute(mon,keepLocks){
+  const days=[]; for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(!isHol(ds)) days.push(ds); }
+  const H=_apHistory(mon);
+  // 1) Rangs (besoins) — mêmes chiffres que la vue Semaine / tableau d'ajustement
+  const rows=[];
+  _wvRows(mon).forEach(r=>{
+    if(!r.key) return;
+    let ref=null,pool=r.sec;
+    if(r.chId) ref=r.chId; else if(r.sto) ref='STO'; else if(r.key.startsWith('STRUCT_')){ ref='STRUCT'; pool='struct'; }
+    else if(r.key.startsWith('AIR_')) ref='AIRBUS'; else if(r.key.startsWith('REC_')) ref=r.key.replace(/_\d{4}-S\d+$/,'');
+    if(!ref) return;
+    const ch=r.chId?(S.chantiers||[]).find(c=>c.id===r.chId):null;
+    rows.push({ref,pool,label:r.label,sub:r.sub,col:r.col,ic:r.ic,need:Math.max(0,r.val||0),target:0,members:[],released:[],chefId:ch&&ch.chef||'',chef:null});
+  });
+  const rowOf=ref=>rows.find(x=>x.ref===ref);
+  // 2) Disponibilités de la semaine
+  const P={};
+  (S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&_presentSemaine(p,mon,addD(mon,4))).forEach(p=>{
+    let fill=0; const fixed={};
+    days.forEach(ds=>{ if(!_apInContract(p,ds)) return; ['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`];
+      if(_apEmpty(e)) fill++; else if(e.type==='travail') [e.chantierId,e.chantierId2].forEach(r=>{ r=_apNormRef(r); if(r) fixed[r]=(fixed[r]||0)+1; }); }); });
+    const fx=Object.entries(fixed).sort((a,b)=>b[1]-a[1])[0];
+    P[p.id]={p,fill,fixedRef:fx?fx[0]:null,fixedHalf:fx?Object.values(fixed).reduce((a,b)=>a+b,0):0,used:false,...(_apAuthFlags(p.id))};
+  });
+  const add=(row,id,tag,locked)=>{ P[id].used=true; row.members.push({id,tag,locked:!!locked,sen:_apSeniority(H,id,row.ref)}); };
+  // 3) Cases déjà saisies (jamais modifiées) + verrous manuels d'une proposition précédente
+  Object.values(P).forEach(x=>{ if(!x.fixedRef) return; const row=rowOf(x.fixedRef); if(row && _apFit(x.p,row)) add(row,x.p.id,'saisi',true); else x.used=true; });
+  if(keepLocks) keepLocks.forEach(l=>{ const row=rowOf(l.ref), x=P[l.id]; if(!row||!x||x.used||!x.fill) return; add(row,l.id,l.tag||'manuel',true); });
+  // 4) Chefs d'équipe sur leur chantier (encadrement, non compté dans le besoin)
+  rows.forEach(row=>{ const x=row.chefId&&P[row.chefId]; if(x && !x.used && x.fill>0){ x.used=true; row.chef=row.chefId; }
+    else if(x && x.fixedRef===row.ref){ row.chef=row.chefId; row.chefSaisi=true; } });
+  // 5) Cibles : manque réparti proportionnellement dans chaque population
+  ['p145','struct','p21','rec'].forEach(pool=>{
+    const R=rows.filter(r=>r.pool===pool); if(!R.length) return;
+    const N=R.reduce((s,r)=>s+r.need,0);
+    const avail=Object.values(P).filter(x=>R.some(r=>_apFit(x.p,r)) && ((x.fill>0&&!x.used) || R.some(r=>r.members.some(m=>m.id===x.p.id)))).length;
+    if(avail>=N||!N){ R.forEach(r=>r.target=r.need); return; }
+    let rest=avail; const q=R.map(r=>{ const v=r.need*avail/N; return {r,f:Math.floor(v),d:v-Math.floor(v)}; });
+    q.forEach(o=>{ o.r.target=o.f; rest-=o.f; });
+    q.sort((a,b)=>b.d-a.d).forEach(o=>{ if(rest>0 && o.r.target<o.r.need){ o.r.target++; rest--; } });
+    R.forEach(r=>r.short=r.need-r.target);
+  });
+  // 6) Noyau dur : on reste sur son chantier des semaines précédentes (ancienneté décroissante)
+  const homes=Object.values(P).filter(x=>!x.used&&x.fill>0).map(x=>({x,home:_apHome(H,x.p.id)})).filter(o=>o.home&&rowOf(o.home)&&_apFit(o.x.p,rowOf(o.home)));
+  homes.sort((a,b)=>_apSeniority(H,b.x.p.id,b.home)-_apSeniority(H,a.x.p.id,a.home));
+  homes.forEach(({x,home})=>{ const row=rowOf(home);
+    if(row.members.length<row.target) add(row,x.p.id,'noyau');
+    else { row.released.push(x.p.id); x.relFrom=home; } });           // besoin en baisse : les derniers arrivés sont libérés
+  // 7) Comblement : le rang le plus en retard d'abord ; candidat = historique sur ce chantier + spécialité + équilibre des autorisations
+  const free=()=>Object.values(P).filter(x=>!x.used&&x.fill>0);
+  // Équilibre embauchés / intérimaires : chaque rang tend vers le ratio de sa population (simple préférence)
+  const _isEmb=p=>p.categorie!=='interimaire';
+  const ratio={}; ['p145','struct','p21','rec'].forEach(pool=>{ const R=rows.filter(r=>r.pool===pool); const L=Object.values(P).filter(x=>R.some(r=>_apFit(x.p,r)) && (x.fill>0 || R.some(r=>r.members.some(m=>m.id===x.p.id))));
+    ratio[pool]=L.length?L.filter(x=>_isEmb(x.p)).length/L.length:0.5; });
+  const tot={insp:0,auth:0,target:0}; Object.values(P).forEach(x=>{ if(x.insp) tot.insp++; if(x.auth) tot.auth++; }); rows.forEach(r=>tot.target+=r.target);
+  for(let guard=0;guard<2000;guard++){
+    const open=rows.filter(r=>r.members.length<r.target && free().some(x=>_apFit(x.p,r)));
+    if(!open.length) break;
+    open.sort((a,b)=>(a.members.length/(a.target||1))-(b.members.length/(b.target||1)) || b.target-a.target);
+    const row=open[0];
+    const share=k=>tot.target?tot[k]*row.target/tot.target:0;
+    const nI=row.members.filter(m=>P[m.id]?.insp).length, nA=row.members.filter(m=>P[m.id]?.auth).length;
+    const cand=free().filter(x=>_apFit(x.p,row)).map(x=>{
+      let s=_apFit(x.p,row)*10 + _apWeeksOn(H,x.p.id,row.ref)*6 + Math.min(x.fill,10)*0.3;
+      if(x.insp && nI<share('insp')) s+=8; else if(x.insp && nI>=Math.ceil(share('insp'))) s-=3;
+      if(x.auth && nA<share('auth')) s+=4;
+      { const tgt=Math.max(row.target,row.members.length+1), nE=row.members.filter(m=>_isEmb(P[m.id].p)).length, nIn=row.members.length-nE, wantE=ratio[row.pool]*tgt;
+        if(_isEmb(x.p)){ if(nE<wantE-0.01) s+=7; else s-=4; } else { if(nIn<tgt-wantE-0.01) s+=7; else s-=4; } }
+      if(row.released.includes(x.p.id)) s-=20;
+      return {x,s};
+    }).sort((a,b)=>b.s-a.s);
+    add(row,cand[0].x.p.id,_apWeeksOn(H,cand[0].x.p.id,row.ref)?'retour':'new');
+  }
+  // libérés réellement replacés ailleurs : on ne les affiche plus en ✂ sur leur ancien chantier
+  rows.forEach(r=>{ r.released=r.released.filter(id=>!rows.some(o=>o.members.some(m=>m.id===id))); });
+  return {mon,days,rows,P,H,ratio};
+}
+
+/* ── Fenêtre « Composition des équipes » (tableau Kanban + liste compacte, glisser-déposer / toucher-placer) ── */
+let _apView='board', _apSel=null, _apQ='', _apF='all', _apPop=null;
+function openAutoPlan(){
+  if(!S.weekStart) S.weekStart=getMon(new Date());
+  const mon=getMon(S.weekStart instanceof Date?S.weekStart:new Date(S.weekStart));
+  _ap=_apCompute(mon); _apSel=null; _apQ=''; _apF='all'; _apPop=null;
+  const q=document.getElementById('ap-q'); if(q) q.value='';
+  _apRender(); openM('m-autoplan');
+}
+function _apShift(n){ _ap=_apCompute(addD(_ap.mon,7*n)); _apSel=null; _apRender(); }
+function _apSetView(v){ _apView=v; _apRender(); }
+function _apRecalc(){ const locks=[]; _ap.rows.forEach(r=>r.members.forEach(m=>{ if(m.locked&&m.tag!=='saisi') locks.push({id:m.id,ref:r.ref,tag:m.tag}); }));
+  const chefs={}; _ap.rows.forEach(r=>{ if(r._chefManual) chefs[r.ref]=r.chef||''; });
+  _ap=_apCompute(_ap.mon,locks);
+  Object.entries(chefs).forEach(([ref,id])=>{ const r=_ap.rows.find(x=>x.ref===ref); if(!r||r.chefSaisi) return; if(r.chef&&_ap.P[r.chef]) _ap.P[r.chef].used=false; r.chef=id||null; r._chefManual=true; if(id&&_ap.P[id]) _ap.P[id].used=true; });
+  _apSel=null; _apRender(); toast('Proposition recalculée — tes choix sont conservés'); }
+function _apRowOf(id){ return _ap.rows.find(r=>r.members.some(m=>m.id===id)); }
+// Pourquoi une personne ne peut pas aller sur un rang
+function _apWhyNot(p,row){
+  if(_apFit(p,row)) return '';
+  if(row.pool==='p21') return 'Réservé aux Tech Part 21';
+  if(row.pool==='rec') return 'Réservé aux A/C Recycling';
+  if(row.pool==='struct') return 'Réservé aux Sheet Metal';
+  if(p.categorie==='interimaire' && p.activite==='stockage') return 'Intérimaire « Stockage » : stockage uniquement';
+  if(_isHorsP145(p)) return 'Hors Part 145';
+  return 'Non compatible';
+}
+function _apMove(id,toRef){
+  const x=_ap.P[id]; if(!x) return;
+  const from=_apRowOf(id);
+  if(from && from.ref===toRef) return;
+  if(from){ const m=from.members.find(m=>m.id===id); if(m && m.tag==='saisi'){ toast('Déjà saisi au planning : modifie la case directement'); return; } from.members=from.members.filter(m=>m.id!==id); }
+  if(toRef){
+    const row=_ap.rows.find(r=>r.ref===toRef); if(!row) return;
+    if(!_apFit(x.p,row)){ toast('⛔ '+_apWhyNot(x.p,row)); if(from) from.members.push({id,tag:'manuel',locked:true,sen:_apSeniority(_ap.H,id,from.ref)}); _apRender(); return; }
+    const sen=_apSeniority(_ap.H,id,toRef);
+    row.members.push({id,tag:sen?'retour':'manuel',locked:true,sen,manual:true}); row.released=row.released.filter(v=>v!==id); x.used=true; x.relFrom=null;
+  } else {
+    x.used=false; if(from && _apSeniority(_ap.H,id,from.ref)) x.relFrom=from.ref;
+  }
+  _apSel=null; _apRender();
+}
+function _apToggleLock(ref,id){ const m=_ap.rows.find(r=>r.ref===ref)?.members.find(x=>x.id===id); if(m&&m.tag!=='saisi'){ m.locked=!m.locked; _apRender(); } }
+/* Sélection au toucher : touche une personne puis un chantier (ou la réserve) */
+function _apTapPerson(ev,id){ ev.stopPropagation(); const x=_ap.P[id]; const r=_apRowOf(id); if(r && r.members.find(m=>m.id===id)?.tag==='saisi'){ toast('Déjà saisi au planning'); return; }
+  _apSel=_apSel===id?null:id; _apPaintTargets(_apSel); document.querySelectorAll('#m-autoplan .ap-tk').forEach(t=>t.classList.toggle('sel',t.dataset.id===_apSel)); _apHint(); }
+function _apTapZone(ref){ if(!_apSel) return; _apMove(_apSel,ref); }
+function _apHint(){ const h=document.getElementById('ap-hint'); if(!h) return;
+  if(_apSel){ const p=_ap.P[_apSel].p; h.innerHTML=`<b style="color:#6effc4">${_bfEsc(p.trigramme||p.nom)}</b> sélectionné · touche un chantier en surbrillance (ou la réserve) · <a href="#" onclick="event.preventDefault();_apSel=null;_apRender()" style="color:#7fd4ff">annuler</a>`; }
+  else h.innerHTML='Glisse-dépose une personne d\'un chantier à l\'autre · sur iPad : touche une personne puis le chantier · les chantiers incompatibles s\'estompent'; }
+/* Glisser-déposer */
+let _apDrag=null;
+function _apDragStart(ev,id){ _apDrag=id; try{ ev.dataTransfer.setData('text/plain',id); ev.dataTransfer.effectAllowed='move'; }catch(_){} setTimeout(()=>{ _apPaintTargets(id); ev.target.classList.add('dragging'); },0); }
+function _apDragEnd(ev){ _apDrag=null; ev.target.classList.remove('dragging'); if(!_apSel) _apPaintTargets(null); document.querySelectorAll('#m-autoplan .over').forEach(e=>e.classList.remove('over')); }
+function _apDragOver(ev,ref){ if(!_apDrag) return; const row=ref?_ap.rows.find(r=>r.ref===ref):null; if(row && !_apFit(_ap.P[_apDrag].p,row)) return; ev.preventDefault(); ev.currentTarget.classList.add('over'); }
+function _apDragLeave(ev){ ev.currentTarget.classList.remove('over'); }
+function _apDrop(ev,ref){ ev.preventDefault(); ev.currentTarget.classList.remove('over'); const id=_apDrag||(()=>{try{return ev.dataTransfer.getData('text/plain');}catch(_){return '';}})(); _apDrag=null; if(id) _apMove(id,ref); }
+function _apPaintTargets(id){
+  const p=id?_ap.P[id]?.p:null, from=id?_apRowOf(id):null;
+  document.querySelectorAll('#m-autoplan [data-zone]').forEach(z=>{
+    const ref=z.dataset.zone; z.classList.remove('ok','no','src'); const w=z.querySelector('.ap-why'); if(w) w.textContent='';
+    if(!p) return;
+    if(ref==='__res'){ z.classList.add('ok'); return; }
+    const row=_ap.rows.find(r=>r.ref===ref); if(!row) return;
+    if(from && from.ref===ref){ z.classList.add('src'); return; }
+    if(_apFit(p,row)) z.classList.add('ok'); else { z.classList.add('no'); if(w) w.textContent='⛔ '+_apWhyNot(p,row); }
+  });
+}
+/* Chef d'équipe : choisir / changer / retirer */
+function _apChefMenu(ev,ref){ ev.stopPropagation(); _apPop=_apPop===ref?null:ref; _apRender(); }
+function _apSetChef(ref,id){ const r=_ap.rows.find(x=>x.ref===ref); if(!r) return;
+  if(r.chef&&_ap.P[r.chef]) _ap.P[r.chef].used=false;
+  r.chef=id||null; r._chefManual=true; if(id&&_ap.P[id]) _ap.P[id].used=true; _apPop=null; _apRender(); }
+function _apFilt(f){ _apF=f; _apRenderRes(); }
+function _apSearch(v){ _apQ=(v||'').toLowerCase().trim(); _apRenderRes(); }
+
+const _AP_TAG={saisi:{i:'📝',t:'Déjà saisi',c:'#82b1ff'},noyau:{i:'🔒',t:'Noyau',c:'#6effc4'},retour:{i:'↩',t:'Retour',c:'#6effc4'},new:{i:'➕',t:'Nouveau',c:'#ffd166'},manuel:{i:'✋',t:'Placé par toi',c:'#c084fc'}};
+function _apAv(p,sz){ const c=_ncolCol(p.categorie); return `<span class="ap-av" style="${sz?`width:${sz}px;height:${sz}px;`:''}background:${hexRgba(c,0.2)};color:${_lightenForDark(c)};border-color:${c}">${_bfEsc(p.trigramme||(p.nom||'?').slice(0,3))}</span>`; }
+function _apHalfTxt(x){ const tot=_ap.days.length*2, h=x.fill+x.fixedHalf; return h<tot?`<span class="ap-tag" style="color:#ffb340;border-color:rgba(255,179,64,.45)" title="Disponible ${(h/2).toLocaleString('fr-FR')} j sur ${_ap.days.length}">${(h/2).toLocaleString('fr-FR')} j</span>`:''; }
+function _apToken(row,m){
+  const x=_ap.P[m.id]; if(!x) return ''; const p=x.p, T=_AP_TAG[m.tag]||_AP_TAG.new, ro=m.tag==='saisi';
+  const kind=ro?'saisi':(m.tag==='noyau'||m.tag==='retour')?'core':'new';
+  const sen=m.sen?`<span class="ap-tag" style="color:#6effc4;background:rgba(110,255,196,.1);border-color:transparent" title="${m.sen} semaine(s) consécutive(s) sur ce chantier">${m.sen} sem.</span>`:'';
+  const lbl=ro?`<span class="ap-tag" style="color:#82b1ff;border-color:rgba(130,177,255,.4)">📝 saisi</span>`:(kind==='new'?`<span class="ap-tag" style="color:${T.c};background:${hexRgba(T.c,.1)};border-color:transparent">${m.tag==='manuel'?'PLACÉ':'NOUVEAU'}</span>`:'');
+  return `<div class="ap-tk ${kind}${_apSel===m.id?' sel':''}" data-id="${m.id}" ${ro?'':`draggable="true" ondragstart="_apDragStart(event,'${m.id}')" ondragend="_apDragEnd(event)"`} onclick="_apTapPerson(event,'${m.id}')" title="${_bfEsc(p.nom+' '+p.prenom)}${ro?' — déjà saisi au planning':''}">
+    ${_apAv(p)}<span class="ap-nm">${_bfEsc(p.nom)} ${_bfEsc(p.prenom||'')}</span>
+    ${p.categorie==='interimaire'?'<span class="ap-tag">INT</span>':''}${_authBadgeHtml(p.id)}${_apHalfTxt(x)}${sen}${lbl}
+    ${ro?'':`<span class="ap-act"><button onclick="event.stopPropagation();_apToggleLock('${row.ref}','${m.id}')" title="${m.locked?'Verrouillé : gardé au recalcul':'Verrouiller (garder au recalcul)'}" class="${m.locked?'on':''}">📌</button><button onclick="event.stopPropagation();_apMove('${m.id}','')" title="Remettre dans la réserve">✕</button></span>`}
+  </div>`;
+}
+function _apStatus(r){ const n=r.members.length, d=n-r.need;
+  if(!r.need && !n) return {t:'Aucun besoin',c:'#7f90aa'};
+  if(d===0) return {t:'✓ Complet',c:'#6effc4'};
+  if(d<0) return {t:`${d}${r.target<r.need?' · cible '+r.target:''}`,c:'#ff8fa3'};
+  return {t:`+${d} en trop`,c:'#ffd166'}; }
+function _apMix(r){ const n=r.members.length; if(!n) return ''; const e=r.members.filter(m=>_ap.P[m.id].p.categorie!=='interimaire').length, i=n-e;
+  const want=Math.round((_ap.ratio?.[r.pool]??0.5)*n);
+  return `<div class="ap-mix" title="Ratio visé pour cette population : ${Math.round((_ap.ratio?.[r.pool]??0.5)*100)} % d'embauchés (≈ ${want} sur ${n})"><span style="color:#d9c2a4">👔 ${e} embauché${e>1?'s':''}</span><span style="color:#ddb8ff">🧑‍🔧 ${i} intérim</span><span class="ap-mixbar"><i style="width:${e/n*100}%"></i></span></div>`; }
+function _apSlots(r){ const tot=Math.max(r.need,r.members.length); if(!tot) return ''; const core=r.members.filter(m=>m.tag==='noyau'||m.tag==='retour').length, sai=r.members.filter(m=>m.tag==='saisi').length, nw=r.members.length-core-sai;
+  let s=''; for(let i=0;i<tot;i++){ const c=i<sai?'#82b1ff':i<sai+core?'#6effc4':i<sai+core+nw?'#ffd166':''; s+=`<i style="${c?`background:${c}`:''}${i>=r.need?';opacity:.5;outline:1px dashed #ffd166':''}"></i>`; } return `<div class="ap-slots">${s}</div>`; }
+function _apChefBlock(r){
+  const chantier=!['STO','STRUCT','AIRBUS'].includes(r.ref)&&!r.ref.startsWith('REC_'); if(!chantier && !r.chef) return '';
+  const c=r.chef?byId(r.chef):null;
+  let menu='';
+  if(_apPop===r.ref){
+    const avail=Object.values(_ap.P).filter(x=>x.p.categorie==='chef'&&(!x.used||x.p.id===r.chef)&&x.fill>0);
+    menu=`<div class="ap-pop" onclick="event.stopPropagation()">${avail.length?_sortByNom(avail.map(x=>x.p)).map(p=>`<div onclick="_apSetChef('${r.ref}','${p.id}')" class="${p.id===r.chef?'on':''}">${_apAv(p,22)} ${_bfEsc(p.nom)} ${_bfEsc(p.prenom||'')}${p.id===r.chefId?' <span class="ap-tag" style="color:#ffa070;border-color:rgba(255,160,112,.4)">titulaire</span>':''}</div>`).join(''):'<div style="cursor:default;color:var(--t3)">Aucun chef d\'équipe disponible</div>'}${r.chef?`<div onclick="_apSetChef('${r.ref}','')" style="color:#ff8fa3">✕ Sans chef cette semaine</div>`:''}</div>`;
+  }
+  if(c) return `<div class="ap-chef${r.chefSaisi?' ro':''}" ${r.chefSaisi?'title="Déjà saisi au planning"':`onclick="_apChefMenu(event,'${r.ref}')" title="Changer ou retirer le chef"`}>${_apAv(c,26)}<b>${_bfEsc(c.nom)} ${_bfEsc(c.prenom||'')}</b><span class="ap-chef-l">CHEF D'ÉQUIPE${r.chefSaisi?' · saisi':' ▾'}</span>${menu}</div>`;
+  return `<div class="ap-chef nochef" onclick="_apChefMenu(event,'${r.ref}')"><span class="ap-av" style="border-style:dashed;border-color:#ff5e00;color:#ffa070;background:transparent">?</span><span>Aucun chef d'équipe</span><span class="ap-chef-l">+ CHOISIR</span>${menu}</div>`;
+}
+function _apCard(r){
+  const st=_apStatus(r), n=r.members.length, left=Math.max(0,r.need-n);
+  const mem=_sortByNom(r.members.map(m=>_ap.P[m.id].p)).map(p=>r.members.find(m=>m.id===p.id));
+  const ord=[...mem.filter(m=>m.tag==='saisi'),...mem.filter(m=>m.tag==='noyau'||m.tag==='retour'),...mem.filter(m=>!['saisi','noyau','retour'].includes(m.tag))];
+  return `<div class="ap-card" data-zone="${r.ref}" ondragover="_apDragOver(event,'${r.ref}')" ondragleave="_apDragLeave(event)" ondrop="_apDrop(event,'${r.ref}')" onclick="_apTapZone('${r.ref}')">
+    <div class="ap-bar" style="background:${r.col}"></div>
+    <div class="ap-ch"><div style="min-width:0"><div class="ap-tt">${r.ic} ${_bfEsc(r.label)}</div><div class="ap-st">${_bfEsc(r.sub||'')}</div></div>
+      <div class="ap-cnt"><div class="ap-n" style="color:${st.c==='#6effc4'||st.c==='#7f90aa'?'#fff':st.c}">${n}<small> / ${r.need}</small></div><span class="ap-pill" style="background:${hexRgba(st.c,.14)};color:${st.c}">${st.t}</span></div></div>
+    ${_apMix(r)}${_apSlots(r)}${_apChefBlock(r)}
+    <div class="ap-team">${ord.map(m=>_apToken(r,m)).join('')}
+      ${left?`<div class="ap-ghost">Glisse ici une personne de la réserve · ${left} place${left>1?'s':''}</div>`:''}</div>
+    ${r.released.length?`<div class="ap-rel">✂ Libérés (besoin en baisse) : ${r.released.map(id=>{const p=byId(id);return p?`<b>${_bfEsc(p.trigramme||p.nom)}</b>`:''}).join(', ')}</div>`:''}
+    <div class="ap-why"></div>
+  </div>`;
+}
+function _apLine(r){
+  const st=_apStatus(r), n=r.members.length, c=r.chef?byId(r.chef):null;
+  return `<div class="ap-line" data-zone="${r.ref}" ondragover="_apDragOver(event,'${r.ref}')" ondragleave="_apDragLeave(event)" ondrop="_apDrop(event,'${r.ref}')" onclick="_apTapZone('${r.ref}')">
+    <div class="ap-bar" style="background:${r.col}"></div>
+    <div class="ap-ll"><div class="ap-tt" style="font-size:12.5px">${r.ic} ${_bfEsc(r.label)}</div><div class="ap-st">${_bfEsc(r.sub||'')}</div></div>
+    <div class="ap-lc"><b style="color:${st.c==='#6effc4'?'#fff':st.c}">${n}</b><small>/${r.need}</small><span class="ap-pill" style="background:${hexRgba(st.c,.14)};color:${st.c}">${st.t}</span></div>
+    <div class="ap-lchef">${c?`🎖 <b>${_bfEsc(c.trigramme||c.nom)}</b>`:'<span style="color:var(--t3)">—</span>'}</div>
+    <div class="ap-lt">${r.members.map(m=>{ const p=_ap.P[m.id].p, ro=m.tag==='saisi', k=ro?'saisi':(m.tag==='noyau'||m.tag==='retour')?'core':'new';
+      return `<span class="ap-mt ${k}${_apSel===m.id?' sel':''}" data-id="${m.id}" ${ro?'':`draggable="true" ondragstart="_apDragStart(event,'${m.id}')" ondragend="_apDragEnd(event)"`} onclick="_apTapPerson(event,'${m.id}')" title="${_bfEsc(p.nom+' '+p.prenom)} · ${(_AP_TAG[m.tag]||_AP_TAG.new).t}" style="color:${_lightenForDark(_ncolCol(p.categorie))};border-color:${hexRgba(_ncolCol(p.categorie),.55)}">${_bfEsc(p.trigramme||p.nom)}</span>`; }).join('')}
+      ${Math.max(0,r.need-n)?`<span class="ap-mt ghost">+${r.need-n}</span>`:''}</div>
+    <div class="ap-why"></div>
+  </div>`;
+}
+function _apRender(){
+  const A=_ap; if(!A) return;
+  const wEnd=addD(A.mon,4);
+  document.getElementById('ap-title').innerHTML=`<div class="ap-h1">Composition des équipes</div><div class="ap-wk">Semaine ${wkN(A.mon)} · ${A.mon.getDate()} → ${wEnd.getDate()} ${MO[wEnd.getMonth()].toLowerCase()} ${wEnd.getFullYear()} · proposition indicative</div>`;
+  document.querySelectorAll('#ap-seg b').forEach(b=>b.classList.toggle('on',b.dataset.v===_apView));
+  // Bandeau de synthèse
+  let need=0,core=0,nw=0,sai=0,miss=0; A.rows.forEach(r=>{ need+=r.need; r.members.forEach(m=>{ if(m.tag==='saisi') sai++; else if(m.tag==='noyau'||m.tag==='retour') core++; else nw++; }); miss+=Math.max(0,r.need-r.members.length); });
+  const tot=core+nw+sai, base=Math.max(need,tot)||1, w=v=>(v/base*100).toFixed(1)+'%';
+  document.getElementById('ap-sum').innerHTML=`<div class="ap-k"><b>${tot}</b>/ ${need} besoin</div>
+    <div class="ap-g"><i style="width:${w(sai)};background:#82b1ff"></i><i style="width:${w(core)};background:#6effc4"></i><i style="width:${w(nw)};background:#ffd166"></i></div>
+    <div class="ap-k"><span style="color:#6effc4">●</span> ${core} noyau</div><div class="ap-k"><span style="color:#ffd166">●</span> ${nw} nouveau${nw>1?'x':''}</div><div class="ap-k"><span style="color:#82b1ff">●</span> ${sai} déjà saisi${sai>1?'s':''}</div>
+    <div class="ap-k" title="Part d'embauchés dans les personnes proposées">👔 <b style="font-size:14px">${(()=>{let e=0,t=0;A.rows.forEach(r=>r.members.forEach(m=>{t++; if(A.P[m.id].p.categorie!=='interimaire') e++;}));return t?Math.round(e/t*100):0;})()} %</b>embauchés</div>
+    <div class="ap-k" style="color:${miss?'#ff8fa3':'#6effc4'}"><b style="color:inherit">${miss}</b>${miss?'manquant'+(miss>1?'s':''):'manquant'}</div>`;
+  // Tableau / liste
+  let h='';
+  _AP_SEC.forEach(sec=>{ const R=A.rows.filter(r=>r.pool===sec.k); if(!R.length) return;
+    h+=`<div class="ap-sec" style="color:${sec.col}">${sec.t}</div>`;
+    h+=_apView==='board'?`<div class="ap-cards">${R.map(_apCard).join('')}</div>`:`<div class="ap-lines">${R.map(_apLine).join('')}</div>`; });
+  if(!A.rows.length) h='<div style="padding:40px;text-align:center;color:var(--t3)">Aucun besoin cette semaine.</div>';
+  document.getElementById('ap-board').innerHTML=h;
+  _apRenderRes(); _apHint();
+  const nb=_apCountHalf(); const v=document.getElementById('ap-val'); if(v){ v.textContent=nb?`✅ Valider · ${nb} demi-journée${nb>1?'s':''}`:'✅ Rien à remplir'; v.disabled=!nb; v.style.opacity=nb?1:.5; }
+  if(_apSel) _apPaintTargets(_apSel);
+}
+function _apRenderRes(){
+  const A=_ap; const box=document.getElementById('ap-reslist'); if(!A||!box) return;
+  const free=Object.values(A.P).filter(x=>!x.used&&x.fill>0&&A.rows.some(r=>_apFit(x.p,r)));
+  document.getElementById('ap-res-h').innerHTML=`🙋 Réserve <span style="color:var(--t3);font-weight:700">· ${free.length} libre${free.length>1?'s':''}</span>`;
+  const F=[['all','Tous'],['emb','Embauchés'],['int','Intérim'],['IMEC','IMEC'],['AMEC','AMEC'],['ISTO','ISTO'],['ISTR','ISTR'],['IELE','IELE']];
+  document.getElementById('ap-fl').innerHTML=F.map(([k,l])=>`<b class="${_apF===k?'on':''}" onclick="_apFilt('${k}')">${l}</b>`).join('');
+  let L=free.filter(x=>{ const p=x.p;
+    if(_apQ && !((p.nom+' '+p.prenom+' '+(p.trigramme||'')).toLowerCase().includes(_apQ))) return false;
+    if(_apF==='emb') return p.categorie!=='interimaire'; if(_apF==='int') return p.categorie==='interimaire';
+    if(_apF!=='all'){ const g=_authBest(p.id).groups.map(g=>g.lbl); return g.includes(_apF)||(_apF==='ISTR'&&g.includes('ICOM')); }
+    return true; });
+  const G=[['Part 145 · embauchés',x=>!_isHorsP145(x.p)&&x.p.categorie!=='interimaire'&&x.p.categorie!=='sheetmetal'],['Part 145 · intérimaires',x=>_isInterimP145(x.p)&&x.p.activite!=='sheetmetal'],['Structure · Sheet Metal',x=>x.p.categorie==='sheetmetal'||x.p.activite==='sheetmetal'],['Part 21 · Airbus',x=>_isPart21Staff(x.p)],['Recyclage',x=>_isRecyMecano(x.p)]];
+  let h=''; const done=new Set();
+  G.forEach(([t,f])=>{ const g=L.filter(x=>!done.has(x.p.id)&&f(x)); if(!g.length) return; g.forEach(x=>done.add(x.p.id));
+    h+=`<div class="ap-grp">${t} <span>${g.length}</span></div>`+_sortByNom(g.map(x=>x.p)).map(p=>{ const x=A.P[p.id];
+      const ex=x.relFrom?A.rows.find(r=>r.ref===x.relFrom):null;
+      const spec=p.categorie==='interimaire'&&p.activite&&!['chantier'].includes(p.activite)?`<span class="ap-tag" title="Spécialité intérim">${_bfEsc(p.activite)}</span>`:'';
+      return `<div class="ap-tk${_apSel===p.id?' sel':''}" data-id="${p.id}" draggable="true" ondragstart="_apDragStart(event,'${p.id}')" ondragend="_apDragEnd(event)" onclick="_apTapPerson(event,'${p.id}')" title="${_bfEsc(p.nom+' '+p.prenom)}">
+        ${_apAv(p)}<span class="ap-nm">${_bfEsc(p.nom)} ${_bfEsc(p.prenom||'')}</span>${p.categorie==='interimaire'?'<span class="ap-tag">INT</span>':''}${spec}${_authBadgeHtml(p.id)}${_apHalfTxt(x)}${ex?`<span class="ap-tag" title="Libéré de ce chantier (besoin en baisse)">✂ ex-${_bfEsc(ex.label)}</span>`:''}</div>`; }).join(''); });
+  box.innerHTML=h||`<div style="color:var(--t3);font-size:12px;padding:10px 2px">${free.length?'Aucun résultat pour ce filtre.':'Tout le monde est placé 👌'}</div>`;
+}
+function _apCountHalf(){ const A=_ap; let n=0; const seen=new Set();
+  const cnt=(id)=>{ if(seen.has(id)) return; seen.add(id); const p=byId(id); if(!p) return; A.days.forEach(ds=>{ if(!_apInContract(p,ds)) return; ['AM','PM'].forEach(h=>{ if(_apEmpty(S.planning[`${id}_${ds}_${h}`])) n++; }); }); };
+  A.rows.forEach(r=>{ r.members.forEach(m=>cnt(m.id)); if(r.chef) cnt(r.chef); }); return n; }
+document.addEventListener('click',e=>{ if(_apPop && !e.target.closest('.ap-pop') && !e.target.closest('.ap-chef')){ _apPop=null; _apRender(); } });
+
+function _apValidate(){
+  const A=_ap; if(!A) return; const undo=[]; let n=0, nPers=0;
+  const put=(id,ref)=>{ const p=byId(id); if(!p) return; let k0=n;
+    A.days.forEach(ds=>{ if(!_apInContract(p,ds)) return; ['AM','PM'].forEach(h=>{ const key=`${id}_${ds}_${h}`, e=S.planning[key];
+      if(!_apEmpty(e)) return; undo.push(e?{key,prev:JSON.parse(JSON.stringify(e))}:{key});
+      S.planning[key]=Object.assign({chantierId:'',chantierId2:'',note:'',formInt:'',vm:''},e||{},{type:'travail',chantierId:ref,chantierId2:''}); n++; }); });
+    if(n>k0) nPers++; };
+  A.rows.forEach(r=>{ r.members.forEach(m=>put(m.id,r.ref)); if(r.chef) put(r.chef,r.ref); });
+  if(!n){ toast('Rien à remplir : toutes les cases concernées sont déjà saisies'); return; }
+  save(); closeM('m-autoplan'); try{ renderWeekly(); renderMaster(); }catch(_){}
+  _bulkBanner(`🪄 Proposition validée : ${n} demi-journée${n>1?'s':''} remplie${n>1?'s':''} pour ${nPers} personne${nPers>1?'s':''}`, undo);
+}
+
 // Petite bannière d'annulation pour les actions groupées (réutilise le style .pl-bar)
 function _bulkBanner(msg, undoItems){
   let b=document.getElementById('bulk-bar');
@@ -12386,9 +12821,9 @@ const REX_GROUPS=[
 ];
 const _rexGroupOf=cat=>{ const g=REX_GROUPS.find(g=>g.cats.includes(cat)); return g?g.k:'autres'; };
 // Couleurs réelles des catégories de personnel (mêmes que les variables CSS de l'app)
-const CAT_HEX={responsable:'#e040fb',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',workshop:'#00c2a8',sheetmetal:'#6d8fb0',
+const CAT_HEX={responsable:'#ff5fa2',chef:'#ff5e00',technicien:'#a88c6a',expert:'#2979ff',workshop:'#ef4444',sheetmetal:'#6d8fb0',
   alternant:'#00e5b0',stagiaire:'#84fab0',interimaire:'#c084fc',prestataire:'#ffdd00',
-  recycling:'#ff9a3c',part21:'#0064c8',iq:'#00a0ff'};
+  recycling:'#ff9a3c',part21:'#a3e635',iq:'#cbd5e1'};
 const _catHex=cat=>CAT_HEX[cat]||'#8e8e93';
 // Ordre : groupe (prod → sous-trait. → encadrement → autres), puis catégorie, puis alphabétique
 const _catOrder=Object.keys(CATS);
@@ -15033,7 +15468,25 @@ function saveStockageConfig(){
 /* ═══ PERSONNEL ═══ */
 let sfilt='all';
 function filterStaff(cat,el){document.querySelectorAll('#persTabs .ftab').forEach(b=>b.classList.remove('on'));el.classList.add('on');sfilt=cat;renderPersonnel();}
+// Éclaircit une couleur trop sombre pour qu'un texte de cette couleur reste lisible sur fond foncé
+function _lightenForDark(h){
+  let r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  const L=(r,g,b)=>{const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
+  let k=0; while(L(r,g,b)<0.22 && k<12){ r=Math.round(r+(255-r)*.15); g=Math.round(g+(255-g)*.15); b=Math.round(b+(255-b)*.15); k++; }
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+// Puces de filtre colorées selon la catégorie (fond teinté opaque + texte blanc ; puce active plus soutenue)
+function _paintPersTabs(){
+  document.querySelectorAll('#persTabs .ftab').forEach(b=>{
+    const m=(b.getAttribute('onclick')||'').match(/filterStaff\('([^']+)'/); const cat=m?m[1]:'';
+    const on=b.classList.contains('on');
+    if(cat==='all'){ b.style.cssText=on?'':'color:#e8eef8'; return; }
+    const col=_ncolCol(cat), txt=_lightenForDark(col);
+    b.style.cssText=`background:linear-gradient(${hexRgba(col,on?0.3:0.14)},${hexRgba(col,on?0.3:0.14)}),#0b0f1a;border:1px solid ${hexRgba(col,on?0.95:0.45)};color:${txt};${on?`box-shadow:0 0 0 1px ${hexRgba(col,0.5)},0 0 12px ${hexRgba(col,0.35)};font-weight:800`:''}`;
+  });
+}
 function renderPersonnel(){
+  try{ _paintPersTabs(); }catch(_){}
   const q=(document.getElementById('staff-search')?.value||'').toLowerCase().trim();
   let emps=sfilt==='all'?S.personnel:S.personnel.filter(p=>p.categorie===sfilt);
   if(q) emps=emps.filter(p=>
@@ -17578,7 +18031,7 @@ function _kpiHeuresData(curMon){
     {key:'interimaire',lbl:'Intérimaire',col:'#a78bfa'},
     {key:'prestataire',lbl:'Sous-traitant',col:'#00e5b0'},
     {key:'recycling',lbl:'Tech. Recyclage',col:'#ff9a3c'},
-    {key:'part21',lbl:'Tech Part 21',col:'#0064c8'}
+    {key:'part21',lbl:'Tech Part 21',col:'#a3e635'}
   ];
   let total=0;
   const cards=CATS_PROD.map(c=>{
@@ -23005,7 +23458,7 @@ function exportMasterPDF(){
   }).join('');
 
   let lastGroup=undefined;let bodyRows='';
-  const numCols=dates.length+1;
+  const numCols=dates.length+2;
   const catIcons={chef:'👷',responsable:'🎯',expert:'🔬',workshop:'🛠',sheetmetal:'🔩',technicien:'🔧',recycling:'♻️',interimaire:'⏱',prestataire:'🤝',alternant:'📚',stagiaire:'🎓',part21:'✈️',iq:'🔍'};
   emps.forEach(emp=>{
     const gKey=emp.categorie||'autre';
@@ -23021,8 +23474,8 @@ function exportMasterPDF(){
       const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
       return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;min-height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${la.txt}${am.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${am.vm}</span>`:''}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${lp.txt}${pm.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${pm.vm}</span>`:''}</div></div></td>`;
     }).join('');
-    const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
-    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span>${_authBadgePrint(emp.id)} ${emp.nom} ${emp.prenom.charAt(0)}.${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
+    const catCol=_ncolCol(emp.categorie);const _pf=_ncolFillPrint(catCol);
+    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;${_pf};border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><div style="display:flex;align-items:center;gap:4px;overflow:hidden"><span style="font-family:monospace;font-weight:900;color:#0d1e3d;font-size:7.5px;width:24px;flex-shrink:0">${emp.trigramme}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${emp.nom} ${emp.prenom.charAt(0)}.${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#b85c00;font-weight:800">⏸HP</span>':''}</span></div></td><td style="padding:2px 4px;${_pf};border:1px solid #e2e8f0;white-space:nowrap;text-align:left;line-height:1.1">${_authCellPrint(emp.id)}</td>${cells}</tr>`;
   });
 
   // Légende : chantiers réellement utilisés ce mois + types d'absence
@@ -23031,7 +23484,7 @@ function exportMasterPDF(){
   const chLegend=[...usedChIds].map(cId=>{const g=groupInfo(cId);return`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${g.color};display:inline-block"></span>${g.icon} ${g.label}</span>`;}).join('');
   const typeLegend=[['conge'],['maladie'],['formation'],['absence'],['deplacement'],['ferie'],['we']].map(([k])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:10px"><span style="width:13px;height:13px;border-radius:3px;background:${COLS[k]};display:inline-block"></span>${LBL_FULL[k]}</span>`).join('');
 
-  const content2=`<div style="overflow-x:auto"><table style="table-layout:fixed"><thead><tr><th style="text-align:left;width:120px;background:#1e3a5f;color:#fff;font-size:9px">Personnel</th>${thCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>
+  const content2=`<div style="overflow-x:auto"><table style="table-layout:fixed"><thead><tr><th style="text-align:left;width:120px;background:#1e3a5f;color:#fff;font-size:9px">Personnel</th><th style="text-align:left;width:118px;background:#1e3a5f;color:#fff;font-size:9px">Autor.</th>${thCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>
   <div style="margin-top:16px;padding:12px 14px;border:1px solid #e0e8f0;border-radius:8px;background:#fafbfc">
     <div style="font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🔧 Chantiers</div>
     <div style="margin-bottom:12px">${chLegend||'<span style="font-size:10px;color:#999">Aucun chantier affecté ce mois</span>'}</div>
@@ -23094,7 +23547,7 @@ function exportWeekHtml(){
     if(gKey!==lastGroup){
       lastGroup=gKey;
       const g=groupInfo(cId);
-      rows+=`<tr><td colspan="${dates.length+2}" style="padding:6px 10px;background:${g.color}18;border-top:2px solid ${g.color};border-bottom:1px solid ${g.color}40;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${g.color}">${g.icon} ${g.label}</td></tr>`;
+      rows+=`<tr><td colspan="${dates.length+3}" style="padding:6px 10px;background:${g.color}18;border-top:2px solid ${g.color};border-bottom:1px solid ${g.color}40;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${g.color}">${g.icon} ${g.label}</td></tr>`;
     }
     const cells=dates.map(d=>{
       const ds=fmt(d);const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
@@ -23105,7 +23558,8 @@ function exportWeekHtml(){
         <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:8px;font-weight:800;margin-top:1px">🩺 VM ${pm.vm}</div>`:''}</div>
       </div></td>`;
     }).join('');
-    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.categorie==='prestataire'?(emp.societe||emp.nom):`${emp.nom} ${emp.prenom}`}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.categorie==='prestataire'?'—':emp.trigramme+_authBadgePrint(emp.id)}</td>${cells}</tr>`;
+    const _pc=_ncolCol(emp.categorie),_pf=_ncolFillPrint(_pc);
+    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd;border-left:4px solid ${_pc};color:#0d1e3d;${_pf}">${emp.categorie==='prestataire'?(emp.societe||emp.nom):`${emp.nom} ${emp.prenom}`}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#b85c00;font-size:9px;font-weight:800">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#0d1e3d;${_pf}">${emp.categorie==='prestataire'?'—':emp.trigramme}</td><td style="padding:6px 8px;text-align:left;font-size:10px;border:1px solid #ddd;white-space:nowrap;${_pf}">${emp.categorie==='prestataire'?'':_authCellPrint(emp.id)}</td>${cells}</tr>`;
   });
 
   const thCells=dates.map((d,i)=>{const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));return`<th style="min-width:78px;padding:6px;background:${isH?'#fff3cd':isW?'#f8f9fa':'#1e3a5f'};color:${isH?'#856404':isW?'#6c757d':'#fff'};border:1px solid #ddd;font-size:10px">${JOURS[wd===0?6:wd-1]}<br><small>${d.getDate()}/${d.getMonth()+1}</small></th>`;}).join('');
@@ -23121,7 +23575,7 @@ function exportWeekHtml(){
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planning S${wkN(S.weekStart)}</title>
   <style>body{font-family:Arial,sans-serif;font-size:11px;margin:16px}table{border-collapse:collapse;width:100%}h2{color:#1e3a5f}.footer{margin-top:20px;text-align:center;font-size:10px;color:#999}.legend-box{margin-top:16px;padding:12px 14px;border:1px solid #ddd;border-radius:8px;background:#fafbfc}.legend-title{font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}@media print{@page{size:A3 landscape;margin:10mm}}</style></head>
   <body><h2>Planning Hebdo — Semaine ${wkN(S.weekStart)} · du ${disp(fmt(dates[0]))} au ${disp(fmt(dates[6]))}</h2>
-  <table><thead><tr><th style="border:1px solid #ddd;padding:6px;background:#1e3a5f;color:#fff;text-align:left">Personnel</th><th style="border:1px solid #ddd;padding:6px;background:#1e3a5f;color:#fff">Tri.</th>${thCells}</tr></thead><tbody>${rows}</tbody></table>
+  <table><thead><tr><th style="border:1px solid #ddd;padding:6px;background:#1e3a5f;color:#fff;text-align:left">Personnel</th><th style="border:1px solid #ddd;padding:6px;background:#1e3a5f;color:#fff">Tri.</th><th style="border:1px solid #ddd;padding:6px;background:#1e3a5f;color:#fff;text-align:left">Autorisations</th>${thCells}</tr></thead><tbody>${rows}</tbody></table>
   <div class="legend-box">
     <div class="legend-title">🔧 Chantiers</div>
     <div style="margin-bottom:10px">${chLegend||'<span style="font-size:10px;color:#999">Aucun chantier affecté cette semaine</span>'}</div>
@@ -23257,13 +23711,15 @@ function exportDayHtml(){
   let lastGroup=undefined;let rows='';
   emps.forEach(emp=>{
     const cId=mainCh(emp);const gKey=cId||'sans';
-    if(gKey!==lastGroup){lastGroup=gKey;const g=groupInfo(cId);rows+=`<tr><td colspan="4" style="padding:6px 12px;background:${g.color}18;border-top:2px solid ${g.color};font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${g.color}">${g.icon} ${g.label}</td></tr>`;}
+    if(gKey!==lastGroup){lastGroup=gKey;const g=groupInfo(cId);rows+=`<tr><td colspan="5" style="padding:6px 12px;background:${g.color}18;border-top:2px solid ${g.color};font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:${g.color}">${g.icon} ${g.label}</td></tr>`;}
     const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(ds);
     const am=S.planning[`${emp.id}_${ds}_AM`]||{};const pm=S.planning[`${emp.id}_${ds}_PM`]||{};
     const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
     const catC=_dayExtractCatColor(emp.categorie);const catL=_dayExtractCatLbl(emp.categorie);
-    rows+=`<tr><td style="padding:8px 12px;font-weight:700;border:1px solid #ddd;border-left:5px solid ${catC}">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:10px;font-weight:700">(hors prod.)</span>':''}<div style="font-size:9px;font-weight:800;color:${catC};text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${catL}</div></td>
-      <td style="padding:8px;text-align:center;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}${_authBadgePrint(emp.id)}</td>
+    const _pf=_ncolFillPrint(catC);
+    rows+=`<tr><td style="padding:8px 12px;font-weight:700;color:#0d1e3d;border:1px solid #ddd;border-left:5px solid ${catC};${_pf}">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#b85c00;font-size:10px;font-weight:800">(hors prod.)</span>':''}<div style="font-size:9px;font-weight:800;color:#3b4a63;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${catL}</div></td>
+      <td style="padding:8px;text-align:center;border:1px solid #ddd;font-weight:800;color:#0d1e3d;${_pf}">${emp.trigramme}</td>
+      <td style="padding:8px;text-align:left;border:1px solid #ddd;white-space:nowrap;${_pf}">${_authCellPrint(emp.id)}</td>
       <td style="padding:8px;background:${la.col}15;color:${la.col};border:1px solid #ddd;font-weight:600">${la.txt}${am.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${am.vm}</div>`:''}</td>
       <td style="padding:8px;background:${lp.col}15;color:${lp.col};border:1px solid #ddd;font-weight:600">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${pm.vm}</div>`:''}</td></tr>`;
   });
@@ -23319,7 +23775,7 @@ function exportDayHtml(){
   <style>body{font-family:Arial,sans-serif;margin:16px}table{border-collapse:collapse;width:100%}h2{color:#1e3a5f}.legend-box{margin-top:16px;padding:12px 14px;border:1px solid #ddd;border-radius:8px;background:#fafbfc}.legend-title{font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.footer{margin-top:16px;text-align:center;font-size:10px;color:#999}@media print{@page{size:A4}}</style></head>
   <body><h2>${JOURS[d.getDay()]} ${disp(ds)} — Planning journée</h2>
   ${synthHtml}
-  <table><thead><tr><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff;text-align:left">Personnel</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Tri.</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Matin</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Après-midi</th></tr></thead>
+  <table><thead><tr><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff;text-align:left">Personnel</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Tri.</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff;text-align:left">Autorisations</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Matin</th><th style="border:1px solid #ddd;padding:8px;background:#1e3a5f;color:#fff">Après-midi</th></tr></thead>
   <tbody>${rows}</tbody></table>
   <div class="legend-box">
     <div class="legend-title">👥 Catégories de personnel</div>
