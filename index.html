@@ -491,6 +491,10 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5) brightnes
 /* Sélecteurs date/heure : thème sombre natif (icônes propres, pas de carré blanc) */
 input[type=date],input[type=time],input[type=datetime-local]{color-scheme:dark}
 input[type=time]::-webkit-calendar-picker-indicator{filter:invert(0.6) brightness(1.8);cursor:pointer}
+.ratio-click{cursor:pointer;border-radius:8px;padding:2px 6px;margin:-2px -6px;transition:background .15s}
+.ratio-click:hover{background:rgba(255,255,255,0.07)}
+.wv-num{-moz-appearance:textfield;appearance:textfield}
+.wv-num::-webkit-inner-spin-button,.wv-num::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 /* Brief du jour */
 .bf .bf-date{font-size:18px;font-weight:800;text-transform:capitalize}
 .bf .bf-mut{color:var(--t3);font-weight:400}
@@ -502,6 +506,7 @@ input[type=time]::-webkit-calendar-picker-indicator{filter:invert(0.6) brightnes
 .bf .bf-row{display:flex;gap:12px;padding:4px 0;font-size:12.5px;line-height:1.45}
 .bf .bf-k{flex:0 0 210px;font-weight:700;color:var(--t1)}
 .bf .bf-bad{color:#ff7088;font-weight:800}.bf .bf-ok{color:#34d399}
+.bf .bf-auth{font-size:9.5px;font-weight:900;color:#7fd4ff;border:1px solid rgba(127,212,255,0.4);border-radius:4px;padding:0 4px;white-space:nowrap}
 .bf .bf-warn{margin-top:6px;color:#ffb340;font-weight:700;font-size:12px}
 @media(max-width:640px){.bf .bf-row{flex-direction:column;gap:1px}.bf .bf-k{flex:none}}
 /* Case à cocher nette (pleine quand cochée) — check-list */
@@ -2517,6 +2522,13 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
+        • <strong style="color:#60b4ff">📅 Vue Semaine</strong> — Programme Activité : clic sur une semaine du tableau d'ajustement (ou 🔍 dans Charge / Capacité). Présents par population (nombre + ETP), seuls les chantiers concernés, besoin modifiable synchronisé avec le tableau d'ajustement, personnes affectées avec leurs noms. Le stockage s'y saisit en Man/Hours, synchronisé avec l'onglet Stockage.<br>
+        • <strong style="color:#00d2ff">🪪 Autorisation à côté du trigramme</strong> — Planning Hebdo, vue Semaine, listes de noms et exports PDF/Excel des plannings : la plus forte autorisation valide (mécanique IMEC › AMEC › ISTO › ASTO ; structure ISTR/ICOM › ASTR/ACOM ; électricité IELE › AELE), en orange si elle expire sous 30 jours.<br>
+        • <strong style="color:#60b4ff">👁 Ratio cliquable</strong> — Tableau de bord : la liste des noms derrière Techniciens, Intérimaires, Prestataires, Hors Part 145 et Improductifs.<br>
+        • <strong style="color:#c792ff">📝 Type de contrat</strong> — nouveau champ dans la fiche personnel (CDI, CDD, Intérim, Alternance, Stage) ; un CDD affiche sa date de fin.<br>
+        • <strong style="color:#ffd060">🎓 Sessions de formation</strong> — Global Refresh réservé aux embauchés déjà formés ; EWIS / CDCCL / Safety Training traités comme formations initiales ; MOE/PART 145 aussi pour les intérimaires.<br>
+        • <strong style="color:#ffd060">✅ Tâches en retard</strong> — même calcul sur le tableau de bord, les alertes et l'onglet To-Do.<br>
+        • <strong style="color:#c7b8ff">🎬 Vidéos de démonstration</strong> — courtes vidéos sous-titrées fournies à côté de l'application (Vue Semaine, Brief du jour, sessions de formation).<br>
         • <strong style="color:#60b4ff">☀️ Brief du jour</strong> — bouton sur le Tableau de bord : absents, retours, formations, visites médicales, chantiers en manque, échéances sous 30 jours et tâches du jour, imprimable en PDF.<br>
         • <strong style="color:#60b4ff">🎯 Compétences critiques</strong> — carte du Tableau de bord : nombre de détenteurs valides présents, semaine par semaine sur 8 semaines, avec alerte sous le seuil. Compétences et seuils au choix (⚙️).<br>
         • <strong style="color:#60b4ff">📈 Prévision 3 mois</strong> — capacité contre besoin sur 13 semaines, avec l'effet des congés prévisionnels et des fins de contrat, et des pistes d'arbitrage.<br>
@@ -3314,6 +3326,29 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
   <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-forecast')">Fermer</button></div>
 </div>
 </div>
+<!-- Vue Semaine : besoins par chantier -->
+<div class="mbg" id="m-weekview">
+<div class="modal" style="max-width:1080px;width:96vw;max-height:95vh">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+    <div class="modal-title" id="wv-title" style="margin:0;flex:1">📅 Semaine</div>
+    <button class="btn btn-ghost btn-sm" onclick="_wvShift(-1)" title="Semaine précédente">◀ Préc.</button>
+    <button class="btn btn-ghost btn-sm" onclick="openWeekView()">Cette semaine</button>
+    <button class="btn btn-ghost btn-sm" onclick="_wvShift(1)" title="Semaine suivante">Suiv. ▶</button>
+  </div>
+  <div id="wv-body" class="bf" style="max-height:calc(95vh - 150px);overflow-y:auto;padding-right:4px"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-weekview')">Fermer</button></div>
+</div>
+</div>
+<!-- Liste nominative du ratio -->
+<div class="mbg" id="m-ratio-list">
+<div class="modal" style="max-width:860px;width:94vw;max-height:94vh">
+  <div class="modal-title" id="ratio-title">Liste</div>
+  <div id="ratio-note" style="font-size:11px;color:var(--t3);margin:-4px 0 8px"></div>
+  <input type="search" id="ratio-search" placeholder="🔍 Filtrer par nom ou trigramme…" oninput="_ratioRender()" style="margin-bottom:8px">
+  <div id="ratio-body" style="max-height:calc(94vh - 210px);overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));column-gap:18px;align-content:start"></div>
+  <div class="mfooter"><button class="btn btn-ghost" onclick="closeM('m-ratio-list')">Fermer</button></div>
+</div>
+</div>
 <!-- Brief du jour -->
 <div class="mbg" id="m-brief">
 <div class="modal" style="max-width:860px">
@@ -3380,7 +3415,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field" id="wrap-trigramme"><label>Trigramme *</label><input type="text" id="p-tri" maxlength="4" style="text-transform:uppercase"></div>
     <div class="field" id="wrap-societe" style="display:none;grid-column:1/-1"><label>Société *</label><input type="text" id="p-societe" placeholder="Nom de la société prestataire"></div>
     <div class="field"><label>Catégorie *</label>
-      <select id="p-cat" onchange="togglePrestFields(this.value)">
+      <select id="p-cat" onchange="togglePrestFields(this.value);_contratDefaultOnCat(this.value)">
         <option value="responsable">Responsable Projet</option>
         <option value="chef">Chef d'équipe</option>
         <option value="technicien">Technicien / Mécanicien</option>
@@ -3433,6 +3468,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
     <div class="field" id="wrap-agence" style="display:none"><label>Agence d'intérim</label><input type="text" id="p-agence" placeholder="Ex : Adecco, Manpower, Randstad…"></div>
     <div class="field" id="wrap-debut" style="display:none"><label>Début de contrat</label><input type="date" id="p-debut"></div>
     <div class="field" id="wrap-taux" style="display:none"><label>Taux horaire (€/h)</label><input type="number" id="p-taux" min="0" step="0.01" placeholder="Ex : 24.50"></div>
+    <div class="field" id="wrap-contrat"><label>Type de contrat</label><select id="p-contrat" onchange="_contratVis()"><option>CDI</option><option>CDD</option><option>Intérim</option><option>Alternance</option><option>Stage</option></select></div>
     <div class="field" id="wrap-emb"><label>Date embauche</label><input type="date" id="p-emb"></div>
     <div class="field" id="wrap-fin"><label>Fin de contrat</label><input type="date" id="p-fin"></div>
   </div>
@@ -7155,6 +7191,7 @@ const GUIDE_DATA = {
     {t:"Filtrer par catégorie", d:"Bouton <b>👥 Catégories</b> : affiche seulement les catégories voulues (ex. que les chefs + responsables) pour alléger l'affichage. Le choix est mémorisé et repris dans les exports.", ill:null},
     {t:"Lire la synthèse", d:"En bas : <b>tension de la semaine</b> (chantiers staffés / en manque), <b>personnes disponibles</b>, et la carte <b>🏖️ Congés de la semaine</b> (validés + demandés par catégorie, avec alerte si seuil dépassé).", ill:null},
     {t:"Exporter", d:"Boutons <b>📊 Export Excel</b> et <b>📄 Export PDF</b> : génèrent la semaine en couleur, en respectant le filtre de catégories actif.", ill:null},
+    {t:"Autorisation affichée", d:"À côté du trigramme, un badge montre la <b>plus forte autorisation valide</b> : mécanique <b>IMEC › AMEC › ISTO › ASTO</b>, structure <b>ISTR/ICOM › ASTR/ACOM</b>, électricité <b>IELE › AELE</b> (un badge par famille détenue). Badge <b>orange</b> = expire sous 30 jours. Survole-le pour voir toutes ses autorisations.", ill:null},
   ]},
   "Congés prévisionnels": { icon:"🏖️", color:"#7fffd4", steps:[
     {t:"Le principe", d:"Avant de valider les congés, tu enregistres les <b>demandes</b> des gens pour voir la concentration (ex. tout le monde la même semaine).", ill:null},
@@ -7175,6 +7212,10 @@ const GUIDE_DATA = {
     {t:"Suivi responsables/chefs", d:"Le <b>Planning Responsables & Chefs</b> montre leur occupation sur l'année. Filtre <b>Les deux / Responsables / Chefs</b> en haut ; les <b>alertes de conflits</b> suivent la sélection.", ill:null},
     {t:"Transférer un avion", d:"Depuis la fiche chantier, tu peux faire passer l'avion en <b>Stockage</b> ou <b>Recyclage</b>. Les affectations déjà saisies gardent le <b>MSN</b> (l'historique est conservé).", ill:null},
     {t:"Heures prévues / consommées", d:"Renseigne le <b>volume Man/Hours</b> d'un chantier : le tableau de bord compare alors les heures <b>consommées</b> (d'après le planning, 3,5 h par demi-journée de technicien) au volume prévu, et projette la <b>date de fin</b> au rythme actuel.", ill:null},
+    {t:"Vue Semaine — ouvrir", d:"Dans <b>Programme Activité</b>, clique l'en-tête d'une semaine (S46, S47…) du <b>tableau d'ajustement</b>, ou la loupe <b>🔍</b> du tableau Charge / Capacité. ◀ ▶ pour passer d'une semaine à l'autre.", ill:null},
+    {t:"Vue Semaine — présents", d:"En haut, une pastille par population : <b>sous-traitants, Part 145 embauchés, Part 145 intérimaires, recyclage, Part 21, IQ, encadrement</b>. Chacune donne le nombre de présents et l'<b>ETP</b> (équivalent temps plein : 1 = présent toute la semaine). Clique une pastille pour voir les noms.", ill:null},
+    {t:"Vue Semaine — besoins", d:"Seuls les chantiers concernés s'affichent. Modifie le <b>besoin</b> avec − / + : c'est le même chiffre que dans le tableau d'ajustement. À droite, le nombre de <b>personnes affectées</b> au planning, l'écart, et les noms au clic.", ill:null},
+    {t:"Vue Semaine — stockage", d:"La ligne <b>🅿️ Stockage</b> se saisit en <b>Man/Hours</b> (35 MH = 1 technicien) et écrit directement dans l'onglet <b>Stockage</b> d'Activité avions : les deux restent identiques.", ill:null},
   ]},
   "Stockage / Recyclage / Slot": { icon:"🅿️", color:"#ff9a3c", steps:[
     {t:"Ajouter un avion", d:"Onglets <b>Stockage</b> ou <b>A/C Recyclage</b> → ajoute l'avion (type, MSN, dates). Le recyclage suit l'avancement du démantèlement.", ill:null},
@@ -7190,6 +7231,7 @@ const GUIDE_DATA = {
     {t:"Planifier une session", d:"Bouton <b>🗓 Planifier une session</b> : choisis la formation et la date. L'app liste les personnes dont elle est <b>expirée</b> ou <b>expire bientôt</b>, signale celles qui sont absentes ce jour-là, et les inscrit au planning en un clic.", ill:null},
     {t:"Depuis le planning", d:"Dans une case « Formation interne », le lien <b>👥 Inscrire d'autres personnes à cette session…</b> ouvre le même écran, déjà réglé sur la formation et la date.", ill:null},
     {t:"Matrice sans doublons", d:"Les autorisations de conduite (chariots, plateformes, tracteur de piste…) sont regroupées sous un <b>libellé unique</b> : plus de colonnes en double après un import.", ill:null},
+    {t:"Initiale ou Global Refresh", d:"Dans <b>🗓 Planifier une session</b> : <b>Global Refresh</b> = recyclage des embauchés déjà formés ; <b>EWIS, CDCCL, Safety Training</b> = formation initiale des embauchés qui ne l'ont jamais suivie ; <b>MOE/PART 145</b> = initiale pour tous, plus le renouvellement des intérimaires (les autres formations intérimaires sont à la charge de l'agence).", ill:null},
   ]},
   "Jours fériés & Sauvegarde": { icon:"💾", color:"#6effc4", steps:[
     {t:"Jours fériés", d:"Les fériés français sont <b>générés automatiquement</b> pour toutes les années (jusqu'en 2060), Pâques/Ascension/Pentecôte inclus. Bouton <b>🎉 Jours fériés</b> pour les voir ou en ajouter.", ill:null},
@@ -7204,6 +7246,8 @@ const GUIDE_DATA = {
     {t:"Prévision 3 mois", d:"Le bouton <b>📈 Prévision 3 mois</b> compare, semaine par semaine sur 13 semaines, les techniciens <b>disponibles</b> au <b>besoin</b>. Deux écarts : l'actuel, et celui obtenu <b>si tous les congés prévisionnels sont validés</b>. Les fins de contrat sont listées, et l'app propose quoi arbitrer ou qui prolonger.", ill:null},
     {t:"Flèche de retour ↩", d:"En haut de l'écran, la flèche <b>↩</b> annule la dernière action, jusqu'à <b>20 fois</b> de suite. Elle garde ton affichage (semaine, mois, filtres). L'historique repart de zéro quand tu recharges l'app.", ill:null},
     {t:"Filtrer les alertes", d:"Dans <b>Alertes actives</b>, le bouton <b>👥 Catégories</b> limite les alertes formations/autorisations aux catégories cochées. Les exports PDF et Excel suivent ce filtre.", ill:null},
+    {t:"Ratio cliquable", d:"Dans <b>Ratio techniciens / intérimaires</b>, clique Techniciens, Intérimaires ou Prestataires (ou « 👁 Voir les noms » dans les détails) pour la liste des personnes derrière chaque chiffre.", ill:null},
+    {t:"Tâches en retard", d:"La carte compte les tâches dont l'<b>échéance est dépassée</b>, et ajoute « + N en attente » pour celles sans échéance qui attendent depuis plus de 7 jours. Mêmes chiffres que dans les Alertes actives.", ill:null},
   ]},
   "Master Planning": { icon:"📅", color:"#60b4ff", steps:[
     {t:"À quoi ça sert", d:"Le <b>Master Planning</b> montre <b>un mois entier</b>, chaque personne sur une ligne, pour une vue large (congés, formations, charge).", ill:null},
@@ -7215,6 +7259,7 @@ const GUIDE_DATA = {
     {t:"Ajouter une personne", d:"Onglet <b>Personnel</b> → <b>+ Ajouter</b>. Renseigne nom, prénom, <b>catégorie</b> (technicien, chef d'équipe, responsable…) et le <b>type de contrat</b>.", ill:null},
     {t:"Intérimaires", d:"Pour un contrat <b>intérim</b>, indique les <b>dates de début et de fin</b>. L'app <b>bloque / alerte</b> si tu affectes la personne <b>avant le début</b> ou <b>après la fin</b> du contrat (saisie, période, copier-coller).", ill:null},
     {t:"Catégories", d:"Les catégories pilotent les <b>filtres</b> du planning, des exports et des <b>seuils de congés</b>. Garde-les cohérentes.", ill:null},
+    {t:"Type de contrat", d:"Dans la fiche, choisis le <b>type de contrat</b> (CDI, CDD, Intérim, Alternance, Stage). Un <b>CDD</b> fait apparaître la date de fin de contrat. C'est la <b>catégorie</b> qui pilote les calculs (ratio, capacité, règles de formation).", ill:null},
   ]},
   "Certifying Staff": { icon:"🎖️", color:"#c792ff", steps:[
     {t:"À quoi ça sert", d:"L'onglet <b>Certifying Staff</b> recense le personnel <b>certifiant</b> et leurs habilitations (B1, B2, etc.) avec les <b>dates d'expiration</b>.", ill:null},
@@ -7875,6 +7920,91 @@ function _exportAlertsXls(){
     }catch(e){ console.error(e); toast('❌ Erreur export: '+e.message); }
   });
 }
+// ── Autorisation principale d'une personne (badge à côté du trigramme) ──
+// Mécanique : IMEC > AMEC > ISTO > ASTO · Structure : ISTR = ICOM > ASTR = ACOM · Électricité : IELE > AELE. On garde la plus forte VALIDE de chaque famille.
+const _AUTH_LADDERS=[
+  {fam:'meca',col:'#00d2ff',levels:[['IMEC'],['AMEC'],['ISTO'],['ASTO']]},
+  {fam:'struct',col:'#a7c1de',levels:[['ISTR','ICOM'],['ASTR','ACOM']]},
+  {fam:'elec',col:'#ffd060',levels:[['IELE'],['AELE']]}
+];
+function _authBest(empId){
+  const today=fmt(new Date()), lim=fmt(addD(new Date(),30));
+  const held={};   // type → date d'expiration la plus lointaine ('' = sans limite)
+  (S.autorisations||[]).forEach(a=>{
+    if(!a||a.empId!==empId) return;
+    let t=String(a.type||'').trim().toUpperCase(); if(t==='IELEC') t='IELE'; else if(t==='AELEC') t='AELE';
+    const e=a.dateExpiration||'';
+    if(e && e<today) return;                                   // expirée → ignorée
+    if(!(t in held)) held[t]=e; else if(held[t]!=='' && (e==='' || e>held[t])) held[t]=e;
+  });
+  const out=[];
+  _AUTH_LADDERS.forEach(L=>{
+    for(const lvl of L.levels){
+      const got=lvl.filter(t=>t in held);
+      if(got.length){ const exps=got.map(t=>held[t]).filter(Boolean).sort(); const warn=!!exps.length && exps[0]<=lim; out.push({lbl:got.join('/'),col:L.col,warn,exp:exps[0]||''}); break; }
+    }
+  });
+  const all=Object.keys(held).sort().map(t=>t+(held[t]?' (→ '+disp(held[t])+')':''));
+  return {groups:out,text:out.map(g=>g.lbl).join(' · '),tip:all.length?'Autorisations valides : '+all.join(', '):''};
+}
+function _authBadgeHtml(empId){
+  const A=_authBest(empId); if(!A.groups.length) return '';
+  return A.groups.map(g=>`<span title="${_bfEsc(A.tip)}${g.warn?' — expire le '+disp(g.exp):''}" style="display:inline-block;font-size:9px;font-weight:900;letter-spacing:.3px;padding:0 5px;border-radius:5px;line-height:1.55;white-space:nowrap;color:${g.warn?'#ffb340':g.col};background:${g.warn?'rgba(255,179,64,0.14)':'rgba(255,255,255,0.07)'};border:1px solid ${g.warn?'rgba(255,179,64,0.55)':'rgba(255,255,255,0.18)'}">${g.lbl}</span>`).join(' ');
+}
+function _authBadgePrint(empId){
+  const A=_authBest(empId); if(!A.groups.length) return '';
+  return ' '+A.groups.map(g=>`<span style="display:inline-block;font-size:8px;font-weight:900;padding:0 4px;border-radius:4px;border:1px solid ${g.warn?'#e08a00':'#8aa4c8'};color:${g.warn?'#b26a00':'#1d4f91'};background:${g.warn?'#fff4e0':'#eef4fc'};white-space:nowrap">${g.lbl}</span>`).join(' ');
+}
+function _authText(empId){ const t=_authBest(empId).text; return t?' ['+t+']':''; }
+
+// ── Tâches : une seule définition partagée (tableau de bord, alertes, onglet To-Do) ──
+function _todoDue(t){
+  const v=t&&(t.dueDate||t.due); if(!v) return null;
+  let d; if(String(v).includes('/')){ const p=String(v).split('/'); d=new Date(+p[2],+p[1]-1,+p[0]); } else d=parseLocal(v);
+  if(!d||isNaN(d)) return null; d.setHours(0,0,0,0); return d;
+}
+function _todoLate(t){ if(!t||t.done) return false; const d=_todoDue(t); if(!d) return false; const n=new Date(); n.setHours(0,0,0,0); return d<n; }   // échéance dépassée
+function _todoStale(t){ if(!t||t.done||_todoDue(t)) return false; const c=new Date(t.createdAt); return !isNaN(c) && (Date.now()-c)>7*86400000; } // sans échéance, en attente +7 j
+// Contrat affiché : valeur saisie, sinon déduite de la catégorie (la fiche personnel n'a pas de champ contrat)
+function _contratLbl(p){
+  if(!p) return '';
+  if(p.contrat) return p.contrat;
+  return ({interimaire:'Intérim',alternant:'Alternance',stagiaire:'Stage',prestataire:'Prestataire'})[p.categorie]||'CDI';
+}
+// Liste nominative derrière chaque chiffre du ratio (mêmes filtres que le widget)
+let _ratioKind='tech';
+function _ratioGroups(){
+  const act=p=>p.actif!==false;
+  return {
+    tech:{t:'Techniciens',col:'#00d2ff',list:S.personnel.filter(p=>p.categorie==='technicien'&&act(p)),note:'Techniciens embauchés en production (compris dans le ratio).'},
+    int:{t:'Intérimaires Part 145',col:'#c084fc',list:S.personnel.filter(p=>_isInterimP145(p)&&act(p)),note:'Intérimaires en production Part 145 (compris dans le ratio).'},
+    prest:{t:'Prestataires',col:'#f5c518',list:S.personnel.filter(p=>p.categorie==='prestataire'&&act(p)),note:'Hors calcul du ratio.'},
+    hp:{t:'Intérimaires hors Part 145',col:'#6effc4',list:S.personnel.filter(p=>p.categorie==='interimaire'&&act(p)&&['recycling','part21','iq'].includes(p.activite)),note:'Recyclage, Part 21 et IQ : hors ratio.'},
+    improd:{t:'Improductifs',col:'#ff9a3c',list:S.personnel.filter(p=>act(p)&&['responsable','chef','expert','workshop'].includes(p.categorie)),note:'Encadrement et experts : hors ratio.'}
+  };
+}
+function openRatioList(kind){ _ratioKind=kind; const s=document.getElementById('ratio-search'); if(s) s.value=''; _ratioRender(); openM('m-ratio-list'); }
+function _ratioRender(){
+  const G=_ratioGroups()[_ratioKind]; if(!G) return;
+  const q=(document.getElementById('ratio-search')?.value||'').trim().toLowerCase();
+  const ACT={recycling:'♻️ Recyclage',part21:'✈️ Part 21',iq:'🔍 IQ'};
+  let list=_sortByNom(G.list.slice());
+  if(q) list=list.filter(p=>((p.nom||'')+' '+(p.prenom||'')+' '+(p.trigramme||'')).toLowerCase().includes(q));
+  document.getElementById('ratio-title').innerHTML=`<span style="color:${G.col}">●</span> ${G.t} — ${G.list.length} personne${G.list.length>1?'s':''}`;
+  document.getElementById('ratio-note').textContent=G.note;
+  const today=fmt(new Date());
+  document.getElementById('ratio-body').innerHTML=list.length?list.map(p=>{
+    const extra=[];
+    if(_ratioKind==='improd') extra.push(_catLabel(p.categorie));
+    if(ACT[p.activite]) extra.push(ACT[p.activite]);
+    extra.push(_contratLbl(p));
+    if(p.dateFin) extra.push((p.dateFin<today?'fin le ':'jusqu\'au ')+disp(p.dateFin));
+    return `<div onclick="closeM('m-ratio-list');try{editPersonnel('${p.id}')}catch(_){}" style="display:flex;align-items:center;gap:10px;padding:5px 6px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;min-width:0" title="Ouvrir la fiche">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:800;color:${G.col};min-width:38px">${p.trigramme||'—'}</span>
+      <span style="flex:1;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_dispNom(p)} ${_authBadgeHtml(p.id)}</span>
+      <span style="font-size:11px;color:var(--t3);white-space:nowrap">${extra.join(' · ')}</span></div>`;
+  }).join(''):'<div style="color:var(--t3);font-size:12px;padding:12px 4px">Aucun résultat.</div>';
+}
 function renderDash(){
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -7883,7 +8013,8 @@ function renderDash(){
   const autoExp=S.autorisations.filter(a=>!_empHorsEffectif(a.empId)&&tSt(a.dateExpiration)==='expired').length;
   const autoWarn=S.autorisations.filter(a=>!_empHorsEffectif(a.empId)&&tSt(a.dateExpiration)==='warning').length;
   const actCh=S.chantiers.filter(c=>c.statut==='encours').length;
-  const late=S.todos.filter(t=>!t.done&&(T-new Date(t.createdAt))>7*86400000).length;
+  const late=S.todos.filter(_todoLate).length;
+  const stale=S.todos.filter(_todoStale).length;
 
   // Ratio techniciens / intérimaires — uniquement le personnel EN PRODUCTION
   const nTech  = S.personnel.filter(p=>p.categorie==='technicien'&&p.actif!==false).length;
@@ -7925,14 +8056,14 @@ function renderDash(){
           </div>
         </div>
         <div class="ratio-legend">
-          <div class="ratio-leg"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#2979ff,#00d2ff)"></div>
-            Techniciens : <strong style="color:var(--cyan)">${nTech}</strong> (${pctTech}%)
+          <div class="ratio-leg ratio-click" onclick="openRatioList('tech')" title="Voir les noms"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#2979ff,#00d2ff)"></div>
+            Techniciens : <strong style="color:var(--cyan)">${nTech}</strong> (${pctTech}%) <span style="color:var(--t4);font-size:10px">👁</span>
           </div>
-          <div class="ratio-leg"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#c084fc,#e040fb)"></div>
-            Intérimaires : <strong style="color:var(--purple)">${nInt}</strong> (${pctInt}%)
+          <div class="ratio-leg ratio-click" onclick="openRatioList('int')" title="Voir les noms"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#c084fc,#e040fb)"></div>
+            Intérimaires : <strong style="color:var(--purple)">${nInt}</strong> (${pctInt}%) <span style="color:var(--t4);font-size:10px">👁</span>
           </div>
-          ${nPrest > 0 ? `<div class="ratio-leg"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#f5c518,#ffdd00)"></div>
-            Prestataires : <strong style="color:var(--prestataire)">${nPrest}</strong> (hors calcul)
+          ${nPrest > 0 ? `<div class="ratio-leg ratio-click" onclick="openRatioList('prest')" title="Voir les noms"><div class="ratio-leg-dot" style="background:linear-gradient(90deg,#f5c518,#ffdd00)"></div>
+            Prestataires : <strong style="color:var(--prestataire)">${nPrest}</strong> (hors calcul) <span style="color:var(--t4);font-size:10px">👁</span>
           </div>` : ''}
           ${nHP > 0 ? `<div class="ratio-leg" style="position:relative;cursor:pointer" onclick="_toggleHP145(event)" title="Voir le détail par activité">
             <div class="ratio-leg-dot" style="background:linear-gradient(90deg,#6effc4,#00a0ff)"></div>
@@ -7943,6 +8074,7 @@ function renderDash(){
               ${nHPp21>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>✈️ Part 21</span><strong style="color:#00a0ff">${nHPp21}</strong></div>`:''}
               ${nHPiq>0?`<div style="display:flex;justify-content:space-between;gap:16px;padding:3px 0;font-size:12px;color:var(--t2)"><span>🔍 IQ</span><strong style="color:#00c8ff">${nHPiq}</strong></div>`:''}
               <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:#6effc4">${nHP}</strong></div>
+              <div onclick="openRatioList('hp')" style="margin-top:8px;font-size:11px;font-weight:700;color:#6effc4;cursor:pointer;text-decoration:underline">👁 Voir les noms</div>
               <div style="font-size:10px;color:var(--t4);margin-top:7px;line-height:1.5">Sortis du ratio car hors production Part 145. Comptés dans les dispos Recyclage / Part 21 / IQ.</div>
             </div>
           </div>` : ''}
@@ -7953,6 +8085,7 @@ function renderDash(){
               <div style="font-size:10px;font-weight:800;color:#ff9a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Encadrement improductif — détail</div>
               ${ipRows}
               <div style="display:flex;justify-content:space-between;gap:16px;padding:6px 0 0;margin-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;font-weight:800;color:var(--t1)"><span>Total</span><strong style="color:#ff9a3c">${nIP}</strong></div>
+              <div onclick="openRatioList('improd')" style="margin-top:8px;font-size:11px;font-weight:700;color:#ff9a3c;cursor:pointer;text-decoration:underline">👁 Voir les noms</div>
               <div style="font-size:10px;color:var(--t4);margin-top:7px;line-height:1.5">Encadrement et experts : exclus de la capacité de production et du ratio technicien/intérimaire.</div>
             </div>
           </div>` : ''}
@@ -8067,10 +8200,10 @@ function renderDash(){
     {v:_absents,l:'Absences de la semaine',c:'c-orange',pop:_absPop,tog:'_toggleAbs'},
     {v:exp+autoExp,l:'Formations/Auto. exp.',c:'c-rose'},
     {v:_avions,l:'Avions sur site',c:'c-mint',pop:_acPop,tog:'_toggleAc'},
-    {v:late,l:'Tâches en retard',c:'c-purple'},
+    {v:late,l:'Tâches en retard'+(stale?` <span style="font-weight:500;opacity:.75">· +${stale} en attente</span>`:''),c:'c-purple',go:'todo'},
   ].map(s=>s.pop
     ? `<div class="st ${s.c}" style="position:relative;cursor:pointer;overflow:visible" onclick="${s.tog||'_toggleEff'}(event)" title="Voir le détail"><div class="st-val">${s.v} <span style="font-size:11px;color:var(--t4)">▾</span></div><div class="st-lbl">${s.l}</div>${s.pop}</div>`
-    : `<div class="st ${s.c}"><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
+    : `<div class="st ${s.c}"${s.go?` style="cursor:pointer" onclick="goTab('${s.go}')" title="Ouvrir l'onglet"`:''}><div class="st-val">${s.v}</div><div class="st-lbl">${s.l}</div></div>`).join('');
 
   const alerts=[];
   // Dédoublonnage : par personne + type, ne garder que l'entrée à l'expiration la plus lointaine
@@ -8142,7 +8275,7 @@ function renderDash(){
     });
     if(over){
       const lbl={travail:'affecté',formation:'en formation',formation_int:'en formation',conge:'en congé',maladie:'en arrêt',absence:'absent',deplacement:'en déplacement'}[overType]||'planifié';
-      alerts.push({cls:'red',ic:'⏳',t:`${emp.prenom} ${emp.nom} planifié après fin de contrat`,s:`${emp.contrat||'Contrat'} jusqu'au ${disp(finStr)} · ${lbl} dès le ${disp(over)}`,cat:emp.categorie});
+      alerts.push({cls:'red',ic:'⏳',t:`${emp.prenom} ${emp.nom} planifié après fin de contrat`,s:`${_contratLbl(emp)} jusqu'au ${disp(finStr)} · ${lbl} dès le ${disp(over)}`,cat:emp.categorie});
     }
   });
   // Compteurs par catégorie (alertes liées à une personne) — pour le sélecteur
@@ -9450,7 +9583,7 @@ function buildGrid(emps,dates,containerId){
     return separator + `<tr style="${inactive?'opacity:.6':''}">
       <td class="ncol" ${isWeekly&&!inactive?`draggable="true" ondragstart="_wkDragStart(event,'${emp.id}')" ondragend="_wkDragEnd(event)" style="cursor:grab;`:'style="'}background:linear-gradient(${cat.col||'#2979ff'}14,${cat.col||'#2979ff'}14),#000000;border-left:3px solid ${inactive?'#ff9a3c':(cat.col||'var(--glass-border)')}">
         <div class="ncol-inner">
-          <div class="emp-tri" style="color:${cat.col||'var(--t3)'};display:flex;align-items:center;justify-content:space-between;gap:4px">${emp.trigramme}${isWeekly&&!inactive?`<button onclick="event.stopPropagation();_wkMoveMenu(event,'${emp.id}')" title="Déplacer vers un chantier" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:5px;padding:0 5px;font-size:11px;font-weight:800;cursor:pointer;line-height:1.5;font-family:'Outfit',sans-serif">⇄</button>`:''}</div>
+          <div class="emp-tri" style="color:${cat.col||'var(--t3)'};display:flex;align-items:center;justify-content:space-between;gap:4px"><span style="display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap">${emp.trigramme}${isWeekly?_authBadgeHtml(emp.id):''}</span>${isWeekly&&!inactive?`<button onclick="event.stopPropagation();_wkMoveMenu(event,'${emp.id}')" title="Déplacer vers un chantier" style="background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3);color:#7fd4ff;border-radius:5px;padding:0 5px;font-size:11px;font-weight:800;cursor:pointer;line-height:1.5;font-family:'Outfit',sans-serif">⇄</button>`:''}</div>
           <div class="emp-name">${emp.nom} ${emp.prenom}${(m=>m?' '+m:'')(_persMarker(emp))}${inactive?' <span style="font-size:7px;font-weight:800;color:#ff9a3c;background:rgba(255,154,60,0.15);border:1px solid rgba(255,154,60,0.35);border-radius:4px;padding:0 3px;white-space:nowrap">HORS PROD</span>':''}</div>
         </div>
       </td>
@@ -15615,9 +15748,13 @@ function togglePrestFields(cat){
   const nivEl=document.getElementById('wrap-niveau');
   if(nivEl) nivEl.style.display=(cat==='technicien'||isInt)?'':'none';
 
-  // Fin de contrat — masquée pour CDI et prestataires
+  // Type de contrat — pas pour les prestataires
+  const ctEl=document.getElementById('wrap-contrat');
+  if(ctEl) ctEl.style.display=isPrest?'none':'';
+  // Fin de contrat — masquée pour CDI et prestataires (visible si un contrat à durée déterminée est choisi)
   const finEl=document.getElementById('wrap-fin');
-  if(finEl) finEl.style.display=(CDI_CATS.includes(cat)||isPrest)?'none':'';
+  const ctV=(document.getElementById('p-contrat')||{}).value||'';
+  if(finEl) finEl.style.display=((CDI_CATS.includes(cat)&&ctV==='CDI')||isPrest)?'none':'';
 
   // Activité principale — visible uniquement pour intérimaires
   const actEl=document.getElementById('wrap-activite');
@@ -15635,6 +15772,10 @@ function togglePrestFields(cat){
   if(nomEl) nomEl.style.display=isPrest?'none':'';
 }
 
+function _contratDefault(cat){ return ({interimaire:'Intérim',alternant:'Alternance',stagiaire:'Stage'})[cat]||'CDI'; }
+// Changement de catégorie : on propose le contrat habituel de la catégorie
+function _contratDefaultOnCat(cat){ const s=document.getElementById('p-contrat'); if(!s) return; s.value=_contratDefault(cat); _contratVis(); }
+function _contratVis(){ togglePrestFields(document.getElementById('p-cat').value); }
 function selectActivite(val){
   document.getElementById('p-activite').value=val;
   document.querySelectorAll('.activite-btn').forEach(btn=>{
@@ -15649,6 +15790,7 @@ function openPersNew(){
   document.getElementById('pi').value='';
   ['pi','p-pre','p-nom','p-tri','p-tel','p-email','p-emb','p-fin','p-agence','p-debut','p-taux','p-niveau'].forEach(i=>{const el=document.getElementById(i); if(el)el.value='';});
   document.getElementById('p-cat').value='technicien';
+  { const s=document.getElementById('p-contrat'); if(s) s.value='CDI'; }
   document.getElementById('p-activite').value='';
   selectActivite('');
   togglePrestFields('technicien');
@@ -15670,6 +15812,7 @@ function editPersonnel(id){
   // Restaurer activité si intérimaire
   document.getElementById('p-activite').value=emp.activite||'';
   selectActivite(emp.activite||'');
+  { const s=document.getElementById('p-contrat'); if(s){ const v=_contratLbl(emp); if(v&&!Array.from(s.options).some(o=>o.value===v)){ const o=document.createElement('option'); o.value=v; o.textContent=v; s.appendChild(o); } s.value=v||_contratDefault(emp.categorie); } }
   togglePrestFields(emp.categorie||'technicien');
   openM('m-pers');
 }
@@ -15691,7 +15834,7 @@ function savePersonnel(){
     if(!pre||!nom||!tri){alert('Prénom, nom et trigramme requis');return;}
   }
   const activite=cat==='interimaire'?(document.getElementById('p-activite')?.value||''):'';
-  const data={prenom:preF,nom:nomF,trigramme:tri,societe:isPrest?societe:'',categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||''};
+  const data={prenom:preF,nom:nomF,trigramme:tri,societe:isPrest?societe:'',categorie:cat,tel:document.getElementById('p-tel').value,email:document.getElementById('p-email').value,dateEmbauche:document.getElementById('p-emb').value,dateFin:document.getElementById('p-fin').value,activite,agence:(document.getElementById('p-agence')?.value||'').trim(),debutContrat:document.getElementById('p-debut')?.value||'',tauxHoraire:(document.getElementById('p-taux')&&document.getElementById('p-taux').value!=='')?parseFloat(document.getElementById('p-taux').value):null,niveau:document.getElementById('p-niveau')?.value||'',contrat:isPrest?'':(document.getElementById('p-contrat')?.value||_contratDefault(cat))};
   if(editId){const i=S.personnel.findIndex(p=>p.id===editId);if(i>-1)S.personnel[i]={...S.personnel[i],...data};}
   else S.personnel.push({id:uid(),...data,actif:true});
   save();closeM('m-pers');popSelects();
@@ -16037,7 +16180,7 @@ function renderTodo(){
   const prioRank=p=>({high:0,medium:1,low:2}[p]||1);
   let pending=(S.todos||[]).filter(t=>!t.done);
   let done=(S.todos||[]).filter(t=>t.done);
-  if(tfilt==='late') pending=pending.filter(t=>{const dd=t.due?parseAny(t.due):null;const dueD=new Date();dueD.setHours(0,0,0,0);return dd?dd<dueD:(T-new Date(t.createdAt))>7*86400000;});
+  if(tfilt==='late') pending=pending.filter(t=>_todoLate(t)||_todoStale(t));
   pending.sort((a,b)=>prioRank(a.priority)-prioRank(b.priority));
   done.sort((a,b)=>String(b.doneAt||b.createdAt||'').localeCompare(String(a.doneAt||a.createdAt||'')));
 
@@ -18445,7 +18588,8 @@ function _briefData(ds){
 function _briefHtml(R){
   const J=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
   const d=parseLocal(R.ds);
-  const who=(arr)=>arr.map(x=>_bfEsc(_bfNom(x.p))+(x.when?` <span class="bf-mut">(${x.when})</span>`:'')).join(' · ');
+  const AB=p=>{ const t=_authBest(p.id).text; return t?` <span class="bf-auth">${t}</span>`:''; };
+  const who=(arr)=>arr.map(x=>_bfEsc(_bfNom(x.p))+AB(x.p)+(x.when?` <span class="bf-mut">(${x.when})</span>`:'')).join(' · ');
   const sec=(ic,title,body,cls)=>`<div class="bf-sec ${cls||''}"><div class="bf-h">${ic} ${title}</div>${body}</div>`;
   const none=t=>`<div class="bf-mut">${t}</div>`;
   let h=`<div class="bf-top"><div class="bf-date">${J[d.getDay()]} ${disp(R.ds)} <span class="bf-mut">· semaine ${wkN(getMon(d))}</span></div>`;
@@ -18457,8 +18601,8 @@ function _briefHtml(R){
   h+=sec('🏖','Absents du jour', ak.length?ak.map(k=>`<div class="bf-row"><span class="bf-k">${_bfEsc(HD_LBL[k]||k)} (${R.abs[k].length})</span><span>${who(R.abs[k])}</span></div>`).join(''):none('Aucun absent saisi.'));
   // mouvements
   let mv='';
-  if(R.retours.length) mv+=`<div class="bf-row"><span class="bf-k">Retours (${R.retours.length})</span><span>${R.retours.map(p=>_bfEsc(_bfNom(p))).join(' · ')}</span></div>`;
-  if(R.departs.length) mv+=`<div class="bf-row"><span class="bf-k">Absents dès demain (${R.departs.length})</span><span>${R.departs.map(x=>_bfEsc(_bfNom(x.p))+(x.why?` <span class="bf-mut">(${_bfEsc(x.why)})</span>`:'')).join(' · ')}</span></div>`;
+  if(R.retours.length) mv+=`<div class="bf-row"><span class="bf-k">Retours (${R.retours.length})</span><span>${R.retours.map(p=>_bfEsc(_bfNom(p))+AB(p)).join(' · ')}</span></div>`;
+  if(R.departs.length) mv+=`<div class="bf-row"><span class="bf-k">Absents dès demain (${R.departs.length})</span><span>${R.departs.map(x=>_bfEsc(_bfNom(x.p))+AB(x.p)+(x.why?` <span class="bf-mut">(${_bfEsc(x.why)})</span>`:'')).join(' · ')}</span></div>`;
   h+=sec('🔁','Retours et départs',mv||none('Aucun mouvement.'));
   // formations & VM
   const fk=Object.keys(R.form); let fm='';
@@ -18467,7 +18611,7 @@ function _briefHtml(R){
   h+=sec('📚','Formations et visites médicales',fm||none('Rien de prévu.'));
   // chantiers
   let ch=R.chantiers.map(c=>`<div class="bf-row"><span class="bf-k">${_bfEsc(c.label)}</span><span><b>${c.n}</b> personne(s)${c.besoin!=null?` <span class="bf-mut">/ besoin ${c.besoin}</span>`:''}${c.manque?` <span class="bf-bad">⚠ manque ${c.manque}</span>`:''}</span></div>`).join('');
-  if(R.sansAff.length) ch+=`<div class="bf-row"><span class="bf-k">Sans affectation (${R.sansAff.length})</span><span class="bf-mut">${R.sansAff.slice(0,14).map(p=>_bfEsc(_bfNom(p))).join(' · ')}${R.sansAff.length>14?' … +'+(R.sansAff.length-14):''}</span></div>`;
+  if(R.sansAff.length) ch+=`<div class="bf-row"><span class="bf-k">Sans affectation (${R.sansAff.length})</span><span class="bf-mut">${R.sansAff.slice(0,14).map(p=>_bfEsc(_bfNom(p))+AB(p)).join(' · ')}${R.sansAff.length>14?' … +'+(R.sansAff.length-14):''}</span></div>`;
   h+=sec('🔧','Chantiers et affectations',ch||none('Aucune affectation saisie pour ce jour.'));
   // compétences critiques
   if(R.crit.length) h+=sec('🎯','Compétences critiques',R.crit.map(c=>`<div class="bf-row"><span class="bf-k">${_bfEsc(c.label)}</span><span><b class="${c.bad?'bf-bad':'bf-ok'}">${c.n} présent(s)</b> <span class="bf-mut">· seuil ${c.min}${c.present.length?' · '+c.present.map(p=>_bfEsc(_bfNom(p))).join(', '):''}</span></span></div>`).join(''));
@@ -18504,6 +18648,7 @@ function briefPrint(){
     .bf-sec{margin-top:11px;break-inside:avoid}.bf-h{font-weight:800;font-size:12.5px;border-bottom:1px solid #dde6f0;padding-bottom:3px;margin-bottom:4px}
     .bf-row{display:flex;gap:10px;padding:2.5px 0}.bf-k{flex:0 0 190px;font-weight:700}.bf-bad{color:#c62828;font-weight:800}.bf-ok{color:#1b8a4b}
     .bf-warn{margin-top:6px;color:#b26a00;font-weight:700}
+    .bf-auth{font-size:8.5px;font-weight:900;color:#1d4f91;border:1px solid #8aa4c8;border-radius:3px;padding:0 3px;white-space:nowrap}
     .ft{margin-top:18px;border-top:1px solid #dde6f0;padding-top:9px;color:#8094ad;font-size:10px}
   </style></head><body>
     <div class="hd"><img src="${PDF_LOGO_B64}"><div class="brand">MARDAM <em>AeroDesk</em> Pro</div><div style="margin-left:auto;font-weight:700">☀️ Brief du jour · Site LFBF</div></div>
@@ -18685,6 +18830,173 @@ function _forecastRender(){
       <th style="text-align:left;padding:6px 10px">Semaine</th><th style="padding:6px 8px" title="Techniciens, intérimaires et sheet metal sous contrat cette semaine">Sous contrat</th><th style="padding:6px 8px" title="Équivalent personnes disponibles, absences fermes déduites">Dispo</th><th style="padding:6px 8px">Besoin</th><th style="padding:6px 8px">Écart</th>
       <th style="padding:6px 8px" title="Personnes ayant un congé prévisionnel cette semaine">Congés prév.</th><th style="padding:6px 8px" title="Écart si tous les congés prévisionnels sont validés">Écart si validés</th><th style="text-align:left;padding:6px 8px">Fins de contrat</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div style="font-size:10px;color:var(--t4);margin-top:8px;line-height:1.5">Dispo et besoin sont calculés comme dans Programme Activité (techniciens, intérimaires, sheet metal ; besoin = chantiers + stockage + Part 21 + recyclage). Une case vide du planning compte comme du travail.</div>`;
+}
+
+/* ════════════ VUE SEMAINE — besoins par chantier, synchronisée avec le tableau d'ajustement ════════════ */
+let _wvMon=null, _wvOpen={};
+function _wvDispoP145(mon){
+  const wEnd=addD(mon,4); let cap=0;
+  S.personnel.filter(x=>(x.categorie==='technicien'||x.categorie==='interimaire'||x.categorie==='sheetmetal')&&!_isHorsP145(x)&&x.actif!==false).forEach(emp=>{
+    if(!_presentSemaine(emp,mon,wEnd)) return; let j=0;
+    for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(isHol(ds)) continue; ['AM','PM'].forEach(h=>{ const e=S.planning[`${emp.id}_${ds}_${h}`]; const t=e?e.type:'travail'; if(!['conge','maladie','formation','absence','deplacement','ferie'].includes(t)) j+=0.5; }); }
+    cap+=j/5;
+  });
+  return Math.round(cap);
+}
+// Personnes affectées (case « Travail ») à une référence de chantier sur la semaine : {empId: nb demi-journées}
+function _wvPeople(mon,match){
+  const out={};
+  for(let i=0;i<7;i++){ const ds=fmt(addD(mon,i));
+    (S.personnel||[]).forEach(p=>{ if(_empHorsEffectif(p.id)) return;
+      ['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`]; if(!e||e.type!=='travail') return;
+        if([e.chantierId,e.chantierId2].some(r=>r&&match(r))) out[p.id]=(out[p.id]||0)+1; }); });
+  }
+  return out;
+}
+function _wvRows(mon){
+  const wk=`${mon.getFullYear()}-S${wkN(mon)}`, wEnd=addD(mon,6);
+  const ovOf=k=>{ const v=S.besoinOverrides?.[k]; return (v===undefined||v===null||v==='')?null:(parseInt(v)||0); };
+  const rows=[];
+  const add=(o)=>{ o.ov=ovOf(o.key); o.val=o.ov!=null?o.ov:(o.inP?o.theo:0); o.nPers=Object.keys(o.people).length; if(o.inP&&o.theo>0||o.ov!=null||o.nPers) rows.push(o); };
+  // Part 145 — chantiers
+  (S.chantiers||[]).forEach(c=>{
+    const d=c.debut?parseLocal(c.debut):null, f=c.fin?parseLocal(c.fin):null;
+    const actif=['encours','futur'].includes(c.statut);
+    const inP=actif&&(!d||d<=wEnd)&&(!f||f>=mon);
+    const people=_wvPeople(mon,r=>r===c.id);
+    if(!actif && !Object.keys(people).length) return;
+    add({sec:'p145',key:`${c.id}_${wk}`,label:_chMsnLabel(c.id).replace(/^\S+\s/,'')||c.nom,sub:[c.nom,c.client].filter(Boolean).join(' · '),col:c.color||'#82b1ff',ic:'🔧',theo:inP?(c.ressources?.technicien||0):0,inP,editable:actif,people,period:`${c.debut?disp(c.debut):'?'} → ${c.fin?disp(c.fin):'?'}`,chId:c.id});
+  });
+  { const o={sec:'p145',key:`STO_${wk}`,label:'Stockage',sub:'Synchronisé avec l\'onglet Stockage · 35 MH = 1 technicien',col:'#82b1ff',ic:'🅿️',theo:_stockBesoinSemaine(mon),inP:true,editable:true,sto:true,mh:(S.stockage?.mhHebdo?.[wk]?.total)||0,people:_wvPeople(mon,r=>r==='STO'||r.startsWith('STO_'))};
+    o.ov=ovOf(o.key); o.val=o.ov!=null?o.ov:o.theo; o.nPers=Object.keys(o.people).length; rows.push(o); }
+  add({sec:'p145',key:`STRUCT_${wk}`,label:'Structure',sub:'Atelier · Sheet Metal Workers',col:'#6d8fb0',ic:'🔩',theo:_structBesoinSemaine(mon),inP:true,editable:true,people:_wvPeople(mon,r=>r==='STRUCT')});
+  // Part 21
+  add({sec:'p21',key:`AIR_${wk}`,label:'Airbus Part 21',sub:'Techniciens P21 · hors IQ',col:'#00a0ff',ic:'✈️',theo:_airbusBesoinSemaine(mon),inP:true,editable:true,people:_wvPeople(mon,r=>r==='AIRBUS')});
+  // Recyclage
+  (S.recycling?.avions||[]).filter(a=>a.statut!=='termine'&&a.msn).forEach(av=>{
+    const d=(av.debutChantier||av.entree)?parseLocal(av.debutChantier||av.entree):null, f=(av.finChantier||av.finPrev)?parseLocal(av.finChantier||av.finPrev):null;
+    const inP=(!d||d<=wEnd)&&(!f||f>=mon);
+    add({sec:'rec',key:`REC_${av.id}_${wk}`,label:`${av.type||'A/C'} — MSN ${av.msn}`,sub:'Recyclage'+(parseInt(av.techsRequis)?` · ${parseInt(av.techsRequis)}T fixe`:''),col:av.color||'#ff9a3c',ic:'♻️',theo:inP?_recBesoinAvionSemaine(av,mon):0,inP,editable:true,people:_wvPeople(mon,r=>r===`REC_${av.id}`),period:`${(av.debutChantier||av.entree)?disp(av.debutChantier||av.entree):'?'} → ${(av.finChantier||av.finPrev)?disp(av.finChantier||av.finPrev):'?'}`});
+  });
+  const recGen=_wvPeople(mon,r=>r==='REC');
+  if(Object.keys(recGen).length) rows.push({sec:'rec',key:null,label:'Recyclage (sans MSN)',sub:'Affectations « REC » sans avion précis',col:'#ff9a3c',ic:'♻️',theo:0,inP:true,editable:false,people:recGen,nPers:Object.keys(recGen).length,ov:null,val:0});
+  return rows;
+}
+// Présence de la semaine par population : nombre de présents (≥ 1 demi-journée) + équivalent temps plein (même calcul que la dispo)
+const _WV_POPS=[
+  {k:'presta',t:'Sous-traitants',ic:'🤝',col:'#f5c518',f:p=>p.categorie==='prestataire'},
+  {k:'p145e',t:'Part 145 embauchés',ic:'🔧',col:'#00d2ff',f:p=>(p.categorie==='technicien'||p.categorie==='sheetmetal')&&!_isHorsP145(p)},
+  {k:'p145i',t:'Part 145 intérimaires',ic:'🧑‍🔧',col:'#c084fc',f:p=>p.categorie==='interimaire'&&!_isHorsP145(p)},
+  {k:'rec',t:'Recyclage',ic:'♻️',col:'#ff9a3c',f:p=>_isRecyMecano(p)},
+  {k:'p21',t:'Part 21',ic:'✈️',col:'#00a0ff',f:p=>_isPart21Staff(p)},
+  {k:'iq',t:'IQ',ic:'🔍',col:'#00c8ff',f:p=>_isIqStaff(p)},
+  {k:'enc',t:'Encadrement',ic:'🎖️',col:'#ff9a3c',f:p=>['responsable','chef','expert','workshop'].includes(p.categorie)}
+];
+function _wvPresence(mon){
+  const ABS=new Set(['conge','maladie','formation','absence','deplacement','ferie']);
+  const wEnd=addD(mon,4); const days=[]; for(let i=0;i<5;i++){ const ds=fmt(addD(mon,i)); if(!isHol(ds)) days.push(ds); }
+  return _WV_POPS.map(P=>{
+    const list=[]; let etp=0;
+    (S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&P.f(p)).forEach(p=>{
+      if(!_presentSemaine(p,mon,wEnd)) return;
+      let j=0; days.forEach(ds=>['AM','PM'].forEach(hh=>{ const e=S.planning[`${p.id}_${ds}_${hh}`]; const t=e?e.type:'travail'; if(!ABS.has(t)) j+=0.5; }));
+      if(j>0){ list.push({p,j}); etp+=j/5; }
+    });
+    return {...P,list:_sortByNom(list.map(x=>x.p)).map(p=>list.find(x=>x.p===p)),n:list.length,etp:Math.round(etp*10)/10,days:days.length};
+  });
+}
+let _wvPop=null;
+function _wvTogglePop(k){ _wvPop=_wvPop===k?null:k; _wvRender(); }
+function openWeekView(monStr){ _wvMon=getMon(monStr?parseLocal(monStr):new Date()); _wvOpen={}; _wvPop=null; _wvRender(); openM('m-weekview'); }
+function _wvShift(n){ _wvMon=addD(_wvMon,7*n); _wvRender(); }
+function _wvSet(key,v){
+  if(!key) return; if(!S.besoinOverrides) S.besoinOverrides={};
+  if(v===''||v===null||isNaN(parseInt(v))) delete S.besoinOverrides[key]; else S.besoinOverrides[key]=Math.max(0,Math.min(99,parseInt(v)));
+  save(); _wvRender(); try{ if(document.getElementById('pg-programme')?.classList.contains('on')) renderProgramme(); }catch(_){}
+}
+function _wvStep(key,cur,d){ _wvSet(key,(parseInt(cur)||0)+d); }
+// Stockage : on écrit les Man/Hours de l'onglet Stockage (source unique), et on retire un éventuel ajustement qui les masquerait
+function _wvSetMH(v){
+  const wk=`${_wvMon.getFullYear()}-S${wkN(_wvMon)}`;
+  if(!S.stockage) S.stockage={avions:[],mhHebdo:{},config:{resp:'',chef:''}};
+  if(!S.stockage.mhHebdo) S.stockage.mhHebdo={};
+  if(!S.stockage.mhHebdo[wk]) S.stockage.mhHebdo[wk]={};
+  S.stockage.mhHebdo[wk].total=Math.max(0,Math.round((parseFloat(v)||0)*2)/2);
+  if(S.besoinOverrides) delete S.besoinOverrides[`STO_${wk}`];
+  save(); _wvRender();
+  try{ if(typeof renderStockageCharge==='function') renderStockageCharge(); }catch(_){}
+  try{ if(document.getElementById('pg-programme')?.classList.contains('on')) renderProgramme(); }catch(_){}
+}
+function _wvStepMH(cur,d){ _wvSetMH(Math.max(0,(parseFloat(cur)||0)+d)); }
+function _wvAddOut(){ const s=document.getElementById('wv-addsel'); if(!s||!s.value) return; _wvSet(s.value,1); }
+function _wvTogglePeople(k){ _wvOpen[k]=!_wvOpen[k]; _wvRender(); }
+function _wvRender(){
+  const box=document.getElementById('wv-body'); if(!box||!_wvMon) return;
+  const mon=_wvMon, wk=wkN(mon), isCur=fmt(mon)===fmt(getMon(new Date()));
+  document.getElementById('wv-title').innerHTML=`📅 Semaine ${wk} <span style="font-weight:500;color:var(--t3);font-size:13px">· du ${disp(fmt(mon))} au ${disp(fmt(addD(mon,6)))}${isCur?' · <span style="color:#ff6b85">en cours</span>':''}</span>`;
+  const rows=_wvRows(mon);
+  const SEC=[{k:'p145',t:'🔧 Part 145 — Production',col:'#6effc4',dispo:_wvDispoP145(mon)},{k:'p21',t:'✈️ Part 21',col:'#00a0ff',dispo:(()=>{try{return getAirbusDispoWeek(mon).part21;}catch(_){return 0;}})()},{k:'rec',t:'♻️ Recyclage',col:'#ff9a3c',dispo:(()=>{try{return getRecyDispoWeek(mon);}catch(_){return 0;}})()}];
+  const btn='width:28px;height:28px;border-radius:7px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.05);color:var(--t1);font-weight:900;cursor:pointer;font-size:14px;line-height:1';
+  let h='';
+  const PR=_wvPresence(mon);
+  h+=`<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin:6px 0 6px">👥 Présents cette semaine <span style="text-transform:none;font-weight:500">· clique une pastille pour voir les noms</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">${PR.filter(x=>x.n||['p145e','p145i'].includes(x.k)).map(x=>`<div onclick="_wvTogglePop('${x.k}')" title="Voir les noms" style="cursor:pointer;padding:7px 12px;border-radius:11px;background:${_wvPop===x.k?x.col+'2e':'rgba(255,255,255,0.04)'};border:1px solid ${_wvPop===x.k?x.col:'var(--glass-border)'};min-width:120px">
+      <div style="font-size:10.5px;color:${x.col};font-weight:800">${x.ic} ${x.t}</div>
+      <div style="font-size:18px;font-weight:900;line-height:1.2">${x.n} <span style="font-size:11px;font-weight:600;color:var(--t3)">présent${x.n>1?'s':''} · ${String(x.etp).replace('.',',')} ETP</span></div>
+    </div>`).join('')}</div>`;
+  if(_wvPop){ const x=PR.find(y=>y.k===_wvPop);
+    if(x) h+=`<div style="margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid ${x.col}55;background:rgba(255,255,255,0.02)">
+      <div style="font-size:11px;font-weight:800;color:${x.col};margin-bottom:5px">${x.ic} ${x.t} — ${x.n} présent(s), ${String(x.etp).replace('.',',')} ETP</div>
+      ${x.list.length?`<div style="display:flex;flex-wrap:wrap;gap:6px">${x.list.map(it=>`<span onclick="aiOpenPerson('${it.p.id}')" style="cursor:pointer;font-size:11.5px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:99px;padding:3px 9px">${_bfEsc(_bfNom(it.p))} ${_authBadgeHtml(it.p.id)} <span style="color:var(--t4)">${it.j>=x.days?'semaine':String(it.j).replace('.',',')+' j'}</span></span>`).join('')}</div>`:'<div style="font-size:11.5px;color:var(--t3)">Personne cette semaine.</div>'}</div>`; }
+  SEC.forEach(sec=>{
+    const R=rows.filter(r=>r.sec===sec.k);
+    const tot=R.reduce((s,r)=>s+r.val,0), nAff=new Set(R.flatMap(r=>Object.keys(r.people))).size;
+    if(!R.length && !sec.dispo) return;
+    const ec=Math.round((sec.dispo-tot)*10)/10, ecCol=ec<0?'#ff7088':ec<1?'#ffb340':'#34d399';
+    h+=`<div style="margin:14px 0 6px;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,${sec.col}22,transparent);border-left:3px solid ${sec.col};display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <b style="color:${sec.col};font-size:13px;flex:1">${sec.t}</b>
+      <span style="font-size:12px">Besoin <b>${tot}</b></span><span style="font-size:12px">Dispo <b>${sec.dispo}</b></span>
+      <span style="font-size:12px">Écart <b style="color:${ecCol}">${ec>0?'+':''}${ec}</b></span><span style="font-size:11px;color:var(--t3)">${nAff} affecté(s) au planning</span></div>`;
+    if(!R.length){ h+=`<div style="font-size:12px;color:var(--t3);padding:4px 12px">Aucune activité cette semaine.</div>`; return; }
+    h+=R.map(r=>{
+      const aff=r.nPers, diff=aff-r.val, open=!!_wvOpen[r.key||r.label];
+      const affCol=r.val===0&&aff===0?'var(--t3)':diff<0?'#ff7088':diff>0?'#82b1ff':'#34d399';
+      const affTxt=r.val||aff?(diff<0?`manque ${-diff}`:diff>0?`+${diff} au-dessus`:'conforme'):'';
+      const badge=r.sto?(r.ov!=null?`<span title="Un ajustement du tableau remplace le calcul MH" style="font-size:10px;color:#ffd060;border:1px solid rgba(255,208,96,0.5);border-radius:99px;padding:1px 7px">ajusté à ${r.ov} · MH ${r.theo}</span>`:`<span style="font-size:10px;color:var(--t4)">calculé des MH</span>`):r.ov!=null?(r.inP?`<span title="Besoin ajusté (théorique : ${r.theo})" style="font-size:10px;color:#ffd060;border:1px solid rgba(255,208,96,0.5);border-radius:99px;padding:1px 7px">ajusté · théo ${r.theo}</span>`:`<span title="Besoin saisi hors période du chantier" style="font-size:10px;color:#8fd0ff;border:1px solid rgba(110,200,255,0.5);border-radius:99px;padding:1px 7px">hors période</span>`):`<span style="font-size:10px;color:var(--t4)">théorique</span>`;
+      const names=Object.entries(r.people).map(([id,n])=>({p:byId(id),n})).filter(x=>x.p).sort((a,b)=>(a.p.nom||'').localeCompare(b.p.nom||'','fr'));
+      const k=(r.key||r.label).replace(/'/g,"\\'");
+      return `<div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;border-left:3px solid ${r.col}">
+        <div style="flex:1;min-width:210px">
+          <div style="font-size:13.5px;font-weight:800">${r.ic} ${_bfEsc(r.label)}</div>
+          <div style="font-size:10.5px;color:var(--t3)">${_bfEsc(r.sub||'')}${r.period?' · '+r.period:''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          ${r.sto?`<button style="${btn}" onclick="_wvStepMH(${r.mh},-35)" title="−35 MH (1 technicien)">−</button>
+          <input type="number" class="wv-num" min="0" step="0.5" value="${r.mh||0}" onchange="_wvSetMH(this.value)" title="Man/Hours de la semaine (onglet Stockage)" style="width:74px;height:30px;padding:0 4px;text-align:center;font-weight:900;font-size:14px;border-radius:8px">
+          <button style="${btn}" onclick="_wvStepMH(${r.mh},35)" title="+35 MH (1 technicien)">+</button>
+          <span style="font-size:11px;color:var(--t3);margin-left:2px">MH → <b style="color:#c0d8ff;font-size:13px">${r.val}</b> tech.</span>`
+          :r.editable?`<button style="${btn}" onclick="_wvStep('${r.key}',${r.val},-1)" title="−1">−</button>
+          <input type="number" class="wv-num" min="0" max="99" value="${r.val}" onchange="_wvSet('${r.key}',this.value)" style="width:56px;height:30px;padding:0 4px;text-align:center;font-weight:900;font-size:14px;border-radius:8px;${r.ov!=null?'background:rgba(255,208,96,0.15);border:1px solid rgba(255,208,96,0.55);color:#ffd060':''}">
+          <button style="${btn}" onclick="_wvStep('${r.key}',${r.val},1)" title="+1">+</button>`:`<span style="width:120px;text-align:center;color:var(--t3);font-size:12px">—</span>`}
+        </div>
+        <div style="width:118px">${badge}${r.ov!=null?`<div><button onclick="_wvSet('${r.key}','')" style="background:none;border:none;color:var(--cyan);font-size:10.5px;cursor:pointer;padding:2px 0;font-family:'Outfit',sans-serif;text-decoration:underline">↺ ${r.sto?'utiliser les MH':r.inP?'revenir au théorique':'retirer'}</button></div>`:''}</div>
+        <div onclick="_wvTogglePeople('${k}')" style="width:170px;cursor:${aff?'pointer':'default'}" title="${aff?'Voir les noms':''}">
+          <div style="font-size:13px"><b style="color:${affCol}">${aff}</b> affecté(s) ${aff?`<span style="font-size:10px;color:var(--t4)">${open?'▴':'▾'}</span>`:''}</div>
+          <div style="font-size:10.5px;color:${affCol}">${affTxt}</div>
+        </div>
+        ${open&&names.length?`<div style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 2px">${names.map(x=>`<span onclick="aiOpenPerson('${x.p.id}')" style="cursor:pointer;font-size:11.5px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:99px;padding:3px 9px">${_bfEsc(_bfNom(x.p))} ${_authBadgeHtml(x.p.id)} <span style="color:var(--t4)">${x.n>=10?'semaine':(x.n/2)+' j'}</span></span>`).join('')}</div>`:''}
+      </div>`;
+    }).join('');
+  });
+  // Ajout d'un chantier hors période
+  const shown=new Set(rows.map(r=>r.key));
+  const opts=(S.chantiers||[]).filter(c=>['encours','futur'].includes(c.statut)&&!shown.has(`${c.id}_${mon.getFullYear()}-S${wk}`))
+    .map(c=>`<option value="${c.id}_${mon.getFullYear()}-S${wk}">${_bfEsc(_chMsnLabel(c.id).replace(/^\S+\s/,''))} · ${_bfEsc(c.nom||'')}${c.debut?' ('+disp(c.debut)+' → '+(c.fin?disp(c.fin):'?')+')':''}</option>`).join('');
+  if(opts) h+=`<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap"><span style="font-size:11.5px;color:var(--t3)">Démarrage anticipé ou prolongation :</span>
+    <select id="wv-addsel" style="flex:1;min-width:240px;height:38px;padding:0 12px;line-height:normal"><option value="">— Ajouter un chantier hors période —</option>${opts}</select>
+    <button class="btn btn-ghost btn-sm" onclick="_wvAddOut()">+ Ajouter</button></div>`;
+  h+=`<div style="font-size:10px;color:var(--t4);margin-top:10px;line-height:1.5">Les valeurs modifiées ici sont les mêmes que dans le tableau « Ajuster les besoins par chantier × semaine » : tout est synchronisé. « Affectés » = personnes ayant au moins une demi-journée « Travail » sur ce chantier dans le planning de la semaine.</div>`;
+  box.innerHTML=h;
 }
 
 /* ════════════ MOTEUR GÉNÉRIQUE ASSISTANT — extraction d'entités + résolveurs ════════════ */
@@ -20005,7 +20317,7 @@ function aiAnswerMois(moisIdx,n){
 function aiAnswerPerson(p){
   const cat={responsable:'Responsable',chef:'Chef d\'équipe',technicien:'Technicien',interimaire:'Intérimaire',alternant:'Alternant/Apprenti',expert:'Expert',workshop:'Workshop Manager',sheetmetal:'Sheet Metal Worker'}[p.categorie]||p.categorie;
   let html=`<div style="font-weight:800;color:#c0e0ff;font-size:15px">${p.nom} ${p.prenom}</div>
-  <div style="font-size:11px;color:#8090a8;margin-bottom:8px">${p.trigramme||''} · ${cat} · ${p.contrat||''}</div>`;
+  <div style="font-size:11px;color:#8090a8;margin-bottom:8px">${p.trigramme||''} · ${cat} · ${_contratLbl(p)}</div>`;
   const forms=(S.formations||[]).filter(f=>f.empId===p.id);
   const autos=(S.autorisations||[]).filter(a=>a.empId===p.id);
   const today=new Date();today.setHours(0,0,0,0);
@@ -21297,7 +21609,7 @@ function renderChargeCapaTable(year){
     const wc=d.isCurrent?'#ffd060':isSel?'var(--cyan)':'#c0d0e8';
     return`<tr ${d.isCurrent?'id="cc-curweek"':''}${isSel?' data-selrow="1"':''} onclick="_synthGoto(${idx})" title="Voir cette semaine dans la synthèse" style="background:${bg};border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer${isSel?';box-shadow:inset 3px 0 0 var(--cyan)':''}">
       <td style="padding:7px 10px;font-weight:700;color:${wc};font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap">
-        S${d.wNum} <span style="font-size:9px;color:#8090a8;font-weight:400">${d.mon.getDate()}/${d.mon.getMonth()+1}</span>
+        S${d.wNum} <span style="font-size:9px;color:#8090a8;font-weight:400">${d.mon.getDate()}/${d.mon.getMonth()+1}</span> <span onclick="event.stopPropagation();openWeekView('${fmt(d.mon)}')" title="Détail des chantiers de la semaine" style="cursor:pointer;font-size:11px;padding:1px 4px;border-radius:5px;background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.35)">🔍</span>
         ${d.isCurrent?'<br><span style="font-size:8px;color:#ffd060;font-weight:800">● SEMAINE ACTUELLE</span>':''}
         ${isSel&&!d.isCurrent?'<br><span style="font-size:8px;color:var(--cyan)">▸ affichée</span>':''}
       </td>
@@ -21664,7 +21976,7 @@ function buildBesoinEditTable(year,weeks){
     const curStyle=isCur
       ? 'color:#fff;background:#5a1524;font-size:13px;font-weight:900;border-left:2px solid #ff4d6d;border-right:2px solid #ff4d6d;box-shadow:0 4px 12px rgba(255,77,109,0.4)'
       : '';
-    return`<th data-today="${isCur?'1':'0'}" style="${thS};position:sticky;top:0;z-index:4;${curStyle}">${isCur?'📍 ':''}S${wkN(mon)}<br><span style="font-weight:${isCur?'700':'400'};font-size:${isCur?'9px':'8px'};color:${isCur?'#ffccd5':'inherit'}">${mon.getDate()}/${mon.getMonth()+1}</span></th>`;
+    return`<th data-today="${isCur?'1':'0'}" onclick="openWeekView('${fmt(mon)}')" title="Ouvrir le détail de la semaine" style="${thS};position:sticky;top:0;z-index:4;cursor:pointer;${curStyle}">${isCur?'📍 ':''}S${wkN(mon)}<br><span style="font-weight:${isCur?'700':'400'};font-size:${isCur?'9px':'8px'};color:${isCur?'#ffccd5':'inherit'}">${mon.getDate()}/${mon.getMonth()+1}</span></th>`;
   }).join('');
 
   // Lignes : un chantier par ligne
@@ -22703,7 +23015,7 @@ function exportMasterPDF(){
       return`<td style="padding:0;min-width:52px;width:52px;border:1px solid #e2e8f0"><div style="display:flex;flex-direction:column;min-height:42px"><div style="flex:1;background:${la.col}22;color:${la.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;border-bottom:1px solid #eef2f7;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${la.txt}${am.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${am.vm}</span>`:''}</div><div style="flex:1;background:${lp.col}22;color:${lp.col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:5.5px;font-weight:800;line-height:1.05;padding:1px;white-space:normal;word-break:break-word">${lp.txt}${pm.vm?`<span style="color:#0e7490;font-size:4.5px;line-height:1">🩺${pm.vm}</span>`:''}</div></div></td>`;
     }).join('');
     const cat=CATS[emp.categorie]||{};const catCol=cat.col||'#64748b';
-    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span> ${emp.nom} ${emp.prenom.charAt(0)}.${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
+    bodyRows+=`<tr><td style="padding:3px 6px;font-size:8px;font-weight:700;color:#0d1e3d;background:#f8faff;border:1px solid #e2e8f0;border-left:3px solid ${catCol};white-space:nowrap;line-height:1.15"><span style="font-family:monospace;font-weight:900;color:${catCol};font-size:7.5px">${emp.trigramme}</span>${_authBadgePrint(emp.id)} ${emp.nom} ${emp.prenom.charAt(0)}.${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-weight:800">⏸HP</span>':''}</td>${cells}</tr>`;
   });
 
   // Légende : chantiers réellement utilisés ce mois + types d'absence
@@ -22786,7 +23098,7 @@ function exportWeekHtml(){
         <div style="padding:3px 5px;background:${lp.col}15;font-size:9px;font-weight:600;color:${lp.col};white-space:normal;word-break:break-word;line-height:1.2;text-align:center">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:8px;font-weight:800;margin-top:1px">🩺 VM ${pm.vm}</div>`:''}</div>
       </div></td>`;
     }).join('');
-    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.categorie==='prestataire'?(emp.societe||emp.nom):`${emp.nom} ${emp.prenom}`}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.categorie==='prestataire'?'—':emp.trigramme}</td>${cells}</tr>`;
+    rows+=`<tr><td style="padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;border:1px solid #ddd">${emp.categorie==='prestataire'?(emp.societe||emp.nom):`${emp.nom} ${emp.prenom}`}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' <span style="color:#e67e00;font-size:9px;font-weight:700">(hors prod.)</span>':''}</td><td style="padding:6px;text-align:center;font-size:10px;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.categorie==='prestataire'?'—':emp.trigramme+_authBadgePrint(emp.id)}</td>${cells}</tr>`;
   });
 
   const thCells=dates.map((d,i)=>{const wd=d.getDay();const isW=wd===0||wd===6;const isH=isHol(fmt(d));return`<th style="min-width:78px;padding:6px;background:${isH?'#fff3cd':isW?'#f8f9fa':'#1e3a5f'};color:${isH?'#856404':isW?'#6c757d':'#fff'};border:1px solid #ddd;font-size:10px">${JOURS[wd===0?6:wd-1]}<br><small>${d.getDate()}/${d.getMonth()+1}</small></th>`;}).join('');
@@ -22944,7 +23256,7 @@ function exportDayHtml(){
     const la=cellLabel(am,isW,isH);const lp=cellLabel(pm,isW,isH);
     const catC=_dayExtractCatColor(emp.categorie);const catL=_dayExtractCatLbl(emp.categorie);
     rows+=`<tr><td style="padding:8px 12px;font-weight:700;border:1px solid #ddd;border-left:5px solid ${catC}">${emp.nom} ${emp.prenom}${emp.actif===false?' <span style="color:#e67e00;font-size:10px;font-weight:700">(hors prod.)</span>':''}<div style="font-size:9px;font-weight:800;color:${catC};text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${catL}</div></td>
-      <td style="padding:8px;text-align:center;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}</td>
+      <td style="padding:8px;text-align:center;border:1px solid #ddd;font-weight:800;color:#5a7090">${emp.trigramme}${_authBadgePrint(emp.id)}</td>
       <td style="padding:8px;background:${la.col}15;color:${la.col};border:1px solid #ddd;font-weight:600">${la.txt}${am.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${am.vm}</div>`:''}</td>
       <td style="padding:8px;background:${lp.col}15;color:${lp.col};border:1px solid #ddd;font-weight:600">${lp.txt}${pm.vm?`<div style="color:#0e7490;font-size:10px;font-weight:800;margin-top:2px">🩺 VM ${pm.vm}</div>`:''}</td></tr>`;
   });
@@ -23102,7 +23414,7 @@ async function _buildColoredWeekXls(){
       if(vms.length){ base={txt:(base.txt?base.txt+'\n':'')+vms.join(' · '), color:base.color}; }
       return base;
     });
-    const row=ws.addRow([`${_persFull(emp)}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
+    const row=ws.addRow([`${_persFull(emp)}${_authText(emp.id)}${(m=>m?' '+m:'')(_persMarker(emp))}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
     row.height=26;
     // Nom coloré par catégorie
     const c0=row.getCell(1);
@@ -23247,7 +23559,7 @@ async function _buildColoredMasterXls(){
       if(vms.length){ base={txt:(base.txt?base.txt+'\n':'')+vms.join(' · '), color:base.color}; }
       return base;
     });
-    const row=ws.addRow([`${_persFull(emp)}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
+    const row=ws.addRow([`${_persFull(emp)}${_authText(emp.id)}${emp.actif===false?' — hors prod.':''}`,...cells.map(c=>c.txt)]);
     row.height=26;
     const c0=row.getCell(1);
     c0.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+catCol(emp.categorie)}};
