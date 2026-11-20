@@ -683,6 +683,7 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .bv-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;align-items:start}.bv-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .bv-box{border-radius:14px;background:#0f1729;border:1px solid rgba(255,255,255,.08);padding:12px 14px}
 .bv-bt{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#9fb0c8;display:flex;align-items:center;gap:7px;margin-bottom:9px}.bv-bt em{margin-left:auto;font-style:normal;color:#6f80a0;letter-spacing:0;text-transform:none;font-weight:700;font-size:11px}.bv-bt em a{color:#7fd4ff;text-decoration:none}
+.bv-man{margin:4px 0 2px;padding:5px 9px;border-radius:8px;background:rgba(255,179,64,.1);border:1px solid rgba(255,179,64,.35);color:#ffc266;font-size:11.5px;font-weight:700}
 .bv-more{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#7fd4ff;text-decoration:none;padding:3px 10px;border-radius:8px;background:rgba(0,210,255,.08);border:1px solid rgba(0,210,255,.3)}.bv-more:hover{background:rgba(0,210,255,.18)}
 .bv-sa{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
 .mto-pill{margin-left:auto;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:12px;color:#e8eef8;cursor:default}
@@ -5688,10 +5689,47 @@ function _hgProp(){   // ATR 72 : aile haute droite, moteurs longs, hélices, em
   return o+'</g>';
 }
 
+// Règles de passage : P3 (devant, au centre) libre ; P2 (gauche) passe si P3 vide ; P1 (droite) passe si P2 et P3 vides
+const _HG_BLOCK={1:[3,2],2:[3],3:[]};
+// Occupation « réelle » : un avion présent le vendredi et le lundi suivant est considéré présent le week-end
+function _hgAtX(pos,ds){
+  const e=_hgAt(pos,ds); if(e) return e;
+  const d=parseLocal(ds), wd=d.getDay(); if(wd!==0&&wd!==6) return null;
+  const fri=fmt(addD(d,wd===6?-1:-2)), mon=fmt(addD(d,wd===6?2:1));
+  const a=_hgAt(pos,fri), b=_hgAt(pos,mon);
+  return (a&&b&&String(a.msn)===String(b.msn))?a:null;
+}
+function _hgMsn(pos,ds){ const e=_hgAtX(pos,ds); return e?String(e.msn||'?'):''; }
+// Mouvements (comparaison par MSN) + manœuvres imposées par les blocages, du jour ds sur n jours
+function _hgMoves(ds,n){
+  const out=[];
+  for(let i=0;i<n;i++){
+    const d=fmt(addD(parseLocal(ds),i)), pd=fmt(addD(parseLocal(ds),i-1));
+    [3,2,1].forEach(p=>{
+      const was=_hgMsn(p,pd), now=_hgMsn(p,d); if(was===now) return;
+      const kind=was&&now?'swap':was?'out':'in';
+      // bloqueurs : avions présents la veille ET le jour même sur une position qui ferme le passage
+      const bl=_HG_BLOCK[p].map(q=>({pos:q,msn:_hgMsn(q,pd)})).filter(x=>x.msn && x.msn===_hgMsn(x.pos,d));
+      out.push({ds:d,pos:p,kind,msnOut:was,msnIn:now,blockers:bl});
+    });
+  }
+  return out;
+}
+function _hgMoveTxt(m){
+  const J=['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'], dd=parseLocal(m.ds), day=`${J[dd.getDay()]} ${disp(m.ds).slice(0,5)}`;
+  const what=m.kind==='swap'?`MSN ${m.msnOut} sort, MSN ${m.msnIn} entre`:m.kind==='out'?`sortie MSN ${m.msnOut}`:`entrée MSN ${m.msnIn}`;
+  let man='';
+  if(m.blockers.length){
+    const act=m.kind==='in'?`rentrer ${m.msnIn}`:m.kind==='out'?`sortir ${m.msnOut}`:`sortir ${m.msnOut} et rentrer ${m.msnIn}`;
+    const seq=m.blockers.map(b=>`${b.msn} (P${b.pos})`);
+    man=`pour ${act}, déplacer d'abord ${seq.join(' puis ')}, puis ${m.blockers.length>1?'les rentrer dans l\'ordre inverse':'le rentrer'}`;
+  }
+  return {day,what,man};
+}
 function _hgPlan(day0){
   const F="font-family=\"Segoe UI,Roboto,Helvetica,Arial,sans-serif\""; let g='';
   // ── Plan du hangar vu de dessus : P1 à gauche, P3 au milieu (reculée, dérive dehors), P2 à droite
-  const ORDER=[1,3,2], ZC={1:['#64b4ff','rgba(100,180,255,.30)'],2:['#50dc8c','rgba(80,220,140,.30)'],3:['#ffb450','rgba(255,180,80,.33)']};
+  const ORDER=[2,3,1], ZC={1:['#64b4ff','rgba(100,180,255,.30)'],2:['#50dc8c','rgba(80,220,140,.30)'],3:['#ffb450','rgba(255,180,80,.33)']};
   const HX=30, HW=580, IN=16, FX=HX+IN, FW=HW-2*IN, BW=FW/3, SREF=BW;
   const topPad=46, depth=topPad+Math.round(SREF*1.25), tarH=Math.round(SREF*0.30)+78, total=IN+depth+10+tarH;
   const HY=128, FY=HY+IN, Yd=FY+depth, y0=FY+topPad;
@@ -5731,7 +5769,7 @@ function _hgPlan(day0){
   ORDER.forEach((p,i)=>{
     const cx=FX+i*BW+BW/2, C=_HG_POS[p];
     g+=`<rect x="${cx-52}" y="${FY+12}" width="104" height="24" rx="12" fill="#fff" fill-opacity=".9" stroke="${C.dark}" stroke-width="1.2"/><text x="${cx}" y="${FY+29}" ${F} font-size="13" font-weight="900" fill="${C.dark}" text-anchor="middle">POSITION ${p}</text>`;
-    const inf=_hgInfo(_hgAt(p,day0)); let top=p===3?noseMid:y0;
+    const inf=_hgInfo(_hgAtX(p,day0)); let top=p===3?noseMid:y0;
     // étiquette sur le tarmac
     const ly=Yd+(p===3?Math.round(SREF*0.30)+16:22), lx=p===3?cx+BW*0.30:cx;
     if(!inf){ const s=SREF*0.72; g+=`<rect x="${cx-s/2}" y="${top}" width="${s}" height="${s*0.9}" rx="14" fill="#fff" fill-opacity=".35" stroke="${C.dark}" stroke-width="2" stroke-dasharray="7 6" opacity=".7"/><text x="${cx}" y="${top+s*0.45+6}" ${F} font-size="18" font-weight="800" fill="${C.dark}" opacity=".7" text-anchor="middle">Libre</text>`; return; }
@@ -5759,7 +5797,7 @@ function _hgSvg(mon){
     <text x="${W-26}" y="34" ${F} font-size="12" fill="#5a6b85" text-anchor="end">Occupation hangar · LFBF</text><text x="${W-26}" y="50" ${F} font-size="12" fill="#5a6b85" text-anchor="end">Édité le ${new Date().toLocaleDateString('fr-FR')}</text>
     <rect x="26" y="60" width="${W-52}" height="3" fill="#2979ff"/>
     <text x="26" y="94" ${F} font-size="20" font-weight="800" fill="#0f1e3d">Semaine ${wkN(mon)} — ${per}</text>
-    <text x="26" y="113" ${F} font-size="12" fill="#5a6b85">Disposition du hangar au lundi ${disp(days[0])} · position 3 au milieu, reculée (dérive hors des portes)</text>`;
+    <text x="26" y="113" ${F} font-size="12" fill="#5a6b85">Disposition du hangar au lundi ${disp(days[0])}</text>`;
   g+=_hgPlan(days[0]).g;
   // ── Tableau lundi → dimanche
   const TX=640,TY=128,TW=W-26-TX, DW=92, PW=(TW-DW)/3, HR=32;
@@ -5771,10 +5809,8 @@ function _hgSvg(mon){
     const h=rowH(di), we=di>=5;
     g+=`<rect x="${TX}" y="${y}" width="${DW}" height="${h}" fill="${we?'#f6f8fb':'#fafcff'}" stroke="#d6dfeb"/><text x="${TX+10}" y="${y+h/2+5}" ${F} font-size="12.5" font-weight="800" fill="${we?'#8094ad':'#0f1e3d'}">${J[di]} ${disp(ds).slice(0,5)}</text>`;
     [1,2,3].forEach((p,i)=>{
-      const x=TX+DW+i*PW, e=_hgAt(p,ds), inf=_hgInfo(e), prev=_hgAt(p,fmt(addD(parseLocal(ds),-1)));
-      const chg=di>0 && (e?e.id:'')!==(prev?prev.id:'');
-      if(di>0 && chg){ const a=_hgInfo(prev), b=inf; if(a&&b) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : MSN ${a.msn} sort, MSN ${b.msn} entre`); else if(a) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : sortie MSN ${a.msn} (fin le ${disp(prev.fin).slice(0,5)})`); else if(b) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : entrée MSN ${b.msn}`); }
-      if(di===0 && e && e.debut===ds) moves.push(`${J[0]} ${disp(ds).slice(0,5)} · Pos. ${p} : entrée MSN ${inf.msn}`);
+      const x=TX+DW+i*PW, e=_hgAtX(p,ds), inf=_hgInfo(e);
+      const chg=_hgMsn(p,ds)!==_hgMsn(p,fmt(addD(parseLocal(ds),-1)));
       g+=`<rect x="${x}" y="${y}" width="${PW}" height="${h}" fill="${chg&&inf?'#fff7e6':we?'#fbfcfe':'#fff'}" stroke="#d6dfeb"/>`;
       if(!inf){ g+=`<text x="${x+PW/2}" y="${y+h/2+5}" ${F} font-size="12" font-style="italic" fill="#b8c4d6" text-anchor="middle">libre</text>`; return; }
       g+=`<rect x="${x}" y="${y}" width="4" height="${h}" fill="${_HG_POS[p].dark}" opacity=".75"/>`;
@@ -5784,11 +5820,18 @@ function _hgSvg(mon){
     });
     y+=h;
   });
-  // Sorties en fin de semaine (dimanche dernier jour d'occupation)
-  [1,2,3].forEach(p=>{ const e=_hgAt(p,days[6]); if(e&&e.fin===days[6]) moves.push(`${J[6]} ${disp(days[6]).slice(0,5)} · Pos. ${p} : dernier jour MSN ${e.msn}`); });
-  y+=26;
-  g+=`<text x="${TX}" y="${y}" ${F} font-size="13" font-weight="800" fill="#0f1e3d">Mouvements de la semaine</text>`;
-  (moves.length?moves:['Aucun mouvement : même disposition toute la semaine.']).slice(0,9).forEach((m,i)=>{ g+=`<text x="${TX}" y="${y+22+i*19}" ${F} font-size="12" fill="#3b4a63">${moves.length?'• ':''}${_hgEsc(m)}</text>`; });
+  // Mouvements de la semaine (+ lundi suivant) et manœuvres imposées par les blocages
+  y+=24;
+  const MV=_hgMoves(days[0],7);
+  g+=`<text x="${TX}" y="${y}" ${F} font-size="13" font-weight="800" fill="#0f1e3d">Mouvements de la semaine</text><text x="${TX+TW}" y="${y}" ${F} font-size="9.5" fill="#8094ad" text-anchor="end">Ordre de sortie : P3 → P2 → P1</text>`;
+  let yy=y+20;
+  if(!MV.length) g+=`<text x="${TX}" y="${yy}" ${F} font-size="12" fill="#3b4a63">Aucun mouvement : même disposition toute la semaine.</text>`;
+  MV.slice(0,10).forEach(m=>{ const t=_hgMoveTxt(m);
+    g+=`<text x="${TX}" y="${yy}" ${F} font-size="11.5" fill="#3b4a63"><tspan font-weight="800">${_hgEsc(t.day)}</tspan> · Pos. ${m.pos} : ${_hgEsc(t.what)}</text>`; yy+=16;
+    if(t.man){ const words=('⚠ '+t.man).split(' '), L=[]; let cur=''; words.forEach(w=>{ if((cur+' '+w).trim().length>78){ L.push(cur.trim()); cur=w; } else cur+=' '+w; }); if(cur.trim()) L.push(cur.trim());
+      g+=`<rect x="${TX}" y="${yy-11}" width="${TW}" height="${4+L.length*14}" rx="4" fill="#fff4e0"/>`+L.map((l,k)=>`<text x="${TX+6}" y="${yy+1+k*14}" ${F} font-size="10.5" font-weight="700" fill="#b26a00">${_hgEsc(l)}</text>`).join(''); yy+=8+L.length*14; }
+  });
+  if(MV.length>10) g+=`<text x="${TX}" y="${yy}" ${F} font-size="10.5" fill="#8094ad">… +${MV.length-10} autre(s)</text>`;
   g+=`<line x1="26" y1="${H-30}" x2="${W-26}" y2="${H-30}" stroke="#dde6f0"/><text x="26" y="${H-14}" ${F} font-size="10" fill="#8094ad">MARDAM AeroDesk Pro · extrait occupation hangar · semaine ${wkN(mon)}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}</svg>`;
 }
@@ -7664,7 +7707,8 @@ const GUIDE_DATA = {
   "Stockage / Recyclage / Slot": { icon:"🅿️", color:"#ff9a3c", steps:[
     {t:"Ajouter un avion", d:"Onglets <b>Stockage</b> ou <b>A/C Recyclage</b> → ajoute l'avion (type, MSN, dates). Le recyclage suit l'avancement du démantèlement.", ill:null},
     {t:"Marquer terminé (recyclage)", d:"Quand un avion est démantelé, passe-le en <b>Terminé</b> : il compte alors dans le KPI <b>avions recyclés</b> de l'année.", ill:null},
-    {t:"Slot Hangar — extrait semaine", d:"Bouton <b>🖨 Extrait semaine</b> : une page A4 paysage avec le <b>plan du hangar vu de dessus</b> au lundi (position 1 à gauche, position 2 à droite, position 3 au milieu et reculée : nez au niveau des ailes, dérive hors des portes ; silhouette réaliste selon le type d'avion, MSN et client sur le tarmac) et le <b>tableau du lundi au dimanche</b> avec les MSN par position et les mouvements de la semaine. ◀ ▶ pour changer de semaine, <b>🖨 PDF / Imprimer</b> ou <b>🖼 Image PNG</b> pour l'envoyer.", ill:null},
+    {t:"Slot Hangar — ordre de sortie", d:"La <b>position 3</b> (devant, au centre) sort librement ; la <b>position 2</b> ne peut sortir ou entrer que si la 3 est vide ; la <b>position 1</b> seulement si la 2 et la 3 sont vides. Quand un mouvement est prévu alors qu'un avion bloque le passage, l'<b>extrait semaine</b> et le <b>Brief du jour</b> affichent la manœuvre à faire (⚠ déplacer d'abord tel MSN, puis le rentrer). Un avion présent le vendredi et le lundi est considéré présent le week-end.", ill:null},
+    {t:"Slot Hangar — extrait semaine", d:"Bouton <b>🖨 Extrait semaine</b> : une page A4 paysage avec le <b>plan du hangar vu de dessus</b> au lundi (position 2 à gauche, position 3 au centre et reculée, position 1 à droite : nez au niveau des ailes, dérive hors des portes ; silhouette réaliste selon le type d'avion, MSN et client sur le tarmac) et le <b>tableau du lundi au dimanche</b> avec les MSN par position et les mouvements de la semaine. ◀ ▶ pour changer de semaine, <b>🖨 PDF / Imprimer</b> ou <b>🖼 Image PNG</b> pour l'envoyer.", ill:null},
     {t:"Slot Hangar — copier/coller", d:"Dans <b>🏭 Slot Hangar</b> : <b>glisse</b> sur une ligne de position pour sélectionner une plage, puis <b>Copier</b> un MSN et <b>Coller</b> ailleurs (Ctrl+C / Ctrl+V). <b>Libérer</b> retire l'occupation.", ill:null},
   ]},
   "Formations & Autorisations": { icon:"📋", color:"#ffd060", steps:[
@@ -19707,6 +19751,7 @@ function _briefExtra(R){
   ((S.stockage&&S.stockage.avions)||[]).forEach(a=>{ const l=`🅿️ ${a.type||''} MSN ${a.msn||''}`.trim(); pushAv('in',a.entree,l,'Stockage','🛬',a); if(!a.sortie||a.sortie>=ds) pushAv('out',a.sortie||a.finPrev,l,'Stockage','🛫',a); });
   ((S.recycling&&S.recycling.avions)||[]).forEach(a=>{ const l=`♻️ ${a.type||''} MSN ${a.msn||''}`.trim(); pushAv('in',a.debutChantier,l,'Recyclage','🛬',a); pushAv('out',a.finChantier,l,'Recyclage','🛫',a); });
   R.avions.sort((a,b)=>a.date.localeCompare(b.date)||(a.kind==='in'?-1:1));
+  try{ R.hg=_hgMoves(R.ds,2); }catch(_){ R.hg=[]; }
   R.om=_omBlocks();
   R.msg=(S.briefMsg&&S.briefMsg[ds])||'';
   return R;
@@ -19762,6 +19807,8 @@ function _briefHtml(R,print){
     L=L.replace('<!--FR24-->',()=>box('📡','Suivi des avions', _fr24SearchHtml()+(on?`<div class="bv-live"><iframe src="${_liveMapUrl()}" loading="lazy" referrerpolicy="no-referrer" title="Carte ADS-B en direct"></iframe></div><div class="bv-mut" style="font-size:10.5px;margin-top:6px">Carte ADS-B communautaire (airplanes.live). Si elle reste vide, ton réseau bloque le site : utilise <a style="color:#7fd4ff" href="${_fr24Url()}" target="_blank" rel="noopener">Flightradar24</a>.</div>`
       :`<div class="bv-mut" style="font-size:11.5px;margin-top:8px">▶ « Afficher la carte » pour voir ici les avions en vol autour de Francazal, en direct.</div>`),
       `<a href="#" onclick="event.preventDefault();_briefLiveToggle()">${on?'Masquer':'▶ Afficher la carte'}</a> · <a href="${_liveMapUrl().replace('&hideSidebar&hideButtons','')}" target="_blank" rel="noopener">⤢ Ouvrir</a> · <a href="${_fr24Url()}" target="_blank" rel="noopener">FR24</a>`)); }
+  if(R.hg&&R.hg.length) Rt+=box('🏭','Hangar — mouvements & manœuvres',R.hg.map(m=>{ const t=_hgMoveTxt(m), C=_HG_POS[m.pos]?.dark||'#7fd4ff';
+      return `<div class="bv-li"><span class="bv-tag" style="color:${print?'#3b4a63':_lightenForDark(C)};border-color:${hexRgba(C,.5)}">P${m.pos}</span> <b>${_bfEsc(t.day)}</b> · ${_bfEsc(t.what)}${t.man?`<div class="bv-man">⚠ ${_bfEsc(t.man)}</div>`:''}</div>`; }).join(''),'aujourd\'hui + demain');
   if(R.crit.length && R.crit.some(c=>c.bad)) Rt+=box('🎯','Compétences critiques',R.crit.filter(c=>c.bad).map(c=>`<div class="bv-li"><b>${_bfEsc(c.label)}</b> <span style="color:#ff8fa3;font-weight:800">${c.n}/${c.min} présent(s)</span></div>`).join(''));
   let ec='';
   if(R.nbExpired) ec+=`<div class="bv-li"><span style="color:#ff8fa3;font-weight:800">${R.nbExpired} déjà expirée(s)</span> <span class="bv-mut">(détail dans les Alertes)</span></div>`;
@@ -19804,6 +19851,7 @@ function briefPrint(){
     .bv-om{display:flex;align-items:center;gap:7px;padding:3px 0;border-top:1px solid #eef2f7}.bv-om.late b{color:#c62828}.bv-ck{font-size:14px}
     .bv-av{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font:800 7px monospace;border:1px solid;flex-shrink:0;color:#0f1e3d}
     .bv-mv{display:flex;align-items:center;gap:7px;padding:2px 0}.bv-nm{flex:1}.bv-tag{font-size:9px;font-weight:800;border:1px solid;border-radius:5px;padding:0 5px;color:#3b4a63!important;border-color:#b8c4d6!important}
+    .bv-man{margin:2px 0;padding:2px 6px;border-radius:4px;background:#fff4e0;color:#b26a00;font-weight:700}
     .bv-li{padding:2px 0}.bv-when{float:right;color:#6b7c96;font-weight:700}.bv-mut{color:#6b7c96;font-weight:400}
     .mto-pill{margin-left:auto;display:flex;align-items:center;gap:8px;border:1px solid #dde6f0;border-radius:8px;padding:4px 10px}.mto-ic{font-size:20px}.mto-pill b{font-size:14px}
     .mto-alerts{display:flex;flex-direction:column;gap:4px;margin:0 0 8px}.mto-small{display:flex;flex-wrap:wrap;gap:4px}.mto-sm{border:1px solid;border-radius:6px;padding:2px 7px;font-size:10px}.mto-al{display:flex;align-items:center;gap:8px;border:1px solid;border-left-width:4px;border-radius:7px;padding:4px 9px}.mto-al-ic{font-size:16px}
