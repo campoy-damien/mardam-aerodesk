@@ -683,6 +683,8 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .bv-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;align-items:start}.bv-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 .bv-box{border-radius:14px;background:#0f1729;border:1px solid rgba(255,255,255,.08);padding:12px 14px}
 .bv-bt{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#9fb0c8;display:flex;align-items:center;gap:7px;margin-bottom:9px}.bv-bt em{margin-left:auto;font-style:normal;color:#6f80a0;letter-spacing:0;text-transform:none;font-weight:700;font-size:11px}.bv-bt em a{color:#7fd4ff;text-decoration:none}
+.bv-more{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#7fd4ff;text-decoration:none;padding:3px 10px;border-radius:8px;background:rgba(0,210,255,.08);border:1px solid rgba(0,210,255,.3)}.bv-more:hover{background:rgba(0,210,255,.18)}
+.bv-sa{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
 .mto-pill{margin-left:auto;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:12px;color:#e8eef8;cursor:default}
 .mto-pill b{font-size:19px;color:#fff}.mto-pill .bv-mut{font-size:11px}.mto-ic{font-size:30px;line-height:1}
 .mto-alerts{display:flex;flex-direction:column;gap:6px;margin:-4px 0 14px}
@@ -2229,11 +2231,15 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-cyan btn-sm" onclick="openHangarExtract()" title="Plan du hangar + tableau lundi → dimanche, en PDF ou en image">🖨 Extrait semaine</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSlotPDF()">📄 Export PDF</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSlotXls()">📊 Export Excel</button>
     </div>
   </div>
 
+  <!-- PLAN DU HANGAR (jour) -->
+  <div id="slot-plan" title="Disposition actuelle du hangar"></div>
+  <style>#slot-plan{margin:0 0 14px;display:flex;justify-content:center}#slot-plan svg{width:100%;max-width:820px;height:auto;display:block;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}</style>
   <!-- LÉGENDE POSITIONS -->
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
     <div style="background:rgba(100,180,255,0.1);border:2px solid rgba(100,180,255,0.35);border-radius:12px;padding:12px 16px;text-align:center">
@@ -3506,6 +3512,23 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 </div>
 </div>
 <!-- Vue Semaine : besoins par chantier -->
+<div class="mbg" id="m-hangar-ext">
+<div class="modal" style="max-width:1180px;width:96vw">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    <div class="modal-title" id="hg-title" style="margin:0;flex:1">🖨 Extrait hangar</div>
+    <button class="btn btn-ghost btn-sm" onclick="_hgShift(-1)">◀ Sem. préc.</button>
+    <button class="btn btn-ghost btn-sm" onclick="_hgMon=getMon(new Date());_hgRender()">Cette semaine</button>
+    <button class="btn btn-ghost btn-sm" onclick="_hgShift(1)">Sem. suiv. ▶</button>
+  </div>
+  <div id="hg-prev" style="background:#e9edf3;border-radius:12px;padding:10px;max-height:calc(100vh - 300px);overflow:auto"></div>
+  <style>#hg-prev svg{width:100%;height:auto;display:block;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25)}</style>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-hangar-ext')">Fermer</button>
+    <button class="btn btn-ghost" onclick="hangarExtractPNG()">🖼 Image PNG</button>
+    <button class="btn btn-cyan" onclick="hangarExtractPDF()">🖨 PDF / Imprimer</button>
+  </div>
+</div>
+</div>
 <div class="mbg" id="m-autoplan">
 <div class="modal ap-modal">
   <div class="ap-top"><span style="font-size:24px">🪄</span><div id="ap-title" style="flex:1;min-width:0"></div>
@@ -5589,6 +5612,211 @@ function getSlotAvions(){
   return list;
 }
 
+
+/* ═══ 🖨 Extrait semaine du hangar : plan vu de dessus (lundi) + tableau lundi → dimanche (PDF + PNG) ═══ */
+const _HG_POS={1:{dark:'#1f6fd1',band:'rgba(100,180,255,.28)',tint:'#e6f1ff'},2:{dark:'#169a55',band:'rgba(80,220,140,.28)',tint:'#e3f8ec'},3:{dark:'#c47a12',band:'rgba(255,180,80,.30)',tint:'#fff1dd'}};
+let _hgMon=null;
+function _hgEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function _hgTr(s,n){ s=String(s||''); return s.length>n?s.slice(0,n-1)+'…':s; }
+function _hgAt(pos,ds){ return (S.slot?.entries||[]).find(e=>parseInt(e.pos)===pos&&e.debut<=ds&&e.fin>=ds)||null; }
+// Infos lisibles d'une occupation : MSN, type court, client, famille de silhouette
+function _hgInfo(e){
+  if(!e) return null;
+  const id=e.avionId||''; let src=null, client='', typ=e.avionNom||'';
+  if(id.startsWith('ch_')){ src=(S.chantiers||[]).find(c=>'ch_'+c.id===id); if(src){ client=src.client||''; typ=src.avion||typ||src.nom; } }
+  else if(id.startsWith('rec_')){ src=(S.recycling?.avions||[]).find(a=>'rec_'+a.id===id); if(src){ client=src.client||'Recyclage'; typ=src.type||typ; } }
+  else if(id.startsWith('sto_')){ src=(S.stockage?.avions||[]).find(a=>'sto_'+a.id===id); if(src){ client=src.client||'Stockage'; typ=src.type||typ; } }
+  else if(id.startsWith('airbus_')){ src=(S.airbus?.msns||[]).find(a=>'airbus_'+a.id===id); client='Airbus Part 21'; if(src) typ=src.type||typ; }
+  if(!client && e.msn){ const c=(S.chantiers||[]).find(c=>String(c.msn||'')===String(e.msn)); if(c){ client=c.client||''; typ=typ||c.avion; } }
+  const short=String(typ||'').replace(/^(airbus|boeing)\s+/i,'').trim()||'Avion';
+  return {msn:String(e.msn||'?'),type:short,full:String(typ||''),client:String(client||'').trim(),kind:_hgKind(typ)};
+}
+function _hgKind(t){ t=String(t||'').toUpperCase().replace(/\s+/g,'');
+  if(/ATR|DASH|Q400|DHC|SAAB|BEECH|KINGAIR|TBM|PC-?12|CESSNA|C208|DO228|JETSTREAM/.test(t)) return 'prop';
+  if(/A30[0-9]|A31[0]|A33|A34|A35|A38|B?74[0-9]|B?76[0-9]|B?77[0-9]|B?78[0-9]|747|767|777|787|MD11|DC10/.test(t)) return 'wide';
+  if(/FALCON|CITATION|GLOBAL|GULFSTREAM|LEARJET|CHALLENGER|LEGACY|PHENOM|HAWKER|PRAETOR/.test(t)) return 'biz';
+  if(/CRJ|ERJ|EMB|E1[79]0|E19[05]|E-?JET|SSJ|SUPERJET|A220|CS[13]00|E2/.test(t)) return 'regional';
+  return 'narrow'; }
+const _HG_SCALE={narrow:1.0,regional:.84,wide:1.06,prop:.76,biz:.62};
+// Silhouettes réalistes vues de dessus (repère -100..100 × 0..200, nez en haut) — proportions des vrais avions
+const _HG_AC={
+  narrow:  {fw:10.5,span:96,le:76,rc:40,tc:8,sw:39,kx:36,eng:[[31,60,24,12.8]],rear:false,st:[5,166,33,184,6,191,4],fin:[158,198],sharklet:true},   // A320 / B737
+  regional:{fw:9.5,span:92,le:82,rc:36,tc:8,sw:30,kx:30,eng:[[28,66,22,11]],rear:false,st:[4,170,30,184,6,190,3.5],fin:[160,198],sharklet:true},       // A220 / E-Jet / CRJ
+  wide:    {fw:12,span:99,le:70,rc:46,tc:9,sw:45,kx:40,eng:[[34,52,30,16]],rear:false,st:[6,168,38,186,7,193,5],fin:[155,198],sharklet:true},          // A330 / B787
+  biz:     {fw:8.5,span:80,le:86,rc:34,tc:8,sw:28,kx:26,eng:[[13,138,24,9]],rear:true,st:[3,176,30,182,6,188,3],fin:[166,198],sharklet:true},          // Falcon / Citation
+};
+function _hgShape(kind){
+  if(kind==='prop') return _hgProp();
+  const P=_HG_AC[kind]||_HG_AC.narrow, w=P.fw, S='stroke="#4b5b72" stroke-width="1" stroke-linejoin="round"';
+  const tipLE=P.le+P.sw, tipTE=tipLE+P.tc, kinkY=P.le+P.rc-4, rootTE=P.le+P.rc;
+  const wing=s=>`M${s*w} ${P.le} L${s*P.span} ${tipLE} L${s*P.span} ${tipTE} L${s*P.kx} ${kinkY} L${s*w} ${rootTE}Z`;
+  let o='<g filter="url(#hgSh)">';
+  // ailes + gouvernes
+  [-1,1].forEach(s=>{
+    o+=`<path d="${wing(s)}" fill="url(#hgWg)" ${S}/>`;
+    o+=`<path d="M${s*(w+2)} ${rootTE-7} L${s*P.kx} ${kinkY-6} L${s*(P.span-16)} ${tipTE-6}" fill="none" stroke="#8a98ac" stroke-width=".8"/><path d="M${s*(P.span-14)} ${tipTE-5} L${s*(P.span-2)} ${tipTE-2}" stroke="#8a98ac" stroke-width=".8"/>`;
+    // carénages de rails de volets
+    [0.32,0.55,0.78].forEach(t=>{ const x=s*(w+(P.span-w)*t*0.85), y=rootTE+(x*s-w)/(P.span-w)*(tipTE-rootTE)*0.9; o+=`<rect x="${x-1.6}" y="${y-9}" width="3.2" height="13" rx="1.6" fill="#cfd6e0" stroke="#6d7b90" stroke-width=".5"/>`; });
+    if(P.sharklet) o+=`<path d="M${s*P.span} ${tipLE+1} L${s*(P.span+3)} ${tipLE-3} L${s*(P.span+3)} ${tipTE-2} L${s*P.span} ${tipTE}Z" fill="#b9c3d0" ${S}/>`;
+  });
+  // empennage horizontal
+  const [rx,ry,tx,ty,tcw,rty,fwT]=P.st;
+  [-1,1].forEach(s=>{ o+=`<path d="M${s*rx} ${ry} L${s*tx} ${ty} L${s*tx} ${ty+tcw} L${s*fwT} ${rty}Z" fill="url(#hgWg)" ${S}/>`; });
+  // fuselage
+  const tail=200, cone=150;
+  o+=`<path d="M0 0 C${w*0.62} 0.6 ${w} 7 ${w} 20 L${w} ${cone} C${w} ${cone+22} ${w*0.42} ${tail-14} ${w*0.18} ${tail} L${-w*0.18} ${tail} C${-w*0.42} ${tail-14} ${-w} ${cone+22} ${-w} ${cone} L${-w} 20 C${-w} 7 ${-w*0.62} 0.6 0 0Z" fill="url(#hgFs)" ${S}/>`;
+  // dérive (vue de dessus) + cône
+  o+=`<path d="M-1.6 ${P.fin[0]} L1.6 ${P.fin[0]} L1.1 ${P.fin[1]} L-1.1 ${P.fin[1]}Z" fill="#6b788b"/>`;
+  // poste de pilotage + hublots + portes
+  o+=`<path d="M${-w*0.55} 9.5 Q0 6.2 ${w*0.55} 9.5 L${w*0.5} 12.6 Q0 10.6 ${-w*0.5} 12.6Z" fill="#1f2a3a"/>`;
+  o+=`<line x1="${-w+2.2}" y1="26" x2="${-w+2.2}" y2="${cone-4}" stroke="#7f8da1" stroke-width="1.2" stroke-dasharray="1.3 2.4"/><line x1="${w-2.2}" y1="26" x2="${w-2.2}" y2="${cone-4}" stroke="#7f8da1" stroke-width="1.2" stroke-dasharray="1.3 2.4"/>`;
+  o+=`<line x1="${-w*0.5}" y1="40" x2="${w*0.5}" y2="40" stroke="#c3ccd8" stroke-width=".6"/><line x1="${-w*0.5}" y1="${cone-6}" x2="${w*0.5}" y2="${cone-6}" stroke="#c3ccd8" stroke-width=".6"/>`;
+  // réacteurs (sous voilure ou arrière)
+  P.eng.forEach(([ex,ey,el,ew])=>{ [-1,1].forEach(s=>{ const x=s*ex;
+    if(!P.rear) o+=`<rect x="${x-1.8}" y="${ey+el-6}" width="3.6" height="${Math.max(6,P.le+8-(ey+el-6))}" fill="#aab4c2" stroke="#5f6d82" stroke-width=".5"/>`;
+    o+=`<rect x="${x-ew/2}" y="${ey}" width="${ew}" height="${el}" rx="${ew/2}" fill="url(#hgEn)" ${S}/><ellipse cx="${x}" cy="${ey+2.2}" rx="${ew/2-1.6}" ry="2" fill="#253041"/><path d="M${x-ew/2+1.5} ${ey+el-3} L${x+ew/2-1.5} ${ey+el-3}" stroke="#56647a" stroke-width=".7"/>`; }); });
+  return o+'</g>';
+}
+function _hgProp(){   // ATR 72 : aile haute droite, moteurs longs, hélices, empennage en T
+  const w=9.5, S='stroke="#4b5b72" stroke-width="1" stroke-linejoin="round"'; let o='<g filter="url(#hgSh)">';
+  [-1,1].forEach(s=>{ o+=`<path d="M${s*w} 74 L${s*99} 78 L${s*99} 88 L${s*w} 93Z" fill="url(#hgWg)" ${S}/><path d="M${s*(w+3)} 88 L${s*62} 85.5 M${s*64} 85.4 L${s*96} 84.2" stroke="#8a98ac" stroke-width=".8" fill="none"/>`; });
+  [-1,1].forEach(s=>{ o+=`<path d="M${s*3.5} 178 L${s*27} 181 L${s*27} 188 L${s*3.5} 191Z" fill="url(#hgWg)" ${S}/>`; });
+  o+=`<path d="M0 0 C6 0.6 ${w} 7 ${w} 22 L${w} 140 C${w} 162 4 186 1.8 199 L-1.8 199 C-4 186 ${-w} 162 ${-w} 140 L${-w} 22 C${-w} 7 -6 0.6 0 0Z" fill="url(#hgFs)" ${S}/>`;
+  o+=`<path d="M-1.5 148 L1.5 148 L1.1 196 L-1.1 196Z" fill="#6b788b"/>`;
+  o+=`<path d="M-5.3 9.5 Q0 6.4 5.3 9.5 L4.8 12.6 Q0 10.6 -4.8 12.6Z" fill="#1f2a3a"/><line x1="-7.3" y1="26" x2="-7.3" y2="138" stroke="#7f8da1" stroke-width="1.2" stroke-dasharray="1.3 3"/><line x1="7.3" y1="26" x2="7.3" y2="138" stroke="#7f8da1" stroke-width="1.2" stroke-dasharray="1.3 3"/>`;
+  [-1,1].forEach(s=>{ const x=s*30; o+=`<rect x="${x-5.5}" y="56" width="11" height="54" rx="5" fill="url(#hgEn)" ${S}/><ellipse cx="${x}" cy="54" rx="15" ry="2.4" fill="#3a4554" opacity=".45"/><rect x="${x-1.6}" y="50" width="3.2" height="6" rx="1.6" fill="#3a4554"/><path d="M${x-14} 54 L${x+14} 54" stroke="#2b3544" stroke-width="1.1" opacity=".7"/>`; });
+  return o+'</g>';
+}
+
+function _hgPlan(day0){
+  const F="font-family=\"Segoe UI,Roboto,Helvetica,Arial,sans-serif\""; let g='';
+  // ── Plan du hangar vu de dessus : P1 à gauche, P3 au milieu (reculée, dérive dehors), P2 à droite
+  const ORDER=[1,3,2], ZC={1:['#64b4ff','rgba(100,180,255,.30)'],2:['#50dc8c','rgba(80,220,140,.30)'],3:['#ffb450','rgba(255,180,80,.33)']};
+  const HX=30, HW=580, IN=16, FX=HX+IN, FW=HW-2*IN, BW=FW/3, SREF=BW;
+  const topPad=46, depth=topPad+Math.round(SREF*1.25), tarH=Math.round(SREF*0.30)+78, total=IN+depth+10+tarH;
+  const HY=128, FY=HY+IN, Yd=FY+depth, y0=FY+topPad;
+  g+=`<defs>
+    <radialGradient id="hgL"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hgW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4452"/><stop offset="1" stop-color="#222a35"/></linearGradient>
+    <linearGradient id="hgFs" x1="0" x2="1"><stop offset="0" stop-color="#bcc6d3"/><stop offset=".3" stop-color="#ffffff"/><stop offset=".7" stop-color="#ffffff"/><stop offset="1" stop-color="#b8c2cf"/></linearGradient>
+    <linearGradient id="hgWg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset="1" stop-color="#d5dce6"/></linearGradient>
+    <linearGradient id="hgEn" x1="0" x2="1"><stop offset="0" stop-color="#8e9aab"/><stop offset=".5" stop-color="#edf1f6"/><stop offset="1" stop-color="#85919f"/></linearGradient>
+    <filter id="hgSh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="5" dy="9" stdDeviation="6" flood-color="#0b1320" flood-opacity=".32"/></filter>
+    <pattern id="hgSlab" width="46" height="46" patternUnits="userSpaceOnUse"><rect width="46" height="46" fill="none" stroke="#c5cfdb" stroke-width=".7"/></pattern>
+    <pattern id="hgTar" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#707b89"/><circle cx="2" cy="3" r=".6" fill="#7e8997"/><circle cx="6" cy="6" r=".5" fill="#65707e"/></pattern>
+  </defs>`;
+  // tarmac + marquage
+  g+=`<rect x="${HX}" y="${Yd}" width="${HW}" height="${10+tarH}" fill="url(#hgTar)"/><line x1="${HX}" y1="${Yd+10+tarH-18}" x2="${HX+HW}" y2="${Yd+10+tarH-18}" stroke="#ffd34d" stroke-width="3" stroke-dasharray="18 12"/>
+    <text x="${HX+HW-10}" y="${Yd+10+tarH-4}" ${F} font-size="10" font-weight="800" fill="#e6ebf2" text-anchor="end">PARKING / TARMAC</text>`;
+  // bâtiment
+  g+=`<rect x="${HX}" y="${HY}" width="${HW}" height="${IN+depth+8}" rx="6" fill="url(#hgW)"/>`;
+  g+=`<rect x="${FX}" y="${FY}" width="${FW}" height="${depth}" fill="#e4e9ef"/><rect x="${FX}" y="${FY}" width="${FW}" height="${depth}" fill="url(#hgSlab)"/>`;
+  ORDER.forEach((p,i)=>{ const x=FX+i*BW; g+=`<rect x="${x}" y="${FY}" width="${BW}" height="${depth}" fill="${ZC[p][1]}"/>`; });
+  g+=`<rect x="${FX+BW}" y="${Yd}" width="${BW}" height="${10+Math.round(SREF*0.30)}" fill="rgba(255,180,80,.22)" stroke="#ffb450" stroke-width="1.2" stroke-dasharray="6 5"/>`;
+  [1,2].forEach(i=>{ const x=FX+i*BW; g+=`<line x1="${x}" y1="${FY}" x2="${x}" y2="${Yd}" stroke="#fff" stroke-width="2.2"/>`; });
+  for(let k=0;k<=6;k++){ const x=HX+6+k*(HW-22)/6; g+=`<rect x="${x}" y="${HY+3}" width="10" height="${IN+2}" fill="#4b5666" stroke="#1b222c" stroke-width=".8"/>`; }
+  [0,1].forEach(k=>{ const yy=HY+IN+depth*(k?0.7:0.3); g+=`<path d="M${HX+2} ${yy-9} L${HX+13} ${yy} L${HX+2} ${yy+9}Z" fill="#7d8899"/><path d="M${HX+HW-2} ${yy-9} L${HX+HW-13} ${yy} L${HX+HW-2} ${yy+9}Z" fill="#7d8899"/>`; });
+  // rail de portes, vantaux repliés sur les côtés (portes ouvertes)
+  g+=`<rect x="${FX}" y="${Yd}" width="${FW}" height="8" fill="#8794a6"/>`;
+  [0,1,2,3].forEach(k=>{ const x=k<2?FX+k*34:FX+FW-(4-k)*34; g+=`<rect x="${x+1}" y="${Yd+1}" width="32" height="6" fill="#a7b2c2" stroke="#5f6b7d" stroke-width=".6"/>`; });
+  g+=`<text x="${FX+70}" y="${Yd+24}" ${F} font-size="9.5" font-weight="800" fill="#fff" opacity=".9" text-anchor="middle">▲ PORTES OUVERTES ▲</text>`;
+  // éclairage
+  for(let r=0;r<3;r++) ORDER.forEach((p,i)=>[0.25,0.75].forEach(q=>{ const lx=FX+i*BW+BW*q, ly=FY+34+r*(depth-60)/2; g+=`<circle cx="${lx}" cy="${ly}" r="14" fill="url(#hgL)" opacity=".7"/>`; }));
+  // racks et équipements le long des murs
+  const rack=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="#2f4a6e" stroke="#16263c" stroke-width=".8"/>`+[...Array(Math.max(1,Math.floor((h-2)/12)))].map((_,k)=>`<rect x="${x+2}" y="${y+2+k*12}" width="${w-4}" height="9" fill="${k%2?'#3f5f86':'#c9b79a'}"/>`).join('');
+  g+=rack(FX+6,Yd-108,18,58)+rack(FX+FW-24,Yd-108,18,58)+rack(FX+6,FY+44,18,34)+rack(FX+FW-24,FY+44,18,34);
+  g+=`<rect x="${FX+BW-24}" y="${Yd-40}" width="12" height="20" rx="2" fill="#e3b23c" stroke="#4a3b12" stroke-width=".7"/><rect x="${FX+2*BW+12}" y="${Yd-40}" width="12" height="20" rx="2" fill="#e3b23c" stroke="#4a3b12" stroke-width=".7"/>`;
+  // avions
+  const noseMid=y0+Math.round(SREF*0.42);   // P3 : nez au niveau des ailes de P1/P2
+  ORDER.forEach((p,i)=>{
+    const cx=FX+i*BW+BW/2, C=_HG_POS[p];
+    g+=`<rect x="${cx-52}" y="${FY+12}" width="104" height="24" rx="12" fill="#fff" fill-opacity=".9" stroke="${C.dark}" stroke-width="1.2"/><text x="${cx}" y="${FY+29}" ${F} font-size="13" font-weight="900" fill="${C.dark}" text-anchor="middle">POSITION ${p}</text>`;
+    const inf=_hgInfo(_hgAt(p,day0)); let top=p===3?noseMid:y0;
+    // étiquette sur le tarmac
+    const ly=Yd+(p===3?Math.round(SREF*0.30)+16:22), lx=p===3?cx+BW*0.30:cx;
+    if(!inf){ const s=SREF*0.72; g+=`<rect x="${cx-s/2}" y="${top}" width="${s}" height="${s*0.9}" rx="14" fill="#fff" fill-opacity=".35" stroke="${C.dark}" stroke-width="2" stroke-dasharray="7 6" opacity=".7"/><text x="${cx}" y="${top+s*0.45+6}" ${F} font-size="18" font-weight="800" fill="${C.dark}" opacity=".7" text-anchor="middle">Libre</text>`; return; }
+    const s=SREF*(_HG_SCALE[inf.kind]||1), k=s/200;
+    if(p===3) top=Yd-0.80*s;   // dérive toujours à l'extérieur des portes
+    g+=`<g transform="translate(${cx},${top}) scale(${k})">${_hgShape(inf.kind)}</g>`;
+    const lw=Math.max(92,Math.min(BW-14,14+Math.max(inf.type.length*8,('MSN '+inf.msn).length*7.2)));
+    const ty=p===3?ly:ly+8;
+    g+=`<rect x="${lx-lw/2}" y="${ty}" width="${lw}" height="${inf.client?48:36}" rx="7" fill="${C.dark}" stroke="#fff" stroke-width="1.2"/>
+      <text x="${lx}" y="${ty+16}" ${F} font-size="12.5" font-weight="900" fill="#fff" text-anchor="middle">${_hgEsc(_hgTr(inf.type,16))}</text>
+      <text x="${lx}" y="${ty+30}" ${F} font-size="11" font-weight="800" fill="#fff" text-anchor="middle" opacity=".92">MSN ${_hgEsc(inf.msn)}</text>
+      ${inf.client?`<text x="${lx}" y="${ty+42}" ${F} font-size="9.5" font-weight="600" fill="#fff" text-anchor="middle" opacity=".82">${_hgEsc(_hgTr(inf.client,20))}</text>`:''}`;
+  });
+  return {g,top:HY,bottom:Yd+10+tarH};
+}
+function _hgSvg(mon){
+  const W=1123,H=794, F="font-family=\"Segoe UI,Roboto,Helvetica,Arial,sans-serif\"";
+  const days=[...Array(7)].map((_,i)=>fmt(addD(mon,i)));
+  const J=['Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.','Dim.'], MO=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const sun=addD(mon,6);
+  const per=mon.getMonth()===sun.getMonth()?`du lundi ${mon.getDate()} au dimanche ${sun.getDate()} ${MO[sun.getMonth()]} ${sun.getFullYear()}`:`du lundi ${mon.getDate()} ${MO[mon.getMonth()]} au dimanche ${sun.getDate()} ${MO[sun.getMonth()]} ${sun.getFullYear()}`;
+  let g=`<rect width="${W}" height="${H}" fill="#fff"/>`;
+  // En-tête
+  g+=`<text x="26" y="44" ${F} font-size="19" font-weight="800" fill="#0f1e3d">MARDAM <tspan fill="#2979ff">AeroDesk</tspan> Pro</text>
+    <text x="${W-26}" y="34" ${F} font-size="12" fill="#5a6b85" text-anchor="end">Occupation hangar · LFBF</text><text x="${W-26}" y="50" ${F} font-size="12" fill="#5a6b85" text-anchor="end">Édité le ${new Date().toLocaleDateString('fr-FR')}</text>
+    <rect x="26" y="60" width="${W-52}" height="3" fill="#2979ff"/>
+    <text x="26" y="94" ${F} font-size="20" font-weight="800" fill="#0f1e3d">Semaine ${wkN(mon)} — ${per}</text>
+    <text x="26" y="113" ${F} font-size="12" fill="#5a6b85">Disposition du hangar au lundi ${disp(days[0])} · position 3 au milieu, reculée (dérive hors des portes)</text>`;
+  g+=_hgPlan(days[0]).g;
+  // ── Tableau lundi → dimanche
+  const TX=640,TY=128,TW=W-26-TX, DW=92, PW=(TW-DW)/3, HR=32;
+  const rowH=i=>i<5?58:40;
+  g+=`<rect x="${TX}" y="${TY}" width="${TW}" height="${HR}" fill="#f3f6fb" stroke="#d6dfeb"/><text x="${TX+DW/2}" y="${TY+20}" ${F} font-size="11" font-weight="800" fill="#3b4a63" text-anchor="middle">JOUR</text>`;
+  [1,2,3].forEach((p,i)=>{ const x=TX+DW+i*PW; g+=`<rect x="${x}" y="${TY}" width="${PW}" height="${HR}" fill="#f3f6fb" stroke="#d6dfeb"/><text x="${x+PW/2}" y="${TY+20}" ${F} font-size="11" font-weight="900" fill="${_HG_POS[p].dark}" text-anchor="middle">POSITION ${p}</text>`; });
+  let y=TY+HR; const moves=[];
+  days.forEach((ds,di)=>{
+    const h=rowH(di), we=di>=5;
+    g+=`<rect x="${TX}" y="${y}" width="${DW}" height="${h}" fill="${we?'#f6f8fb':'#fafcff'}" stroke="#d6dfeb"/><text x="${TX+10}" y="${y+h/2+5}" ${F} font-size="12.5" font-weight="800" fill="${we?'#8094ad':'#0f1e3d'}">${J[di]} ${disp(ds).slice(0,5)}</text>`;
+    [1,2,3].forEach((p,i)=>{
+      const x=TX+DW+i*PW, e=_hgAt(p,ds), inf=_hgInfo(e), prev=_hgAt(p,fmt(addD(parseLocal(ds),-1)));
+      const chg=di>0 && (e?e.id:'')!==(prev?prev.id:'');
+      if(di>0 && chg){ const a=_hgInfo(prev), b=inf; if(a&&b) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : MSN ${a.msn} sort, MSN ${b.msn} entre`); else if(a) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : sortie MSN ${a.msn} (fin le ${disp(prev.fin).slice(0,5)})`); else if(b) moves.push(`${J[di]} ${disp(ds).slice(0,5)} · Pos. ${p} : entrée MSN ${b.msn}`); }
+      if(di===0 && e && e.debut===ds) moves.push(`${J[0]} ${disp(ds).slice(0,5)} · Pos. ${p} : entrée MSN ${inf.msn}`);
+      g+=`<rect x="${x}" y="${y}" width="${PW}" height="${h}" fill="${chg&&inf?'#fff7e6':we?'#fbfcfe':'#fff'}" stroke="#d6dfeb"/>`;
+      if(!inf){ g+=`<text x="${x+PW/2}" y="${y+h/2+5}" ${F} font-size="12" font-style="italic" fill="#b8c4d6" text-anchor="middle">libre</text>`; return; }
+      g+=`<rect x="${x}" y="${y}" width="4" height="${h}" fill="${_HG_POS[p].dark}" opacity=".75"/>`;
+      if(we) g+=`<text x="${x+PW/2}" y="${y+h/2+5}" ${F} font-size="13" font-weight="800" fill="#0f1e3d" text-anchor="middle">${_hgEsc(inf.msn)}${chg?' ↗':''}</text>`;
+      else g+=`<text x="${x+PW/2}" y="${y+24}" ${F} font-size="14" font-weight="900" fill="#0f1e3d" text-anchor="middle">${_hgEsc(inf.msn)}${chg?' ↗':''}</text>
+        <text x="${x+PW/2}" y="${y+40}" ${F} font-size="10" font-weight="600" fill="#5a6b85" text-anchor="middle">${_hgEsc(_hgTr(inf.type+(inf.client?' · '+inf.client:''),Math.floor(PW/6.2)))}</text>`;
+    });
+    y+=h;
+  });
+  // Sorties en fin de semaine (dimanche dernier jour d'occupation)
+  [1,2,3].forEach(p=>{ const e=_hgAt(p,days[6]); if(e&&e.fin===days[6]) moves.push(`${J[6]} ${disp(days[6]).slice(0,5)} · Pos. ${p} : dernier jour MSN ${e.msn}`); });
+  y+=26;
+  g+=`<text x="${TX}" y="${y}" ${F} font-size="13" font-weight="800" fill="#0f1e3d">Mouvements de la semaine</text>`;
+  (moves.length?moves:['Aucun mouvement : même disposition toute la semaine.']).slice(0,9).forEach((m,i)=>{ g+=`<text x="${TX}" y="${y+22+i*19}" ${F} font-size="12" fill="#3b4a63">${moves.length?'• ':''}${_hgEsc(m)}</text>`; });
+  g+=`<line x1="26" y1="${H-30}" x2="${W-26}" y2="${H-30}" stroke="#dde6f0"/><text x="26" y="${H-14}" ${F} font-size="10" fill="#8094ad">MARDAM AeroDesk Pro · extrait occupation hangar · semaine ${wkN(mon)}</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}</svg>`;
+}
+function renderSlotPlan(){
+  const el=document.getElementById('slot-plan'); if(!el) return;
+  const ds=fmt(new Date()), P=_hgPlan(ds);
+  el.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 ${P.top-6} 592 ${P.bottom-P.top+12}" preserveAspectRatio="xMidYMid meet">${P.g}</svg>`;
+}
+function openHangarExtract(){
+  const base=new Date(); _hgMon=getMon(base); _hgRender(); openM('m-hangar-ext');
+}
+function _hgShift(n){ _hgMon=addD(_hgMon,7*n); _hgRender(); }
+function _hgRender(){ const el=document.getElementById('hg-prev'); if(!el) return; el.innerHTML=_hgSvg(_hgMon);
+  const t=document.getElementById('hg-title'); if(t) t.textContent=`🖨 Extrait hangar — Semaine ${wkN(_hgMon)}`; }
+function hangarExtractPDF(){
+  const svg=_hgSvg(_hgMon);
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>Hangar S${wkN(_hgMon)}</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0;background:#fff}svg{width:297mm;height:210mm;display:block}@media screen{body{background:#e9edf3}svg{width:100%;height:auto;max-width:1123px;margin:10px auto;box-shadow:0 6px 30px rgba(0,0,0,.18)}}</style></head><body>${svg}</body></html>`;
+  openPrintView(html,`Extrait hangar — Semaine ${wkN(_hgMon)}`);
+}
+function hangarExtractPNG(){
+  const svg=_hgSvg(_hgMon), url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+  const img=new Image();
+  img.onload=()=>{ const sc=2, c=document.createElement('canvas'); c.width=1123*sc; c.height=794*sc; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+    c.toBlob(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`Hangar_S${String(wkN(_hgMon)).padStart(2,'0')}_${_hgMon.getFullYear()}.png`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); toast('🖼 Image de l\'extrait téléchargée'); },'image/png'); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); toast('Impossible de générer l\'image'); };
+  img.src=url;
+}
+
 function renderSlot(){
   if(!S.slot) S.slot={entries:[]};
   const now=new Date();
@@ -5655,6 +5883,7 @@ function updateSlotPositionLabels(){
 }
 
 function renderSlotGrid(){
+  try{ renderSlotPlan(); }catch(_){}
   const el=document.getElementById('slot-grid');
   if(!el) return;
   const prevScroll=el.scrollLeft;
@@ -7435,6 +7664,7 @@ const GUIDE_DATA = {
   "Stockage / Recyclage / Slot": { icon:"🅿️", color:"#ff9a3c", steps:[
     {t:"Ajouter un avion", d:"Onglets <b>Stockage</b> ou <b>A/C Recyclage</b> → ajoute l'avion (type, MSN, dates). Le recyclage suit l'avancement du démantèlement.", ill:null},
     {t:"Marquer terminé (recyclage)", d:"Quand un avion est démantelé, passe-le en <b>Terminé</b> : il compte alors dans le KPI <b>avions recyclés</b> de l'année.", ill:null},
+    {t:"Slot Hangar — extrait semaine", d:"Bouton <b>🖨 Extrait semaine</b> : une page A4 paysage avec le <b>plan du hangar vu de dessus</b> au lundi (position 1 à gauche, position 2 à droite, position 3 au milieu et reculée : nez au niveau des ailes, dérive hors des portes ; silhouette réaliste selon le type d'avion, MSN et client sur le tarmac) et le <b>tableau du lundi au dimanche</b> avec les MSN par position et les mouvements de la semaine. ◀ ▶ pour changer de semaine, <b>🖨 PDF / Imprimer</b> ou <b>🖼 Image PNG</b> pour l'envoyer.", ill:null},
     {t:"Slot Hangar — copier/coller", d:"Dans <b>🏭 Slot Hangar</b> : <b>glisse</b> sur une ligne de position pour sélectionner une plage, puis <b>Copier</b> un MSN et <b>Coller</b> ailleurs (Ctrl+C / Ctrl+V). <b>Libérer</b> retire l'occupation.", ill:null},
   ]},
   "Formations & Autorisations": { icon:"📋", color:"#ffd060", steps:[
@@ -19444,6 +19674,12 @@ function _fr24SearchHtml(){
   return `<div class="fr24-bar"><span class="fr24-ic">🔍</span><input id="fr24-q" type="text" placeholder="Immatriculation (F-HBNA) ou n° de vol (AFR1234)" autocomplete="off" oninput="_fr24Hint(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();_fr24Go();}"><span id="fr24-kind" class="fr24-kind"></span><button onclick="_fr24Go()">📡 Suivre sur FR24</button></div>
   ${rec.length?`<div class="fr24-rec"><span class="bv-mut" style="font-size:10.5px;font-weight:700">Récents :</span>${rec.map(x=>`<span class="fr24-chip" onclick="_fr24Go('${x.q}')" title="Rouvrir sur Flightradar24">${x.k==='vol'?'✈':'🛩'} ${_bfEsc(x.q)}<b onclick="event.stopPropagation();_fr24Forget('${x.q}')" title="Retirer">✕</b></span>`).join('')}</div>`:''}`; }
 function _fr24Hint(v){ const e=document.getElementById('fr24-kind'); if(!e) return; const k=_fr24Kind(v); e.textContent=k==='vol'?'n° de vol':k==='immat'?'immatriculation':''; e.style.display=k?'inline-block':'none'; }
+// Listes du brief : repliées au-delà de N éléments, dépliables (tout est imprimé)
+window._bfExp=window._bfExp||{};
+function _bfToggle(k){ window._bfExp[k]=!window._bfExp[k]; const b=document.getElementById('brief-body'), y=b?b.scrollTop:0; _briefRender(); if(b) b.scrollTop=y; }
+function _bfLim(k,n,print){ return (print||window._bfExp[k])?Infinity:n; }
+function _bfMore(k,total,n,print){ if(print||total<=n) return ''; const o=!!window._bfExp[k];
+  return `<a href="#" class="bv-more" onclick="event.preventDefault();_bfToggle('${k}')">${o?'▴ Réduire':`▾ Voir les ${total-n} autre${total-n>1?'s':''}`}</a>`; }
 function _bfAv(p,print){ const c=_ncolCol(p.categorie); return print?`<span class="bv-av" style="border-color:${c};background:${hexRgba(c,.18)}">${_bfEsc(p.trigramme||'')}</span>`:`<span class="bv-av" style="border-color:${c};background:${hexRgba(c,.2)};color:${_lightenForDark(c)}">${_bfEsc(p.trigramme||(p.nom||'?').slice(0,3))}</span>`; }
 function _briefExtra(R){
   const ds=R.ds, d=parseLocal(ds);
@@ -19506,21 +19742,22 @@ function _briefHtml(R,print){
         <div class="bv-tri">${x.team.map(p=>{ const i=_authBest(p.id).groups.some(g=>/^I/.test(g.lbl)); return `<span class="${i?'i':''}" title="${_bfEsc(p.nom+' '+p.prenom)}${_authBest(p.id).text?' · '+_bfEsc(_authBest(p.id).text):''}">${_bfEsc(p.trigramme||p.nom)}</span>`; }).join('')||'<span class="bv-mut" style="border:none">personne affectée</span>'}</div></div>
         <div class="bv-n"><b style="color:${x.manque?'#ffb340':'inherit'}">${x.n}</b>${x.besoin!=null?`<small> / ${x.besoin}</small>`:''}<br>${st}${x.insp?`<div class="bv-mut" style="margin-top:2px">${x.insp} insp.</div>`:''}</div></div>`; }).join('');
     c+=R.autres.map(a=>`<div class="bv-ch"><div class="bv-bar" style="background:#6d8fb0"></div><div class="bv-chm"><div class="bv-tt">${_bfEsc(a.label)}</div><div class="bv-tri">${_sortByNom(a.ids.map(byId).filter(Boolean)).map(p=>`<span title="${_bfEsc(p.nom+' '+p.prenom)}">${_bfEsc(p.trigramme||p.nom)}</span>`).join('')}</div></div><div class="bv-n"><b>${a.n}</b></div></div>`).join('');
+    if(R.sansAff.length && !print){ const sa=_sortByNom(R.sansAff); c+=`<div class="bv-sa"><a href="#" class="bv-more" onclick="event.preventDefault();_bfToggle('sa')">${window._bfExp.sa&&!print?'▴ Masquer':'▾ Voir'} les ${sa.length} non affecté${sa.length>1?'s':''}</a>${(window._bfExp.sa&&!print)?`<div class="bv-tri" style="margin-top:6px">${sa.map(p=>`<span title="${_bfEsc(p.nom+' '+(p.prenom||''))}">${_bfEsc(p.trigramme||p.nom)}</span>`).join('')}</div>`:''}</div>`; }
     L+=box('🛠','Chantiers du jour',c,`${R.cards.length} chantier${R.cards.length>1?'s':''}${R.sansAff.length?` · <span title="${_bfEsc(R.sansAff.map(p=>_bfNom(p)).join(', '))}">${R.sansAff.length} non affecté${R.sansAff.length>1?'s':''}</span>`:''}`);
   }
   // ── colonne droite
   let Rt='';
-  if(R.om.length) Rt+=box('📝','Ordres de mission à faire',R.om.slice(0,12).map(b=>{ const p=byId(b.empId); const late=b.j<=2;
-      return `<div class="bv-om${late?' late':''}">${_bfAv(p,print)}<div style="flex:1;min-width:0"><div><b>${nm(p)}</b> · ${b.type==='deplacement'?'🚗 Déplacement':'🎓 Formation externe'}${b.notes.length?` <span class="bv-mut">— ${_bfEsc(b.notes.join(', '))}</span>`:''}</div><div class="bv-mut">${disp(b.start)}${b.end!==b.start?' → '+disp(b.end):''} · ${b.j===0?'<b style="color:#ff8fa3">aujourd\'hui — dernier rappel</b>':rel(b.start)}</div></div>${print?'<span class="bv-ck">☐</span>':`<span class="bv-omact"><button class="bv-okb" onclick="_omValidate('${b.key}')" title="Ordre de mission fait">✓ Fait</button><button class="bv-nob" onclick="_omSkip('${b.key}')" title="Pas besoin d'ordre de mission pour celui-ci">Pas besoin</button></span>`}</div>`; }).join('')+(R.om.length>12?`<div class="bv-mut">… +${R.om.length-12} autre(s)</div>`:''),`${R.om.length} en attente`,'bv-ombox');
+  if(R.om.length) Rt+=box('📝','Ordres de mission à faire',R.om.slice(0,_bfLim('om',12,print)).map(b=>{ const p=byId(b.empId); const late=b.j<=2;
+      return `<div class="bv-om${late?' late':''}">${_bfAv(p,print)}<div style="flex:1;min-width:0"><div><b>${nm(p)}</b> · ${b.type==='deplacement'?'🚗 Déplacement':'🎓 Formation externe'}${b.notes.length?` <span class="bv-mut">— ${_bfEsc(b.notes.join(', '))}</span>`:''}</div><div class="bv-mut">${disp(b.start)}${b.end!==b.start?' → '+disp(b.end):''} · ${b.j===0?'<b style="color:#ff8fa3">aujourd\'hui — dernier rappel</b>':rel(b.start)}</div></div>${print?'<span class="bv-ck">☐</span>':`<span class="bv-omact"><button class="bv-okb" onclick="_omValidate('${b.key}')" title="Ordre de mission fait">✓ Fait</button><button class="bv-nob" onclick="_omSkip('${b.key}')" title="Pas besoin d'ordre de mission pour celui-ci">Pas besoin</button></span>`}</div>`; }).join('')+(_bfMore('om',R.om.length,12,print)),`${R.om.length} en attente`,'bv-ombox');
   const mv=[]; R.retours.forEach(p=>mv.push({p,t:'↩ retour',c:'#6effc4'}));
   (S.personnel||[]).forEach(p=>{ const a=p.debutContrat||p.dateEmbauche; if(a===R.ds && p.actif!==false) mv.push({p,t:'★ 1er jour',c:'#7fd4ff'}); });
   R.departs.forEach(x=>mv.push({p:x.p,t:`${(x.why||'absent').toLowerCase()} dès demain`,c:'#ff8fa3'}));
   R.contrats.filter(x=>x.j<=7).forEach(x=>mv.push({p:x.p,t:x.j===0?'fin de contrat ce soir':`fin de contrat J+${x.j}`,c:'#ffb340'}));
   Object.keys(R.abs).forEach(k=>R.abs[k].forEach(x=>mv.push({p:x.p,t:(HD_LBL[k]||k)+(x.when?' ('+x.when+')':''),c:'#9fb0c8',abs:true})));
-  if(mv.length) Rt+=box('🔁','Présences & mouvements',mv.map(m=>`<div class="bv-mv${m.abs?' abs':''}">${_bfAv(m.p,print)}<span class="bv-nm">${nm(m.p)}</span><span class="bv-tag" style="color:${m.c};border-color:${hexRgba(m.c,.4)}">${_bfEsc(m.t)}</span></div>`).join(''));
+  if(mv.length) Rt+=box('🔁','Présences & mouvements',mv.slice(0,_bfLim('mv',10,print)).map(m=>`<div class="bv-mv${m.abs?' abs':''}">${_bfAv(m.p,print)}<span class="bv-nm">${nm(m.p)}</span><span class="bv-tag" style="color:${m.c};border-color:${hexRgba(m.c,.4)}">${_bfEsc(m.t)}</span></div>`).join('')+_bfMore('mv',mv.length,10,print));
   const fk=Object.keys(R.form);
   if(fk.length||R.vm.length) Rt+=box('📚','Formations & visites médicales',fk.map(k=>`<div class="bv-li">📖 <b>${_bfEsc(k)}</b> <span class="bv-mut">· ${R.form[k].map(x=>_bfEsc(x.p.trigramme||_bfNom(x.p))+(x.when?` (${x.when})`:'')).join(', ')}</span></div>`).join('')+R.vm.map(v=>`<div class="bv-li">🩺 Visite médicale · <b>${_bfEsc(v.t)}</b> <span class="bv-mut">· ${nm(v.p)}</span></div>`).join(''));
-  if(R.avions.length) Rt+=box('✈️','Avions — entrées & sorties',R.avions.map(a=>`<div class="bv-li">${a.ic} <span class="bv-tag" style="color:${a.kind==='in'?'#6effc4':'#7fd4ff'};border-color:${a.kind==='in'?'rgba(110,255,196,.4)':'rgba(127,212,255,.4)'}">${a.kind==='in'?'Arrivée':'Sortie'}</span> <b>${_bfEsc(a.lbl)}</b>${a.immat?` <span class="bv-imm">${_bfEsc(a.immat)}</span>`:''}${a.sub?` <span class="bv-mut">${_bfEsc(a.sub)}</span>`:''}${print?'':' '+_fr24Link(a,a.vol?'Vol '+a.vol:'Suivre')} <span class="bv-when">${rel(a.date)}</span></div>`).join(''),`7 prochains jours${print?'':' · <a href="'+_fr24Url()+'" target="_blank" rel="noopener">📡 Radar LFBF</a>'}`);
+  if(R.avions.length) Rt+=box('✈️','Avions — entrées & sorties',R.avions.slice(0,_bfLim('av',8,print)).map(a=>`<div class="bv-li">${a.ic} <span class="bv-tag" style="color:${a.kind==='in'?'#6effc4':'#7fd4ff'};border-color:${a.kind==='in'?'rgba(110,255,196,.4)':'rgba(127,212,255,.4)'}">${a.kind==='in'?'Arrivée':'Sortie'}</span> <b>${_bfEsc(a.lbl)}</b>${a.immat?` <span class="bv-imm">${_bfEsc(a.immat)}</span>`:''}${a.sub?` <span class="bv-mut">${_bfEsc(a.sub)}</span>`:''}${print?'':' '+_fr24Link(a,a.vol?'Vol '+a.vol:'Suivre')} <span class="bv-when">${rel(a.date)}</span></div>`).join('')+_bfMore('av',R.avions.length,8,print),`7 prochains jours${print?'':' · <a href="'+_fr24Url()+'" target="_blank" rel="noopener">📡 Radar LFBF</a>'}`);
   if(!print){ const on=_briefLiveOn();
     L=L.replace('<!--FR24-->',()=>box('📡','Suivi des avions', _fr24SearchHtml()+(on?`<div class="bv-live"><iframe src="${_liveMapUrl()}" loading="lazy" referrerpolicy="no-referrer" title="Carte ADS-B en direct"></iframe></div><div class="bv-mut" style="font-size:10.5px;margin-top:6px">Carte ADS-B communautaire (airplanes.live). Si elle reste vide, ton réseau bloque le site : utilise <a style="color:#7fd4ff" href="${_fr24Url()}" target="_blank" rel="noopener">Flightradar24</a>.</div>`
       :`<div class="bv-mut" style="font-size:11.5px;margin-top:8px">▶ « Afficher la carte » pour voir ici les avions en vol autour de Francazal, en direct.</div>`),
@@ -19528,11 +19765,11 @@ function _briefHtml(R,print){
   if(R.crit.length && R.crit.some(c=>c.bad)) Rt+=box('🎯','Compétences critiques',R.crit.filter(c=>c.bad).map(c=>`<div class="bv-li"><b>${_bfEsc(c.label)}</b> <span style="color:#ff8fa3;font-weight:800">${c.n}/${c.min} présent(s)</span></div>`).join(''));
   let ec='';
   if(R.nbExpired) ec+=`<div class="bv-li"><span style="color:#ff8fa3;font-weight:800">${R.nbExpired} déjà expirée(s)</span> <span class="bv-mut">(détail dans les Alertes)</span></div>`;
-  R.ech.slice(0,8).forEach(x=>{ ec+=`<div class="bv-li">${_bfEsc(x.type)} · <b>${_bfEsc(_bfNom(x.emp))}</b> <span class="bv-when">${x.days===0?'aujourd\'hui':'J+'+x.days}</span></div>`; });
-  if(R.ech.length>8) ec+=`<div class="bv-mut">… +${R.ech.length-8} autre(s)</div>`;
+  R.ech.slice(0,_bfLim('ech',8,print)).forEach(x=>{ ec+=`<div class="bv-li">${_bfEsc(x.type)} · <b>${_bfEsc(_bfNom(x.emp))}</b> <span class="bv-when">${x.days===0?'aujourd\'hui':'J+'+x.days}</span></div>`; });
+  ec+=_bfMore('ech',R.ech.length,8,print);
   if(ec) Rt+=box('⏰','Échéances sous 30 jours',ec);
   let tk='';
-  if(R.todoLate.length) tk+=`<div class="bv-li"><span style="color:#ff8fa3;font-weight:800">En retard (${R.todoLate.length})</span> <span class="bv-mut">${R.todoLate.slice(0,5).map(t=>_bfEsc(t.text||t.titre||'')).join(' · ')}</span></div>`;
+  if(R.todoLate.length) tk+=`<div class="bv-li"><span style="color:#ff8fa3;font-weight:800">En retard (${R.todoLate.length})</span> <span class="bv-mut">${R.todoLate.slice(0,_bfLim('todo',5,print)).map(t=>_bfEsc(t.text||t.titre||'')).join(' · ')}</span> ${_bfMore('todo',R.todoLate.length,5,print)}</div>`;
   if(R.todoDay.length) tk+=`<div class="bv-li"><b>Pour ce jour (${R.todoDay.length})</b> <span class="bv-mut">${R.todoDay.map(t=>_bfEsc(t.text||t.titre||'')).join(' · ')}</span></div>`;
   if(R.cl && R.cl.left.length) tk+=`<div class="bv-li"><b>Check-list</b> <span class="bv-mut">${R.cl.left.length} restante(s) sur ${R.cl.total}</span></div>`;
   if(tk) Rt+=box('✅','Tâches',tk);
