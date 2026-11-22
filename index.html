@@ -2362,6 +2362,16 @@ html.is-touch .ptable .hd{transition:none!important}
 .nt-li{position:relative}
 .nt-li .nt-x{position:static;flex-shrink:0;margin:4px 0 0 4px;background:rgba(255,77,109,.12);color:#ff8fa3;border:1px solid rgba(255,77,109,.35)}
 .nt-li .nt-x:hover{background:#ff4d6d;color:#fff}
+
+html.dg-noanim *,html.dg-noanim *::before,html.dg-noanim *::after{animation:none!important;transition:none!important}
+html.dg-nostick .ptable th,html.dg-nostick .ptable td,html.dg-nostick .ptable tr,html.dg-nostick .bn-sep-in{position:static!important}
+html.dg-simple .ptable .hd{border-radius:0!important;background-image:none!important;box-shadow:none!important;font-size:0!important;position:static!important}
+html.dg-simple .ptable .hd *{display:none!important}
+#diag-ov .dg-next{margin-top:10px;font-size:12px;color:#b6c0da}#diag-ov .dg-next div{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}#diag-ov .dg-next button{width:auto;margin:0;height:32px;padding:0 12px;border-radius:999px;background:rgba(142,162,255,.16);border-color:rgba(142,162,255,.45)}
+#diag-ov table.dg-cmp{margin:4px 0 8px}#diag-ov .dg-cmp th{font-size:11px;color:#97a3c0;text-align:right;font-weight:600}#diag-ov .dg-cmp th:first-child{text-align:left}#diag-ov .dg-cmp td{font-size:12px}
+#diag-ov .dg-card{max-height:calc(100vh - 40px);overflow:auto}
+/* tactile : pas d'animation en boucle (logo, pastille d'alerte) — elles forcent un rendu à chaque image */
+html.is-touch .logo-icon,html.is-touch .alert-pill,html.is-touch .alert-pill *{animation:none!important}
 </style>
 </head>
 <body>
@@ -11205,8 +11215,8 @@ function buildGrid(emps,dates,containerId){
       const pmDivStyle = (pmTwo ? 'padding:0;overflow:hidden' : pmStyle) + (pmGap?gapStyle:'');
       return`<td>
         <div class="hw">
-          <div class="hd ${amCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="AM" data-r="${rowIdx}" data-c="${dayIdx*2}" style="position:relative;${amDivStyle}" ${amClick} title="${at==='formation_int'&&am.formInt?'Formation · '+am.formInt:amTitle2}${am.vm?' · VM '+am.vm:''}">${amInner}${vmBadge(am.vm)}</div>
-          <div class="hd ${pmCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="PM" data-r="${rowIdx}" data-c="${dayIdx*2+1}" style="position:relative;${pmDivStyle}" ${pmClick} title="${pt==='formation_int'&&pm.formInt?'Formation · '+pm.formInt:pmTitle2}${pm.vm?' · VM '+pm.vm:''}">${pmInner}${vmBadge(pm.vm)}</div>
+          <div class="hd ${amCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="AM" data-r="${rowIdx}" data-c="${dayIdx*2}" style="${am.vm?'position:relative;':''}${amDivStyle}" ${amClick} title="${at==='formation_int'&&am.formInt?'Formation · '+am.formInt:amTitle2}${am.vm?' · VM '+am.vm:''}">${amInner}${vmBadge(am.vm)}</div>
+          <div class="hd ${pmCls}" data-emp="${emp.id}" data-ds="${ds}" data-half="PM" data-r="${rowIdx}" data-c="${dayIdx*2+1}" style="${pm.vm?'position:relative;':''}${pmDivStyle}" ${pmClick} title="${pt==='formation_int'&&pm.formInt?'Formation · '+pm.formInt:pmTitle2}${pm.vm?' · VM '+pm.vm:''}">${pmInner}${vmBadge(pm.vm)}</div>
         </div>
       </td>`;
     }).join('');
@@ -13932,12 +13942,16 @@ function openStorage(){
 const _yearOfPlanKey = k => { const p=k.split('_'); return (p[p.length-2]||'').slice(0,4); };  // empId_YYYY-MM-DD_AM
 const _yearOfRealKey = k => { const p=k.split('_'); return (p[p.length-1]||'').slice(0,4); };  // chId_empId_YYYY-MM-DD
 
+let _archYC=null;
 function archivableYears(){
   const cur=new Date().getFullYear(), y={};
-  Object.keys(S.planning||{}).forEach(k=>{ const a=_yearOfPlanKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
+  const pk=Object.keys(S.planning||{}), sig=cur+'|'+pk.length+'|'+Object.keys(S.realHours||{}).length+'|'+Object.keys(S.realBreak||{}).length+'|'+(pk[0]||'')+'|'+(pk[pk.length-1]||'');
+  if(_archYC&&_archYC.sig===sig&&_archYC.S===S) return _archYC.res.map(r=>({...r}));   // calcul mémorisé : il parcourait tout le planning à chaque affichage
+  pk.forEach(k=>{ const a=_yearOfPlanKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
   Object.keys(S.realHours||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
   Object.keys(S.realBreak||{}).forEach(k=>{ const a=_yearOfRealKey(k); if(/^\d{4}$/.test(a)&&+a<cur) y[a]=(y[a]||0)+1; });
-  return Object.keys(y).sort().map(a=>({year:+a, entries:y[a]}));
+  const res=Object.keys(y).sort().map(a=>({year:+a, entries:y[a]}));
+  _archYC={sig,S,res}; return res.map(r=>({...r}));
 }
 // Toutes les années présentes dans les données (archivables ou non) — pour expliquer l'état vide
 function _yearsPresent(){
@@ -27316,7 +27330,7 @@ let _bnxBusy=false;
 function _bnHarmonize(root){
   if(_bnxBusy||!document.body.classList.contains('th-bento')||!root) return; _bnxBusy=true;
   try{
-    const els=root.querySelectorAll('div,section,article,button,span,a,label,td,th,b,strong,small,p,h1,h2,h3,h4');
+    const els=root.querySelectorAll(['div','section','article','button','span','a','label','td','th','b','strong','small','p','h1','h2','h3','h4'].map(t=>t+':not(.ptable *)').join(','));   // les cases des plannings sont déjà au style Bento : on les saute
     let n=0;
     for(const el of els){
       if(n++>6000) break;
@@ -27794,30 +27808,40 @@ function _vrInit(el){
 }
 function _vrSoon(el){ if(!_IS_TOUCH_DEV) return; setTimeout(()=>{ try{ _vrInit(el); }catch(e){ console.warn('vr',e); } },450); }
 
-/* ═══ Diagnostic fluidité (Ctrl + K › « Diagnostic fluidité ») ═══ */
-function diagOpen(){
+/* ═══ Diagnostic fluidité (Ctrl + K › « Diagnostic fluidité ») — avec essais comparatifs sur l'appareil ═══ */
+const _DG_MODES={base:['Normal',''],noanim:['Sans animations','dg-noanim'],nostick:['Sans colonnes figées','dg-nostick'],simple:['Cases allégées','dg-simple'],all:['Tout combiné','dg-noanim dg-nostick dg-simple']};
+window._dgRes=window._dgRes||[];
+function _dgClear(){ document.documentElement.classList.remove('dg-noanim','dg-nostick','dg-simple'); }
+function diagClose(){ _dgClear(); const o=document.getElementById('diag-ov'); if(o) o.remove(); }
+function diagOpen(mode){
+  mode=mode||'base'; if(mode==='base') window._dgRes=[];
+  _dgClear(); const cls=_DG_MODES[mode][1]; if(cls) cls.split(' ').forEach(c=>document.documentElement.classList.add(c));
   let o=document.getElementById('diag-ov'); if(o) o.remove();
   o=document.createElement('div'); o.id='diag-ov';
-  o.innerHTML=`<div class="dg-card"><b>⏱️ Diagnostic fluidité</b><div id="dg-msg">Fais défiler le planning <b>pendant 5 secondes</b> (haut/bas puis gauche/droite)…</div><div class="dg-bar"><i id="dg-p"></i></div><button type="button" onclick="document.getElementById('diag-ov').remove()">Fermer</button></div>`;
+  o.innerHTML=`<div class="dg-card"><b>⏱️ Diagnostic fluidité${mode!=='base'?' · essai « '+_DG_MODES[mode][0]+' »':''}</b><div id="dg-msg">Fais défiler le planning <b>pendant 5 secondes</b> (haut/bas puis gauche/droite)…</div><div class="dg-bar"><i id="dg-p"></i></div><button type="button" onclick="diagClose()">Fermer</button></div>`;
   document.body.appendChild(o);
   const gaps=[]; let last=0, t0=0, started=false, done=false;
   const onS=()=>{ if(!started){ started=true; t0=performance.now(); last=t0; requestAnimationFrame(loop); } };
   document.addEventListener('scroll',onS,{passive:true,capture:true}); document.addEventListener('touchmove',onS,{passive:true}); document.addEventListener('wheel',onS,{passive:true});
-  const loop=t=>{ if(done) return; gaps.push(t-last); last=t; const p=Math.min(1,(t-t0)/5000); const pb=document.getElementById('dg-p'); if(pb) pb.style.width=(p*100)+'%'; if(p<1) requestAnimationFrame(loop); else finish(); };
+  const loop=t=>{ if(done) return; gaps.push(t-last); last=t; const pr=Math.min(1,(t-t0)/5000); const pb=document.getElementById('dg-p'); if(pb) pb.style.width=(pr*100)+'%'; if(pr<1) requestAnimationFrame(loop); else finish(); };
   const finish=()=>{ done=true; document.removeEventListener('scroll',onS,true); document.removeEventListener('touchmove',onS); document.removeEventListener('wheel',onS);
-    const g=gaps.slice(1).sort((x,y)=>x-y); const med=g[Math.floor(g.length/2)]||0, p95=g[Math.floor(g.length*.95)]||0, mx=g[g.length-1]||0;
+    const g=gaps.slice(1).sort((x,y)=>x-y); const med=g[Math.floor(g.length/2)]||0, mx=g[g.length-1]||0;
     const fps=Math.round(1000/(med||16.7)), jank=g.filter(x=>x>34).length, big=g.filter(x=>x>100).length;
+    window._dgRes.push({m:_DG_MODES[mode][0],fps,jank,n:g.length,big,mx:Math.round(mx)});
     const pg=document.querySelector('.page.on'); const all=document.getElementsByTagName('*').length, inPg=pg?pg.getElementsByTagName('*').length:0;
     let st=0,bf=0; if(pg) pg.querySelectorAll('*').forEach(e=>{ const cs=getComputedStyle(e); if(cs.position==='sticky') st++; const v=cs.backdropFilter||cs.webkitBackdropFilter; if(v&&v!=='none') bf++; });
-    const vr=pg&&pg.querySelector('.vr-sp')?'oui':'non';
+    const an=(document.getAnimations?document.getAnimations().length:0);
     const verdict=jank<=5&&big===0?'✅ Fluide':jank<=20&&big<=2?'🟡 Correct, quelques à-coups':'🔴 Saccadé';
-    document.getElementById('dg-msg').innerHTML=`<div class="dg-v">${verdict}</div><table>
+    const cmp=window._dgRes.length>1?`<table class="dg-cmp"><tr><th>Essai</th><th>img/s</th><th>à-coups</th><th>pire</th></tr>${window._dgRes.map(r=>`<tr><td>${r.m}</td><td>${r.fps}</td><td>${r.jank}/${r.n}</td><td>${r.mx} ms</td></tr>`).join('')}</table>`:'';
+    const next=Object.keys(_DG_MODES).filter(k=>k!=='base'&&!window._dgRes.some(r=>r.m===_DG_MODES[k][0]));
+    document.getElementById('dg-msg').innerHTML=`<div class="dg-v">${verdict}</div>${cmp}<table>
       <tr><td>Images / seconde</td><td><b>${fps}</b></td></tr><tr><td>À-coups (&gt;34 ms)</td><td><b>${jank}</b> sur ${g.length}</td></tr><tr><td>Gros blocages (&gt;100 ms)</td><td><b>${big}</b> · pire ${Math.round(mx)} ms</td></tr>
       <tr><td>Page</td><td>${pg?pg.id.replace('pg-',''):'?'} · ${document.body.classList.contains('th-bento')?'Bento':'Cockpit'}</td></tr>
       <tr><td>Écran</td><td>${innerWidth}×${innerHeight} · ×${devicePixelRatio}</td></tr>
-      <tr><td>Mode fluide tactile</td><td>${document.documentElement.classList.contains('is-touch')?'actif':'<b>inactif</b>'} · lignes allégées : ${vr}</td></tr>
-      <tr><td>Éléments (page / total)</td><td>${inPg} / ${all}</td></tr><tr><td>Collants · flous</td><td>${st} · ${bf}</td></tr>
-      <tr><td>Appareil</td><td style="font-size:10.5px">${_bfEsc(navigator.userAgent.replace(/Mozilla\/5\.0 /,'').slice(0,90))}</td></tr></table><div style="font-size:11.5px;opacity:.7;margin-top:6px">Fais une capture d'écran de ce résultat et envoie-la.</div>`;
+      <tr><td>Mode fluide tactile</td><td>${document.documentElement.classList.contains('is-touch')?'actif':'<b>inactif</b>'}</td></tr>
+      <tr><td>Éléments (page / total)</td><td>${inPg} / ${all}</td></tr><tr><td>Collants · flous · animations</td><td>${st} · ${bf} · ${an}</td></tr></table>
+      ${next.length?`<div class="dg-next">Essais comparatifs (le planning reste intact, c'est temporaire) :<div>${next.map(k=>`<button type="button" onclick="diagOpen('${k}')">${_DG_MODES[k][0]}</button>`).join('')}</div></div>`:'<div class="dg-next">Tous les essais sont faits.</div>'}
+      <div style="font-size:11.5px;opacity:.7;margin-top:6px">Fais une capture d'écran de ce résultat et envoie-la.</div>`;
   };
 }
 try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['⏱️','Diagnostic fluidité','diagnostic lenteur scroll defilement saccade performance ipad',()=>{ setTimeout(diagOpen,150); }]); }catch(_){}
