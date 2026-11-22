@@ -1541,6 +1541,8 @@ body.th-bento #pg-weekly > .gc{background:transparent;border:none;padding:0!impo
 body.th-bento #pg-weekly #weekSummary{display:none}
 body.th-bento #pg-weekly.bn-sum-on #weekSummary{display:block}
 body.th-bento #weeklyGrid.pscroll{overflow:visible}
+/* écran étroit : le planning hebdo défile latéralement (tous les chantiers ensemble), noms figés à gauche */
+@media(max-width:1100px){body.th-bento #pg-weekly > .gc{max-width:100%;min-width:0}body.th-bento #weeklyGrid.pscroll{overflow-x:auto;overflow-y:hidden;max-width:100%;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}}@media(max-width:760px){body.th-bento #weeklyGrid .bnw{min-width:792px}html body.th-bento #weeklyGrid .bnw-t th:first-child,html body.th-bento #weeklyGrid .bnw-t tr > td.ncol:first-child{position:sticky;left:0;z-index:8;background:#121a2c!important;background-color:#121a2c!important;box-shadow:-16px 0 0 #121a2c,8px 0 12px -6px rgba(0,0,0,.6)}body.th-bento #weeklyGrid .bnw-card{background:#121a2c}}
 body.th-bento #pg-master > .gc{padding:12px 12px 6px!important}
 /* cartes chantier (hebdo) */
 .bnw{display:flex;flex-direction:column;gap:12px}
@@ -2338,6 +2340,28 @@ html.is-touch .ls-card{background:rgba(14,19,33,.82);backdrop-filter:blur(10px);
 .lc-cap{font-size:11.5px;color:var(--t3,#97a3c0);margin-top:7px;text-align:center}
 .lc-sec input[type=range]{width:100%;max-width:300px;-webkit-appearance:auto;appearance:auto;background:none!important;border:0!important;height:auto!important;padding:0!important;box-shadow:none!important;accent-color:#8ea2ff}
 .lc-sw{width:42px;height:25px;border-radius:99px;background:rgba(255,255,255,.18);position:relative;flex-shrink:0;transition:background .15s}.lc-sw::after{content:'';position:absolute;left:3px;top:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left .15s}.lc-sw.on{background:#34c759}.lc-sw.on::after{left:20px}
+
+/* ═══ Diagnostic fluidité ═══ */
+#diag-ov{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:9900;pointer-events:none}
+#diag-ov .dg-card{pointer-events:auto;width:330px;max-width:calc(100vw - 32px);background:rgba(14,19,33,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:14px 16px;color:#e8ecff;font:500 13px 'Space Grotesk','Outfit',sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.55)}
+#diag-ov .dg-card > b{font-size:15px;display:block;margin-bottom:6px}
+#diag-ov .dg-bar{height:6px;border-radius:9px;background:rgba(255,255,255,.1);margin:10px 0;overflow:hidden}#diag-ov .dg-bar i{display:block;height:100%;width:0;background:#8ea2ff}
+#diag-ov table{width:100%;border-collapse:collapse;margin-top:6px}#diag-ov td{padding:3px 0;border-top:1px solid rgba(255,255,255,.06);vertical-align:top}#diag-ov td:last-child{text-align:right}
+#diag-ov .dg-v{font-size:17px;font-weight:700;margin:2px 0 4px}#diag-ov td:first-child{white-space:nowrap;padding-right:12px;color:#b6c0da}#diag-ov .dg-card{width:370px}
+#diag-ov button{margin-top:10px;width:100%;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e8ecff;font:600 13px inherit;cursor:pointer}
+/* tactile : ombres et transitions des cases de planning coûteuses à redessiner */
+html.is-touch .ptable th,html.is-touch .ptable td,html.is-touch .ptable .ncol,html.is-touch .ptable .ncol-head{box-shadow:none!important;transition:none!important}
+html.is-touch .ptable .hd{transition:none!important}
+
+/* supprimer une note en un geste */
+.nt-x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;display:grid;place-items:center;font:800 12px/1 sans-serif;cursor:pointer;padding:0;z-index:2;transition:opacity .15s,transform .15s}
+.nt-pi .nt-x{background:rgba(0,0,0,.14);color:rgba(30,30,30,.75)}
+.nt-pi .nt-x:hover{background:rgba(179,38,30,.85);color:#fff;transform:scale(1.08)}
+@media(hover:hover) and (pointer:fine){.nt-pi .nt-x{opacity:0}.nt-pi:hover .nt-x{opacity:1}}
+.nt-pi .nt-tx{padding-right:22px}
+.nt-li{position:relative}
+.nt-li .nt-x{position:static;flex-shrink:0;margin:4px 0 0 4px;background:rgba(255,77,109,.12);color:#ff8fa3;border:1px solid rgba(255,77,109,.35)}
+.nt-li .nt-x:hover{background:#ff4d6d;color:#fff}
 </style>
 </head>
 <body>
@@ -6189,14 +6213,18 @@ function connectGAS(){
     return;
   }
   if(!S.gdrive) S.gdrive={};
+  const _wasConnected=!!S.gdrive.connected && S.gdrive.gasUrl===url;
   S.gdrive.connected=true;
   S.gdrive.gasUrl=url;
   S.gdrive.device=_detectDevice();
-  save();
-  toast('✅ Google Drive connecté');
+  // SÉCURITÉ ANTI-PERTE : à la (re)connexion, on RÉCUPÈRE d'abord la copie du Drive, sans rien envoyer.
+  // Avant, save() datait la version locale « maintenant » puis l'envoyait : une installation vide écrasait le Drive.
+  if(!_wasConnected) delete S.gdrive.lastModified;   // la version du Drive est prioritaire
+  _driveFirstPull=true;
+  try{ _safeStorage.setItem('asp4',JSON.stringify(S)); }catch(e){}
+  toast('✅ Google Drive connecté — récupération de tes données…');
   if(typeof refreshGdriveUI==='function') refreshGdriveUI();
-  // Première récupération + sauvegarde
-  setTimeout(()=>pullFromDrive(false),600);
+  setTimeout(()=>pullFromDrive(false).finally(()=>{ _driveFirstPull=false; if(!S.gdrive.lastModified) schedDriveSync(); }),300);   // Drive vide : on y envoie les données de cet appareil
 }
 
 function disconnectGAS(){
@@ -6263,8 +6291,10 @@ function refreshGdriveUI(){
   if(url && S.gdrive?.gasUrl) url.value=S.gdrive.gasUrl;
 }
 
+let _driveFirstPull=false;
 function schedDriveSync(){
   if(!S.gdrive?.connected || !S.gdrive?.gasUrl) return;
+  if(_driveFirstPull){ clearTimeout(_driveSyncTimer); _driveSyncTimer=setTimeout(schedDriveSync,1500); return; }   // attendre la récupération du Drive avant d'envoyer
   clearTimeout(_driveSyncTimer);
   _driveSyncTimer=setTimeout(()=>{
     try{
@@ -8793,9 +8823,10 @@ const GUIDE_DATA = {
     {t:"Recherche éclair (Ctrl + K)", d:"Appuie sur <b>Ctrl + K</b> (ou ⌘ + K sur Mac), ou clique sur 🔍 en haut, pour tout retrouver d'un coup : une <b>personne</b> (nom, prénom, trigramme), un <b>chantier ou un avion</b> (client, type, MSN), un <b>onglet</b>, ou une <b>action</b> (« congé », « nouvelle tâche », « proposer les équipes », « extrait hangar »…). Tape « s48 » pour ouvrir le planning de la semaine 48, ou une immatriculation / un n° de vol pour le suivre sur Flightradar24. Flèches ↑↓ puis Entrée.", ill:null},
     {t:"iPad / iPhone : fluidité et barre du haut", d:"Sur tablette et téléphone, l'application passe toute seule en <b>mode fluide</b> : plus d'effet de flou derrière les cartes, fond d'écran immobile et seules les cartes visibles sont dessinées — le défilement des plannings ne saccade plus. La barre du haut garde 🔍, ↩️, les alertes, Drive et le stockage ; les autres actions (Backup, Restaurer, Utilisateurs, Apparence, mot de passe, déconnexion) sont dans le bouton <b>⋯</b>. Sur iPad/iPhone, ↩️ Annuler garde les 5 dernières actions (20 sur PC). Rien ne change sur ordinateur."},
     {t:"Synchronisation Drive au bon moment", d:"Tes modifications partent toujours sur le Drive automatiquement. Les nouveautés venant d'un autre appareil sont vérifiées à l'ouverture, au retour sur l'app et toutes les 5 min, mais <b>jamais en plein geste</b> : si tu fais défiler, saisis ou as une fenêtre ouverte, une pastille <b>↻ Nouvelles données</b> apparaît en bas et la mise à jour se fait seule à la première pause (ou tout de suite si tu appuies sur « Mettre à jour »). Tu restes sur le même écran, à la même position."},
-    {t:"Pense-bête (post-it)", d:"Sur le tableau de bord, la carte <b>📌 Pense-bête</b> (en Cockpit : <b>✈ Notes de bord</b>) garde tes petits rappels. <b>+ Note</b> : tu tapes, Entrée pour enregistrer (Maj + Entrée pour aller à la ligne). Choisis une couleur, une <b>date de rappel</b> si besoin (la note n'apparaît qu'à partir de ce jour-là ; « Voir les rappels à venir » pour les afficher) et coche <b>👥 Partagée</b> pour que tous les comptes la voient — sinon elle reste 🔒 perso. Coche la case quand c'est fait : la note reste barrée jusqu'au soir puis disparaît. Toutes les notes actives apparaissent aussi dans le <b>☀️ Brief du jour</b> (bandeau « À ne pas oublier ») et dans son impression. Seul l'auteur (ou un admin) peut modifier ou supprimer une note ; tout le monde peut la cocher. Ctrl + K retrouve une note par son texte."},
+    {t:"Pense-bête (post-it)", d:"Sur le tableau de bord, la carte <b>📌 Pense-bête</b> (en Cockpit : <b>✈ Notes de bord</b>) garde tes petits rappels. <b>+ Note</b> : tu tapes, Entrée pour enregistrer (Maj + Entrée pour aller à la ligne). Choisis une couleur, une <b>date de rappel</b> si besoin (la note n'apparaît qu'à partir de ce jour-là ; « Voir les rappels à venir » pour les afficher) et coche <b>👥 Partagée</b> pour que tous les comptes la voient — sinon elle reste 🔒 perso. Coche la case quand c'est fait : la note reste barrée jusqu'au soir puis disparaît. Toutes les notes actives apparaissent aussi dans le <b>☀️ Brief du jour</b> (bandeau « À ne pas oublier ») et dans son impression. Pour <b>supprimer</b> une note : touche le <b>✕</b> dans son coin (sur PC, il apparaît au survol) — ↩️ en haut la récupère si besoin. Seul l'auteur (ou un admin) peut modifier ou supprimer une note ; tout le monde peut la cocher. Ctrl + K retrouve une note par son texte."},
     {t:"MARDAM AeroMargin (calculs MPA)", d:"AeroMargin reste une application à part, mais s'ouvre directement depuis AeroDesk : icône <b>réacteur</b> dans le dock (Bento) ou bouton <b>AeroMargin</b> dans la barre du haut (Cockpit), ou Ctrl + K → « Ouvrir AeroMargin ». Elle s'affiche en plein écran ; <b>← AeroDesk</b> te ramène où tu étais (AeroMargin reste ouverte en arrière-plan). ↻ recharge, ↗ Onglet l'ouvre à part. Son adresse est déjà réglée (⚙️ pour la changer, admin). <b>Connexion unique</b> : AeroDesk te connecte tout seul à AeroMargin avec le même identifiant et le même mot de passe (gardé en mémoire le temps de la session, jamais enregistré). Après un simple rechargement de la page, ou si tes mots de passe diffèrent, AeroMargin te le demande une fois. Te déconnecter d'AeroDesk ferme aussi AeroMargin."},
     {t:"Page de connexion MARDAM", d:"La page d'accueil s'appelle maintenant <b>MARDAM · AeroDesk & AeroMargin</b>. Choisis <b>Ouvrir : AeroDesk / AeroMargin</b> avant de te connecter : avec AeroMargin, tu arrives directement sur le calcul MPA, déjà connecté (le choix est retenu sur l'appareil). La photo de fond change chaque jour, avec la grande heure, la date et la météo LFBF. <b>Admin</b> : 🎨 Apparence › « 🔐 Page de connexion » pour choisir le mode (chaque jour / fixe / au hasard), les photos de la rotation, l'assombrissement, la position de la carte, la couleur du bouton, l'heure et le choix AeroDesk / AeroMargin — appliqué sur tous les appareils par la synchro Drive."},
+    {t:"Diagnostic fluidité", d:"Si le défilement te paraît lent sur un appareil : Ctrl + K (ou 🔍) › « Diagnostic fluidité », puis fais défiler le planning pendant 5 secondes. Un résumé s'affiche (images par seconde, à-coups, mode fluide actif ou non, nombre d'éléments affichés) : fais-en une capture pour l'envoyer. Sur iPad et iPhone, les grands plannings n'affichent que les lignes proches de l'écran (les autres s'ajoutent au fil du défilement) pour rester fluides."},
     {t:"Mode TV atelier", d:"Le bouton <b>📺 Mode TV</b> du tableau de bord (ou Ctrl + K → « Mode TV ») ouvre un plein écran pour l'écran de l'atelier. Quatre pages défilent toutes les 20 s : <b>brief du jour</b> (chiffres, message, ODM), <b>plan du hangar</b> avec l'ordre de sortie, <b>équipes du jour</b> par chantier avec le chef, <b>météo et compteurs sécurité</b>. Clic ou → pour passer à la suivante, ← pour revenir, <b>Échap</b> pour quitter.", ill:null},
     {t:"Fonds d'écran — mes photos et photothèque", d:"Dans <b>🎨 Apparence</b> : <b>＋ Ajouter mes photos</b> importe tes photos (hangar, avions, équipe…) depuis le PC ou le téléphone ; elles sont recadrées et compressées automatiquement et <b>partagées avec toute l'équipe</b> (8 maximum). La <b>photothèque en ligne</b> propose des photos aviation libres de droits ; elles sont gardées sur l'appareil après le premier affichage. Les <b>réglages</b> permettent d'assombrir ou flouter la photo, de rendre les panneaux transparents, d'ajouter un zoom lent ou une parallaxe, et de <b>changer de photo chaque jour</b> ou à chaque ouverture. Ces réglages sont propres à chaque utilisateur.", ill:null},
     {t:"Bento — exports PDF et Excel", d:"Quand le thème <b>Bento</b> est actif, les exports prennent son style. Le <b>PDF du planning hebdo</b> présente une carte par activité (icône 🔧 maintenance, 🅿️ stockage, ♻️ recyclage, ✈️ Airbus…), avec des pastilles arrondies matin / après-midi, les avatars et les autorisations. L'<b>Excel du planning hebdo</b> est sans quadrillage, avec un bandeau coloré par activité, une colonne Autorisations et des cases pleines séparées par un liseré blanc. Les autres exports reprennent la police et les en-têtes Bento. En thème Cockpit, les exports restent ceux d'origine.", ill:null},
@@ -11254,6 +11285,7 @@ function buildGrid(emps,dates,containerId){
   window.PLGRIDS=window.PLGRIDS||{}; window.PLGRIDS[containerId]=_grid;
   window.PLGRID=_grid;
   if(typeof _plInit==='function') _plInit();
+  try{ if(typeof _vrSoon==='function') _vrSoon(el); }catch(_){}
   if(typeof _wheelHorizInit==='function') _wheelHorizInit();
   if(typeof _plApplyHighlight==='function') _plApplyHighlight();
 }
@@ -26032,7 +26064,10 @@ function exportAll(){
 function handleJsonImport(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=ev=>{try{const p=JSON.parse(ev.target.result);S={...S,...p};if(p.weekStart)S.weekStart=new Date(p.weekStart);save();location.reload();}catch(err){alert('Fichier invalide : '+err.message);}};
+  reader.onload=ev=>{try{let p=JSON.parse(ev.target.result); if(p&&p.data&&typeof p.data==='object'&&Array.isArray(p.data.personnel)&&!Array.isArray(p.personnel)) p=p.data;   /* accepte aussi une version téléchargée depuis le Drive (AeroStaff_Data.json) */
+    if(!p||!Array.isArray(p.personnel)){ alert('Ce fichier ne contient pas de données AeroDesk.'); return; } S={...S,...p};if(p.weekStart)S.weekStart=new Date(p.weekStart);save();   /* save() date la restauration « maintenant » : elle devient la version la plus récente */
+    try{ sessionStorage.setItem('mard_push_after_restore','1'); }catch(_){}
+    location.reload();}catch(err){alert('Fichier invalide : '+err.message);}};
   reader.readAsText(file);e.target.value='';
 }
 
@@ -26665,6 +26700,7 @@ function _dashInjectBtn(){
 // Passe « Bento » après chaque rendu (débouncée)
 let _bnPostPending=false;
 function _bnPost(){
+  if(window.__vrSwap) return;
   if(_bnPostPending) return; _bnPostPending=true;
   requestAnimationFrame(()=>{ _bnPostPending=false;
     if(!document.body.classList.contains('th-bento')){ const bar=document.getElementById('dash-bar'); if(bar) bar.remove(); return; }
@@ -27306,7 +27342,7 @@ function _bnHarmonize(root){
 }
 let _bnxT=null;
 function _bnHarmonizeSoon(){ clearTimeout(_bnxT); _bnxT=setTimeout(()=>{ if(!document.body.classList.contains('th-bento')) return; document.querySelectorAll('.page.on,.mbg.on .modal,.mbg.on .bf-modal,.sp.on').forEach(_bnHarmonize); },120); }
-(function(){ try{ new MutationObserver(muts=>{ if(!document.body.classList.contains('th-bento')) return; if(muts.some(m=>m.type==='childList'||(m.type==='attributes'&&m.attributeName==='class'&&m.target.classList&&(m.target.classList.contains('mbg')||m.target.classList.contains('page')||m.target.classList.contains('sp'))))) _bnHarmonizeSoon(); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']}); }catch(e){} })();
+(function(){ try{ new MutationObserver(muts=>{ if(!document.body.classList.contains('th-bento')||window.__vrSwap) return; if(muts.some(m=>m.type==='childList'||(m.type==='attributes'&&m.attributeName==='class'&&m.target.classList&&(m.target.classList.contains('mbg')||m.target.classList.contains('page')||m.target.classList.contains('sp'))))) _bnHarmonizeSoon(); }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']}); }catch(e){} })();
 
 /* ═══ Bento — Dock façon Apple : icônes d'app, verre dépoli, agrandissement au survol ═══ */
 const _DK_G={
@@ -27417,7 +27453,7 @@ function _hdrMoreInit(){
   const m=document.createElement('button'); m.id='hdr-more'; m.className='hbtn hbtn-ghost'; m.type='button'; m.title='Plus d\'actions'; m.textContent='⋯';
   hr.appendChild(m);
   const pop=document.createElement('div'); pop.id='hdr-more-pop'; document.body.appendChild(pop);
-  const close=()=>pop.classList.remove('on');
+  const close=()=>{ if(pop.classList.contains('on')) pop.classList.remove('on'); };
   m.addEventListener('click',e=>{
     e.stopPropagation();
     if(pop.classList.contains('on')){ close(); return; }
@@ -27461,6 +27497,8 @@ function _hdrFit(){
 function _syncSchedInit(){
   if(window.__syncSched) return; window.__syncSched=1;
   if(!S.gdrive?.connected||!S.gdrive?.gasUrl) return;
+  // Après une restauration : envoyer tout de suite la version restaurée sur le Drive (avant toute récupération)
+  try{ if(sessionStorage.getItem('mard_push_after_restore')){ sessionStorage.removeItem('mard_push_after_restore'); S.gdrive.lastModified=new Date().toISOString(); try{_safeStorage.setItem('asp4',JSON.stringify(S));}catch(_){} schedDriveSync(); setTimeout(()=>{ try{ toast('☁️ Version restaurée envoyée sur Google Drive'); }catch(_){} },2600); _lastPullAt=Date.now()+600000; } }catch(_){}
   setTimeout(()=>_whenIdle(()=>{ _lastPullAt=Date.now(); pullFromDrive(true); },20000),1200);
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') _softPull(); });
   setInterval(_softPull,300000);
@@ -27486,8 +27524,10 @@ function _ntMeta(n,ds){ const me=_ntMe(), o=[];
   if(n.due){ if(n.due<ds&&!n.done) o.push(`<span class="nt-due nt-late">⏰ depuis le ${_ntDd(n.due)}</span>`); else if(n.due===ds) o.push(`<span class="nt-due">📅 aujourd'hui</span>`); else o.push(`<span class="nt-due">📅 ${_ntDd(n.due)}</span>`); }
   o.push(n.sh?`<span>👥 ${n.by===me.login?'partagée':_bfEsc(_ntFirst(n))}</span>`:'<span>🔒 perso</span>');
   return `<div class="nt-meta">${o.join('')}</div>`; }
-function _ntPi(n,ds){ return `<div class="nt-pi nt-c-${n.c||'y'}${n.done?' done':''}" style="--r:${_ntRot(n.id)}deg" onclick="ntOpen('${n.id}')" title="Toucher pour modifier"><div class="nt-tx">${_bfEsc(n.t)}</div>${_ntMeta(n,ds)}<input type="checkbox" class="nt-ck" ${n.done?'checked':''} onclick="event.stopPropagation();ntDone('${n.id}',this.checked)" title="Fait"></div>`; }
-function _ntLi(n,ds){ return `<li class="nt-li${n.done?' done':''}" onclick="ntOpen('${n.id}')"><input type="checkbox" class="nt-ck" ${n.done?'checked':''} onclick="event.stopPropagation();ntDone('${n.id}',this.checked)" title="Fait"><span class="nt-dot nt-c-${n.c||'y'}"></span><div style="flex:1;min-width:0"><div class="nt-tx">${_bfEsc(n.t)}</div></div>${_ntMeta(n,ds)}</li>`; }
+function _ntCan(n){ const me=_ntMe(); return n.by===me.login||me.admin; }
+function _ntX(n){ return _ntCan(n)?`<button type="button" class="nt-x" onclick="event.stopPropagation();ntDel('${n.id}')" title="Supprimer la note" aria-label="Supprimer la note">✕</button>`:''; }
+function _ntPi(n,ds){ return `<div class="nt-pi nt-c-${n.c||'y'}${n.done?' done':''}" style="--r:${_ntRot(n.id)}deg" onclick="ntOpen('${n.id}')" title="Toucher pour modifier">${_ntX(n)}<div class="nt-tx">${_bfEsc(n.t)}</div>${_ntMeta(n,ds)}<input type="checkbox" class="nt-ck" ${n.done?'checked':''} onclick="event.stopPropagation();ntDone('${n.id}',this.checked)" title="Fait"></div>`; }
+function _ntLi(n,ds){ return `<li class="nt-li${n.done?' done':''}" onclick="ntOpen('${n.id}')"><input type="checkbox" class="nt-ck" ${n.done?'checked':''} onclick="event.stopPropagation();ntDone('${n.id}',this.checked)" title="Fait"><span class="nt-dot nt-c-${n.c||'y'}"></span><div style="flex:1;min-width:0"><div class="nt-tx">${_bfEsc(n.t)}</div></div>${_ntMeta(n,ds)}${_ntX(n)}</li>`; }
 function _ntBlocks(list,ds){ return `<div class="nt-board">${list.map(n=>_ntPi(n,ds)).join('')}</div><ul class="nt-list">${list.map(n=>_ntLi(n,ds)).join('')}</ul>`; }
 // ── Tableau de bord ──
 function _ntRender(){
@@ -27548,7 +27588,7 @@ function ntSave(){
   toast(_ntEdit?'📌 Note modifiée':(due&&due>fmt(new Date())?`📌 Rappel noté pour le ${_ntDd(due)}`:'📌 Note ajoutée'));
 }
 function ntDone(id,on){ const n=_ntAll().find(x=>x.id===id); if(!n) return; n.done=on?1:0; n.doneDs=on?fmt(new Date()):''; n.doneBy=on?_ntMe().login:''; save(); _ntRefresh(); }
-function ntDel(id){ id=id||_ntEdit; const i=_ntAll().findIndex(x=>x.id===id); if(i<0) return; S.notes.splice(i,1); closeM('m-note'); save(); _ntRefresh(); toast('🗑 Note supprimée — ↩️ pour annuler'); }
+function ntDel(id){ id=id||_ntEdit; const i=_ntAll().findIndex(x=>x.id===id); if(i<0) return; S.notes.splice(i,1); closeM('m-note'); save(); _ntRefresh(); toast('🗑 Note supprimée — touche ↩️ en haut pour la récupérer'); }
 // Ctrl + K : « Nouvelle note »
 try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.unshift(['📌','Nouvelle note','pense-bête post-it rappel mémo',()=>{ goTab('dashboard'); setTimeout(()=>ntOpen(),80); }]); }catch(_){}
 
@@ -27714,6 +27754,73 @@ async function _lcRender(){
 try{ _lsApply(); }catch(e){ console.warn('login:',e); }
 addEventListener('load',()=>{ try{ _lsApply(); }catch(_){} });
 try{ const a=document.getElementById('ls-am-ic'); if(a&&!a.firstChild) a.innerHTML=_amSvg(); const b=document.getElementById('ls-am-mi'); if(b&&!b.firstChild) b.innerHTML=_amSvg(); }catch(_){}
+
+/* ═══ iPad / iPhone : plannings « virtualisés » — seules les lignes proches de l'écran sont dans la page ═══ */
+// Les lignes restent en mémoire (déjà construites, avec leurs actions) : on n'insère que celles autour de la zone visible.
+window.__vrSwap=false;
+function _vrInit(el){
+  if(!_IS_TOUCH_DEV||!el) return;
+  const sc=el.firstElementChild, tb=sc&&sc.querySelector('table.ptable > tbody'); if(!sc||!tb) return;
+  if(sc.__vr) return;
+  { const cs=getComputedStyle(sc); if(!/(auto|scroll)/.test(cs.overflowY)||sc.scrollHeight<=sc.clientHeight+50) return; }   // seulement si le planning défile dans son propre cadre
+  const all=[...tb.rows]; if(all.length<50) return;          // petit planning : inutile
+  const charge=all[all.length-1]&&/sticky/.test(all[all.length-1].getAttribute('style')||'')?all.pop():null;
+  const rows=all, H=rows.map(r=>r.offsetHeight||0);
+  if(H.some(h=>h===0)&&H.filter(h=>h===0).length>rows.length/2) return;   // page cachée : on réessaiera au prochain rendu
+  const top=[0]; for(let i=0;i<H.length;i++) top.push(top[i]+H[i]);
+  const total=top[top.length-1];
+  const ncols=(sc.querySelector('thead tr')||{cells:[]}).cells.length||1;
+  const mk=()=>{ const tr=document.createElement('tr'); tr.className='vr-sp'; tr.innerHTML=`<td colspan="${ncols}" style="padding:0;border:0;height:0;background:transparent"></td>`; return tr; };
+  const spT=mk(), spB=mk();
+  const headH=(sc.querySelector('thead')||{offsetHeight:0}).offsetHeight;
+  const find=y=>{ let lo=0,hi=rows.length; while(lo<hi){ const m=(lo+hi)>>1; if(top[m+1]<=y) lo=m+1; else hi=m; } return lo; };
+  let a=-1,b=-1,raf=0; const BUF=900;
+  const upd=()=>{ raf=0;
+    const y=sc.scrollTop-headH, vh=sc.clientHeight;
+    let from=Math.max(0,find(y-BUF)), to=Math.min(rows.length,find(y+vh+BUF)+1);
+    if(from>=a&&to<=b&&a>=0&&(from-a<15)&&(b-to<15)) return;    // fenêtre encore suffisante : rien à faire
+    from=Math.max(0,from-8); to=Math.min(rows.length,to+8);
+    if(from===a&&to===b) return; a=from; b=to;
+    window.__vrSwap=true;
+    spT.firstChild.style.height=top[a]+'px'; spB.firstChild.style.height=(total-top[b])+'px';
+    const f=document.createDocumentFragment(); f.appendChild(spT); for(let i=a;i<b;i++) f.appendChild(rows[i]); f.appendChild(spB); if(charge) f.appendChild(charge);
+    tb.replaceChildren(f);
+    requestAnimationFrame(()=>{ window.__vrSwap=false; });
+  };
+  sc.__vr={rows,upd};
+  sc.addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(upd); },{passive:true});
+  addEventListener('resize',()=>{ if(sc.isConnected){ a=b=-1; upd(); } });
+  upd();
+}
+function _vrSoon(el){ if(!_IS_TOUCH_DEV) return; setTimeout(()=>{ try{ _vrInit(el); }catch(e){ console.warn('vr',e); } },450); }
+
+/* ═══ Diagnostic fluidité (Ctrl + K › « Diagnostic fluidité ») ═══ */
+function diagOpen(){
+  let o=document.getElementById('diag-ov'); if(o) o.remove();
+  o=document.createElement('div'); o.id='diag-ov';
+  o.innerHTML=`<div class="dg-card"><b>⏱️ Diagnostic fluidité</b><div id="dg-msg">Fais défiler le planning <b>pendant 5 secondes</b> (haut/bas puis gauche/droite)…</div><div class="dg-bar"><i id="dg-p"></i></div><button type="button" onclick="document.getElementById('diag-ov').remove()">Fermer</button></div>`;
+  document.body.appendChild(o);
+  const gaps=[]; let last=0, t0=0, started=false, done=false;
+  const onS=()=>{ if(!started){ started=true; t0=performance.now(); last=t0; requestAnimationFrame(loop); } };
+  document.addEventListener('scroll',onS,{passive:true,capture:true}); document.addEventListener('touchmove',onS,{passive:true}); document.addEventListener('wheel',onS,{passive:true});
+  const loop=t=>{ if(done) return; gaps.push(t-last); last=t; const p=Math.min(1,(t-t0)/5000); const pb=document.getElementById('dg-p'); if(pb) pb.style.width=(p*100)+'%'; if(p<1) requestAnimationFrame(loop); else finish(); };
+  const finish=()=>{ done=true; document.removeEventListener('scroll',onS,true); document.removeEventListener('touchmove',onS); document.removeEventListener('wheel',onS);
+    const g=gaps.slice(1).sort((x,y)=>x-y); const med=g[Math.floor(g.length/2)]||0, p95=g[Math.floor(g.length*.95)]||0, mx=g[g.length-1]||0;
+    const fps=Math.round(1000/(med||16.7)), jank=g.filter(x=>x>34).length, big=g.filter(x=>x>100).length;
+    const pg=document.querySelector('.page.on'); const all=document.getElementsByTagName('*').length, inPg=pg?pg.getElementsByTagName('*').length:0;
+    let st=0,bf=0; if(pg) pg.querySelectorAll('*').forEach(e=>{ const cs=getComputedStyle(e); if(cs.position==='sticky') st++; const v=cs.backdropFilter||cs.webkitBackdropFilter; if(v&&v!=='none') bf++; });
+    const vr=pg&&pg.querySelector('.vr-sp')?'oui':'non';
+    const verdict=jank<=5&&big===0?'✅ Fluide':jank<=20&&big<=2?'🟡 Correct, quelques à-coups':'🔴 Saccadé';
+    document.getElementById('dg-msg').innerHTML=`<div class="dg-v">${verdict}</div><table>
+      <tr><td>Images / seconde</td><td><b>${fps}</b></td></tr><tr><td>À-coups (&gt;34 ms)</td><td><b>${jank}</b> sur ${g.length}</td></tr><tr><td>Gros blocages (&gt;100 ms)</td><td><b>${big}</b> · pire ${Math.round(mx)} ms</td></tr>
+      <tr><td>Page</td><td>${pg?pg.id.replace('pg-',''):'?'} · ${document.body.classList.contains('th-bento')?'Bento':'Cockpit'}</td></tr>
+      <tr><td>Écran</td><td>${innerWidth}×${innerHeight} · ×${devicePixelRatio}</td></tr>
+      <tr><td>Mode fluide tactile</td><td>${document.documentElement.classList.contains('is-touch')?'actif':'<b>inactif</b>'} · lignes allégées : ${vr}</td></tr>
+      <tr><td>Éléments (page / total)</td><td>${inPg} / ${all}</td></tr><tr><td>Collants · flous</td><td>${st} · ${bf}</td></tr>
+      <tr><td>Appareil</td><td style="font-size:10.5px">${_bfEsc(navigator.userAgent.replace(/Mozilla\/5\.0 /,'').slice(0,90))}</td></tr></table><div style="font-size:11.5px;opacity:.7;margin-top:6px">Fais une capture d'écran de ce résultat et envoie-la.</div>`;
+  };
+}
+try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['⏱️','Diagnostic fluidité','diagnostic lenteur scroll defilement saccade performance ipad',()=>{ setTimeout(diagOpen,150); }]); }catch(_){}
 </script>
 
 <!-- Modal confirmation formations internes -->
