@@ -2062,9 +2062,9 @@ body.th-bento .dk-sep2{display:block;width:30px;height:1px;background:rgba(255,2
 .dk-sq{background:linear-gradient(160deg,var(--g1),var(--g2))}
 .dk-sq::after,.dk-cal::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 48%);pointer-events:none}
 .dk-sq svg{position:absolute;inset:18%;width:64%;height:64%;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.22))}
-.dk-cal{background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
-.dk-cal b{display:block;width:100%;text-align:center;background:linear-gradient(180deg,#ff5a52,#e5322b);color:#fff;font:700 calc(8.4px*var(--s,1)) 'Space Grotesk',sans-serif;letter-spacing:.04em;padding:calc(2px*var(--s,1)) 0}
-.dk-cal i{font-style:normal;font:600 calc(22px*var(--s,1))/1.05 'Space Grotesk',sans-serif;color:#1c1c1e;margin-top:calc(1px*var(--s,1))}
+.dk-cal{background:#fff;display:flex;flex-direction:column;container-type:size}
+.dk-cal b{flex:0 0 30%;display:grid;place-items:center;width:100%;background:linear-gradient(180deg,#ff5a52,#e5322b);color:#fff;font:700 7px/1 'Space Grotesk',sans-serif;font-size:15cqh;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.dk-cal i{flex:1;display:grid;place-items:center;font-style:normal;font:600 20px/1 'Space Grotesk',sans-serif;font-size:44cqh;letter-spacing:-.03em;color:#1c1c1e;padding-bottom:3%}
 /* point « ouvert » + libellé */
 body.th-bento .fam-btn.active{background:transparent!important}
 body.th-bento .fam-btn.active::before{content:'';position:absolute;left:-7px;top:50%;width:4px;height:4px;margin-top:-2px;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.9)}
@@ -2112,7 +2112,7 @@ body.th-bento .header .logo .logo-sub{letter-spacing:.04em!important}
 
 @media(max-width:760px){body.th-bento .fam-row #fam-guide{display:flex!important}body.th-bento .fam-row .dk-sep2{display:block!important;width:1px;height:calc(36px*var(--s,1));align-self:center;margin:0 2px}}
 
-@media(max-width:760px){body.th-bento{--dkm:min(44px,calc((100vw - 104px) / 8.4))}body.th-bento .fam-row{gap:7px!important;padding:7px 9px!important}body.th-bento .fam-row .fam-btn{width:calc(var(--dkm)*var(--s,1))!important;height:calc(var(--dkm)*var(--s,1))!important;border-radius:calc(var(--dkm)*.26)!important}body.th-bento .fam-row .dk-sep2{height:calc(var(--dkm)*.8)!important}}
+@media(max-width:760px){body.th-bento{--dkm:min(44px,calc((100vw - 116px) / 9.4))}body.th-bento .fam-row{gap:7px!important;padding:7px 9px!important}body.th-bento .fam-row .fam-btn{width:calc(var(--dkm)*var(--s,1))!important;height:calc(var(--dkm)*var(--s,1))!important;border-radius:calc(var(--dkm)*.26)!important}body.th-bento .fam-row .dk-sep2{height:calc(var(--dkm)*.8)!important}}
 
 /* ═══ Mode fluide automatique sur iPad / iPhone (html.is-touch) ═══ */
 /* 1. Plus de flou « verre » recalculé à chaque image du défilement : on garde seulement l'en-tête, la barre d'onglets et le dock */
@@ -2372,6 +2372,40 @@ html.dg-simple .ptable .hd *{display:none!important}
 #diag-ov .dg-card{max-height:calc(100vh - 40px);overflow:auto}
 /* tactile : pas d'animation en boucle (logo, pastille d'alerte) — elles forcent un rendu à chaque image */
 html.is-touch .logo-icon,html.is-touch .alert-pill,html.is-touch .alert-pill *{animation:none!important}
+
+/* ═══ Documentation constructeurs ═══ */
+.doc-lg{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:11px;overflow:hidden;background:#f7f8fa;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.doc-lg img{width:100%;height:100%;display:block}.doc-lg.sm{width:24px;height:24px;border-radius:6px;vertical-align:middle}.doc-lg.xs{width:22px;height:22px;border-radius:6px}
+/* dock Bento */
+.dk-sq.doc-tile{background:#f7f8fa}.dk-sq.doc-tile img{width:100%;height:100%;display:block;object-fit:contain}
+.dk-sq.doc-folder{background:rgba(255,255,255,.22);display:grid!important;grid-template-columns:1fr 1fr;gap:8%;padding:14%;box-sizing:border-box}
+.dk-sq.doc-folder img,.dk-sq.doc-folder i{width:100%;aspect-ratio:1;border-radius:22%;display:block;font-style:normal;font-size:8px}
+body:not(.th-bento) .doc-dk{display:none!important}
+#fam-doc-all{display:none!important}
+@media(max-width:760px){body.th-bento .doc-dk{display:none!important}body.th-bento #fam-doc-all{display:flex!important}}
+/* carte Cockpit (tableau de bord) — en Bento, l'accès est dans le dock */
+body.th-bento #docWidget{display:none}
+.doc-card{background:rgba(11,17,30,.95);border:1px solid rgba(0,210,255,.22);border-radius:16px;padding:14px 16px;margin:0 0 14px}
+.doc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#00d2ff;font-weight:800}
+.doc-gear{background:none;border:0;cursor:pointer;font-size:15px}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.doc-b{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#e8ecff;cursor:pointer;text-align:left;font-family:inherit}
+.doc-b:hover{background:rgba(0,210,255,.08);border-color:rgba(0,210,255,.35)}
+.doc-bt{flex:1;min-width:0;display:flex;flex-direction:column}.doc-bt b{font-size:14px}.doc-bt small{font-size:11.5px;color:#8ea6c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-b > i{font-style:normal;color:#00d2ff}
+/* liste des portails */
+#doc-pop{position:fixed;z-index:9700;min-width:240px;max-width:min(340px,calc(100vw - 16px));padding:8px;border-radius:16px;background:rgba(22,27,42,.98);border:1px solid rgba(255,255,255,.16);box-shadow:0 20px 50px rgba(0,0,0,.55);font-family:'Space Grotesk','Outfit',sans-serif}
+#doc-pop .doc-pt{font-size:12.5px;color:#97a3c0;padding:4px 8px 8px;display:flex;align-items:center;gap:8px}
+#doc-pop button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border:0;border-radius:11px;background:transparent;color:#e8ecff;font:600 14.5px inherit;text-align:left;cursor:pointer}
+#doc-pop button:hover,#doc-pop button:active{background:rgba(255,255,255,.08)}
+#doc-pop button span{flex:1}#doc-pop button > span.doc-lg{flex:0 0 22px;width:22px}#doc-pop button small{color:#97a3c0;font-weight:500;margin-left:4px}#doc-pop button i{font-style:normal;color:#8ea2ff}
+#doc-pop .doc-cfg{color:#b9c4ff;font-size:13px;border-top:1px solid rgba(255,255,255,.08);border-radius:0 0 11px 11px;margin-top:4px}
+#doc-pop .doc-empty{padding:8px 10px;font-size:13px;color:#97a3c0}
+/* réglage */
+.doc-cs{padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}.doc-cs > b{margin-left:8px;font-size:14px}
+.doc-row{display:grid;grid-template-columns:150px 1fr 38px;gap:6px;margin:8px 0}
+.doc-row input{height:36px}.doc-row button{border:0;background:rgba(255,77,109,.12);border-radius:9px;cursor:pointer}
+@media(max-width:600px){.doc-row{grid-template-columns:1fr 38px}.doc-row input:nth-child(2){grid-column:1/2}}
 </style>
 </head>
 <body>
@@ -2556,6 +2590,7 @@ html.is-touch .logo-icon,html.is-touch .alert-pill,html.is-touch .alert-pill *{a
   </div>
   <div class="stats" id="statsGrid"></div>
   <div id="notesWidget"></div>
+  <div id="docWidget"></div>
   <div id="ratioWidget"></div>
   <div id="avancementWidget"></div>
   <div id="critWidget"></div>
@@ -8837,6 +8872,7 @@ const GUIDE_DATA = {
     {t:"MARDAM AeroMargin (calculs MPA)", d:"AeroMargin reste une application à part, mais s'ouvre directement depuis AeroDesk : icône <b>réacteur</b> dans le dock (Bento) ou bouton <b>AeroMargin</b> dans la barre du haut (Cockpit), ou Ctrl + K → « Ouvrir AeroMargin ». Elle s'affiche en plein écran ; <b>← AeroDesk</b> te ramène où tu étais (AeroMargin reste ouverte en arrière-plan). ↻ recharge, ↗ Onglet l'ouvre à part. Son adresse est déjà réglée (⚙️ pour la changer, admin). <b>Connexion unique</b> : AeroDesk te connecte tout seul à AeroMargin avec le même identifiant et le même mot de passe (gardé en mémoire le temps de la session, jamais enregistré). Après un simple rechargement de la page, ou si tes mots de passe diffèrent, AeroMargin te le demande une fois. Te déconnecter d'AeroDesk ferme aussi AeroMargin."},
     {t:"Page de connexion MARDAM", d:"La page d'accueil s'appelle maintenant <b>MARDAM · AeroDesk & AeroMargin</b>. Choisis <b>Ouvrir : AeroDesk / AeroMargin</b> avant de te connecter : avec AeroMargin, tu arrives directement sur le calcul MPA, déjà connecté (le choix est retenu sur l'appareil). La photo de fond change chaque jour, avec la grande heure, la date et la météo LFBF. <b>Admin</b> : 🎨 Apparence › « 🔐 Page de connexion » pour choisir le mode (chaque jour / fixe / au hasard), les photos de la rotation, l'assombrissement, la position de la carte, la couleur du bouton, l'heure et le choix AeroDesk / AeroMargin — appliqué sur tous les appareils par la synchro Drive."},
     {t:"Diagnostic fluidité", d:"Si le défilement te paraît lent sur un appareil : Ctrl + K (ou 🔍) › « Diagnostic fluidité », puis fais défiler le planning pendant 5 secondes. Un résumé s'affiche (images par seconde, à-coups, mode fluide actif ou non, nombre d'éléments affichés) : fais-en une capture pour l'envoyer. "},
+    {t:"Documentation constructeurs (Airbus · ATR · Boeing)", d:"Accès direct aux portails de documentation : en <b>Bento</b>, les logos Airbus, ATR et Boeing sont dans le dock (sur iPhone, regroupés dans une icône « Documentation ») ; en <b>Cockpit</b>, carte « 📘 Documentation technique » sur le tableau de bord. Un seul portail : il s'ouvre directement (nouvel onglet / Safari) ; plusieurs : une petite liste s'affiche. Ctrl + K : tape « ATR », « Airbus »… Les portails demandent ta connexion constructeur : AeroDesk ne voit ni ne garde ces identifiants. <b>Admin</b> : ⚙️ « Gérer les liens » pour ajouter/modifier les adresses (communes à tous)."},
     {t:"Mode TV atelier", d:"Le bouton <b>📺 Mode TV</b> du tableau de bord (ou Ctrl + K → « Mode TV ») ouvre un plein écran pour l'écran de l'atelier. Quatre pages défilent toutes les 20 s : <b>brief du jour</b> (chiffres, message, ODM), <b>plan du hangar</b> avec l'ordre de sortie, <b>équipes du jour</b> par chantier avec le chef, <b>météo et compteurs sécurité</b>. Clic ou → pour passer à la suivante, ← pour revenir, <b>Échap</b> pour quitter.", ill:null},
     {t:"Fonds d'écran — mes photos et photothèque", d:"Dans <b>🎨 Apparence</b> : <b>＋ Ajouter mes photos</b> importe tes photos (hangar, avions, équipe…) depuis le PC ou le téléphone ; elles sont recadrées et compressées automatiquement et <b>partagées avec toute l'équipe</b> (8 maximum). La <b>photothèque en ligne</b> propose des photos aviation libres de droits ; elles sont gardées sur l'appareil après le premier affichage. Les <b>réglages</b> permettent d'assombrir ou flouter la photo, de rendre les panneaux transparents, d'ajouter un zoom lent ou une parallaxe, et de <b>changer de photo chaque jour</b> ou à chaque ouverture. Ces réglages sont propres à chaque utilisateur.", ill:null},
     {t:"Bento — exports PDF et Excel", d:"Quand le thème <b>Bento</b> est actif, les exports prennent son style. Le <b>PDF du planning hebdo</b> présente une carte par activité (icône 🔧 maintenance, 🅿️ stockage, ♻️ recyclage, ✈️ Airbus…), avec des pastilles arrondies matin / après-midi, les avatars et les autorisations. L'<b>Excel du planning hebdo</b> est sans quadrillage, avec un bandeau coloré par activité, une colonne Autorisations et des cases pleines séparées par un liseré blanc. Les autres exports reprennent la police et les en-têtes Bento. En thème Cockpit, les exports restent ceux d'origine.", ill:null},
@@ -9616,6 +9652,7 @@ function _ratioRender(){
 function renderDash(){
   try{ _briefBadge(); }catch(_){}
   try{ _ntRender(); }catch(e){ console.warn('notes:',e); }
+  try{ if(typeof _docRender==='function') _docRender(); }catch(_){}
   const T=new Date();
   document.getElementById('todayLbl').textContent=T.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const exp=S.formations.filter(f=>!_empHorsEffectif(f.empId)&&tSt(f.dateExpiration)==='expired').length;
@@ -27368,7 +27405,7 @@ const _DK_G={
   'fam-outils':['#a1a1aa','#3f3f46','<circle cx="12" cy="12" r="6.2" fill="none" stroke="#fff" stroke-width="3.6" stroke-dasharray="2.43 2.43"/><circle cx="12" cy="12" r="5.1" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="12" cy="12" r="1.9" fill="#fff"/>'],
   'fam-guide':['#bf5af2','#6e2ce6','<path d="M9.3 9.2a2.8 2.8 0 1 1 4.3 2.4c-.9.6-1.6 1.2-1.6 2.4v.6" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="12" cy="18" r="1.4" fill="#fff"/>'],
 };
-function _dkCal(){ const d=new Date(); const J=['DIM.','LUN.','MAR.','MER.','JEU.','VEN.','SAM.']; return `<span class="dk-cal"><b>${J[d.getDay()]}</b><i>${d.getDate()}</i></span>`; }
+function _dkCal(){ const d=new Date(); const J=['DIM.','LUNDI','MARDI','MER.','JEUDI','VEN.','SAMEDI']; return `<span class="dk-cal"><b>${J[d.getDay()]}</b><i>${d.getDate()}</i></span>`; }   // jour en toutes lettres quand il tient, sinon abrégé
 function _dkIcon(id){ if(id==='fam-planning') return _dkCal(); const g=_DK_G[id]; if(!g) return ''; return `<span class="dk-sq" style="--g1:${g[0]};--g2:${g[1]}"><svg viewBox="0 0 24 24" aria-hidden="true">${g[2]}</svg></span>`; }
 function _dkInit(){
   const row=document.getElementById('famRow'); if(!row) return;
@@ -27845,6 +27882,75 @@ function diagOpen(mode){
   };
 }
 try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['⏱️','Diagnostic fluidité','diagnostic lenteur scroll defilement saccade performance ipad',()=>{ setTimeout(diagOpen,150); }]); }catch(_){}
+
+/* ═══ Documentation technique constructeurs : Airbus · ATR · Boeing ═══ */
+const _DOC_LOGO={"airbus": "data:image/webp;base64,UklGRsIFAABXRUJQVlA4ILYFAAAwIACdASqgAKAAPj0ejUSiIaETCGyMIAPEsrdwuUh6iA/xGrj9w5VDi6Nq754g/53ry/on+M9gHmAfwD+8dIDzAeer6KfQA/XTrSvQA8tn2eMhX8Z3411CF8fokt975WkC/Ov9Bz2X+D9wHs7/Lv75/1f7/8Av6t/6z1gPV/+zvsM/qiQiqjkp+OcMhPyQMgzF79dQvNFjYvKfjY0k77h4m+3fpw6J+FVdaxVItjgGmBwBM/gviH5xJBmjTkyOjuIQGELCvWQOHkjvphqIP6H+382SJeuK4EmlYb5HJgn6P+hLE48eDeCD8dNRHQGh7cCdFX6+WGPLPtY3604F4fnlAZIR44ZCfkgYQAD+/6gZZ0QYAAZ3/+HR/4POIz4Nfv7XXJVGDaKFrP3SjDt1NunY/x/OnsjT7D5K4uK3AzTwE/DZPBvqM01C8wx0Rnvm87R/z9/qn/76CXa2eLVYMT8oVfd0G987RwCrp3Hsl+SKGEqU2mvPVWZne4KHcjk7NucthEH9ESOTkY3p//hk1mpz0d+rw4+NTU4grmxVJ4uMJ6K1m8KOzAC1/vsb2pGNhjuEYDoh2zU0fAS5LWntisnkFWjmmeE2IBT3CvAHpXigSBcDS4tqCxJE8zzi7XJahAghJqzGla4goEHtu/wpyUBkxUyLXzNnD/JQKlUwrMRtatYLYLLsrwGoNJRWE7y9ghkxuRCMDEZ7omKoDiU/Jq6A7SUzuQP9b+k83ydHb0mH6z9qinysoE2P1zRBJv/6P//sp+iKc5irLRpxNS6ee1ppwcf+gAwZgWDc5z+NCNsNyE6oTTA78OKsOq5fnJHE2pTe4fST9GE4U9ZSowpfkgtVRI2o/NusH4plNnBKRRBfdt2yVY9amtTbbomqCXdtsQ4rs6crR8AqMG8AF1O40g6O3ZBbtdtXrGXO2sD2KjrXteitiaHoInq8gPGeMW/g8SeHvA81/nu3NoaCVwhoUC2Qot9fqcpVFY0JppAuoYoGydzRkjV7Sljlq5YBX3jRKPBpCLJQd69sVFsdUJOmmzsiIS/KEhpBEY2f1id1DckSZsXEHYz91mx369+dm+Yz8mjoCKHH4rzoGgpKVmS/eq++0ddjj1+qHR5AFMkZlECsZ/WlrCyPKx2GhvrK+SeRPZNhF2lQew5/18HhO5lGbHUq3G12cD7BMm6MlZc2mgtgoY/PVdcgLl6k1ZIh/wr6kxRye60pXrVqgI7TUDEz5/nYznTBRtVpF6qLbniqqyI3aLHpDW5GNF0ERtt8Mf4Zj5K+pkG5nVUyxh2R8bbfLzFv3v+Vf8L9OvX48wocD4L+oaaLZhDoinlKBZyIT8eNxJPpzuQBLhWXOpFFlqyubz67N0iXKUyG6cQt46e73rnCMVy5S/Opa4Vdc/5Dhn+O3/Br/NpKt9m26aDPwF03GB2a3EvfSvdVGtLvpgac9ShumFL9dojg3AFQBYt757zIepGUz4oeaijEhvcktDbkPnLun2J6wWImOl1kuHwJc+XRnTl57i4rVB7eN9UqFhB6/biK5+KGDTdpThqmlwaay6mhjkOU22xW3GXvK19rmaxRPJ6svDpd+Ca+fSGI3Kl16NAG7B4KlOXqZU7I1iO3cuJf/i+P6L3F7KhlZ8VtM8Kl71fA/HdLYfTPAp1w62df3jf+3pZLgmh70nv/CiXl4nne6hyqP9XW40TcTyP+U1a/CuGo10Ugw0qN8ohUyjOkb2H9YE5kJspGewEbxDp1lJlT3JM8KRke8aUFPzdotiqijwBBJA6sCIn8fRnVPATFrQs1ufvHAd/jaqiK6AX9ms/FLb/uUabWdvk3mPKH+JK1SW8Ba+r/VUix3QBmz/8lpykwK8SZXbw2/OsivzKo5WUaNuIZEiILsKXa3G5zF8NPRWdWMe7usxNqLK0JBMESbvb3Q71Ng+pYWbCjeJHD+EQOAAAAAAAA", "atr": "data:image/webp;base64,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", "boeing": "data:image/webp;base64,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"};
+const _DOC_DEF=[{id:'airbus',n:'Airbus',links:[{n:'AirbusWorld',u:"https://w3.airbus.com/H380/world/airbusworld/forms/airbus.fcc?TYPE=33554433&REALMOID=06-2c93f4bb-1103-4238-98fa-62ca07aab930&GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-t%2fTX88CtTFIPqQ15ugBfOME66PQGCWGuAAOSByMZUiVIJPozo431pS4LE4YuSGzU&TARGET=-SM-HTTPS%3a%2f%2fw3%2eairbus%2ecom%2fU980%2fU980_redirect_world%2ehtml%3fresumePath%3d-%2Fidp-%2F9UARgXohOD-%2FresumeSAML20-%2Fidp-%2FSSO%2eping-%3FpfLoginRedirect-%3Dtrue#!%40%40%3F_afrWindowId%3DIW1arPto%26_afrLoop%3D3119096760701550%26_afrWindowMode%3D0%26_adf.ctrl-state%3Dems3llgen_5"}]},{id:'atr',n:'ATR',links:[{n:'ATR NavX',u:"https://w3.airbus.com/H380/world/airbusworld/forms/airbus.fcc?TYPE=33554433&REALMOID=06-2c93f4bb-1103-4238-98fa-62ca07aab930&GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-t%2fTX88CtTFIPqQ15ugBfOME66PQGCWGuAAOSByMZUiVIJPozo431pS4LE4YuSGzU&TARGET=-SM-HTTPS%3a%2f%2fw3%2eairbus%2ecom%2fU980%2fU980_redirect_world%2ehtml%3fresumePath%3d-%2Fidp-%2FUVSoVnnR6M-%2FresumeSAML20-%2Fidp-%2FSSO%2eping-%3FpfLoginRedirect-%3Dtrue"}]},{id:'boeing',n:'Boeing',links:[{n:'Boeing (Aviation ID)',u:'https://ui.aviationid.com/iamui/mfa/userReference'}]}];
+function _docData(){ const d=(S.docLinks&&Array.isArray(S.docLinks)&&S.docLinks.length)?S.docLinks:_DOC_DEF; return d; }
+function _docIsAdmin(){ try{ return ((_currentUser&&_currentUser.role)||JSON.parse(sessionStorage.getItem('mard_auth')||'{}').role)==='admin'; }catch(_){ return false; } }
+function _docGo(u){ if(!u) return; try{ window.open(u,'_blank','noopener'); }catch(_){ location.href=u; } _docClose(); }
+function _docClose(){ const p=document.getElementById('doc-pop'); if(p) p.remove(); }
+function _docLogo(id,cls){ const L=_DOC_LOGO[id]; return L?`<span class="doc-lg ${cls||''}"><img src="${L}" alt=""></span>`:`<span class="doc-lg doc-lg-t ${cls||''}">📘</span>`; }
+// Ouvre le portail (1 lien) ou la liste des portails (plusieurs) ; id vide = tous les constructeurs (dossier du dock sur iPhone)
+function docOpen(id,ev){
+  if(ev) ev.stopPropagation();
+  const D=_docData(), list=id?D.filter(c=>c.id===id):D;
+  const links=list.flatMap(c=>c.links.map(l=>({...l,c:c.n,cid:c.id})));
+  if(id&&links.length===1){ _docGo(links[0].u); return; }
+  if(!links.length&&!_docIsAdmin()){ toast(`📘 Aucun lien ${id?list[0]?.n||'':''} réglé pour l'instant (à faire par un admin)`); return; }
+  _docClose();
+  const p=document.createElement('div'); p.id='doc-pop';
+  p.innerHTML=`<div class="doc-pt">${id?_docLogo(id,'sm')+' '+_bfEsc(list[0]?.n||'')+' · documentation':'📘 Documentation technique'}</div>`
+    +(links.length?links.map(l=>`<button type="button" onclick="_docGo(${_bfEsc(JSON.stringify(l.u))})">${id?'':_docLogo(l.cid,'xs')}<span>${_bfEsc(l.n)}${id?'':` <small>${_bfEsc(l.c)}</small>`}</span><i>↗</i></button>`).join(''):`<div class="doc-empty">Aucun lien pour l'instant.</div>`)
+    +(_docIsAdmin()?`<button type="button" class="doc-cfg" onclick="docConfig()">⚙️ Gérer les liens</button>`:'');
+  document.body.appendChild(p);
+  const a=ev&&ev.currentTarget&&ev.currentTarget.getBoundingClientRect?ev.currentTarget.getBoundingClientRect():null;
+  const w=p.offsetWidth, h=p.offsetHeight;
+  if(a){ const vert=a.left<120&&a.height<120&&innerWidth>760; let x=vert?a.right+12:a.left+a.width/2-w/2, y=vert?a.top+a.height/2-h/2:(a.top>innerHeight/2?a.top-h-10:a.bottom+10);
+    p.style.left=Math.max(8,Math.min(innerWidth-w-8,x))+'px'; p.style.top=Math.max(8,Math.min(innerHeight-h-8,y))+'px'; }
+  else { p.style.left=Math.max(8,(innerWidth-w)/2)+'px'; p.style.top=Math.max(8,(innerHeight-h)/2)+'px'; }
+  setTimeout(()=>{ const off=e=>{ if(!p.contains(e.target)){ _docClose(); document.removeEventListener('pointerdown',off,true); } }; document.addEventListener('pointerdown',off,true); },0);
+}
+// ── Carte « Documentation technique » (tableau de bord, thème Cockpit) ──
+function _docRender(){
+  const box=document.getElementById('docWidget'); if(!box) return; const D=_docData();
+  box.innerHTML=`<div class="doc-card"><div class="doc-hd"><span>📘 Documentation technique</span>${_docIsAdmin()?`<button type="button" class="doc-gear" onclick="docConfig()" title="Gérer les liens">⚙️</button>`:''}</div><div class="doc-grid">${D.map(c=>`<button type="button" class="doc-b doc-${c.id}" onclick="docOpen('${c.id}',event)">${_docLogo(c.id)}<span class="doc-bt"><b>${_bfEsc(c.n)}</b><small>${c.links.length?c.links.map(l=>_bfEsc(l.n)).join(' · '):'lien à régler'}</small></span><i>↗</i></button>`).join('')}</div></div>`;
+}
+// ── Icônes dans le dock (thème Bento) ──
+function _docDockInit(){
+  const row=document.getElementById('famRow'); if(!row) return;
+  row.querySelectorAll('.doc-dk').forEach(b=>b.remove());
+  const before=row.querySelector('.dk-sep2')||document.getElementById('fam-guide');
+  const mk=(id,label,html,fn)=>{ const b=document.createElement('button'); b.type='button'; b.className='fam-btn doc-dk'; b.id='fam-doc-'+id; b.dataset.t=label; b.title=label; b.innerHTML=`<span class="dk-ic">${html}</span><span class="fi">📘</span><span class="fl">${_bfEsc(label)}</span>`; b.onclick=fn; row.insertBefore(b,before); return b; };
+  const sep=document.createElement('span'); sep.className='dk-sep2 doc-dk doc-sep'; row.insertBefore(sep,before);
+  _docData().forEach(c=>mk(c.id,c.n+' · documentation',`<span class="dk-sq doc-tile">${_DOC_LOGO[c.id]?`<img src="${_DOC_LOGO[c.id]}" alt="">`:'📘'}</span>`,e=>docOpen(c.id,e)));
+  // iPhone : un seul « dossier » qui regroupe les constructeurs
+  mk('all','Documentation',`<span class="dk-sq doc-folder">${_docData().slice(0,4).map(c=>_DOC_LOGO[c.id]?`<img src="${_DOC_LOGO[c.id]}" alt="">`:'<i>📘</i>').join('')}</span>`,e=>docOpen('',e));
+}
+// ── Réglage des liens (admin) ──
+let _docEdit=null;
+function docConfig(){
+  if(!_docIsAdmin()){ toast('Réservé aux administrateurs'); return; } _docClose();
+  _docEdit=JSON.parse(JSON.stringify(_docData()));
+  let m=document.getElementById('m-doc'); if(!m){ m=document.createElement('div'); m.className='mbg'; m.id='m-doc'; m.addEventListener('click',e=>{ if(e.target===m) closeM('m-doc'); }); document.body.appendChild(m); }
+  _docCfgRender(); openM('m-doc');
+}
+function _docCfgRender(){
+  const m=document.getElementById('m-doc'); if(!m) return;
+  m.innerHTML=`<div class="modal" style="max-width:640px"><div class="modal-title">📘 Liens de documentation</div><div style="font-size:12.5px;opacity:.75;margin:-4px 0 12px">Communs à tous les comptes. Colle l'adresse de la page d'accueil du portail (pas une adresse de connexion en cours, qui expire).</div>
+  ${_docEdit.map((c,ci)=>`<div class="doc-cs">${_docLogo(c.id,'sm')}<b>${_bfEsc(c.n)}</b>${c.links.map((l,li)=>`<div class="doc-row"><input value="${_bfEsc(l.n)}" placeholder="Nom (ex. ATRDoc)" oninput="_docEdit[${ci}].links[${li}].n=this.value"><input value="${_bfEsc(l.u)}" placeholder="https://…" oninput="_docEdit[${ci}].links[${li}].u=this.value.trim()"><button type="button" title="Supprimer" onclick="_docEdit[${ci}].links.splice(${li},1);_docCfgRender()">🗑</button></div>`).join('')}<button type="button" class="btn btn-ghost btn-sm" onclick="_docEdit[${ci}].links.push({n:'',u:''});_docCfgRender()">+ Ajouter un lien ${_bfEsc(c.n)}</button></div>`).join('')}
+  <div class="mfooter"><button type="button" class="btn btn-ghost" onclick="closeM('m-doc')">Annuler</button><button type="button" class="btn btn-cyan" onclick="_docSave()">Enregistrer</button></div></div>`;
+}
+function _docSave(){
+  const bad=[]; _docEdit.forEach(c=>{ c.links=c.links.filter(l=>l.u||l.n); c.links.forEach(l=>{ if(!/^https?:\/\/\S+$/i.test(l.u)) bad.push(l.n||l.u||'?'); if(!l.n) l.n=(l.u.replace(/^https?:\/\//,'').split('/')[0]); }); });
+  if(bad.length){ toast('⚠️ Adresse invalide : '+bad.join(', ')+' — elle doit commencer par https://'); return; }
+  S.docLinks=_docEdit; save(); closeM('m-doc'); _docRefresh(); toast('📘 Liens de documentation enregistrés');
+}
+// ── Ctrl + K ──
+function _docCk(){ try{ if(typeof _CK_ACTIONS==='undefined') return; for(let i=_CK_ACTIONS.length-1;i>=0;i--) if(_CK_ACTIONS[i].__doc) _CK_ACTIONS.splice(i,1);
+  _docData().forEach(c=>c.links.forEach(l=>{ const a=['📘',`Doc ${c.n} · ${l.n}`,`documentation ${c.n} ${l.n} manuel amm ipc constructeur`,()=>_docGo(l.u)]; a.__doc=1; _CK_ACTIONS.push(a); })); }catch(_){} }
+function _docRefresh(){ try{ _docRender(); }catch(_){} try{ _docDockInit(); }catch(_){} _docCk(); }
+try{ _docRefresh(); }catch(e){ console.warn('doc:',e); }
 </script>
 
 <!-- Modal confirmation formations internes -->
