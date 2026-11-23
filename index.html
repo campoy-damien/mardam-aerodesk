@@ -2406,6 +2406,105 @@ body.th-bento #docWidget{display:none}
 .doc-row{display:grid;grid-template-columns:150px 1fr 38px;gap:6px;margin:8px 0}
 .doc-row input{height:36px}.doc-row button{border:0;background:rgba(255,77,109,.12);border-radius:9px;cursor:pointer}
 @media(max-width:600px){.doc-row{grid-template-columns:1fr 38px}.doc-row input:nth-child(2){grid-column:1/2}}
+
+/* ═══ 🧩 Affectations du jour ═══ */
+#aff-ov{position:fixed;inset:0;z-index:8600;background:rgba(4,7,14,.82);padding:14px;box-sizing:border-box;font-family:'Outfit',sans-serif;color:#e6eefc}
+.af-board{height:100%;display:flex;flex-direction:column;background:#0b1220;border:1px solid rgba(0,210,255,.25);border-radius:16px;padding:12px;box-sizing:border-box;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.af-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.af-t{font-size:16px;font-weight:900;letter-spacing:.3px}
+.af-nav{display:flex;align-items:center;gap:6px}.af-nav button{height:32px;min-width:32px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#e6eefc;font:700 15px inherit;cursor:pointer;padding:0 10px}
+.af-day{font-weight:800;text-transform:capitalize;min-width:170px;text-align:center}.af-nav .af-today{font-size:12px}
+.af-seg{display:flex;gap:3px;padding:3px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.af-seg button{border:0;background:transparent;color:#c9d6ea;font:700 12.5px inherit;padding:6px 11px;border-radius:8px;cursor:pointer}.af-seg button.on{background:#00d2ff;color:#04121a}
+.af-btn{height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#e6eefc;font:700 12.5px inherit;padding:0 12px;cursor:pointer}
+.af-close{margin-left:auto;width:34px;padding:0}.af-top .af-seg:first-of-type{margin-left:auto}
+.af-tip{font-size:12px;color:#8fa3c0;margin:2px 2px 10px}
+#aff-ov.af-picking .af-tip{color:#ffe066;font-weight:700}
+.af-cols{flex:1;display:flex;gap:10px;overflow:auto;align-items:stretch;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.af-col{flex:0 0 228px;display:flex;flex-direction:column;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:7px;box-sizing:border-box;min-height:0;transition:border-color .12s,background .12s}
+.af-col.over,#aff-ov.af-picking .af-col:hover{border-color:#00d2ff;background:rgba(0,210,255,.07)}
+#aff-ov.af-picking .af-col{cursor:copy}
+.af-h{border-radius:9px;padding:7px 9px;background:var(--hc);display:flex;flex-direction:column;gap:1px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.af-h span{font-size:12.5px;font-weight:900;line-height:1.2}.af-h small{font-size:10.5px;font-weight:700;opacity:.85}
+.af-cnt{font-size:11px;color:#8fa3c0;margin:5px 3px 6px}
+.af-body{flex:1;overflow:auto;min-height:40px}
+.af-p{position:relative;border-radius:9px;padding:6px 8px 6px 10px;margin-bottom:6px;cursor:grab;border-left:4px solid var(--cc);background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 30%,transparent),color-mix(in srgb,var(--cc) 9%,transparent));user-select:none;-webkit-user-select:none;transition:transform .1s,box-shadow .1s}
+.af-p:active{cursor:grabbing}.af-p.drag{opacity:.45}
+.af-p.sel{outline:2px solid #ffe066;box-shadow:0 0 0 4px rgba(255,224,102,.2);transform:scale(1.02)}
+.af-n{font-size:12.5px;font-weight:800;padding-right:16px}.af-mk{font-size:11px}
+.af-s{font-size:10.5px;color:#c9d6ea}.af-s b{color:#ffe066}
+.af-a{margin-top:3px;display:flex;flex-wrap:wrap;gap:3px}
+.af-x{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.25);color:#fff;font-size:10px;cursor:pointer;padding:0}
+.af-x:hover{background:#ff4d6d}
+.af-gt{font-size:11.5px;font-weight:800;color:#cbd5e1;margin:6px 2px 5px}.af-gt small{opacity:.6}
+.af-hint{font-size:11.5px;color:#6f86a3;border:1.5px dashed rgba(255,255,255,.14);border-radius:9px;padding:12px 8px;text-align:center}
+.af-abs .af-p{opacity:.82}
+.af-dlg{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);z-index:60;padding:16px}
+.af-dc{width:100%;max-width:400px;background:#111a2c;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.af-dc b{font-size:14.5px}.af-dc input{width:100%;height:42px;margin:12px 0 8px;font-size:15px;box-sizing:border-box}
+.af-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}.af-chips button{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e6eefc;border-radius:999px;padding:7px 12px;font:700 12.5px inherit;cursor:pointer}
+.af-dr{display:flex;justify-content:flex-end;gap:8px}.af-dr button{height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#e6eefc;font:700 13px inherit;padding:0 14px;cursor:pointer}.af-dr .af-ok{background:#00d2ff;color:#04121a;border-color:#00d2ff}
+/* Bento */
+body.th-bento #aff-ov{font-family:'Space Grotesk',sans-serif}
+body.th-bento .af-board{background:#0e1424;border-color:rgba(255,255,255,.12);border-radius:26px;padding:16px}
+body.th-bento .af-t{letter-spacing:0;font-weight:700}
+body.th-bento .af-nav button,body.th-bento .af-btn,body.th-bento .af-dr button{border-radius:999px}
+body.th-bento .af-seg{border-radius:999px}body.th-bento .af-seg button{border-radius:999px}body.th-bento .af-seg button.on{background:#e8ecff;color:#0a0e19}
+body.th-bento .af-col{border-radius:20px;padding:9px;background:rgba(255,255,255,.035)}
+body.th-bento .af-col.over,body.th-bento #aff-ov.af-picking .af-col:hover{border-color:#8ea2ff;background:rgba(142,162,255,.08)}
+body.th-bento .af-h{border-radius:13px}
+body.th-bento .af-p{border-radius:13px}
+body.th-bento .af-dc{border-radius:22px}body.th-bento .af-dr .af-ok{background:#e8ecff;color:#0a0e19;border-color:#e8ecff}
+body:not(.th-bento) .af-h span{text-transform:uppercase;letter-spacing:.4px;font-size:11.5px}
+/* tablette / téléphone */
+@media(max-width:760px){#aff-ov{padding:6px}.af-board{padding:8px}.af-col{flex-basis:200px}.af-top{gap:6px}.af-day{min-width:0}.af-btn{font-size:11.5px;padding:0 9px}}
+html.is-touch .af-p{cursor:pointer}
+
+#aff-ov{padding:0!important;background:#070b14}
+.af-board{border-radius:0!important;border:0!important;box-shadow:none!important;padding:12px 14px 0!important;padding-top:calc(env(safe-area-inset-top,0px) + 12px)!important}
+.af-cols{overflow:auto;align-items:flex-start;padding:0 2px 24px;overscroll-behavior:contain}
+.af-col{max-height:none;min-height:100%;padding-top:0!important}
+.af-body{overflow:visible;flex:none}
+.af-h{position:sticky;top:0;z-index:4;margin:0 -7px;border-radius:0 0 10px 10px;box-shadow:0 6px 14px rgba(0,0,0,.35);padding:9px 12px}
+body.th-bento .af-h{border-radius:0 0 14px 14px;margin:0 -9px}
+.af-col .af-cnt{margin-top:6px}
+.af-addc{flex:0 0 230px;align-self:flex-start;position:sticky;top:0;border:2px dashed rgba(0,210,255,.4);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;background:rgba(0,210,255,.04)}
+body.th-bento .af-addc{border-color:rgba(142,162,255,.5);border-radius:18px;background:rgba(142,162,255,.05)}
+.af-addb{border:0;background:transparent;color:#7fe3ff;font:800 14px inherit;padding:8px;cursor:pointer;border-radius:9px}
+body.th-bento .af-addb{color:#b9c4ff}
+.af-addb:hover{background:rgba(255,255,255,.05)}
+.af-addl{display:flex;flex-direction:column;gap:2px;max-height:60vh;overflow:auto;background:rgba(10,15,27,.97);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:5px}
+.af-addl button{display:flex;gap:8px;align-items:flex-start;text-align:left;border:0;background:transparent;color:#e6eefc;font:600 12.5px inherit;padding:8px;border-radius:8px;cursor:pointer}
+.af-addl button:hover{background:rgba(255,255,255,.07)}
+
+@media(max-width:760px){
+ .af-board{padding:8px 10px 0!important;padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important}
+ .af-top{position:relative;padding-right:44px;row-gap:6px}
+ .af-top .af-close{position:absolute;right:0;top:0}
+ .af-t{flex-basis:100%;font-size:16px}
+ .af-lg,.af-tip{display:none!important}
+ .af-nav button,.af-today{height:32px}
+ .af-seg button{padding:0 10px;font-size:12px}
+ .af-addc{flex-basis:200px}
+}
+
+.af-cat.on{color:#00d2ff;border-color:rgba(0,210,255,.5)!important}
+body.th-bento .af-cat.on{color:#b9c4ff;border-color:rgba(142,162,255,.55)!important}
+
+/* Cartes : en Cockpit, barre de couleur ; en Bento, pastille trigramme comme dans le planning */
+.af-av{display:none}
+body.th-bento #aff-ov .af-p{display:flex;align-items:center;gap:11px;border-left:0;border-radius:16px;padding:8px 26px 8px 9px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);margin-bottom:6px}
+html.is-touch body.th-bento #aff-ov .af-p{background:rgba(22,28,46,.95)}
+body.th-bento #aff-ov .af-p:hover{background:rgba(255,255,255,.075)}
+body.th-bento #aff-ov .af-av{display:inline-grid;width:42px;height:42px;font-size:11.5px;border:none;flex:0 0 42px}
+body.th-bento #aff-ov .af-tx{min-width:0;flex:1}
+body.th-bento #aff-ov .af-n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:#eef1ff;padding-right:0;line-height:1.2}
+body.th-bento #aff-ov .af-s{color:#97a3c0;font-size:12px;line-height:1.35}
+body.th-bento #aff-ov .af-a{margin-top:3px}
+body.th-bento #aff-ov .af-abs .af-p,body.th-bento #aff-ov .af-col[data-k=ABS] .af-p{opacity:.8}
+body.th-bento #aff-ov .af-col{flex-basis:262px}
+body.th-bento #aff-ov .af-p:not(:has(.af-x)){padding-right:10px}
+@media(max-width:760px){body.th-bento #aff-ov .af-col{flex-basis:224px}body.th-bento #aff-ov .af-av{width:34px;height:34px;flex-basis:34px;font-size:10px}body.th-bento #aff-ov .af-n{font-size:13px}}
 </style>
 </head>
 <body>
@@ -8873,6 +8972,7 @@ const GUIDE_DATA = {
     {t:"Page de connexion MARDAM", d:"La page d'accueil s'appelle maintenant <b>MARDAM · AeroDesk & AeroMargin</b>. Choisis <b>Ouvrir : AeroDesk / AeroMargin</b> avant de te connecter : avec AeroMargin, tu arrives directement sur le calcul MPA, déjà connecté (le choix est retenu sur l'appareil). La photo de fond change chaque jour, avec la grande heure, la date et la météo LFBF. <b>Admin</b> : 🎨 Apparence › « 🔐 Page de connexion » pour choisir le mode (chaque jour / fixe / au hasard), les photos de la rotation, l'assombrissement, la position de la carte, la couleur du bouton, l'heure et le choix AeroDesk / AeroMargin — appliqué sur tous les appareils par la synchro Drive."},
     {t:"Diagnostic fluidité", d:"Si le défilement te paraît lent sur un appareil : Ctrl + K (ou 🔍) › « Diagnostic fluidité », puis fais défiler le planning pendant 5 secondes. Un résumé s'affiche (images par seconde, à-coups, mode fluide actif ou non, nombre d'éléments affichés) : fais-en une capture pour l'envoyer. "},
     {t:"Documentation constructeurs (Airbus · ATR · Boeing)", d:"Accès direct aux portails de documentation : en <b>Bento</b>, les logos Airbus, ATR et Boeing sont dans le dock (sur iPhone, regroupés dans une icône « Documentation ») ; en <b>Cockpit</b>, carte « 📘 Documentation technique » sur le tableau de bord. Un seul portail : il s'ouvre directement (nouvel onglet / Safari) ; plusieurs : une petite liste s'affiche. Ctrl + K : tape « ATR », « Airbus »… Les portails demandent ta connexion constructeur : AeroDesk ne voit ni ne garde ces identifiants. <b>Admin</b> : ⚙️ « Gérer les liens » pour ajouter/modifier les adresses (communes à tous)."},
+    {t:"🧩 Affectations du jour", d:"Pour réaffecter vite les équipes : clique sur un jour du planning (« Qui est où ») › <b>🧩 Modifier les affectations</b>, ou Ctrl + K › « Affectations du jour ». Seuls les chantiers occupés ce jour-là s'affichent ; <b>＋ Ajouter un chantier</b> crée la colonne d'un autre avion. Une colonne par chantier (couleurs des chantiers), les personnes avec la couleur de leur catégorie et leurs autorisations. <b>Glisse un nom</b> vers une autre colonne (sur iPad : touche le nom puis la colonne) : le planning est mis à jour aussitôt. <b>Journée / Matin / Après-midi</b> : ce qui est modifié. Une demi-journée de congé ou formation est conservée. <b>↔ Déplacer</b> : la personne change de chantier ; <b>＋ Ajouter</b> : elle garde le sien et reçoit le nouveau (double affectation, retirée avec ✕). <b>Autre tâche</b> : écris la tâche (rangement, logistique…), elle s'affiche dans le planning. <b>Absents</b> : déplacement avec confirmation. ↩️ Annuler défait le dernier déplacement ; « 📄 Extrait affectation journalier » ouvre ton extrait du jour."},
     {t:"Mode TV atelier", d:"Le bouton <b>📺 Mode TV</b> du tableau de bord (ou Ctrl + K → « Mode TV ») ouvre un plein écran pour l'écran de l'atelier. Quatre pages défilent toutes les 20 s : <b>brief du jour</b> (chiffres, message, ODM), <b>plan du hangar</b> avec l'ordre de sortie, <b>équipes du jour</b> par chantier avec le chef, <b>météo et compteurs sécurité</b>. Clic ou → pour passer à la suivante, ← pour revenir, <b>Échap</b> pour quitter.", ill:null},
     {t:"Fonds d'écran — mes photos et photothèque", d:"Dans <b>🎨 Apparence</b> : <b>＋ Ajouter mes photos</b> importe tes photos (hangar, avions, équipe…) depuis le PC ou le téléphone ; elles sont recadrées et compressées automatiquement et <b>partagées avec toute l'équipe</b> (8 maximum). La <b>photothèque en ligne</b> propose des photos aviation libres de droits ; elles sont gardées sur l'appareil après le premier affichage. Les <b>réglages</b> permettent d'assombrir ou flouter la photo, de rendre les panneaux transparents, d'ajouter un zoom lent ou une parallaxe, et de <b>changer de photo chaque jour</b> ou à chaque ouverture. Ces réglages sont propres à chaque utilisateur.", ill:null},
     {t:"Bento — exports PDF et Excel", d:"Quand le thème <b>Bento</b> est actif, les exports prennent son style. Le <b>PDF du planning hebdo</b> présente une carte par activité (icône 🔧 maintenance, 🅿️ stockage, ♻️ recyclage, ✈️ Airbus…), avec des pastilles arrondies matin / après-midi, les avatars et les autorisations. L'<b>Excel du planning hebdo</b> est sans quadrillage, avec un bandeau coloré par activité, une colonne Autorisations et des cases pleines séparées par un liseré blanc. Les autres exports reprennent la police et les en-têtes Bento. En thème Cockpit, les exports restent ceux d'origine.", ill:null},
@@ -10881,8 +10981,11 @@ function xlsDate(v){
 
 /* ═══ PLANNING GRID ═══ */
 // Couleur d'un chantier/activité spéciale (pour les bandes multi-chantiers)
+function _isTache(cid){ return typeof cid==='string'&&cid.startsWith('TACHE:'); }
+function _tacheTxt(cid){ return _isTache(cid)?cid.slice(6):''; }
 function _chColor(cid){
   if(!cid) return '#2979ff';
+  if(_isTache(cid)) return '#94a3b8';
   if(cid==='STO'||cid.startsWith('STO_')) return '#ff9a3c';
   if(cid==='AIRBUS') return '#00a0ff';
   if(cid==='STRUCT') return '#6d8fb0';
@@ -10894,6 +10997,7 @@ function _chColor(cid){
 function _avShort(t){ return (t||'').replace('Boeing 737 ','B737').replace('Boeing ','B').replace('Airbus ','').replace('ATR 72','ATR72').replace('ATR 42','ATR42').replace(' CEO','').replace(' NEO','').replace(' CL','').replace(' NG','').replace(' MAX','').trim(); }
 function _chMsnLabel(cid){
   if(!cid) return '';
+  if(_isTache(cid)) return '🧰 '+_tacheTxt(cid);
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
   if(cid==='STRUCT') return '\ud83d\udd29 STRU';
@@ -10952,6 +11056,7 @@ function _chAlerts(c){
 // Libellé court : MSN en premier (prioritaire sur cases étroites), type d'avion ensuite si présent
 function _chMsnShort(cid){
   if(!cid) return '';
+  if(_isTache(cid)) return '🧰 '+_tacheTxt(cid);
   if(cid==='STO') return '\u2708\ufe0f STO';
   if(cid==='AIRBUS') return '\u2708\ufe0f P21';
   if(cid==='STRUCT') return '\ud83d\udd29 STRU';
@@ -10983,7 +11088,7 @@ function _dayRecap(ds){
       const nom=`${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim();
       if(e.type==='travail'){
         [e.chantierId,e.chantierId2].filter(Boolean).forEach(cid=>{
-          const nm=cid==='STO'?'🅿️ Stockage':cid?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===cid.slice(4));return a?`🅿️ ${a.type||'A/C'} MSN${a.msn||'?'}`:'🅿️ Stockage';})():cid==='AIRBUS'?'✈️ Airbus Part 21':cid==='REC'?'♻️ Recyclage':cid==='STRUCT'?'🔩 Structure':(S.chantiers.find(c=>c.id===cid)?.nom|| (cid.startsWith('REC_')?'♻️ Recyclage':'Chantier'));
+          const nm=_isTache(cid)?'🧰 '+_tacheTxt(cid):cid==='STO'?'🅿️ Stockage':cid?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===cid.slice(4));return a?`🅿️ ${a.type||'A/C'} MSN${a.msn||'?'}`:'🅿️ Stockage';})():cid==='AIRBUS'?'✈️ Airbus Part 21':cid==='REC'?'♻️ Recyclage':cid==='STRUCT'?'🔩 Structure':(S.chantiers.find(c=>c.id===cid)?.nom|| (cid.startsWith('REC_')?'♻️ Recyclage':'Chantier'));
           (byChantier[nm]=byChantier[nm]||new Set()).add(nom);
         });
         if(!e.chantierId&&!e.chantierId2){ (byChantier['🔧 Travail (non affecté)']=byChantier['🔧 Travail (non affecté)']||new Set()).add(nom); }
@@ -11004,6 +11109,7 @@ function _dayRecap(ds){
   pop.innerHTML=`<div style="background:#0e1626;border:1px solid rgba(0,210,255,0.3);border-radius:16px;max-width:560px;width:100%;max-height:80vh;overflow:auto;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="font-size:16px;font-weight:900;color:#e6eefc">📍 Qui est où — ${disp(ds)}</div>
+      <button type="button" onclick="affOpen('${ds}')" class="btn btn-cyan btn-sm" style="margin-left:auto;margin-right:10px">🧩 Modifier les affectations</button>
       <button onclick="document.getElementById('day-recap-pop').remove()" style="background:none;border:none;color:#8090a8;font-size:20px;cursor:pointer">✕</button>
     </div>
     ${chBlocks||'<div style="color:#8090a8;font-size:12px">Personne au travail ce jour.</div>'}
@@ -11185,6 +11291,7 @@ function buildGrid(emps,dates,containerId){
         else if(am.chantierId==='AIRBUS'){amStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(am.chantierId==='STRUCT'){amStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
         else if(am.chantierId==='PROD'){amStyle='background:rgba(41,121,255,0.18);color:#82b1ff;';}
+        else if(_isTache(am.chantierId)){amStyle='background:rgba(148,163,184,0.2);color:#cbd5e1;';}
         else{const ch=S.chantiers.find(c=>c.id===am.chantierId);if(ch?.color){amStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color};`;}}
       }
       if(pt==='travail'&&pm.chantierId){
@@ -11193,6 +11300,7 @@ function buildGrid(emps,dates,containerId){
         else if(pm.chantierId==='AIRBUS'){pmStyle='background:rgba(0,100,200,0.18);color:#00a0ff;';}
         else if(pm.chantierId==='STRUCT'){pmStyle='background:rgba(109,143,176,0.2);color:#a7c1de;';}
         else if(pm.chantierId==='PROD'){pmStyle='background:rgba(41,121,255,0.18);color:#82b1ff;';}
+        else if(_isTache(pm.chantierId)){pmStyle='background:rgba(148,163,184,0.2);color:#cbd5e1;';}
         else{const ch=S.chantiers.find(c=>c.id===pm.chantierId);if(ch?.color){pmStyle=`background:${hexRgba(ch.color,0.18)};color:${ch.color}`;}}
       }
 
@@ -11220,7 +11328,7 @@ function buildGrid(emps,dates,containerId){
         :pt==='formation_int'?_hdFormLbl('📖',pm.formInt||'Formation')
         :(HD_LBL[pt]||'');
 
-      const getChNom=id=>id==='STO'?'Stockage':id?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===id.slice(4));return a?`🅿️ ${a.type} MSN${a.msn}`:'Stockage';})():id==='AIRBUS'?'Airbus Part 21':id?.startsWith('REC_')?(()=>{const a=S.recycling?.avions?.find(x=>x.id===id.slice(4));return a?`♻️ ${a.type} MSN${a.msn}`:' Recyclage';})():id==='REC'?'Recyclage':S.chantiers.find(c=>c.id===id)?.nom||'';
+      const getChNom=id=>_isTache(id)?'🧰 '+_tacheTxt(id):id==='STO'?'Stockage':id?.startsWith('STO_')?(()=>{const a=S.stockage?.avions?.find(x=>x.id===id.slice(4));return a?`🅿️ ${a.type} MSN${a.msn}`:'Stockage';})():id==='AIRBUS'?'Airbus Part 21':id?.startsWith('REC_')?(()=>{const a=S.recycling?.avions?.find(x=>x.id===id.slice(4));return a?`♻️ ${a.type} MSN${a.msn}`:' Recyclage';})():id==='REC'?'Recyclage':S.chantiers.find(c=>c.id===id)?.nom||'';
       const amTitle=`${at||'Vide'}${am.note?' · '+am.note:am.chantierId?' · '+getChNom(am.chantierId):''}`;
       const pmTitle=`${pt||'Vide'}${pm.note?' · '+pm.note:pm.chantierId?' · '+getChNom(pm.chantierId):''}`;
 
@@ -12808,6 +12916,7 @@ function openCell(empId,dateStr,half){
   document.querySelector('.vmc')?.classList.toggle('sel',cellVM);
   document.getElementById('wrapVM').style.display=cellVM?'block':'none';
   document.getElementById('cellVMTime').value=ex.vm||'';
+  ['cellChantier','cellChantier2'].forEach((sid,ix)=>{ const v=ix?ex.chantierId2:ex.chantierId; const sel=document.getElementById(sid); if(sel&&_isTache(v)&&![...sel.options].some(o=>o.value===v)){ const o=document.createElement('option'); o.value=v; o.textContent='🧰 '+_tacheTxt(v); sel.appendChild(o); } });
   document.getElementById('cellChantier').value=ex.chantierId||'';
   const cc2=document.getElementById('cellChantier2'); if(cc2) cc2.value=ex.chantierId2||'';
   try{ _cbxRefresh('cellChantier'); _cbxRefresh('cellChantier2'); }catch(_){}
@@ -25455,6 +25564,7 @@ function exportMasterPDF(){
   };
   const mainCh=emp=>{const counts={};dates.forEach(d=>['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${fmt(d)}_${h}`]||{};if(e.type==='travail'&&e.chantierId)counts[e.chantierId]=(counts[e.chantierId]||0)+1;}));const s=Object.entries(counts).sort((a,b)=>b[1]-a[1]);return s.length?s[0][0]:null;};
   const groupInfo=cId=>{
+    if(_isTache(cId)) return{label:_tacheTxt(cId),icon:'🧰',color:'#64748b'};
     if(cId==='STO') return{label:'Stockage',icon:'✈️',color:'#e65100'};
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
@@ -25546,6 +25656,7 @@ function exportWeekHtml(){
     return s.length?s[0][0]:null;
   };
   const groupInfo=cId=>{
+    if(_isTache(cId)) return{label:_tacheTxt(cId),icon:'🧰',color:'#64748b'};
     if(cId==='STO') return{label:'Stockage',icon:'✈️',color:'#e65100'};
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
@@ -25698,6 +25809,7 @@ function exportDayHtml(){
     const t=e.type||(isH?'ferie':isW?'we':'');
     if(t==='travail'&&e.chantierId){
       if(e.chantierId2) return{txt:_chMsnLabel(e.chantierId)+' + '+_chMsnLabel(e.chantierId2),col:_chColor(e.chantierId)};      if(e.chantierId==='STO') return{txt:'Stockage (STO)',col:'#e65100'};
+      if(_isTache(e.chantierId)) return{txt:'🧰 '+_tacheTxt(e.chantierId),col:'#64748b'};
       if(e.chantierId==='STRUCT') return{txt:'🔩 Structure',col:'#6d8fb0'};
       if(e.chantierId==='PROD') return{txt:'🏭 Production',col:'#2979ff'};
       if(e.chantierId==='AIRBUS') return{txt:'Airbus Part 21',col:'#0277bd'};
@@ -25716,6 +25828,7 @@ function exportDayHtml(){
 
   const mainCh=emp=>{const counts={};['AM','PM'].forEach(h=>{const e=S.planning[`${emp.id}_${ds}_${h}`]||{};if(e.type==='travail'&&e.chantierId)counts[e.chantierId]=(counts[e.chantierId]||0)+1;});const s=Object.entries(counts).sort((a,b)=>b[1]-a[1]);return s.length?s[0][0]:null;};
   const groupInfo=cId=>{
+    if(_isTache(cId)) return{label:_tacheTxt(cId),icon:'🧰',color:'#64748b'};
     if(cId==='STO') return{label:'Stockage',icon:'✈️',color:'#e65100'};
     if(cId==='AIRBUS') return{label:'Airbus — Activité Part 21',icon:'✈️',color:'#0277bd'};
     if(cId==='REC') return{label:'Recyclage',icon:'♻️',color:'#2e7d32'};
@@ -26950,6 +27063,7 @@ function _bnCellInfo(e,isW,isH){
 // Groupe principal (comme les cartes du planning hebdo) : icône, libellé, couleur
 function _bnGroupMeta(cId){
   if(!cId) return {key:'',ic:'📋',lbl:'Sans chantier assigné',col:'#7c8aa0'};
+  if(_isTache(cId)) return {key:cId,ic:'🧰',lbl:_tacheTxt(cId),col:'#94a3b8'};
   if(cId.startsWith('REC_')){ const a=(S.recycling?.avions||[]).find(x=>x.id===cId.slice(4)); return {key:cId,ic:'♻️',lbl:a?`Recyclage · ${a.type||'A/C'} MSN ${a.msn||'?'}`:'Recyclage',col:'#6effc4'}; }
   if(cId.startsWith('STO_')){ const a=(S.stockage?.avions||[]).find(x=>x.id===cId.slice(4)); return {key:cId,ic:'🅿️',lbl:a?`Stockage · ${a.type||'A/C'} MSN ${a.msn||'?'}`:'Stockage',col:'#ff9a3c'}; }
   if(cId==='STO') return {key:cId,ic:'🅿️',lbl:'Stockage',col:'#ff9a3c'};
@@ -27951,6 +28065,185 @@ function _docCk(){ try{ if(typeof _CK_ACTIONS==='undefined') return; for(let i=_
   _docData().forEach(c=>c.links.forEach(l=>{ const a=['📘',`Doc ${c.n} · ${l.n}`,`documentation ${c.n} ${l.n} manuel amm ipc constructeur`,()=>_docGo(l.u)]; a.__doc=1; _CK_ACTIONS.push(a); })); }catch(_){} }
 function _docRefresh(){ try{ _docRender(); }catch(_){} try{ _docDockInit(); }catch(_){} _docCk(); }
 try{ _docRefresh(); }catch(e){ console.warn('doc:',e); }
+
+/* ═══ 🧩 Affectations du jour : un tableau par chantier, on déplace les gens, le planning suit ═══ */
+const _AFF={ds:null,mode:'move',half:'day',sel:null,drag:null,extra:[],addOpen:false};
+// Liste des avions / activités qu'on peut ajouter comme colonne
+function _affAddList(shown){
+  const L=[];
+  S.chantiers.filter(c=>c.statut!=='termine'&&c.statut!=='annule').forEach(c=>L.push([c.id,'🔧',`${c.client||c.nom||'Chantier'}${c.avion?' — '+c.avion:''}${c.msn?' · MSN '+c.msn:''}`]));
+  L.push(['STO','🅿️','Stockage — maintenance']);
+  (S.stockage?.avions||[]).filter(a=>a.statut!=='sorti'&&a.statut!=='termine').forEach(a=>L.push(['STO_'+a.id,'🅿️',`${a.type||'A/C'} — MSN ${a.msn||'?'} (Stockage)`]));
+  (S.recycling?.avions||[]).filter(a=>a.statut!=='termine').forEach(a=>L.push(['REC_'+a.id,'♻️',`${a.type||'A/C'} — MSN ${a.msn||'?'} (Recyclage)`]));
+  L.push(['AIRBUS','✈️','Airbus — Activité Part 21'],['STRUCT','🔩','Structure — atelier'],['PROD','🏭','Production']);
+  return L.filter(x=>!shown.includes(x[0]));
+}
+function _affAddCol(k){ if(!_AFF.extra.includes(k)) _AFF.extra.push(k); _AFF.addOpen=false; _affRender(); setTimeout(()=>{ const c=document.querySelector(`#aff-ov .af-col[data-k="${k}"]`); if(c) c.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); },60); }
+const _AFF_ABS=[['conge','🏖 Congé'],['maladie','🤒 Maladie'],['formation','🎓 Formation'],['absence','❓ Absence'],['deplacement','✈️ Déplacement']];
+const _AFF_ABSLBL={conge:'Congé',conge_prev:'Congé prévu',maladie:'Maladie',formation:'Formation',formation_int:'Formation interne',ecole:'École',absence:'Absence',deplacement:'Déplacement'};
+function _affHalves(){ return _AFF.half==='day'?['AM','PM']:[_AFF.half]; }
+function _affName(p){ return `${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim(); }
+function _affColMeta(cid){
+  if(cid==='TODO') return {lbl:'À affecter',sub:'rien de prévu',col:'#7c5cff'};
+  if(cid==='ABS') return {lbl:'Absents',sub:'congé · maladie · formation',col:'#8a6d1f'};
+  if(cid==='TACHE') return {lbl:'Autre tâche',sub:'rangement, logistique…',col:'#64748b'};
+  if(cid==='STO') return {lbl:'🅿️ Stockage',sub:'maintenance',col:'#ff9a3c'};
+  if(cid==='AIRBUS') return {lbl:'✈️ Airbus Part 21',sub:'',col:'#00a0ff'};
+  if(cid==='STRUCT') return {lbl:'🔩 Structure',sub:'atelier',col:'#6d8fb0'};
+  if(cid==='PROD') return {lbl:'🏭 Production',sub:'',col:'#2979ff'};
+  if(cid==='REC') return {lbl:'♻️ Recyclage',sub:'',col:'#2fbf8a'};
+  if(cid.startsWith('REC_')){ const a=(S.recycling?.avions||[]).find(x=>x.id===cid.slice(4)); return {lbl:`♻️ ${a?(a.type||'A/C'):'Recyclage'}`,sub:a?'MSN '+(a.msn||'?'):'',col:'#2fbf8a'}; }
+  if(cid.startsWith('STO_')){ const a=(S.stockage?.avions||[]).find(x=>x.id===cid.slice(4)); return {lbl:`🅿️ ${a?(a.type||'A/C'):'Stockage'}`,sub:a?'MSN '+(a.msn||'?'):'',col:'#ff9a3c'}; }
+  const ch=S.chantiers.find(c=>c.id===cid); const col=ch&&String(ch.color||'').startsWith('#')?ch.color:'#2979ff';
+  return {lbl:ch?`${ch.client||ch.nom||'Chantier'}${ch.avion?' — '+ch.avion:''}`:'Chantier',sub:ch&&ch.msn?'MSN '+ch.msn:(ch?ch.nom:''),col};
+}
+// Construit les colonnes du jour
+function _affHidCats(){ if(_AFF.allCats) return []; const h=_AFF.catSrc==='master'?S.masterHiddenCats:S.weeklyHiddenCats; return Array.isArray(h)?h:[]; }
+function _affCatInfo(){
+  const all=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived); const cats=[...new Set(all.map(p=>p.categorie||'autre'))];
+  const h=(_AFF.catSrc==='master'?S.masterHiddenCats:S.weeklyHiddenCats)||[]; const hid=cats.filter(c=>h.includes(c)).length;
+  return {n:cats.length,on:cats.length-hid,hid};
+}
+function _affBuild(){
+  const ds=_AFF.ds, H=_affHalves(); const hidC=_affHidCats();
+  const P=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&!(typeof _empHorsEffectif==='function'&&_empHorsEffectif(p.id))&&!hidC.includes(p.categorie||'autre'));
+  const cols={}; const add=(k,p,h,extra)=>{ const c=(cols[k]=cols[k]||{}); const r=(c[p.id]=c[p.id]||{p,h:new Set(),x:new Set(),t:''}); r.h.add(h); if(extra&&extra.x) r.x.add(extra.x); if(extra&&extra.t) r.t=extra.t; };
+  P.forEach(p=>H.forEach(h=>{
+    const e=S.planning[`${p.id}_${ds}_${h}`];
+    if(!e||!e.type){ add('TODO',p,h); return; }
+    if(e.type==='travail'){
+      const ids=[e.chantierId,e.chantierId2].filter(Boolean);
+      if(!ids.length){ add('TODO',p,h,{t:'travail sans chantier'}); return; }
+      ids.forEach((cid,i)=>{ const other=ids[1-i]; add(_isTache(cid)?'TACHE':cid,p,h,{x:other||'',t:_isTache(cid)?_tacheTxt(cid):''}); if(_isTache(cid)) cols.TACHE[p.id].cid=cid; });
+    } else add('ABS',p,h,{t:_AFF_ABSLBL[e.type]||e.type});
+  }));
+  // colonnes : seulement les chantiers occupés ce jour-là (ordre du planning) + ceux ajoutés à la main
+  const order=['TODO'];
+  const known=[...S.chantiers.map(c=>c.id),'STO',...(S.stockage?.avions||[]).map(a=>'STO_'+a.id),'REC',...(S.recycling?.avions||[]).map(a=>'REC_'+a.id),'AIRBUS','STRUCT','PROD'];
+  known.forEach(k=>{ if(cols[k]||_AFF.extra.includes(k)) order.push(k); });
+  Object.keys(cols).forEach(k=>{ if(!order.includes(k)&&k!=='TACHE'&&k!=='ABS'&&k!=='TODO') order.push(k); });
+  _AFF.extra.forEach(k=>{ if(!order.includes(k)) order.push(k); });
+  order.push('ADD','TACHE','ABS');
+  return {cols,order:order.filter((k,i)=>order.indexOf(k)===i)};
+}
+function _affCard(r,colKey){
+  const p=r.p, cat=p.categorie||'autre', col=(typeof _ncolCol==='function'?_ncolCol(cat):'')||'#7c8aa5';
+  const half=_AFF.half==='day'&&r.h.size===1?(r.h.has('AM')?'matin':'après-midi'):'';
+  const tags=[half&&`<b>${half}</b>`, colKey==='ABS'&&r.t, colKey==='TODO'&&r.t, [...r.x].filter(Boolean).map(x=>'+ '+_bfEsc(_chMsnLabel(x).replace(/^\S+\s/,''))).join(' ')].filter(Boolean).join(' · ');
+  const sel=_AFF.sel&&_AFF.sel.pid===p.id&&_AFF.sel.from===colKey&&(_AFF.sel.cid||'')===(r.cid||'');
+  const canX=colKey!=='TODO'&&colKey!=='ABS'&&r.x.size&&[...r.x].some(Boolean);
+  return `<div class="af-p${sel?' sel':''}" draggable="true" data-pid="${p.id}" data-from="${colKey}" data-cid="${r.cid||''}" style="--cc:${col}" onclick="_affPick(event,'${p.id}','${colKey}','${r.cid||''}')">
+    ${canX?`<button type="button" class="af-x" title="Retirer de ce chantier (garde l'autre)" onclick="event.stopPropagation();_affRemove('${p.id}','${colKey}')">✕</button>`:''}
+    <span class="bn-av af-av" style="background:${col}">${_bfEsc(p.trigramme||((p.prenom||'?')[0]+(p.nom||'?')[0]))}</span><div class="af-tx">
+    <div class="af-n">${_bfEsc(_affName(p))} <span class="af-mk">${typeof _persMarker==='function'?_persMarker(p):''}</span></div>
+    <div class="af-s">${_bfEsc((CATS[cat]||{}).lbl||cat)}${tags?' · '+tags:''}</div>
+    ${typeof _authBadgeHtml==='function'&&_authBadgeHtml(p.id)?`<div class="af-a">${_authBadgeHtml(p.id)}</div>`:''}</div></div>`;
+}
+function _affRender(){
+  const ov=document.getElementById('aff-ov'); if(!ov) return;
+  const {cols,order}=_affBuild(); const d=parseLocal(_AFF.ds);
+  { const cb=ov.querySelector('.af-cat'); const ci=_affCatInfo(); if(cb){ cb.style.display=ci.hid?'':'none'; cb.classList.toggle('on',!_AFF.allCats); cb.textContent=_AFF.allCats?`👥 Toutes les catégories · revenir au filtre`:`👥 Catégories (${ci.on}/${ci.n}) · tout afficher`; } }
+  const sortR=a=>Object.values(a||{}).sort((x,y)=>(typeof _catOrder==='function'?0:0)||_affName(x.p).localeCompare(_affName(y.p)));
+  const catRank=r=>{ const o=['responsable','chef','expert','workshop','technicien','sheetmetal','iq','part21','recycling','interimaire','prestataire','alternant','stagiaire']; const i=o.indexOf(r.p.categorie); return i<0?99:i; };
+  const html=order.map(k=>{
+    if(k==='ADD'){ const L=_affAddList(order); return `<div class="af-addc" onclick="event.stopPropagation()"><button type="button" class="af-addb" onclick="_AFF.addOpen=!_AFF.addOpen;_affRender()">＋ Ajouter un chantier</button>${_AFF.addOpen?`<div class="af-addl">${L.length?L.map(([id,ic,l])=>`<button type="button" onclick="_affAddCol('${id}')"><span>${ic}</span>${_bfEsc(l)}</button>`).join(''):'<div class="af-hint">Tous tes avions sont déjà affichés</div>'}</div>`:''}</div>`; }
+    const m=_affColMeta(k); let list=Object.values(cols[k]||{}).sort((a,b)=>catRank(a)-catRank(b)||_affName(a.p).localeCompare(_affName(b.p)));
+    let body='';
+    if(k==='TACHE'){ const g={}; list.forEach(r=>{ (g[r.t]=g[r.t]||[]).push(r); }); body=Object.entries(g).map(([t,rs])=>`<div class="af-gt">🧰 ${_bfEsc(t)} <small>${rs.length}</small></div>${rs.map(r=>_affCard(r,k)).join('')}`).join('')||'<div class="af-hint">Dépose ici une personne pour lui donner une tâche (rangement, logistique…)</div>'; }
+    else body=list.map(r=>_affCard(r,k)).join('')||`<div class="af-hint">${k==='TODO'?'Tout le monde est affecté 👍':'Déposer ici'}</div>`;
+    const ink=typeof _bnInk==='function'?_bnInk(m.col):'#fff';
+    return `<div class="af-col${k==='TODO'?' af-todo':k==='ABS'?' af-abs':k==='TACHE'?' af-task':''}" data-k="${k}" onclick="_affDrop(event,'${k}')"><div class="af-h" style="--hc:${m.col};color:${ink}"><span>${_bfEsc(m.lbl)}</span><small>${_bfEsc(m.sub||'')}</small></div><div class="af-cnt">${list.length} pers.</div><div class="af-body">${body}</div></div>`;
+  }).join('');
+  ov.querySelector('.af-cols').innerHTML=html;
+  ov.querySelector('.af-day').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  ov.querySelectorAll('.af-seg[data-g="half"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===_AFF.half));
+  ov.querySelectorAll('.af-seg[data-g="mode"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===_AFF.mode));
+  ov.classList.toggle('af-picking',!!_AFF.sel);
+  const hint=ov.querySelector('.af-tip'); if(hint) hint.textContent=_AFF.sel?`${_affName(byId(_AFF.sel.pid)||{})} sélectionné(e) — touche la colonne d'arrivée (ou touche-le à nouveau pour annuler)`:(_AFF.mode==='add'?'Mode Ajouter : la personne garde son chantier et reçoit le nouveau en plus (double affectation)':'Glisse un nom vers une autre colonne — ou touche le nom puis la colonne');
+  // glisser-déposer (souris)
+  ov.querySelectorAll('.af-p').forEach(c=>{ c.addEventListener('dragstart',e=>{ _AFF.drag={pid:c.dataset.pid,from:c.dataset.from,cid:c.dataset.cid}; c.classList.add('drag'); try{ e.dataTransfer.setData('text/plain',c.dataset.pid); e.dataTransfer.effectAllowed='move'; }catch(_){} }); c.addEventListener('dragend',()=>{ c.classList.remove('drag'); ov.querySelectorAll('.af-col.over').forEach(x=>x.classList.remove('over')); }); });
+  ov.querySelectorAll('.af-col').forEach(col=>{ col.addEventListener('dragover',e=>{ if(!_AFF.drag) return; e.preventDefault(); col.classList.add('over'); }); col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove('over'); }); col.addEventListener('drop',e=>{ e.preventDefault(); col.classList.remove('over'); const d=_AFF.drag; _AFF.drag=null; if(d) _affMove(d,col.dataset.k); }); });
+}
+function _affPick(ev,pid,from,cid){ ev.stopPropagation(); if(_AFF.sel&&_AFF.sel.pid===pid&&_AFF.sel.from===from){ _AFF.sel=null; } else if(_AFF.sel&&_AFF.sel.from!==from){ const s=_AFF.sel; _AFF.sel=null; _affMove(s,from); return; } else _AFF.sel={pid,from,cid}; _affRender(); }
+function _affDrop(ev,k){ if(!_AFF.sel) return; const s=_AFF.sel; _AFF.sel=null; _affMove(s,k); }
+// Applique un déplacement (avec demandes : tâche / type d'absence / confirmation)
+function _affMove(src,to){
+  if(!src||!to||src.from===to&&to!=='TACHE') { _affRender(); return; }
+  const p=byId(src.pid); if(!p){ _affRender(); return; }
+  if(to==='TACHE'){ _affAsk('tache',p,t=>_affApply(src,'TACHE:'+t)); return; }
+  if(to==='ABS'){ _affAsk('abs',p,t=>_affApply(src,'ABS:'+t)); return; }
+  if(src.from==='ABS'){ _affConfirm(`Remplacer l'absence de ${_affName(p)} par « ${_affColMeta(to).lbl} » ?`,()=>_affApply(src,to,true)); return; }
+  _affApply(src,to);
+}
+function _affApply(src,to,forceAbs){
+  const ds=_AFF.ds, H=_affHalves(); const p=byId(src.pid); let changed=0, kept=0;
+  const fromCid=src.from==='TACHE'?(src.cid||''):(['TODO','ABS'].includes(src.from)?'':src.from);
+  H.forEach(h=>{
+    const k=`${p.id}_${ds}_${h}`, e=S.planning[k]?{...S.planning[k]}:{}; const vm=e.vm||'';
+    const isAbs=e.type&&e.type!=='travail';
+    if(to.startsWith('ABS:')){ if(isAbs&&e.type===to.slice(4)) return; S.planning[k]={type:to.slice(4),note:'',chantierId:'',chantierId2:'',formInt:'',vm}; changed++; return; }
+    if(isAbs&&!forceAbs){ kept++; return; }                       // congé / formation d'une demi-journée : conservé
+    if(to==='TODO'){
+      if(isAbs){ if(vm) S.planning[k]={type:'',vm}; else delete S.planning[k]; changed++; return; }
+      if(e.type==='travail'){ let a=e.chantierId||'', b=e.chantierId2||''; if(fromCid&&b===fromCid) b=''; else if(fromCid&&a===fromCid){ a=b; b=''; } else { a=''; b=''; }
+        if(!a){ if(vm) S.planning[k]={type:'',vm}; else delete S.planning[k]; } else S.planning[k]={...e,chantierId:a,chantierId2:b}; changed++; }
+      return;
+    }
+    // vers un chantier / une tâche
+    let a='', b='';
+    if(e.type==='travail'&&!isAbs){ a=e.chantierId||''; b=e.chantierId2||''; }
+    if(_AFF.mode==='add'&&a&&a!==to){ b=to; }
+    else if(fromCid&&b===fromCid){ b=to; }
+    else if(fromCid&&a===fromCid){ a=to; }
+    else { a=to; b=''; }
+    if(b===a) b='';
+    S.planning[k]={type:'travail',note:'',chantierId:a,chantierId2:b,formInt:'',vm}; changed++;
+  });
+  if(!changed){ toast(kept?`ℹ️ ${_affName(p)} est absent(e) sur ${_AFF.half==='day'?'cette journée':'cette demi-journée'} : rien n'a changé`:'Rien à changer'); _affRender(); return; }
+  save();
+  const tgt=to.startsWith('ABS:')?(_AFF_ABSLBL[to.slice(4)]||to.slice(4)):to==='TODO'?'À affecter':_isTache(to)?'🧰 '+_tacheTxt(to):_affColMeta(to).lbl;
+  toast(`↪ ${_affName(p)} → ${tgt} · ${disp(ds)}${_AFF.half==='day'?'':(_AFF.half==='AM'?' (matin)':' (après-midi)')}${kept?' · demi-journée d\'absence conservée':''}${_AFF.mode==='add'&&!to.startsWith('ABS:')&&to!=='TODO'?' · en plus':''} — « ↩️ Annuler » pour revenir`);
+  _AFF.dirty=true; _affRender();
+}
+function _affRemove(pid,colKey){ const r={pid,from:colKey,cid:''}; if(colKey==='TACHE'){ const card=document.querySelector(`#aff-ov .af-p[data-pid="${pid}"][data-from="TACHE"]`); r.cid=card?card.dataset.cid:''; } const m=_AFF.mode; _AFF.mode='move'; _affApply(r,'TODO'); _AFF.mode=m; _affRender(); }
+// Petites fenêtres internes
+function _affAsk(kind,p,cb){
+  const ov=document.getElementById('aff-ov'); const d=document.createElement('div'); d.className='af-dlg';
+  if(kind==='tache'){
+    const rec=(S.affTaches&&S.affTaches.length?S.affTaches:['Rangement','Logistique','Magasin','Nettoyage','Outillage']).slice(0,8);
+    d.innerHTML=`<div class="af-dc"><b>🧰 Tâche pour ${_bfEsc(_affName(p))}</b><input id="af-tin" maxlength="40" placeholder="Rangement, logistique…"><div class="af-chips">${rec.map(t=>`<button type="button" data-t="${_bfEsc(t)}">${_bfEsc(t)}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button><button type="button" class="af-ok">Valider</button></div></div>`;
+    ov.appendChild(d); const inp=d.querySelector('#af-tin'); setTimeout(()=>inp.focus(),50);
+    const go=t=>{ t=(t||'').trim().replace(/:/g,' '); if(!t){ inp.focus(); return; } S.affTaches=[t,...(S.affTaches||[]).filter(x=>x.toLowerCase()!==t.toLowerCase())].slice(0,12); d.remove(); cb(t); };
+    d.querySelectorAll('.af-chips button').forEach(b=>b.onclick=()=>go(b.dataset.t)); d.querySelector('.af-ok').onclick=()=>go(inp.value); inp.onkeydown=e=>{ if(e.key==='Enter') go(inp.value); if(e.key==='Escape') d.remove(); };
+  } else {
+    d.innerHTML=`<div class="af-dc"><b>Absence pour ${_bfEsc(_affName(p))}</b><div style="font-size:12.5px;opacity:.8;margin:4px 0 10px">Remplace son affectation ${_AFF.half==='day'?'de la journée':(_AFF.half==='AM'?'du matin':'de l\'après-midi')} du ${disp(_AFF.ds)}.</div><div class="af-chips">${_AFF_ABS.map(([v,l])=>`<button type="button" data-t="${v}">${l}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button></div></div>`;
+    ov.appendChild(d); d.querySelectorAll('.af-chips button').forEach(b=>b.onclick=()=>{ d.remove(); cb(b.dataset.t); });
+  }
+  d.querySelector('.af-c').onclick=()=>{ d.remove(); _affRender(); }; d.addEventListener('click',e=>{ if(e.target===d){ d.remove(); _affRender(); } });
+}
+function _affConfirm(msg,ok){ const ov=document.getElementById('aff-ov'); const d=document.createElement('div'); d.className='af-dlg'; d.innerHTML=`<div class="af-dc"><b>${_bfEsc(msg)}</b><div class="af-dr"><button type="button" class="af-c">Annuler</button><button type="button" class="af-ok">Confirmer</button></div></div>`; ov.appendChild(d); d.querySelector('.af-c').onclick=()=>{ d.remove(); _affRender(); }; d.querySelector('.af-ok').onclick=()=>{ d.remove(); ok(); }; }
+// Ouverture / navigation
+function affOpen(ds){
+  _AFF.catSrc=document.getElementById('pg-master')?.classList.contains('on')?'master':'weekly'; _AFF.allCats=false;
+  const nd=ds||(typeof _AFF.ds==='string'&&_AFF.ds)||fmt(new Date()); if(nd!==_AFF.ds){ _AFF.extra=[]; } _AFF.ds=nd; _AFF.sel=null; _AFF.dirty=false; _AFF.addOpen=false;
+  document.getElementById('day-recap-pop')?.remove();
+  let ov=document.getElementById('aff-ov');
+  if(!ov){ ov=document.createElement('div'); ov.id='aff-ov';
+    ov.innerHTML=`<div class="af-board"><div class="af-top"><b class="af-t">🧩 Affectations du jour</b><div class="af-nav"><button type="button" onclick="_affDay(-1)" aria-label="Jour précédent">‹</button><span class="af-day"></span><button type="button" onclick="_affDay(1)" aria-label="Jour suivant">›</button><button type="button" class="af-today" onclick="affOpen(fmt(new Date()))">Aujourd'hui</button></div>
+      <div class="af-seg" data-g="half"><button type="button" data-v="day" onclick="_AFF.half='day';_affRender()">Journée</button><button type="button" data-v="AM" onclick="_AFF.half='AM';_affRender()">Matin</button><button type="button" data-v="PM" onclick="_AFF.half='PM';_affRender()">Après-midi</button></div>
+      <div class="af-seg" data-g="mode"><button type="button" data-v="move" onclick="_AFF.mode='move';_affRender()">↔ Déplacer</button><button type="button" data-v="add" onclick="_AFF.mode='add';_affRender()">＋ Ajouter</button></div>
+      <button type="button" class="af-btn af-cat" onclick="_AFF.allCats=!_AFF.allCats;_affRender()" title="Suit le filtre Catégories du planning — touche pour tout afficher"></button><button type="button" class="af-btn" onclick="undoLast();setTimeout(_affRender,60)" title="Annuler le dernier déplacement">↩️ Annuler</button><button type="button" class="af-btn" onclick="_affExtract()">📄 Extrait<span class="af-lg"> affectation journalier</span></button><button type="button" class="af-btn af-close" onclick="affClose()" aria-label="Fermer">✕</button></div>
+      <div class="af-tip"></div><div class="af-cols"></div></div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener('click',e=>{ if(e.target===ov) affClose(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('aff-ov')&&!document.querySelector('#aff-ov .af-dlg')) affClose(); });
+  }
+  _affRender();
+}
+function _affDay(n){ const d=addD(parseLocal(_AFF.ds),n); _AFF.ds=fmt(d); _AFF.sel=null; _AFF.extra=[]; _AFF.addOpen=false; _affRender(); }
+function affClose(){ const ov=document.getElementById('aff-ov'); if(ov) ov.remove(); if(_AFF.dirty){ _AFF.dirty=false; try{ const a=(document.querySelector('.page.on')?.id||'pg-dashboard').replace(/^pg-/,''); const sc=document.querySelector('.body'); const y=sc?sc.scrollTop:0; goTab(a); if(sc) requestAnimationFrame(()=>sc.scrollTop=y); }catch(_){} } }
+function _affExtract(){ const ds=_AFF.ds; affClose(); try{ S.weekStart=getMon(parseLocal(ds)); openDayExtract(); const i=Math.round((parseLocal(ds)-S.weekStart)/864e5); const sel=document.getElementById('dayextract-select'); if(sel) sel.value=String(i); }catch(e){ toast('Extrait indisponible'); } }
+try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['🧩','Affectations du jour','affectation effectif reaffecter deplacer chantier equipe jour',()=>affOpen()]); }catch(_){}
 </script>
 
 <!-- Modal confirmation formations internes -->
