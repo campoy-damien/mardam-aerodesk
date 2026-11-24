@@ -2407,6 +2407,7 @@ body.th-bento #docWidget{display:none}
 .doc-row input{height:36px}.doc-row button{border:0;background:rgba(255,77,109,.12);border-radius:9px;cursor:pointer}
 @media(max-width:600px){.doc-row{grid-template-columns:1fr 38px}.doc-row input:nth-child(2){grid-column:1/2}}
 
+html.pl-cv-off .bnw-card,html.pl-cv-off .bn-ppr{content-visibility:visible!important}
 /* ═══ 🧩 Affectations du jour ═══ */
 #aff-ov{position:fixed;inset:0;z-index:8600;background:rgba(4,7,14,.82);padding:14px;box-sizing:border-box;font-family:'Outfit',sans-serif;color:#e6eefc}
 .af-board{height:100%;display:flex;flex-direction:column;background:#0b1220;border:1px solid rgba(0,210,255,.25);border-radius:16px;padding:12px;box-sizing:border-box;box-shadow:0 24px 70px rgba(0,0,0,.6)}
@@ -2534,6 +2535,35 @@ body.th-bento .af-selbar button{border-radius:999px;background:#e8ecff;color:#0a
 .af-board{position:relative}
 .af-ghost{position:fixed;top:-100px;left:-100px;padding:8px 14px;border-radius:999px;background:#ffe066;color:#1a1400;font:800 13px sans-serif}
 @media(max-width:760px){.af-selbar span{display:none}}
+
+/* Menu Catégories du tableau */
+#af-catpop{position:fixed;z-index:70;width:260px;max-height:70vh;overflow:auto;padding:8px;border-radius:14px;background:#0e1422;border:1px solid rgba(0,210,255,.3);box-shadow:0 18px 44px rgba(0,0,0,.55);color:#e6eefc;isolation:isolate}
+body.th-bento #af-catpop{border-radius:20px;border-color:rgba(255,255,255,.14);background:#121829;font-family:'Space Grotesk',sans-serif}
+.af-cph{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 8px;font-size:13px}
+.af-cph span{font-size:11px;color:#97a3c0}
+.af-cpl{display:flex;flex-direction:column;gap:4px}
+.af-cpl button{display:flex;align-items:center;gap:9px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#97a3c0;font:700 12.5px inherit;padding:8px 10px;border-radius:10px;cursor:pointer;text-align:left}
+.af-cpl button.on{border-color:var(--cc);background:color-mix(in srgb,var(--cc) 15%,transparent);color:#eef3ff}
+.af-cpl button i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--cc);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;color:#0a0e19;flex-shrink:0}
+.af-cpl button.on i{background:var(--cc)}
+.af-cpl button span{flex:1}
+.af-cpl button small{font-size:11px;opacity:.7}
+body.th-bento .af-cpl button{border-radius:999px}
+.af-cpf{display:flex;gap:6px;margin-top:8px}
+.af-cpf button{flex:1;border:1px solid rgba(255,255,255,.14);background:transparent;color:#cfe0ff;font:700 12px inherit;padding:7px;border-radius:9px;cursor:pointer}
+body.th-bento .af-cpf button{border-radius:999px}
+
+/* ═══ 🗓 Brief de la semaine ═══ */
+.bs-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.bs-wk{min-width:96px;text-align:center;font-size:14px}
+.bs-lbl{display:block;font-size:12px;font-weight:700;margin-bottom:6px;opacity:.9}.bs-lbl small{font-weight:500;opacity:.7}
+.bs-msgrow{display:flex;gap:8px;align-items:flex-start;margin-bottom:12px}
+.bs-msgrow textarea{flex:1;min-height:64px;resize:vertical;font:inherit;font-size:13px;line-height:1.4;padding:9px 12px;border-radius:10px}
+.bs-prev{background:#e9edf3;border-radius:12px;padding:10px;max-height:62vh;overflow:auto}
+.bs-prev svg{display:block;width:100%;height:auto;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+body.th-bento .bs-prev{border-radius:18px;background:rgba(255,255,255,.06)}
+body.th-bento .bs-msgrow textarea{border-radius:14px}
+@media(max-width:760px){.bs-msgrow{flex-direction:column}.bs-msgrow .btn{align-self:flex-end}.bs-prev{padding:6px;max-height:none}}
 </style>
 </head>
 <body>
@@ -2713,6 +2743,7 @@ body.th-bento .af-selbar button{border-radius:999px;background:#e8ecff;color:#0a
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <span id="todayLbl" style="font-size:13px;color:var(--t3);font-weight:500"></span>
       <button class="btn btn-cyan btn-sm" onclick="openBrief()" title="Le point du jour prêt pour ton brief d'équipe" style="position:relative">☀️ Brief du jour<span id="brief-om-badge" style="display:none;position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:#ffd166;color:#1a1200;font-size:10px;font-weight:900;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px #0a0f1b"></span></button>
+      <button class="btn btn-cyan btn-sm" onclick="openBriefWeek()" title="Le récap de la semaine à envoyer au personnel de production">🗓 Brief de la semaine</button>
       <button class="btn btn-ghost btn-sm" onclick="openForecast()" title="Capacité, besoin, congés prévisionnels et fins de contrat sur 13 semaines">📈 Prévision 3 mois</button>
     </div>
   </div>
@@ -4869,6 +4900,26 @@ body.th-bento .af-selbar button{border-radius:999px;background:#e8ecff;color:#0a
   <div class="mfooter">
     <button class="btn btn-ghost" onclick="closeM('m-brief')">Fermer</button>
     <button class="btn btn-cyan" onclick="briefPrint()">🖨 Imprimer / PDF</button>
+  </div>
+</div>
+</div>
+<!-- Brief de la semaine -->
+<div class="mbg" id="m-bsem">
+<div class="modal bs-modal" style="max-width:1240px;width:97vw">
+  <div class="bs-top">
+    <div class="modal-title" style="margin:0;flex:1">🗓 Brief de la semaine</div>
+    <button class="btn btn-ghost btn-sm" onclick="_bsShift(-1)" title="Semaine précédente">◀</button>
+    <b id="bs-title" class="bs-wk">Semaine</b>
+    <button class="btn btn-ghost btn-sm" onclick="_bsShift(1)" title="Semaine suivante">▶</button>
+    <button class="btn btn-ghost btn-sm" onclick="openBriefWeek()">Cette semaine</button>
+  </div>
+  <label class="bs-lbl">📣 Infos de la réunion de production <small>(consignes, sécurité, infos de la semaine — gardées pour cette semaine)</small></label>
+  <div class="bs-msgrow"><textarea id="bs-msg" rows="3" placeholder="Ex : Rappel sécurité : port des EPI obligatoire en zone hangar…" oninput="_bsMsgInput(this.value)"></textarea><button class="btn btn-ghost btn-sm" onclick="_bsMsgPrev()" title="Reprendre le message de la semaine précédente">↺ Reprendre</button></div>
+  <div id="bs-prev" class="bs-prev"></div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeM('m-bsem')">Fermer</button>
+    <button class="btn btn-ghost" onclick="briefWeekPNG()" title="Image PNG pour WhatsApp / téléphone">🖼 Image</button>
+    <button class="btn btn-cyan" onclick="briefWeekPDF()" title="PDF A4 paysage pour le mail">📄 PDF</button>
   </div>
 </div>
 </div>
@@ -9028,6 +9079,7 @@ const GUIDE_DATA = {
   "Tableau de bord": { icon:"🏠", color:"#60b4ff", steps:[
     {t:"À quoi ça sert", d:"Le <b>Tableau de bord</b> est la page d'accueil : vue d'ensemble de l'activité du jour, raccourcis et <b>alertes</b> (expirations proches, chantiers en manque d'effectif, congés à valider).", ill:null},
     {t:"Naviguer", d:"Les <b>familles d'onglets</b> en haut (Pilotage, Planning, Avions, Personnel, Outils) regroupent les pages. Clique une famille puis le sous-onglet voulu.", ill:null},
+    {t:"Brief de la semaine", d:"Le bouton <b>🗓 Brief de la semaine</b> (tableau de bord, ou Ctrl + K) prépare une page A4 à envoyer au personnel de production : tes <b>infos de la réunion</b>, le schéma et les positions du hangar du lundi au dimanche, les <b>chantiers avec leur chef d'équipe</b>, les formations, les absences (la maladie reste « Absent »), les arrivées / départs d'intérimaires et les visites médicales. ◀ ▶ pour changer de semaine ; <b>🖼 Image</b> pour WhatsApp, <b>📄 PDF</b> pour le mail."},
     {t:"Brief du jour", d:"Le bouton <b>☀️ Brief du jour</b> ouvre le point du jour : chiffres clés, <b>📣 message du brief</b> (consigne sécurité ou info du jour, enregistrée pour la date et imprimée), <b>chantiers en cartes</b> (chef d'équipe, équipe en trigrammes — inspecteurs en cyan —, effectif / besoin, avancement), présences & mouvements, formations et visites, <b>✈️ entrées / sorties d'avions</b> à 7 jours, échéances et tâches. Les rubriques vides sont masquées. Flèches pour changer de jour, <b>🖨 Imprimer / PDF</b> pour le partager.", ill:null},
     {t:"Météo et alertes", d:"Le brief affiche la <b>météo de Francazal</b> (modèles Météo-France via Open-Meteo) : conditions actuelles, 4 jours et le déroulé heure par heure. Des <b>bandeaux d'alerte</b> apparaissent en cas de <b>risque d'orage</b> ⛈️, <b>vent fort / coup de vent / tempête</b> 💨🌪️ (rafales ≥ 60 / 80 / 100 km/h), de rafales au-dessus du <b>seuil nacelles</b> (réglable, 45 km/h par défaut), de brouillard ou de gel — pour le jour du brief et le lendemain. Lien direct vers la <b>vigilance officielle Météo-France</b>. Connexion Internet nécessaire.", ill:null},
     {t:"Suivre les avions", d:"Dans le brief, rubrique <b>📡 Suivi des avions</b> : tape une <b>immatriculation</b> (F-HBNA, EC-NAZ…) ou un <b>n° de vol</b> (AFR1234…) puis <b>Entrée</b> — l'app reconnaît le type et ouvre l'avion ou le vol sur <b>Flightradar24</b>. Les recherches récentes restent en raccourcis (✕ pour les retirer). Le bouton <b>📡 Radar LFBF</b> ouvre Flightradar24 centré sur Francazal, et la carte <b>Trafic en direct</b> (▶ Afficher la carte) montre les avions en vol autour du site directement dans le brief. <b>⛶ Plein écran</b> agrandit le brief sur tout l'écran.", ill:null},
@@ -11101,6 +11153,14 @@ function _chMsnShort(cid){
 }
 
 // Personnes hors production (actif=false) ayant au moins un jour de planning sur la période (traçabilité)
+// Personnes à montrer dans un planning sur une période : sous contrat sur au moins un jour de la période,
+// ou ayant quand même quelque chose de planifié (pour ne rien cacher de saisi).
+function _plVisible(p,dates){
+  if(typeof _presentSemaine!=='function') return true;
+  const a=dates[0], b=dates[dates.length-1];
+  if(_presentSemaine(p,a,b) && dates.some(d=>_enContrat(p,fmt(d)))) return true;
+  return dates.some(d=>{ const ds=fmt(d); return S.planning[`${p.id}_${ds}_AM`]||S.planning[`${p.id}_${ds}_PM`]; });
+}
 function _inactifsAvecPlanning(dates){
   const inactifs=(S.personnel||[]).filter(p=>p.actif===false);
   return inactifs.filter(p=>dates.some(d=>{const ds=fmt(d);return S.planning[`${p.id}_${ds}_AM`]||S.planning[`${p.id}_${ds}_PM`];}));
@@ -11902,7 +11962,12 @@ function _plKeepScroll(fn,gridId){
   if(g) g.querySelectorAll(':scope > *, :scope > * > *, :scope > * > * > *').forEach(e=>{ if(e.tagName!=='TD'&&e.tagName!=='TR') C.add(e); });
   const root=document.body, saved=[];
   C.forEach(e=>{ if(e&&(e.scrollTop>0||e.scrollLeft>0)){ const pa=e===document.scrollingElement?'win':_scPath(e,root); if(pa) saved.push([pa,e.scrollTop,e.scrollLeft]); } });
+  // iPad / iPhone : les cartes hors écran ont une taille « estimée » juste après un redessin → on les dessine une fois pour de vrai
+  const H=document.documentElement; H.classList.add('pl-cv-off'); clearTimeout(window._plCvT); window._plCvT=setTimeout(()=>H.classList.remove('pl-cv-off'),600);
   fn();
+  // Bento : la mise en cartes du planning se fait d'habitude à l'image suivante → la page « rétrécit » un instant (sursaut).
+  // On la fait tout de suite, avant de remettre le défilement, pour que tout se passe en une seule image.
+  try{ if(document.body.classList.contains('th-bento')){ const pg=document.querySelector('.page.on'); if(pg&&(pg.id==='pg-master'||pg.id==='pg-weekly')){ if(typeof _bnSolidCells==='function') _bnSolidCells(pg); if(typeof _bnPlanningPost==='function') _bnPlanningPost(pg.id); } } }catch(e){ console.warn('bento post',e); }
   if(!saved.length) return;
   const restore=()=>saved.forEach(([pa,t,l])=>{ const e=pa==='win'?document.scrollingElement:_scFind(pa,root); if(e){ if(e.scrollTop!==t) e.scrollTop=t; if(e.scrollLeft!==l) e.scrollLeft=l; } });
   restore(); requestAnimationFrame(restore); setTimeout(restore,120);
@@ -12108,7 +12173,8 @@ function renderMaster(){
   let emps;
   if(empF){ emps=S.personnel.filter(p=>p.id===empF); }
   else{
-    emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false));
+    const _mq0=(document.getElementById('master-search')?.value||'').trim();
+    emps=sortPersonnel(S.personnel.filter(p=>p.actif!==false&&(_mq0||_plVisible(p,dates))));
     emps=emps.concat(sortPersonnel(_inactifsAvecPlanning(dates)));
     // Filtre catégories (si des catégories sont masquées) — sauf quand une personne précise est sélectionnée
     const hid=Array.isArray(S.masterHiddenCats)?S.masterHiddenCats:[];
@@ -12771,7 +12837,8 @@ function renderWeekly(){
   const dates=Array.from({length:7},(_,i)=>addD(S.weekStart,i));
   const end=dates[6];
   document.getElementById('weekLbl').textContent=`Semaine ${wkN(S.weekStart)} · ${S.weekStart.getDate()} ${MO[S.weekStart.getMonth()].slice(0,3)} – ${end.getDate()} ${MO[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
-  const sorted = sortByChantier(S.personnel.filter(p=>p.actif!==false), dates);
+  const _wq0=(document.getElementById('week-search')?.value||'').trim(), _we0=document.getElementById('wk-emp')?.value||'';
+  const sorted = sortByChantier(S.personnel.filter(p=>p.actif!==false&&(_wq0||_we0||_plVisible(p,dates))), dates);
   const sortis = sortPersonnel(_inactifsAvecPlanning(dates));
   const _we=document.getElementById('wk-emp');
   if(_we && _we.options.length<=1){ try{popSelects();}catch(e){} }
@@ -27391,6 +27458,7 @@ function _bnLot4Post(id){
 const _CK_TABS=[['dashboard','🏠','Tableau de bord'],['programme','📊','Programme activité'],['chantiers','🔧','Chantiers'],['kpi','📈','Tableau KPI'],['master','📅','Master planning'],['weekly','🗓','Planning hebdo'],['slot','🏭','Slot Hangar'],['stockage','🅿️','Stockage'],['recycling','♻️','A/C Recyclage'],['airbus','🛩','Airbus activité'],['personnel','👥','Personnel'],['certif','🛫','Certifying Staff'],['formations','📋','Formations'],['autorisations','🛡','Autorisations'],['todo','✅','To-Do'],['checklist','🗒️','Check-list'],['ai','✦','Assistant IA'],['simulation','🧪','Simulation'],['notice','📖','Notice']];
 const _CK_ACTIONS=[
   ['☀️','Brief du jour','brief matin point equipe',()=>openBrief()],
+  ['🗓','Brief de la semaine','brief semaine hebdo recap production envoyer personnel formations absences hangar',()=>openBriefWeek()],
   ['📺','Mode TV atelier','tv ecran atelier diaporama plein ecran',()=>tvOpen()],
   ['🪄','Proposer les équipes','auto planning composition equipes semaine',()=>{ goTab('weekly'); openAutoPlan(); }],
   ['➕','Nouveau congé / saisir une case','conge absence saisie planning case',()=>{ goTab('weekly'); toast('Clique sur la case de la personne dans le planning'); }],
@@ -28159,7 +28227,7 @@ function _affCatInfo(){
 }
 function _affBuild(){
   const ds=_AFF.ds, H=_affHalves(); const hidC=_affHidCats();
-  const P=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&!(typeof _empHorsEffectif==='function'&&_empHorsEffectif(p.id))&&!hidC.includes(p.categorie||'autre'));
+  const P=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&!(typeof _empHorsEffectif==='function'&&_empHorsEffectif(p.id))&&!hidC.includes(p.categorie||'autre')&&_plVisible(p,[parseLocal(ds)]));
   const cols={}; const add=(k,p,h,extra)=>{ const c=(cols[k]=cols[k]||{}); const r=(c[p.id]=c[p.id]||{p,h:new Set(),x:new Set(),t:''}); r.h.add(h); if(extra&&extra.x) r.x.add(extra.x); if(extra&&extra.t) r.t=extra.t; };
   P.forEach(p=>H.forEach(h=>{
     const e=S.planning[`${p.id}_${ds}_${h}`];
@@ -28195,7 +28263,7 @@ function _affCard(r,colKey){
 function _affRender(){
   const ov=document.getElementById('aff-ov'); if(!ov) return;
   const {cols,order}=_affBuild(); const d=parseLocal(_AFF.ds);
-  { const cb=ov.querySelector('.af-cat'); const ci=_affCatInfo(); if(cb){ cb.style.display=ci.hid?'':'none'; cb.classList.toggle('on',!_AFF.allCats); cb.textContent=_AFF.allCats?`👥 Toutes les catégories · revenir au filtre`:`👥 Catégories (${ci.on}/${ci.n}) · tout afficher`; } }
+  { const cb=ov.querySelector('.af-cat'); const ci=_affCatInfo(); if(cb){ cb.style.display=''; cb.classList.toggle('on',ci.hid>0); cb.textContent=ci.hid?`👥 Catégories (${ci.on}/${ci.n}) ▾`:'👥 Catégories ▾'; if(document.getElementById('af-catpop')) _affCatPopFill(); } }
   const sortR=a=>Object.values(a||{}).sort((x,y)=>(typeof _catOrder==='function'?0:0)||_affName(x.p).localeCompare(_affName(y.p)));
   const catRank=r=>{ const o=['responsable','chef','expert','workshop','technicien','sheetmetal','iq','part21','recycling','interimaire','prestataire','alternant','stagiaire']; const i=o.indexOf(r.p.categorie); return i<0?99:i; };
   const html=order.map(k=>{
@@ -28312,6 +28380,26 @@ function _affAutoStart(){ if(_affAuto) return; _affAuto={x:-1,y:-1,raf:0};
   _affAuto.raf=requestAnimationFrame(step); }
 function _affAutoStop(){ if(!_affAuto) return; cancelAnimationFrame(_affAuto.raf); document.removeEventListener('dragover',_affAuto.onOver,true); _affAuto=null; }
 document.addEventListener('dragend',()=>_affAutoStop(),true); document.addEventListener('drop',()=>_affAutoStop(),true);
+
+// Menu déroulant Catégories du tableau (même filtre que le planning d'où on vient : Hebdo ou Master)
+function _affHidRef(){ const k=_AFF.catSrc==='master'?'masterHiddenCats':'weeklyHiddenCats'; if(!Array.isArray(S[k])) S[k]=[]; return k; }
+function _affCatList(){ const roster=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived); const cats=[...new Set(roster.map(p=>p.categorie||'autre'))]; const ref=(typeof CATS!=='undefined')?Object.keys(CATS):[]; cats.sort((a,b)=>{const ia=ref.indexOf(a),ib=ref.indexOf(b);if(ia!==-1&&ib!==-1)return ia-ib;if(ia!==-1)return -1;if(ib!==-1)return 1;return _dayExtractCatLbl(a).localeCompare(_dayExtractCatLbl(b));}); return {roster,cats}; }
+function _affCatPop(){
+  const old=document.getElementById('af-catpop'); if(old){ old.remove(); return; }
+  const ov=document.getElementById('aff-ov'), btn=ov&&ov.querySelector('.af-cat'); if(!btn) return;
+  const pop=document.createElement('div'); pop.id='af-catpop'; pop.addEventListener('click',e=>e.stopPropagation()); ov.appendChild(pop);
+  _affCatPopFill();
+  const r=btn.getBoundingClientRect(); const w=pop.offsetWidth; pop.style.top=(r.bottom+8)+'px'; pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';
+  setTimeout(()=>{ const close=e=>{ if(!pop.contains(e.target)&&!btn.contains(e.target)){ pop.remove(); document.removeEventListener('pointerdown',close,true); } }; document.addEventListener('pointerdown',close,true); },0);
+}
+function _affCatPopFill(){
+  const pop=document.getElementById('af-catpop'); if(!pop) return;
+  const k=_affHidRef(), hid=S[k], {roster,cats}=_affCatList();
+  pop.innerHTML=`<div class="af-cph"><b>Catégories affichées</b><span>${_AFF.catSrc==='master'?'Master':'Hebdo'}</span></div><div class="af-cpl">${cats.map(c=>{ const on=!hid.includes(c), col=_dayExtractCatColor(c), n=roster.filter(p=>(p.categorie||'autre')===c).length;
+    return `<button type="button" class="${on?'on':''}" style="--cc:${col}" onclick="_affCatToggle('${c}')"><i>${on?'✓':''}</i><span>${_bfEsc(_dayExtractCatLbl(c))}</span><small>${n}</small></button>`; }).join('')}</div><div class="af-cpf"><button type="button" onclick="_affCatAll(true)">Tout afficher</button><button type="button" onclick="_affCatAll(false)">Tout masquer</button></div>`;
+}
+function _affCatToggle(c){ const k=_affHidRef(); S[k]=S[k].includes(c)?S[k].filter(x=>x!==c):[...S[k],c]; _AFF.allCats=false; try{save();}catch(_){} _AFF.dirty=true; _affRender(); }
+function _affCatAll(on){ const k=_affHidRef(); S[k]=on?[]:_affCatList().cats.slice(); _AFF.allCats=false; try{save();}catch(_){} _AFF.dirty=true; _affRender(); }
 // Ouverture / navigation
 function affOpen(ds){
   _AFF.catSrc=document.getElementById('pg-master')?.classList.contains('on')?'master':'weekly'; _AFF.allCats=false;
@@ -28322,7 +28410,7 @@ function affOpen(ds){
     ov.innerHTML=`<div class="af-board"><div class="af-top"><b class="af-t">🧩 Affectations du jour</b><div class="af-nav"><button type="button" onclick="_affDay(-1)" aria-label="Jour précédent">‹</button><span class="af-day"></span><button type="button" onclick="_affDay(1)" aria-label="Jour suivant">›</button><button type="button" class="af-today" onclick="affOpen(fmt(new Date()))">Aujourd'hui</button></div>
       <div class="af-seg" data-g="half"><button type="button" data-v="day" onclick="_AFF.half='day';_affRender()">Journée</button><button type="button" data-v="AM" onclick="_AFF.half='AM';_affRender()">Matin</button><button type="button" data-v="PM" onclick="_AFF.half='PM';_affRender()">Après-midi</button></div>
       <div class="af-seg" data-g="mode"><button type="button" data-v="move" onclick="_AFF.mode='move';_affRender()">↔ Déplacer</button><button type="button" data-v="add" onclick="_AFF.mode='add';_affRender()">＋ Ajouter</button></div>
-      <button type="button" class="af-btn af-cat" onclick="_AFF.allCats=!_AFF.allCats;_affRender()" title="Suit le filtre Catégories du planning — touche pour tout afficher"></button><button type="button" class="af-btn" onclick="undoLast();setTimeout(_affRender,60)" title="Annuler le dernier déplacement">↩️ Annuler</button><button type="button" class="af-btn" onclick="_affExtract()">📄 Extrait<span class="af-lg"> affectation journalier</span></button><button type="button" class="af-btn af-close" onclick="affClose()" aria-label="Fermer">✕</button></div>
+      <button type="button" class="af-btn af-cat" onclick="event.stopPropagation();_affCatPop()" title="Choisir les catégories affichées (même filtre que le planning)"></button><button type="button" class="af-btn" onclick="undoLast();setTimeout(_affRender,60)" title="Annuler le dernier déplacement">↩️ Annuler</button><button type="button" class="af-btn" onclick="_affExtract()">📄 Extrait<span class="af-lg"> affectation journalier</span></button><button type="button" class="af-btn af-close" onclick="affClose()" aria-label="Fermer">✕</button></div>
       <div class="af-tip"></div><div class="af-cols"></div></div>`;
     document.body.appendChild(ov);
     ov.addEventListener('click',e=>{ if(e.target===ov) affClose(); });
@@ -28334,6 +28422,201 @@ function _affDay(n){ const d=addD(parseLocal(_AFF.ds),n); _AFF.ds=fmt(d); _AFF.s
 function affClose(){ const ov=document.getElementById('aff-ov'); if(ov) ov.remove(); if(_AFF.dirty){ _AFF.dirty=false; try{ const a=(document.querySelector('.page.on')?.id||'pg-dashboard').replace(/^pg-/,''); const sc=document.querySelector('.body'); const y=sc?sc.scrollTop:0; goTab(a); if(sc) requestAnimationFrame(()=>sc.scrollTop=y); }catch(_){} } }
 function _affExtract(){ const ds=_AFF.ds; affClose(); try{ S.weekStart=getMon(parseLocal(ds)); openDayExtract(); const i=Math.round((parseLocal(ds)-S.weekStart)/864e5); const sel=document.getElementById('dayextract-select'); if(sel) sel.value=String(i); }catch(e){ toast('Extrait indisponible'); } }
 try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['🧩','Affectations du jour','affectation effectif reaffecter deplacer chantier equipe jour',()=>affOpen()]); }catch(_){}
+
+/* ═══ 🗓 Brief de la semaine (une page A4 à envoyer au personnel de production) ═══ */
+let _bsMon=null, _bsMsgT=null, _bsCtx=null;
+const _BS_F='Segoe UI,Roboto,Helvetica Neue,Helvetica,Arial,sans-serif';
+const _bsE=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function _bsW(t,sz,wt){ if(!_bsCtx) _bsCtx=document.createElement('canvas').getContext('2d'); _bsCtx.font=`${wt||400} ${sz}px ${_BS_F}`; return _bsCtx.measureText(String(t)).width; }
+function _bsFit(t,sz,wt,max){ t=String(t||''); if(_bsW(t,sz,wt)<=max) return t; while(t.length>1&&_bsW(t+'…',sz,wt)>max) t=t.slice(0,-1); return t.trim()+'…'; }
+function _bsWrap(t,sz,wt,max){ const out=[]; String(t||'').split('\n').forEach(par=>{ let cur=''; par.split(/\s+/).filter(Boolean).forEach(x=>{ const n=cur?cur+' '+x:x; if(_bsW(n,sz,wt)<=max) cur=n; else { if(cur) out.push(cur); cur=_bsW(x,sz,wt)<=max?x:_bsFit(x,sz,wt,max); } }); out.push(cur); }); while(out.length&&!out[out.length-1]) out.pop(); return out; }
+function _bsT(x,y,t,sz,wt,fill,anchor,extra){ return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="${_BS_F}" font-size="${sz.toFixed(2)}" font-weight="${wt||400}" fill="${fill||'#0f1e3d'}"${anchor?` text-anchor="${anchor}"`:''}${extra||''}>${_bsE(t)}</text>`; }
+const _BS_J=['Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.','Dim.'], _BS_J1=['L','M','M','J','V','S','D'], _BS_J3=['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+const _BS_MO=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function _bsNm(p){ return `${(p.nom||'').toUpperCase()} ${p.prenom||''}`.trim(); }
+function _bsRng(days,idx){ if(!idx.length) return ''; const out=[]; let a=idx[0],b=idx[0]; const d=i=>`${_BS_J[i]} ${parseLocal(days[i]).getDate()}`; for(let k=1;k<=idx.length;k++){ if(idx[k]===b+1){ b=idx[k]; continue; } out.push(a===b?d(a):`${d(a)} → ${d(b)}`); a=b=idx[k]; } return out.join(', '); }
+// Libellé d'un chantier / d'une activité pour la carte
+function _bsChLbl(cid){
+  const c=(S.chantiers||[]).find(x=>x.id===cid);
+  if(c) return {t:(c.client||c.nom||'Chantier').trim(), s:[c.avion||c.type||'',c.msn?'MSN '+c.msn:'',c.client&&c.nom&&c.nom!==c.client?c.nom:''].filter(Boolean).join(' · ')};
+  const av=(arr,id)=>(arr||[]).find(a=>a.id===id);
+  if(cid==='STO') return {t:'Stockage',s:'maintenance stockage'};
+  if(cid==='REC') return {t:'Recyclage',s:''};
+  if(cid.startsWith('STO_')){ const a=av(S.stockage?.avions,cid.slice(4)); return {t:'Stockage',s:a?[a.type,a.msn?'MSN '+a.msn:''].filter(Boolean).join(' · '):''}; }
+  if(cid.startsWith('REC_')){ const a=av(S.recycling?.avions,cid.slice(4)); return {t:'Recyclage',s:a?[a.type,a.msn?'MSN '+a.msn:''].filter(Boolean).join(' · '):''}; }
+  return {t:({AIRBUS:'Airbus — Part 21',STRUCT:'Structure — atelier',PROD:'Production'})[cid]||cid, s:''};
+}
+// Toutes les données de la semaine
+function _bsData(mon){
+  const days=[...Array(7)].map((_,i)=>fmt(addD(mon,i)));
+  const P=(S.personnel||[]).filter(p=>!p.archived);
+  const cell=(p,ds,h)=>S.planning[`${p.id}_${ds}_${h}`];
+  // Chantiers de la semaine + chef(s) d'équipe le(s) plus présent(s)
+  const CH={};
+  P.forEach(p=>days.forEach(ds=>['AM','PM'].forEach(h=>{ const e=cell(p,ds,h); if(!e||e.type!=='travail') return;
+    [e.chantierId,e.chantierId2].filter(c=>c&&!_isTache(c)).forEach(cid=>{ const c=CH[cid]=CH[cid]||{n:new Set(),chefs:{}}; c.n.add(p.id); if(p.categorie==='chef') c.chefs[p.id]=(c.chefs[p.id]||0)+1; }); })));
+  const chantiers=Object.entries(CH).map(([cid,c])=>{ const t=Object.entries(c.chefs).sort((a,b)=>b[1]-a[1]); const chefs=t.length?t.filter(([,v])=>v>=t[0][1]*0.4).slice(0,2).map(([id])=>byId(id)).filter(Boolean):[];
+    return {cid,col:_chColor(cid),...(_bsChLbl(cid)),n:c.n.size,chefs}; }).sort((a,b)=>b.n-a.n);
+  // Formations (externes + internes), regroupées par intitulé
+  const F={};
+  P.forEach(p=>days.forEach((ds,i)=>['AM','PM'].forEach(h=>{ const e=cell(p,ds,h); if(!e||(e.type!=='formation'&&e.type!=='formation_int')) return;
+    const t=((e.type==='formation_int'?e.formInt:e.note)||'Formation').trim(); const f=F[t]=F[t]||{t,int:e.type==='formation_int',pp:{},d:new Set()}; f.d.add(i); (f.pp[p.id]=f.pp[p.id]||new Set()).add(i); })));
+  const formations=Object.values(F).map(f=>({t:f.t,int:f.int,days:[...f.d].sort((a,b)=>a-b),people:Object.keys(f.pp).map(id=>byId(id)).filter(Boolean).sort((a,b)=>_bsNm(a).localeCompare(_bsNm(b)))})).sort((a,b)=>a.days[0]-b.days[0]||a.t.localeCompare(b.t));
+  // Absences (la maladie reste « Absent » : le brief part à tout le monde)
+  const AK={conge:'conge',conge_prev:'conge',maladie:'abs',absence:'abs',deplacement:'dep',ecole:'ecole'};
+  const absences=[];
+  P.forEach(p=>{ const g={}; days.forEach((ds,i)=>['AM','PM'].forEach(h=>{ const e=cell(p,ds,h); const k=e&&AK[e.type]; if(!k) return; const o=g[k]=g[k]||{d:{},note:''}; o.d[i]=(o.d[i]||'')+h; if(k==='dep'&&e.note) o.note=e.note; }));
+    Object.entries(g).forEach(([k,o])=>absences.push({p,k,d:o.d,note:o.note,first:Math.min(...Object.keys(o.d).map(Number))})); });
+  absences.sort((a,b)=>a.first-b.first||_bsNm(a.p).localeCompare(_bsNm(b.p)));
+  // Intérimaires : arrivées / départs (avec les reprises après interruption)
+  const arr=[], dep=[];
+  P.filter(p=>p.categorie==='interimaire').forEach(p=>{ const sg=_contratSegs(p);
+    sg.forEach((s,i)=>{ const prev=sg[i-1], next=sg[i+1];
+      if(s[0]&&s[0]>=days[0]&&s[0]<=days[6]&&!(prev&&prev[1]&&fmt(addD(parseLocal(prev[1]),1))>=s[0])) arr.push({p,ds:s[0],re:!!prev});
+      if(s[1]&&s[1]>=days[0]&&s[1]<=days[6]&&!(next&&next[0]&&fmt(addD(parseLocal(s[1]),1))>=next[0])) dep.push({p,ds:s[1],re:!!next}); }); });
+  arr.sort((a,b)=>a.ds.localeCompare(b.ds)); dep.sort((a,b)=>a.ds.localeCompare(b.ds));
+  // Visites médicales
+  const vm=[]; P.forEach(p=>days.forEach((ds,i)=>['AM','PM'].forEach(h=>{ const e=cell(p,ds,h); if(e&&e.vm) vm.push({p,i,t:String(e.vm)}); })));
+  vm.sort((a,b)=>a.i-b.i||a.t.localeCompare(b.t));
+  return {mon,days,chantiers,formations,absences,arr,dep,vm,msg:((S.briefWeek||{})[days[0]]||'').trim()};
+}
+// ── Petits éléments graphiques ──
+function _bsDots(x,y,sz,map,col){ // mini-semaine L M M J V S D ; map[i] = 'AMPM' | 'AM' | 'PM'
+  let g=''; for(let i=0;i<7;i++){ const xx=x+i*(sz+2), h=map[i]||'', we=i>4;
+    g+=`<rect x="${xx}" y="${y}" width="${sz}" height="${sz}" rx="${sz*.22}" fill="#f1f4f8"${we?' opacity=".6"':''}/>`;
+    if(h.length>2) g+=`<rect x="${xx}" y="${y}" width="${sz}" height="${sz}" rx="${sz*.22}" fill="${col}"/>`;
+    else if(h==='AM') g+=`<rect x="${xx}" y="${y}" width="${sz}" height="${sz/2}" rx="${sz*.22}" fill="${col}"/><rect x="${xx}" y="${y+sz/4}" width="${sz}" height="${sz/4}" fill="${col}"/>`;
+    else if(h==='PM') g+=`<rect x="${xx}" y="${y+sz/2}" width="${sz}" height="${sz/2}" rx="${sz*.22}" fill="${col}"/><rect x="${xx}" y="${y+sz/2}" width="${sz}" height="${sz/4}" fill="${col}"/>`;
+    g+=_bsT(xx+sz/2,y+sz*.72,_BS_J1[i],sz*.6,800,h.length>2||h==='AM'?'#fff':h==='PM'?'#3b4a63':'#b8c4d6','middle'); }
+  return g; }
+function _bsDate(x,y,sz,i,days,col){ const d=parseLocal(days[i]).getDate();
+  return `<rect x="${x}" y="${y}" width="${sz}" height="${sz}" rx="${sz*.22}" fill="${col}" fill-opacity=".1" stroke="${col}" stroke-opacity=".4"/>`+_bsT(x+sz/2,y+sz*.36,_BS_J3[i],sz*.22,800,col,'middle')+_bsT(x+sz/2,y+sz*.82,d,sz*.42,900,col,'middle'); }
+// ── Blocs du bas : chacun se dessine à l'échelle s et renvoie la hauteur utilisée ──
+function _bsTileFormations(D,x,y,w,s){
+  let g='', yy=y; const dz=13*s, dw=7*(dz+2);
+  if(!D.formations.length){ return {g:_bsT(x,y+12,'Aucune formation cette semaine',11*s,400,'#b8c4d6','',' font-style="italic"'),h:16}; }
+  D.formations.forEach(f=>{ const top=yy, pad=7*s;
+    let inner=_bsT(x+10*s,yy+pad+11*s,_bsFit(f.t,11.5*s,700,w-dw-24*s),11.5*s,700);
+    inner+=_bsT(x+10*s,yy+pad+24*s,_bsFit(`${f.int?'Formation interne':'Formation externe'} · ${_bsRng(D.days,f.days)}`,10*s,700,w-dw-24*s),10*s,700,'#6b55c9');
+    const m={}; f.days.forEach(i=>m[i]='AMPM'); inner+=_bsDots(x+w-dw-6*s,yy+pad+1,dz,m,'#7c5cff');
+    const cols=Math.max(1,Math.floor((w-20*s)/(120*s))), cw=(w-20*s)/cols; let ny=yy+pad+30*s;
+    f.people.forEach((p,k)=>{ const cx=x+12*s+(k%cols)*cw, cy=ny+Math.floor(k/cols)*14*s+10*s; inner+=`<circle cx="${cx}" cy="${cy-3.3*s}" r="${2*s}" fill="#7c5cff"/>`+_bsT(cx+6*s,cy,_bsFit(_bsNm(p),10.5*s,600,cw-12*s),10.5*s,600); });
+    const hh=pad+30*s+Math.ceil(f.people.length/cols)*14*s+pad;
+    g+=`<rect x="${x}" y="${top}" width="${w}" height="${hh}" rx="${7*s}" fill="#faf8ff"/><rect x="${x}" y="${top}" width="${3*s}" height="${hh}" fill="#7c5cff"/>`+inner;
+    yy+=hh+6*s; });
+  return {g,h:yy-y}; }
+const _BS_ABS={conge:['Congé','#2f9e6e'],dep:['Déplacement','#7c5cff'],abs:['Absent','#8a94a6'],ecole:['École','#2979ff']};
+function _bsTileAbsences(D,x,y,w,s){
+  let g='', yy=y; const dz=13*s, dw=7*(dz+2), rh=21*s;
+  if(!D.absences.length) return {g:_bsT(x,y+12,'Aucune absence',11*s,400,'#b8c4d6','',' font-style="italic"'),h:16};
+  D.absences.forEach(a=>{ const [l,c]=_BS_ABS[a.k]; const nmW=w-dw-8*s; let t=_bsNm(a.p); const nmTxt=_bsFit(t,11*s,700,nmW);
+    g+=_bsT(x,yy+14*s,nmTxt,11*s,700);
+    if(a.note){ const used=_bsW(nmTxt,11*s,700)+6*s; if(nmW-used>30*s) g+=_bsT(x+used,yy+14*s,_bsFit(a.note,9.5*s,700,nmW-used),9.5*s,700,c); }
+    g+=_bsDots(x+w-dw,yy+4*s,dz,a.d,c)+`<line x1="${x}" y1="${yy+rh}" x2="${x+w}" y2="${yy+rh}" stroke="#eef2f7"/>`; yy+=rh; });
+  // légende
+  yy+=12*s; let lx=x; const used=[...new Set(D.absences.map(a=>a.k))];
+  used.map(k=>_BS_ABS[k]).concat([['matin',null],['après-midi',null]]).forEach(([l,c],i)=>{ const sz=9*s; const col=c||'#2f9e6e';
+    if(c) g+=`<rect x="${lx}" y="${yy-sz+1}" width="${sz}" height="${sz}" rx="2" fill="${col}"/>`;
+    else g+=`<rect x="${lx}" y="${yy-sz+1}" width="${sz}" height="${sz}" rx="2" fill="#e6ebf2"/><rect x="${lx}" y="${yy-sz+1+(l==='matin'?0:sz/2)}" width="${sz}" height="${sz/2}" fill="${col}"/>`;
+    g+=_bsT(lx+sz+3,yy,l,9*s,600,'#8094ad'); lx+=sz+8+_bsW(l,9*s,600); if(lx>x+w-50*s&&i<5){ lx=x; yy+=13*s; } });
+  return {g,h:yy-y+4}; }
+function _bsTileInterim(D,x,y,w,s){
+  let g='', yy=y; const bz=30*s;
+  const sec=(lbl,col,list,none,sub)=>{ g+=_bsT(x,yy+10*s,lbl,10*s,900,col)+(sub?_bsT(x+_bsW(lbl,10*s,900)+5*s,yy+10*s,sub,9*s,600,'#8094ad'):''); yy+=16*s;
+    if(!list.length){ g+=_bsT(x,yy+10*s,none,10.5*s,400,'#b8c4d6','',' font-style="italic"'); yy+=18*s; return; }
+    list.forEach(o=>{ const i=(parseLocal(o.ds).getDay()+6)%7; g+=_bsDate(x,yy,bz,i,D.days,col)+_bsT(x+bz+8*s,yy+13*s,_bsFit(_bsNm(o.p),11*s,700,w-bz-10*s),11*s,700)+_bsT(x+bz+8*s,yy+26*s,_bsFit((o.p.agence||'Intérim')+(o.re?(lbl.includes('ARR')?' · reprise':' · interruption'):''),9.5*s,500,w-bz-10*s),9.5*s,500,'#5a6b85'); yy+=bz+6*s; }); };
+  sec('↘ ARRIVÉES','#1e9e5a',D.arr,'Aucune arrivée');
+  yy+=4*s; sec('↗ DÉPARTS','#d64545',D.dep,'Aucun départ','(dernier jour)');
+  return {g,h:yy-y}; }
+function _bsTileVm(D,x,y,w,s){
+  let g='', yy=y; const bz=30*s;
+  if(!D.vm.length) return {g:_bsT(x,y+12,'Aucune visite médicale',11*s,400,'#b8c4d6','',' font-style="italic"'),h:16};
+  D.vm.forEach(v=>{ g+=_bsDate(x,yy,bz,v.i,D.days,'#0f9fb5')+_bsT(x+bz+8*s,yy+13*s,_bsFit(_bsNm(v.p),11*s,700,w-bz-10*s),11*s,700)+_bsT(x+bz+8*s,yy+26*s,'🕘 '+v.t,9.5*s,600,'#5a6b85'); yy+=bz+6*s; });
+  return {g,h:yy-y}; }
+// ── La page complète (SVG A4 paysage) ──
+function _bsSvg(mon){
+  const D=_bsData(mon), W=1123, H=794, M=24; const days=D.days, sun=addD(mon,6);
+  const per=`du lundi ${mon.getDate()}${mon.getMonth()!==sun.getMonth()?' '+_BS_MO[mon.getMonth()]:''} au dimanche ${sun.getDate()} ${_BS_MO[sun.getMonth()]} ${sun.getFullYear()}`;
+  let g=`<rect width="${W}" height="${H}" fill="#fff"/>`, y=18;
+  // Titre
+  const kb='BRIEF DE LA SEMAINE', kw=_bsW(kb,10.5,800)+20;
+  g+=`<rect x="${M}" y="${y}" width="${kw}" height="22" rx="6" fill="#0f1e3d"/>`+_bsT(M+10,y+15,kb,10.5,800,'#fff','',' letter-spacing=".4"');
+  g+=_bsT(M+kw+12,y+18,`Semaine ${wkN(mon)} — ${per}`,20,800); y+=34;
+  // Infos de la réunion
+  if(D.msg){ const L=_bsWrap(D.msg,12,400,W-2*M-28).slice(0,4); const h=26+L.length*16;
+    g+=`<rect x="${M}" y="${y}" width="${W-2*M}" height="${h}" rx="8" fill="#fff8e1"/><rect x="${M}" y="${y}" width="4" height="${h}" rx="2" fill="#f5b400"/>`+_bsT(M+14,y+16,'📣 INFOS PRODUCTION',10,800,'#a87400','',' letter-spacing=".5"');
+    L.forEach((l,i)=>{ g+=_bsT(M+14,y+32+i*16,l,12,400,'#2b2f38'); }); y+=h+10; }
+  // Hangar : schéma (disposition du lundi) + positions du lundi au dimanche (sans mouvements)
+  const hp=_hgPlan(days[0]), pw=290, ph=pw*(hp.bottom-hp.top+12)/592;
+  g+=`<svg x="${M}" y="${y}" width="${pw}" height="${ph}" viewBox="24 ${hp.top-6} 592 ${hp.bottom-hp.top+12}" preserveAspectRatio="xMidYMid meet">${hp.g}</svg>`;
+  const TX=M+pw+16, TW=W-M-TX, DW=70, PW=(TW-DW)/3, HR=20, rh=i=>i<5?25:21, posCol={1:'#2979ff',2:'#1e9e5a',3:'#d4870f'};
+  const tH=HR+5*25+2*21;
+  g+=`<rect x="${TX}" y="${y}" width="${TW}" height="${tH}" rx="9" fill="#fff" stroke="#dfe6ef"/><path d="M${TX+9} ${y}h${TW-18}a9 9 0 0 1 9 9v${HR-9}h-${TW}v-${HR-9}a9 9 0 0 1 9 -9z" fill="#f4f7fb"/>`;
+  [1,2,3].forEach((q,i)=>{ g+=_bsT(TX+DW+i*PW+PW/2,y+14,`POSITION ${q}`,9.5,800,posCol[q],'middle',' letter-spacing=".5"'); });
+  let ty=y+HR;
+  days.forEach((ds,di)=>{ const h=rh(di), we=di>4;
+    if(we) g+=`<rect x="${TX+1}" y="${ty}" width="${TW-2}" height="${h-(di===6?1:0)}" fill="#f8fafc"/>`;
+    g+=`<line x1="${TX}" y1="${ty}" x2="${TX+TW}" y2="${ty}" stroke="#eef2f7"/>`+_bsT(TX+10,ty+h/2+4,`${_BS_J[di]} ${parseLocal(ds).getDate()}`,11,800,we?'#8094ad':'#0f1e3d');
+    [1,2,3].forEach((q,i)=>{ const x=TX+DW+i*PW, inf=_hgInfo(_hgAtX(q,ds));
+      if(!inf){ g+=_bsT(x+PW/2,ty+h/2+4,'libre',10.5,400,'#b8c4d6','middle',' font-style="italic"'); return; }
+      g+=`<rect x="${x}" y="${ty}" width="3" height="${h}" fill="${posCol[q]}"/>`;
+      const a=`MSN ${inf.msn}`; g+=_bsT(x+9,ty+h/2+4,a,11.5,800); const rest=[inf.type,inf.client].filter(Boolean).join(' · ');
+      if(rest) g+=_bsT(x+13+_bsW(a,11.5,800),ty+h/2+4,_bsFit(rest,10,500,PW-22-_bsW(a,11.5,800)),10,500,'#5a6b85'); });
+    ty+=h; });
+  y+=Math.max(ph,tH)+12;
+  // Chantiers de la semaine + chef d'équipe
+  g+=_bsT(M,y+11,'✈️ Chantiers de la semaine',12,800)+_bsT(M+_bsW('✈️ Chantiers de la semaine',12,800)+6,y+11,"— adresse-toi au chef d'équipe du chantier",10.5,600,'#8094ad'); y+=18;
+  const CHs=D.chantiers.slice(0,12);
+  if(!CHs.length){ g+=_bsT(M,y+12,'Aucun chantier planifié cette semaine',11,400,'#b8c4d6','',' font-style="italic"'); y+=22; }
+  else { const cols=Math.min(CHs.length,6), rows=Math.ceil(CHs.length/cols), gap=7, cw=(W-2*M-gap*(cols-1))/cols, cs=rows>1?.9:1;
+    const nl=Math.max(1,...CHs.map(c=>c.chefs.length||1)), anySub=CHs.some(c=>c.s), chh=(8+13+(anySub?12:0)+nl*14+4)*cs;
+    CHs.forEach((c,k)=>{ const x=M+(k%cols)*(cw+gap), yy=y+Math.floor(k/cols)*(chh+gap);
+      g+=`<rect x="${x}" y="${yy}" width="${cw}" height="${chh}" rx="8" fill="#fff" stroke="#dfe6ef"/><rect x="${x}" y="${yy}" width="5" height="${chh}" rx="2" fill="${c.col}"/>`;
+      let ly=yy+17*cs; g+=_bsT(x+13,ly,_bsFit(c.t,12*cs,800,cw-20),12*cs,800); ly+=13*cs;
+      if(anySub){ if(c.s) g+=_bsT(x+13,ly-1,_bsFit(c.s,9.5*cs,500,cw-20),9.5*cs,500,'#5a6b85'); ly+=12*cs; }
+      if(c.chefs.length) c.chefs.forEach(ch=>{ g+=_bsT(x+13,ly+1,'👷',10*cs,400)+_bsT(x+30,ly+1,_bsFit(_bsNm(ch),10.5*cs,700,cw-38),10.5*cs,700); ly+=14*cs; });
+      else g+=_bsT(x+13,ly+1,"👷 chef d'équipe non renseigné",10*cs,500,'#8094ad'); });
+    y+=rows*chh+(rows-1)*gap; }
+  y+=12;
+  // Les 4 blocs
+  const tiles=[['🎓','Formations','#7c5cff',1.55,_bsTileFormations,D.formations.reduce((n,f)=>n+f.people.length,0)],['🏖','Absences','#2f9e6e',1.1,_bsTileAbsences,D.absences.length],['👷','Intérimaires','#e0702a',.85,_bsTileInterim,D.arr.length+D.dep.length],['🩺','Visites médicales','#0f9fb5',.78,_bsTileVm,D.vm.length]];
+  const gap=10, tot=tiles.reduce((n,t)=>n+t[3],0), avail=W-2*M-gap*3, th=H-16-y; let tx=M;
+  tiles.forEach(([ic,lbl,col,fr,fn,n],ti)=>{ const tw=avail*fr/tot, hh=26, bodyH=th-hh-14;
+    g+=`<rect x="${tx}" y="${y}" width="${tw}" height="${th}" rx="11" fill="#fff" stroke="#dfe6ef"/><path d="M${tx+11} ${y}h${tw-22}a11 11 0 0 1 11 11v${hh-11}h-${tw}v-${hh-11}a11 11 0 0 1 11 -11z" fill="${col}" fill-opacity=".1"/><rect x="${tx}" y="${y+hh-2}" width="${tw}" height="2" fill="${col}"/>`;
+    g+=_bsT(tx+10,y+18,ic,13,400)+_bsT(tx+30,y+18,lbl,12,800,col);
+    const ns=String(n), nw=_bsW(ns,10,800)+12; g+=`<rect x="${tx+tw-nw-8}" y="${y+6}" width="${nw}" height="15" rx="7.5" fill="${col}"/>`+_bsT(tx+tw-8-nw/2,y+17,ns,10,800,'#fff','middle');
+    // échelle : la plus grande qui tient
+    let r=null; for(const s of [1,.92,.85,.78,.71,.64,.58]){ r=fn(D,tx+10,y+hh+8,tw-20,s); if(r.h<=bodyH) break; }
+    g+=`<clipPath id="bs-clip${ti}"><rect x="${tx}" y="${y+hh}" width="${tw}" height="${th-hh-4}"/></clipPath><g clip-path="url(#bs-clip${ti})">${r.g}</g>`;
+    tx+=tw+gap; });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}</svg>`;
+}
+// ── Fenêtre ──
+function openBriefWeek(ds){ _bsMon=getMon(ds?parseLocal(ds):new Date()); _bsRender(); openM('m-bsem'); }
+function _bsShift(n){ _bsMon=addD(_bsMon,7*n); _bsRender(); }
+function _bsRender(){
+  const t=document.getElementById('bs-title'); if(t) t.textContent=`Semaine ${wkN(_bsMon)}`;
+  const ta=document.getElementById('bs-msg'); if(ta&&document.activeElement!==ta) ta.value=(S.briefWeek||{})[fmt(_bsMon)]||'';
+  const el=document.getElementById('bs-prev'); if(el) el.innerHTML=_bsSvg(_bsMon);
+}
+function _bsMsgInput(v){ if(!S.briefWeek) S.briefWeek={}; const k=fmt(_bsMon); if((v||'').trim()) S.briefWeek[k]=v; else delete S.briefWeek[k];
+  clearTimeout(_bsMsgT); _bsMsgT=setTimeout(()=>{ try{save();}catch(_){} _bsRender(); },350); }
+function _bsMsgPrev(){ const ks=Object.keys(S.briefWeek||{}).filter(k=>k<fmt(_bsMon)).sort(); if(!ks.length){ toast('Aucun message d\'une semaine précédente'); return; } const v=S.briefWeek[ks[ks.length-1]]; const ta=document.getElementById('bs-msg'); if(ta) ta.value=v; _bsMsgInput(v); }
+function _bsName(){ return `Brief_S${String(wkN(_bsMon)).padStart(2,'0')}_${_bsMon.getFullYear()}`; }
+function briefWeekPDF(){
+  const svg=_bsSvg(_bsMon);
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${_bsName()}</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0;background:#fff}svg{width:297mm;height:210mm;display:block}@media screen{body{background:#e9edf3}svg{width:100%;height:auto;max-width:1123px;margin:10px auto;box-shadow:0 6px 30px rgba(0,0,0,.18)}}</style></head><body>${svg}</body></html>`;
+  openPrintView(html,`Brief de la semaine — Semaine ${wkN(_bsMon)}`);
+}
+function briefWeekPNG(){
+  const svg=_bsSvg(_bsMon), url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'})), img=new Image();
+  img.onload=()=>{ const sc=2, c=document.createElement('canvas'); c.width=1123*sc; c.height=794*sc; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+    c.toBlob(async b=>{ if(!b){ toast('Impossible de générer l\'image'); return; } const name=_bsName()+'.png';
+      try{ const file=new File([b],name,{type:'image/png'}); if(_IS_TOUCH_DEV&&navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:`Brief de la semaine ${wkN(_bsMon)}`}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+      const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); toast('🖼 Image du brief téléchargée'); },'image/png'); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); toast('Impossible de générer l\'image'); };
+  img.src=url;
+}
 </script>
 
 <!-- Modal confirmation formations internes -->
