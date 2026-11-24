@@ -2505,6 +2505,35 @@ body.th-bento #aff-ov .af-abs .af-p,body.th-bento #aff-ov .af-col[data-k=ABS] .a
 body.th-bento #aff-ov .af-col{flex-basis:262px}
 body.th-bento #aff-ov .af-p:not(:has(.af-x)){padding-right:10px}
 @media(max-width:760px){body.th-bento #aff-ov .af-col{flex-basis:224px}body.th-bento #aff-ov .af-av{width:34px;height:34px;flex-basis:34px;font-size:10px}body.th-bento #aff-ov .af-n{font-size:13px}}
+
+/* Colonnes toutes à la hauteur de la plus longue (ou de l'écran) : on peut déposer un nom n'importe où dans la colonne */
+#aff-ov .af-cols{display:grid;grid-auto-flow:column;grid-auto-columns:var(--afw,228px);grid-template-rows:minmax(max-content,auto);align-content:stretch;align-items:stretch;justify-content:start;gap:10px}
+#aff-ov .af-col{min-height:0;width:auto}
+#aff-ov .af-body{flex:1 0 auto}
+#aff-ov .af-addc{align-self:start}
+body.th-bento #aff-ov .af-cols{--afw:262px}
+@media(max-width:760px){#aff-ov .af-cols{--afw:200px}body.th-bento #aff-ov .af-cols{--afw:224px}}
+
+/* Sélection multiple */
+.af-all{margin-left:6px;border:0;background:transparent;color:#00d2ff;font:700 11px inherit;cursor:pointer;padding:2px 4px;border-radius:6px}
+body.th-bento .af-all{color:#b9c4ff}
+.af-all:hover{background:rgba(255,255,255,.06)}
+#aff-ov .af-p.sel{outline:2px solid #ffe066;outline-offset:-1px;box-shadow:0 0 0 4px rgba(255,224,102,.18);transform:none;position:relative}
+#aff-ov .af-p.sel::before{content:'✓';position:absolute;left:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:#ffe066;color:#1a1400;font:900 12px/20px sans-serif;text-align:center;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+#aff-ov .af-p.drag{opacity:.45}
+body:not(.th-bento) #aff-ov .af-p.sel::before{left:auto;top:auto;right:-6px;bottom:-6px;width:18px;height:18px;font-size:11px;line-height:18px}
+#aff-ov.af-picking .af-h{cursor:pointer}
+#aff-ov.af-picking .af-col:not(.af-todo) .af-h{box-shadow:0 0 0 2px rgba(255,224,102,.55),0 6px 14px rgba(0,0,0,.35)}
+.af-selbar{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 24px);padding:9px 10px 9px 16px;border-radius:14px;background:rgba(18,24,41,.97);border:1px solid rgba(255,224,102,.45);color:#e8ecff;font:600 13px inherit;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.af-selbar{pointer-events:none}.af-selbar button{pointer-events:auto}
+.af-selbar b{color:#ffe066;font-size:15px}
+.af-selbar span{color:#97a3c0;font-size:12px}
+.af-selbar button{border:0;border-radius:10px;background:#ffe066;color:#1a1400;font:800 12.5px inherit;padding:7px 12px;cursor:pointer}
+body.th-bento .af-selbar{border-radius:999px;font-family:'Space Grotesk',sans-serif}
+body.th-bento .af-selbar button{border-radius:999px;background:#e8ecff;color:#0a0e19}
+.af-board{position:relative}
+.af-ghost{position:fixed;top:-100px;left:-100px;padding:8px 14px;border-radius:999px;background:#ffe066;color:#1a1400;font:800 13px sans-serif}
+@media(max-width:760px){.af-selbar span{display:none}}
 </style>
 </head>
 <body>
@@ -8972,7 +9001,7 @@ const GUIDE_DATA = {
     {t:"Page de connexion MARDAM", d:"La page d'accueil s'appelle maintenant <b>MARDAM · AeroDesk & AeroMargin</b>. Choisis <b>Ouvrir : AeroDesk / AeroMargin</b> avant de te connecter : avec AeroMargin, tu arrives directement sur le calcul MPA, déjà connecté (le choix est retenu sur l'appareil). La photo de fond change chaque jour, avec la grande heure, la date et la météo LFBF. <b>Admin</b> : 🎨 Apparence › « 🔐 Page de connexion » pour choisir le mode (chaque jour / fixe / au hasard), les photos de la rotation, l'assombrissement, la position de la carte, la couleur du bouton, l'heure et le choix AeroDesk / AeroMargin — appliqué sur tous les appareils par la synchro Drive."},
     {t:"Diagnostic fluidité", d:"Si le défilement te paraît lent sur un appareil : Ctrl + K (ou 🔍) › « Diagnostic fluidité », puis fais défiler le planning pendant 5 secondes. Un résumé s'affiche (images par seconde, à-coups, mode fluide actif ou non, nombre d'éléments affichés) : fais-en une capture pour l'envoyer. "},
     {t:"Documentation constructeurs (Airbus · ATR · Boeing)", d:"Accès direct aux portails de documentation : en <b>Bento</b>, les logos Airbus, ATR et Boeing sont dans le dock (sur iPhone, regroupés dans une icône « Documentation ») ; en <b>Cockpit</b>, carte « 📘 Documentation technique » sur le tableau de bord. Un seul portail : il s'ouvre directement (nouvel onglet / Safari) ; plusieurs : une petite liste s'affiche. Ctrl + K : tape « ATR », « Airbus »… Les portails demandent ta connexion constructeur : AeroDesk ne voit ni ne garde ces identifiants. <b>Admin</b> : ⚙️ « Gérer les liens » pour ajouter/modifier les adresses (communes à tous)."},
-    {t:"🧩 Affectations du jour", d:"Pour réaffecter vite les équipes : clique sur un jour du planning (« Qui est où ») › <b>🧩 Modifier les affectations</b>, ou Ctrl + K › « Affectations du jour ». Seuls les chantiers occupés ce jour-là s'affichent ; <b>＋ Ajouter un chantier</b> crée la colonne d'un autre avion. Une colonne par chantier (couleurs des chantiers), les personnes avec la couleur de leur catégorie et leurs autorisations. <b>Glisse un nom</b> vers une autre colonne (sur iPad : touche le nom puis la colonne) : le planning est mis à jour aussitôt. <b>Journée / Matin / Après-midi</b> : ce qui est modifié. Une demi-journée de congé ou formation est conservée. <b>↔ Déplacer</b> : la personne change de chantier ; <b>＋ Ajouter</b> : elle garde le sien et reçoit le nouveau (double affectation, retirée avec ✕). <b>Autre tâche</b> : écris la tâche (rangement, logistique…), elle s'affiche dans le planning. <b>Absents</b> : déplacement avec confirmation. ↩️ Annuler défait le dernier déplacement ; « 📄 Extrait affectation journalier » ouvre ton extrait du jour."},
+    {t:"🧩 Affectations du jour", d:"Pour réaffecter vite les équipes : clique sur un jour du planning (« Qui est où ») › <b>🧩 Modifier les affectations</b>, ou Ctrl + K › « Affectations du jour ». Seuls les chantiers occupés ce jour-là s'affichent ; <b>＋ Ajouter un chantier</b> crée la colonne d'un autre avion. <b>Sélection multiple</b> : touche plusieurs noms (ou « Tout sélectionner » sous une colonne), puis touche le titre de la colonne d'arrivée ou glisse un des noms cochés — l'écran défile tout seul quand tu approches du bord. Une colonne par chantier (couleurs des chantiers), les personnes avec la couleur de leur catégorie et leurs autorisations. <b>Glisse un nom</b> vers une autre colonne (sur iPad : touche le nom puis la colonne) : le planning est mis à jour aussitôt. <b>Journée / Matin / Après-midi</b> : ce qui est modifié. Une demi-journée de congé ou formation est conservée. <b>↔ Déplacer</b> : la personne change de chantier ; <b>＋ Ajouter</b> : elle garde le sien et reçoit le nouveau (double affectation, retirée avec ✕). <b>Autre tâche</b> : écris la tâche (rangement, logistique…), elle s'affiche dans le planning. <b>Absents</b> : déplacement avec confirmation. ↩️ Annuler défait le dernier déplacement ; « 📄 Extrait affectation journalier » ouvre ton extrait du jour."},
     {t:"Mode TV atelier", d:"Le bouton <b>📺 Mode TV</b> du tableau de bord (ou Ctrl + K → « Mode TV ») ouvre un plein écran pour l'écran de l'atelier. Quatre pages défilent toutes les 20 s : <b>brief du jour</b> (chiffres, message, ODM), <b>plan du hangar</b> avec l'ordre de sortie, <b>équipes du jour</b> par chantier avec le chef, <b>météo et compteurs sécurité</b>. Clic ou → pour passer à la suivante, ← pour revenir, <b>Échap</b> pour quitter.", ill:null},
     {t:"Fonds d'écran — mes photos et photothèque", d:"Dans <b>🎨 Apparence</b> : <b>＋ Ajouter mes photos</b> importe tes photos (hangar, avions, équipe…) depuis le PC ou le téléphone ; elles sont recadrées et compressées automatiquement et <b>partagées avec toute l'équipe</b> (8 maximum). La <b>photothèque en ligne</b> propose des photos aviation libres de droits ; elles sont gardées sur l'appareil après le premier affichage. Les <b>réglages</b> permettent d'assombrir ou flouter la photo, de rendre les panneaux transparents, d'ajouter un zoom lent ou une parallaxe, et de <b>changer de photo chaque jour</b> ou à chaque ouverture. Ces réglages sont propres à chaque utilisateur.", ill:null},
     {t:"Bento — exports PDF et Excel", d:"Quand le thème <b>Bento</b> est actif, les exports prennent son style. Le <b>PDF du planning hebdo</b> présente une carte par activité (icône 🔧 maintenance, 🅿️ stockage, ♻️ recyclage, ✈️ Airbus…), avec des pastilles arrondies matin / après-midi, les avatars et les autorisations. L'<b>Excel du planning hebdo</b> est sans quadrillage, avec un bandeau coloré par activité, une colonne Autorisations et des cases pleines séparées par un liseré blanc. Les autres exports reprennent la police et les en-têtes Bento. En thème Cockpit, les exports restent ceux d'origine.", ill:null},
@@ -11772,14 +11801,38 @@ function _plCopy(){
 // être écrasés par un collage/remplissage (ils restent modifiables en cliquant la case).
 const PL_PROTECT=new Set(['conge','conge_prev','maladie','formation','ecole','formation_int','absence','deplacement']);
 function _plIsProtected(k){ const e=S.planning[k]; return !!(e&&PL_PROTECT.has(e.type)); }
-// Garde-fou contrat : vrai si la date est hors de la période de contrat de l'employé (avant début ou après fin)
+// ── Périodes de contrat réelles (contrat d'origine + chaque prolongation acceptée, avec ses interruptions) ──
+// Avant : la date de début était remplacée par celle de la dernière prolongation → la personne semblait « pas encore arrivée ».
+function _contratSegs(emp){
+  if(!emp) return [];
+  const ps=(Array.isArray(emp.prolongations)?emp.prolongations:[]).filter(p=>(p.statut==='acceptee'||!p.statut)&&p.nouvelleFin);
+  if(!ps.length){ const a=emp.debutContrat||emp.dateEmbauche||'', b=emp.dateFin||''; return (a||b)?[[a,b]]:[]; }
+  const segs=[]; const first=ps[0];
+  if(first.ancienneFin){
+    let s0=emp.debutInitial||'';
+    if(!s0){ const cands=[emp.dateEmbauche,emp.debutContrat].filter(x=>x&&x<=first.ancienneFin).sort(); s0=cands[0]||''; }
+    segs.push([s0,first.ancienneFin]);
+  }
+  ps.forEach(p=>{ const st=p.nouveauDebut||(p.ancienneFin?fmt(addD(parseLocal(p.ancienneFin),1)):''); segs.push([st,p.nouvelleFin]); });
+  const last=segs[segs.length-1]; if(emp.dateFin&&last[1]&&emp.dateFin>last[1]) last[1]=emp.dateFin;
+  return segs;
+}
+function _enContrat(emp,ds){ const S_=_contratSegs(emp); if(!S_.length) return true; return S_.some(([a,b])=>(!a||ds>=a)&&(!b||ds<=b)); }
+function _contratArrivee(emp){ const S_=_contratSegs(emp); return S_.length?S_[0][0]:''; }
+function _contratTxt(emp,ds){
+  const S_=_contratSegs(emp); if(!S_.length) return '';
+  const f=([a,b])=>a&&b?`du ${disp(a)} au ${disp(b)}`:(b?`jusqu'au ${disp(b)}`:`à partir du ${disp(a)}`);
+  if(S_.length===1) return f(S_[0]);
+  const prev=[...S_].reverse().find(([a,b])=>b&&b<ds), next=S_.find(([a])=>a&&a>ds);
+  if(prev&&next) return `entre deux contrats (fin le ${disp(prev[1])}, reprise le ${disp(next[0])})`;
+  if(next) return `pas encore arrivé (début le ${disp(next[0])})`;
+  if(prev) return `contrat terminé le ${disp(prev[1])}`;
+  return f(S_[S_.length-1]);
+}
+// Garde-fou contrat : vrai si la date est hors des périodes de contrat de l'employé
 function _plHorsContrat(empId, ds){
   const emp=byId(empId); if(!emp) return false;
-  const cStart=emp.debutContrat||emp.dateEmbauche;
-  const cEnd=emp.dateFin;
-  if(cStart && ds < cStart) return true;
-  if(cEnd && ds > cEnd) return true;
-  return false;
+  return !_enContrat(emp,ds);
 }
 
 function _plPaste(){
@@ -11840,13 +11893,27 @@ function _plUndo(){
   PLUNDO=null; _plRefresh();
   try{toast('↩️ Annulé');}catch(_){}
 }
+// Conserve la position de défilement (haut/bas et gauche/droite) pendant qu'un planning est redessiné.
+// On ne mesure que les conteneurs susceptibles de défiler (pas les milliers de cases du tableau).
+function _plKeepScroll(fn,gridId){
+  const g=gridId&&document.getElementById(gridId);
+  const C=new Set([document.scrollingElement,document.querySelector('.body')]);
+  for(let e=g;e&&e!==document.body;e=e.parentElement) C.add(e);
+  if(g) g.querySelectorAll(':scope > *, :scope > * > *, :scope > * > * > *').forEach(e=>{ if(e.tagName!=='TD'&&e.tagName!=='TR') C.add(e); });
+  const root=document.body, saved=[];
+  C.forEach(e=>{ if(e&&(e.scrollTop>0||e.scrollLeft>0)){ const pa=e===document.scrollingElement?'win':_scPath(e,root); if(pa) saved.push([pa,e.scrollTop,e.scrollLeft]); } });
+  fn();
+  if(!saved.length) return;
+  const restore=()=>saved.forEach(([pa,t,l])=>{ const e=pa==='win'?document.scrollingElement:_scFind(pa,root); if(e){ if(e.scrollTop!==t) e.scrollTop=t; if(e.scrollLeft!==l) e.scrollLeft=l; } });
+  restore(); requestAnimationFrame(restore); setTimeout(restore,120);
+}
 function _plRefresh(){
   try{ if(typeof save==='function') save(); }catch(_){}
   const c=window.PLGRID&&PLGRID.container;
-  try{
+  _plKeepScroll(()=>{ try{
     if(c==='masterGrid'&&typeof renderMaster==='function') renderMaster();
     else if(c==='weeklyGrid'&&typeof renderWeekly==='function') renderWeekly();
-  }catch(_){}
+  }catch(_){} },c);
   _plUpdateBar();
 }
 function _plKey(e){
@@ -11970,16 +12037,11 @@ function applyAffectPerm(){
   if(d>end){ toast('⚠️ La date de début est après la fin'); return; }
   // Garde-fou période de contrat : si la période saisie sort du contrat (avant le début OU après la fin), demander confirmation
   const _emp=byId(empId);
-  const _cStart=_emp && (_emp.debutContrat||_emp.dateEmbauche);
-  const _cEnd=_emp && _emp.dateFin;
-  const _avant=_cStart && from < _cStart;
-  const _apres=_cEnd && to > _cEnd;
-  if(_emp && (_avant||_apres) && !window._skipContratCheck){
-    const _periode=(_cStart&&_cEnd)?`du ${disp(_cStart)} au ${disp(_cEnd)}`:(_cEnd?`jusqu'au ${disp(_cEnd)}`:`à partir du ${disp(_cStart)}`);
-    const _quand=_avant?`commence le ${disp(from)}, avant le début de son contrat (${disp(_cStart)})`:`va jusqu'au ${disp(to)}, après la fin de son contrat (${disp(_cEnd)})`;
+  let _out=''; if(_emp){ for(let dd=parseLocal(from);dd<=end;dd=addD(dd,1)){ const x=fmt(dd), w=dd.getDay(); if(w===0||w===6||isHol(x)) continue; if(!_enContrat(_emp,x)){ _out=x; break; } } }
+  if(_emp && _out && !window._skipContratCheck){
     confirmDel(
       'Hors période de contrat',
-      `${_emp.prenom} ${_emp.nom} est en ${_emp.contrat||'contrat temporaire'} ${_periode}. La période saisie ${_quand}. Confirmer quand même ?`,
+      `${_emp.prenom} ${_emp.nom} (${_emp.contrat||'contrat temporaire'}) n'est pas sous contrat le ${disp(_out)} : ${_contratTxt(_emp,_out)}. La période saisie contient des jours hors contrat. Confirmer quand même ?`,
       ()=>{ window._skipContratCheck=true; applyAffectPerm(); window._skipContratCheck=false; },
       {btn:'✓ Confirmer', icon:'⏳', safe:true}
     );
@@ -12222,10 +12284,7 @@ let _ap=null;
 const _AP_SEC=[{k:'p145',t:'🔧 Part 145 — Chantiers & Stockage',col:'#6effc4'},{k:'struct',t:'🔩 Structure — atelier',col:'#6d8fb0'},{k:'p21',t:'✈️ Airbus Part 21',col:'#00a0ff'},{k:'rec',t:'♻️ Recyclage',col:'#ff9a3c'}];
 function _apNormRef(r){ if(!r) return ''; if(r==='STO'||r.startsWith('STO_')) return 'STO'; return r; }
 function _apEmpty(e){ return !e || (!e.type && !e.note) || (e.type==='travail' && !e.chantierId && !e.chantierId2); }
-function _apInContract(p,ds){
-  const a=p.debutContrat||p.dateEmbauche; if(a && a>ds) return false;
-  if(p.dateFin && p.dateFin<ds) return false; return true;
-}
+function _apInContract(p,ds){ return _enContrat(p,ds); }
 // Rôle d'une personne pour un rang : 0 = non éligible, sinon score de spécialité (plus haut = plus adapté)
 function _apFit(p,row){
   const cat=p.categorie, act=p.activite||'';
@@ -13017,17 +13076,11 @@ function saveCellEdit(){
   // Garde-fou fin de contrat (intérim/CDD) : si la case saisie dépasse la fin de contrat, demander confirmation
   if(cellType && cellType!=='' && !window._skipContratCheck){
     const emp=byId(empId);
-    const cStart = emp && (emp.debutContrat||emp.dateEmbauche);
-    const cEnd   = emp && emp.dateFin;
-    const avant  = cStart && dateStr < cStart;   // avant le début de contrat (pas encore là)
-    const apres  = cEnd   && dateStr > cEnd;      // après la fin de contrat (parti)
-    if(emp && (avant||apres)){
+    if(emp && !_enContrat(emp,dateStr)){
       const actLbl = cellType==='formation_int'||cellType==='formation' ? 'former' : (['conge','conge_prev','maladie','absence','deplacement'].includes(cellType) ? 'poser une absence à' : 'affecter');
-      const periode = (cStart&&cEnd) ? `du ${disp(cStart)} au ${disp(cEnd)}` : (cEnd?`jusqu'au ${disp(cEnd)}`:`à partir du ${disp(cStart)}`);
-      const quand = avant ? `avant le début de son contrat (${disp(cStart)})` : `après la fin de son contrat (${disp(cEnd)})`;
       confirmDel(
         'Hors période de contrat',
-        `${emp.prenom} ${emp.nom} est en ${emp.contrat||'contrat temporaire'} ${periode}. Vous voulez ${actLbl} cette personne le ${disp(dateStr)}, ${quand}. Confirmer quand même ?`,
+        `${emp.prenom} ${emp.nom} (${emp.contrat||'contrat temporaire'}) n'est pas sous contrat le ${disp(dateStr)} : ${_contratTxt(emp,dateStr)}. Vous voulez ${actLbl} cette personne ce jour-là. Confirmer quand même ?`,
         ()=>{ window._skipContratCheck=true; saveCellEdit(); window._skipContratCheck=false; },
         {btn:'✓ Confirmer', icon:'⏳', safe:true}
       );
@@ -13122,7 +13175,7 @@ function saveCellEdit(){
     });
   }
 
-  save();closeM('m-cell');renderWeekly();renderMaster();cellCtx=null;
+  save();closeM('m-cell');_plKeepScroll(()=>{renderWeekly();renderMaster();},document.querySelector('#pg-master.on')?'masterGrid':'weeklyGrid');cellCtx=null;
   try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){}
   if(cellType==='formation'||cellType==='deplacement'){ const _e=byId(empId); setTimeout(()=>toast(`📝 Pense à l'ordre de mission de ${_e?_e.prenom+' '+_e.nom:'la personne'} (${cellType==='deplacement'?'déplacement':'formation externe'}) — rappel ajouté au Brief du jour jusqu'à validation`),350); }
   try{ _briefBadge(); }catch(_){}
@@ -17454,7 +17507,7 @@ function _recomputeInterimFin(emp){
   const ps=Array.isArray(emp.prolongations)?emp.prolongations:[];
   let lastAcc=null;
   ps.forEach(p=>{ if(p.statut==='acceptee'||!p.statut) lastAcc=p; });
-  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut) emp.debutContrat=lastAcc.nouveauDebut; }
+  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut){ if(!emp.debutInitial&&emp.debutContrat&&emp.debutContrat<lastAcc.nouveauDebut) emp.debutInitial=emp.debutContrat; emp.debutContrat=lastAcc.nouveauDebut; } }
 }
 // Charger une prolongation existante dans le formulaire pour la modifier
 function editProlong(empId,pid){
@@ -17579,7 +17632,7 @@ function deleteProlong(empId,pid){
   // Recalculer la fin de contrat effective d'après les prolongations acceptées restantes
   let lastAcc=null;
   emp.prolongations.forEach(p=>{ if(p.statut==='acceptee'||!p.statut) lastAcc=p; });
-  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut) emp.debutContrat=lastAcc.nouveauDebut; }
+  if(lastAcc){ emp.dateFin=lastAcc.nouvelleFin; if(lastAcc.nouveauDebut){ if(!emp.debutInitial&&emp.debutContrat&&emp.debutContrat<lastAcc.nouveauDebut) emp.debutInitial=emp.debutContrat; emp.debutContrat=lastAcc.nouveauDebut; } }
   else if(original){ emp.dateFin=original; }
   save(); renderPersonnel(); if(typeof renderDash==='function')renderDash();
   _refreshProlongHist(empId);
@@ -17590,7 +17643,7 @@ function acceptProlong(empId,pid){
   const emp=byId(empId); if(!emp) return;
   const p=(emp.prolongations||[]).find(x=>x.id===pid); if(!p) return;
   p.statut='acceptee';
-  if(p.nouveauDebut) emp.debutContrat=p.nouveauDebut;
+  if(p.nouveauDebut){ if(!emp.debutInitial&&emp.debutContrat&&emp.debutContrat<p.nouveauDebut) emp.debutInitial=emp.debutContrat; emp.debutContrat=p.nouveauDebut; }
   emp.dateFin=p.nouvelleFin;
   save(); renderPersonnel(); if(typeof renderDash==='function')renderDash();
   const info=document.getElementById('prolong-info'); if(info) info.innerHTML=`<strong style="color:var(--t1)">${emp.nom} ${emp.prenom}</strong> · ${emp.agence||'agence non renseignée'}<br>Fin de contrat actuelle : <strong>${emp.dateFin?disp(emp.dateFin):'—'}</strong>`;
@@ -23762,7 +23815,7 @@ function _synthGoto(idx){
 // intérimaire avec date de fin = présent seulement dans sa période de contrat.
 function _presentSemaine(p, wStart, wEnd){
   // Arrivée : début de contrat (intérim/CDD) ou, à défaut, date d'embauche — la personne n'existe pas avant
-  const arrStr=p.debutContrat||p.dateEmbauche;
+  const arrStr=_contratArrivee(p);
   if(arrStr){
     const arr=parseLocal(arrStr);
     if(arr && arr>wEnd) return false;          // arrive après cette semaine
@@ -28067,7 +28120,7 @@ function _docRefresh(){ try{ _docRender(); }catch(_){} try{ _docDockInit(); }cat
 try{ _docRefresh(); }catch(e){ console.warn('doc:',e); }
 
 /* ═══ 🧩 Affectations du jour : un tableau par chantier, on déplace les gens, le planning suit ═══ */
-const _AFF={ds:null,mode:'move',half:'day',sel:null,drag:null,extra:[],addOpen:false};
+const _AFF={ds:null,mode:'move',half:'day',sels:[],drag:null,extra:[],addOpen:false};
 // Liste des avions / activités qu'on peut ajouter comme colonne
 function _affAddList(shown){
   const L=[];
@@ -28130,7 +28183,7 @@ function _affCard(r,colKey){
   const p=r.p, cat=p.categorie||'autre', col=(typeof _ncolCol==='function'?_ncolCol(cat):'')||'#7c8aa5';
   const half=_AFF.half==='day'&&r.h.size===1?(r.h.has('AM')?'matin':'après-midi'):'';
   const tags=[half&&`<b>${half}</b>`, colKey==='ABS'&&r.t, colKey==='TODO'&&r.t, [...r.x].filter(Boolean).map(x=>'+ '+_bfEsc(_chMsnLabel(x).replace(/^\S+\s/,''))).join(' ')].filter(Boolean).join(' · ');
-  const sel=_AFF.sel&&_AFF.sel.pid===p.id&&_AFF.sel.from===colKey&&(_AFF.sel.cid||'')===(r.cid||'');
+  const sel=_affIsSel(p.id,colKey,r.cid);
   const canX=colKey!=='TODO'&&colKey!=='ABS'&&r.x.size&&[...r.x].some(Boolean);
   return `<div class="af-p${sel?' sel':''}" draggable="true" data-pid="${p.id}" data-from="${colKey}" data-cid="${r.cid||''}" style="--cc:${col}" onclick="_affPick(event,'${p.id}','${colKey}','${r.cid||''}')">
     ${canX?`<button type="button" class="af-x" title="Retirer de ce chantier (garde l'autre)" onclick="event.stopPropagation();_affRemove('${p.id}','${colKey}')">✕</button>`:''}
@@ -28152,31 +28205,56 @@ function _affRender(){
     if(k==='TACHE'){ const g={}; list.forEach(r=>{ (g[r.t]=g[r.t]||[]).push(r); }); body=Object.entries(g).map(([t,rs])=>`<div class="af-gt">🧰 ${_bfEsc(t)} <small>${rs.length}</small></div>${rs.map(r=>_affCard(r,k)).join('')}`).join('')||'<div class="af-hint">Dépose ici une personne pour lui donner une tâche (rangement, logistique…)</div>'; }
     else body=list.map(r=>_affCard(r,k)).join('')||`<div class="af-hint">${k==='TODO'?'Tout le monde est affecté 👍':'Déposer ici'}</div>`;
     const ink=typeof _bnInk==='function'?_bnInk(m.col):'#fff';
-    return `<div class="af-col${k==='TODO'?' af-todo':k==='ABS'?' af-abs':k==='TACHE'?' af-task':''}" data-k="${k}" onclick="_affDrop(event,'${k}')"><div class="af-h" style="--hc:${m.col};color:${ink}"><span>${_bfEsc(m.lbl)}</span><small>${_bfEsc(m.sub||'')}</small></div><div class="af-cnt">${list.length} pers.</div><div class="af-body">${body}</div></div>`;
+    return `<div class="af-col${k==='TODO'?' af-todo':k==='ABS'?' af-abs':k==='TACHE'?' af-task':''}" data-k="${k}" onclick="_affDrop(event,'${k}')"><div class="af-h" style="--hc:${m.col};color:${ink}"><span>${_bfEsc(m.lbl)}</span><small>${_bfEsc(m.sub||'')}</small></div><div class="af-cnt">${list.length} pers.${list.length>1?` <button type="button" class="af-all" onclick="event.stopPropagation();_affSelCol('${k}')">${list.every(r=>_affIsSel(r.p.id,k,r.cid))?'Tout désélectionner':'Tout sélectionner'}</button>`:''}</div><div class="af-body">${body}</div></div>`;
   }).join('');
   ov.querySelector('.af-cols').innerHTML=html;
   ov.querySelector('.af-day').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   ov.querySelectorAll('.af-seg[data-g="half"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===_AFF.half));
   ov.querySelectorAll('.af-seg[data-g="mode"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===_AFF.mode));
-  ov.classList.toggle('af-picking',!!_AFF.sel);
-  const hint=ov.querySelector('.af-tip'); if(hint) hint.textContent=_AFF.sel?`${_affName(byId(_AFF.sel.pid)||{})} sélectionné(e) — touche la colonne d'arrivée (ou touche-le à nouveau pour annuler)`:(_AFF.mode==='add'?'Mode Ajouter : la personne garde son chantier et reçoit le nouveau en plus (double affectation)':'Glisse un nom vers une autre colonne — ou touche le nom puis la colonne');
+  const nSel=_AFF.sels.length; ov.classList.toggle('af-picking',nSel>0);
+  let bar=ov.querySelector('.af-selbar'); if(nSel){ if(!bar){ bar=document.createElement('div'); bar.className='af-selbar'; ov.querySelector('.af-board').appendChild(bar); } bar.innerHTML=`<b>${nSel}</b> ${nSel>1?'personnes sélectionnées':'personne sélectionnée'}<span>Touche le titre d'une colonne (ou glisse un des noms) pour ${nSel>1?'les':'la'} déplacer</span><button type="button" onclick="_AFF.sels=[];_affRender()">✕ Désélectionner</button>`; } else if(bar) bar.remove();
+  const hint=ov.querySelector('.af-tip'); if(hint) hint.textContent=nSel?`${nSel} sélectionné${nSel>1?'s':''} — touche le titre de la colonne d'arrivée, ou touche un nom pour l'ajouter / l'enlever`:(_AFF.mode==='add'?'Mode Ajouter : la personne garde son chantier et reçoit le nouveau en plus (double affectation)':'Glisse un nom vers une autre colonne — ou touche le nom puis la colonne');
   // glisser-déposer (souris)
-  ov.querySelectorAll('.af-p').forEach(c=>{ c.addEventListener('dragstart',e=>{ _AFF.drag={pid:c.dataset.pid,from:c.dataset.from,cid:c.dataset.cid}; c.classList.add('drag'); try{ e.dataTransfer.setData('text/plain',c.dataset.pid); e.dataTransfer.effectAllowed='move'; }catch(_){} }); c.addEventListener('dragend',()=>{ c.classList.remove('drag'); ov.querySelectorAll('.af-col.over').forEach(x=>x.classList.remove('over')); }); });
-  ov.querySelectorAll('.af-col').forEach(col=>{ col.addEventListener('dragover',e=>{ if(!_AFF.drag) return; e.preventDefault(); col.classList.add('over'); }); col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove('over'); }); col.addEventListener('drop',e=>{ e.preventDefault(); col.classList.remove('over'); const d=_AFF.drag; _AFF.drag=null; if(d) _affMove(d,col.dataset.k); }); });
+  ov.querySelectorAll('.af-p').forEach(c=>{ c.addEventListener('dragstart',e=>{ const me={pid:c.dataset.pid,from:c.dataset.from,cid:c.dataset.cid||''}; _AFF.drag=_affIsSel(me.pid,me.from,me.cid)?_AFF.sels.slice():[me]; c.classList.add('drag'); if(_AFF.drag.length>1){ ov.querySelectorAll('.af-p.sel').forEach(x=>x.classList.add('drag')); try{ const g=document.createElement('div'); g.className='af-ghost'; g.textContent=`${_AFF.drag.length} personnes`; document.body.appendChild(g); e.dataTransfer.setDragImage(g,20,20); setTimeout(()=>g.remove(),0); }catch(_){} } _affAutoStart(); try{ e.dataTransfer.setData('text/plain',c.dataset.pid); e.dataTransfer.effectAllowed='move'; }catch(_){} }); c.addEventListener('dragend',()=>{ _affAutoStop(); ov.querySelectorAll('.af-p.drag').forEach(x=>x.classList.remove('drag')); c.classList.remove('drag'); ov.querySelectorAll('.af-col.over').forEach(x=>x.classList.remove('over')); }); });
+  ov.querySelectorAll('.af-col').forEach(col=>{ col.addEventListener('dragover',e=>{ if(!_AFF.drag) return; e.preventDefault(); col.classList.add('over'); }); col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove('over'); }); col.addEventListener('drop',e=>{ e.preventDefault(); _affAutoStop(); col.classList.remove('over'); const d=_AFF.drag; _AFF.drag=null; if(d){ _AFF.sels=[]; _affMoveMany(d,col.dataset.k); } }); });
 }
-function _affPick(ev,pid,from,cid){ ev.stopPropagation(); if(_AFF.sel&&_AFF.sel.pid===pid&&_AFF.sel.from===from){ _AFF.sel=null; } else if(_AFF.sel&&_AFF.sel.from!==from){ const s=_AFF.sel; _AFF.sel=null; _affMove(s,from); return; } else _AFF.sel={pid,from,cid}; _affRender(); }
-function _affDrop(ev,k){ if(!_AFF.sel) return; const s=_AFF.sel; _AFF.sel=null; _affMove(s,k); }
-// Applique un déplacement (avec demandes : tâche / type d'absence / confirmation)
-function _affMove(src,to){
-  if(!src||!to||src.from===to&&to!=='TACHE') { _affRender(); return; }
-  const p=byId(src.pid); if(!p){ _affRender(); return; }
-  if(to==='TACHE'){ _affAsk('tache',p,t=>_affApply(src,'TACHE:'+t)); return; }
-  if(to==='ABS'){ _affAsk('abs',p,t=>_affApply(src,'ABS:'+t)); return; }
-  if(src.from==='ABS'){ _affConfirm(`Remplacer l'absence de ${_affName(p)} par « ${_affColMeta(to).lbl} » ?`,()=>_affApply(src,to,true)); return; }
-  _affApply(src,to);
+function _affIsSel(pid,from,cid){ return _AFF.sels.some(x=>x.pid===pid&&x.from===from&&(x.cid||'')===(cid||'')); }
+function _affPick(ev,pid,from,cid){ ev.stopPropagation(); cid=cid||''; const i=_AFF.sels.findIndex(x=>x.pid===pid&&x.from===from&&(x.cid||'')===cid); if(i>=0) _AFF.sels.splice(i,1); else _AFF.sels.push({pid,from,cid}); _affRender(); }
+function _affSelCol(k){ const cards=[...document.querySelectorAll(`#aff-ov .af-col[data-k="${k}"] .af-p`)].map(c=>({pid:c.dataset.pid,from:c.dataset.from,cid:c.dataset.cid||''})); const all=cards.length&&cards.every(c=>_affIsSel(c.pid,c.from,c.cid)); if(all) _AFF.sels=_AFF.sels.filter(x=>!cards.some(c=>c.pid===x.pid&&c.from===x.from&&c.cid===(x.cid||''))); else cards.forEach(c=>{ if(!_affIsSel(c.pid,c.from,c.cid)) _AFF.sels.push(c); }); _affRender(); }
+function _affDrop(ev,k){ if(!_AFF.sels.length) return; if(ev.target.closest&&ev.target.closest('.af-p,.af-all,button')) return; const L=_AFF.sels.slice(); _AFF.sels=[]; _affMoveMany(L,k); }
+// compat : un seul déplacement
+function _affMove(src,to){ _affMoveMany([src],to); }
+// Déplacement d'une ou plusieurs personnes (une seule question pour tout le groupe)
+function _affMoveMany(list,to){
+  list=(list||[]).filter(s=>s&&byId(s.pid)&&!(s.from===to&&to!=='TACHE'));
+  if(!to||!list.length){ _affRender(); return; }
+  const who=list.length===1?_affName(byId(list[0].pid)):`${list.length} personnes`;
+  const go=(dest,force)=>_affApplyMany(list,dest,force);
+  if(to==='TACHE'){ _affAsk('tache',who,t=>go('TACHE:'+t)); return; }
+  if(to==='ABS'){ _affAsk('abs',who,t=>go('ABS:'+t)); return; }
+  const fromAbs=list.filter(s=>s.from==='ABS');
+  if(fromAbs.length){ const n=fromAbs.length===1?_affName(byId(fromAbs[0].pid)):`${fromAbs.length} personnes absentes`; _affConfirm(`Remplacer l'absence de ${n} par « ${_affColMeta(to).lbl} » ?`,()=>go(to,true)); return; }
+  go(to);
 }
+function _affApplyMany(list,to,forceAbs){
+  if(list.length===1) return _affApply(list[0],to,forceAbs);
+  let moved=0, kept=0; list.forEach(src=>{ const r=_affApplyCore(src,to,forceAbs&&src.from==='ABS'); if(r.changed) moved++; if(r.kept) kept++; });
+  if(!moved){ toast('Rien à changer (absences conservées)'); _affRender(); return; }
+  save();
+  toast(`↪ ${moved} personne${moved>1?'s':''} → ${_affTgtLbl(to)} · ${disp(_AFF.ds)}${_AFF.half==='day'?'':(_AFF.half==='AM'?' (matin)':' (après-midi)')}${kept?` · ${kept} demi-journée${kept>1?'s':''} d'absence conservée${kept>1?'s':''}`:''} — « ↩️ Annuler » pour revenir`);
+  _AFF.dirty=true; _affRender();
+}
+function _affTgtLbl(to){ return to.startsWith('ABS:')?(_AFF_ABSLBL[to.slice(4)]||to.slice(4)):to==='TODO'?'À affecter':_isTache(to)?'🧰 '+_tacheTxt(to):_affColMeta(to).lbl; }
 function _affApply(src,to,forceAbs){
-  const ds=_AFF.ds, H=_affHalves(); const p=byId(src.pid); let changed=0, kept=0;
+  const p=byId(src.pid); const {changed,kept}=_affApplyCore(src,to,forceAbs); const ds=_AFF.ds;
+  if(!changed){ toast(kept?`ℹ️ ${_affName(p)} est absent(e) sur ${_AFF.half==='day'?'cette journée':'cette demi-journée'} : rien n'a changé`:'Rien à changer'); _affRender(); return; }
+  save();
+  const tgt=_affTgtLbl(to);
+  toast(`↪ ${_affName(p)} → ${tgt} · ${disp(ds)}${_AFF.half==='day'?'':(_AFF.half==='AM'?' (matin)':' (après-midi)')}${kept?' · demi-journée d\'absence conservée':''}${_AFF.mode==='add'&&!to.startsWith('ABS:')&&to!=='TODO'?' · en plus':''} — « ↩️ Annuler » pour revenir`);
+  _AFF.dirty=true; _affRender();
+}
+function _affApplyCore(src,to,forceAbs){
+  const ds=_AFF.ds, H=_affHalves(); const p=byId(src.pid); let changed=0, kept=0; if(!p) return {changed,kept};
   const fromCid=src.from==='TACHE'?(src.cid||''):(['TODO','ABS'].includes(src.from)?'':src.from);
   H.forEach(h=>{
     const k=`${p.id}_${ds}_${h}`, e=S.planning[k]?{...S.planning[k]}:{}; const vm=e.vm||'';
@@ -28199,33 +28277,45 @@ function _affApply(src,to,forceAbs){
     if(b===a) b='';
     S.planning[k]={type:'travail',note:'',chantierId:a,chantierId2:b,formInt:'',vm}; changed++;
   });
-  if(!changed){ toast(kept?`ℹ️ ${_affName(p)} est absent(e) sur ${_AFF.half==='day'?'cette journée':'cette demi-journée'} : rien n'a changé`:'Rien à changer'); _affRender(); return; }
-  save();
-  const tgt=to.startsWith('ABS:')?(_AFF_ABSLBL[to.slice(4)]||to.slice(4)):to==='TODO'?'À affecter':_isTache(to)?'🧰 '+_tacheTxt(to):_affColMeta(to).lbl;
-  toast(`↪ ${_affName(p)} → ${tgt} · ${disp(ds)}${_AFF.half==='day'?'':(_AFF.half==='AM'?' (matin)':' (après-midi)')}${kept?' · demi-journée d\'absence conservée':''}${_AFF.mode==='add'&&!to.startsWith('ABS:')&&to!=='TODO'?' · en plus':''} — « ↩️ Annuler » pour revenir`);
-  _AFF.dirty=true; _affRender();
+  return {changed,kept};
 }
 function _affRemove(pid,colKey){ const r={pid,from:colKey,cid:''}; if(colKey==='TACHE'){ const card=document.querySelector(`#aff-ov .af-p[data-pid="${pid}"][data-from="TACHE"]`); r.cid=card?card.dataset.cid:''; } const m=_AFF.mode; _AFF.mode='move'; _affApply(r,'TODO'); _AFF.mode=m; _affRender(); }
 // Petites fenêtres internes
 function _affAsk(kind,p,cb){
+  const nm=typeof p==='string'?p:_affName(p);
   const ov=document.getElementById('aff-ov'); const d=document.createElement('div'); d.className='af-dlg';
   if(kind==='tache'){
     const rec=(S.affTaches&&S.affTaches.length?S.affTaches:['Rangement','Logistique','Magasin','Nettoyage','Outillage']).slice(0,8);
-    d.innerHTML=`<div class="af-dc"><b>🧰 Tâche pour ${_bfEsc(_affName(p))}</b><input id="af-tin" maxlength="40" placeholder="Rangement, logistique…"><div class="af-chips">${rec.map(t=>`<button type="button" data-t="${_bfEsc(t)}">${_bfEsc(t)}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button><button type="button" class="af-ok">Valider</button></div></div>`;
+    d.innerHTML=`<div class="af-dc"><b>🧰 Tâche pour ${_bfEsc(nm)}</b><input id="af-tin" maxlength="40" placeholder="Rangement, logistique…"><div class="af-chips">${rec.map(t=>`<button type="button" data-t="${_bfEsc(t)}">${_bfEsc(t)}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button><button type="button" class="af-ok">Valider</button></div></div>`;
     ov.appendChild(d); const inp=d.querySelector('#af-tin'); setTimeout(()=>inp.focus(),50);
     const go=t=>{ t=(t||'').trim().replace(/:/g,' '); if(!t){ inp.focus(); return; } S.affTaches=[t,...(S.affTaches||[]).filter(x=>x.toLowerCase()!==t.toLowerCase())].slice(0,12); d.remove(); cb(t); };
     d.querySelectorAll('.af-chips button').forEach(b=>b.onclick=()=>go(b.dataset.t)); d.querySelector('.af-ok').onclick=()=>go(inp.value); inp.onkeydown=e=>{ if(e.key==='Enter') go(inp.value); if(e.key==='Escape') d.remove(); };
   } else {
-    d.innerHTML=`<div class="af-dc"><b>Absence pour ${_bfEsc(_affName(p))}</b><div style="font-size:12.5px;opacity:.8;margin:4px 0 10px">Remplace son affectation ${_AFF.half==='day'?'de la journée':(_AFF.half==='AM'?'du matin':'de l\'après-midi')} du ${disp(_AFF.ds)}.</div><div class="af-chips">${_AFF_ABS.map(([v,l])=>`<button type="button" data-t="${v}">${l}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button></div></div>`;
+    d.innerHTML=`<div class="af-dc"><b>Absence pour ${_bfEsc(nm)}</b><div style="font-size:12.5px;opacity:.8;margin:4px 0 10px">Remplace son affectation ${_AFF.half==='day'?'de la journée':(_AFF.half==='AM'?'du matin':'de l\'après-midi')} du ${disp(_AFF.ds)}.</div><div class="af-chips">${_AFF_ABS.map(([v,l])=>`<button type="button" data-t="${v}">${l}</button>`).join('')}</div><div class="af-dr"><button type="button" class="af-c">Annuler</button></div></div>`;
     ov.appendChild(d); d.querySelectorAll('.af-chips button').forEach(b=>b.onclick=()=>{ d.remove(); cb(b.dataset.t); });
   }
   d.querySelector('.af-c').onclick=()=>{ d.remove(); _affRender(); }; d.addEventListener('click',e=>{ if(e.target===d){ d.remove(); _affRender(); } });
 }
 function _affConfirm(msg,ok){ const ov=document.getElementById('aff-ov'); const d=document.createElement('div'); d.className='af-dlg'; d.innerHTML=`<div class="af-dc"><b>${_bfEsc(msg)}</b><div class="af-dr"><button type="button" class="af-c">Annuler</button><button type="button" class="af-ok">Confirmer</button></div></div>`; ov.appendChild(d); d.querySelector('.af-c').onclick=()=>{ d.remove(); _affRender(); }; d.querySelector('.af-ok').onclick=()=>{ d.remove(); ok(); }; }
+
+// Défilement automatique du tableau quand on glisse un nom près d'un bord
+let _affAuto=null;
+function _affAutoStart(){ if(_affAuto) return; _affAuto={x:-1,y:-1,raf:0};
+  const onOver=e=>{ if(_affAuto){ _affAuto.x=e.clientX; _affAuto.y=e.clientY; } };
+  _affAuto.onOver=onOver; document.addEventListener('dragover',onOver,true);
+  const step=()=>{ if(!_affAuto) return; const c=document.querySelector('#aff-ov .af-cols'); if(c&&_affAuto.x>=0){ const r=c.getBoundingClientRect(), Z=90, sp=d=>Math.ceil(Math.pow(Math.max(0,Z-d)/Z,1.6)*28);
+      const {x,y}=_affAuto; let dx=0, dy=0;
+      if(x<r.left+Z) dx=-sp(x-r.left); else if(x>r.right-Z) dx=sp(r.right-x);
+      if(y<r.top+Z+40) dy=-sp(y-r.top-40); else if(y>r.bottom-Z) dy=sp(r.bottom-y);
+      if(dx) c.scrollLeft+=dx; if(dy) c.scrollTop+=dy; }
+    _affAuto.raf=requestAnimationFrame(step); };
+  _affAuto.raf=requestAnimationFrame(step); }
+function _affAutoStop(){ if(!_affAuto) return; cancelAnimationFrame(_affAuto.raf); document.removeEventListener('dragover',_affAuto.onOver,true); _affAuto=null; }
+document.addEventListener('dragend',()=>_affAutoStop(),true); document.addEventListener('drop',()=>_affAutoStop(),true);
 // Ouverture / navigation
 function affOpen(ds){
   _AFF.catSrc=document.getElementById('pg-master')?.classList.contains('on')?'master':'weekly'; _AFF.allCats=false;
-  const nd=ds||(typeof _AFF.ds==='string'&&_AFF.ds)||fmt(new Date()); if(nd!==_AFF.ds){ _AFF.extra=[]; } _AFF.ds=nd; _AFF.sel=null; _AFF.dirty=false; _AFF.addOpen=false;
+  const nd=ds||(typeof _AFF.ds==='string'&&_AFF.ds)||fmt(new Date()); if(nd!==_AFF.ds){ _AFF.extra=[]; } _AFF.ds=nd; _AFF.sels=[]; _AFF.dirty=false; _AFF.addOpen=false;
   document.getElementById('day-recap-pop')?.remove();
   let ov=document.getElementById('aff-ov');
   if(!ov){ ov=document.createElement('div'); ov.id='aff-ov';
@@ -28240,7 +28330,7 @@ function affOpen(ds){
   }
   _affRender();
 }
-function _affDay(n){ const d=addD(parseLocal(_AFF.ds),n); _AFF.ds=fmt(d); _AFF.sel=null; _AFF.extra=[]; _AFF.addOpen=false; _affRender(); }
+function _affDay(n){ const d=addD(parseLocal(_AFF.ds),n); _AFF.ds=fmt(d); _AFF.sels=[]; _AFF.extra=[]; _AFF.addOpen=false; _affRender(); }
 function affClose(){ const ov=document.getElementById('aff-ov'); if(ov) ov.remove(); if(_AFF.dirty){ _AFF.dirty=false; try{ const a=(document.querySelector('.page.on')?.id||'pg-dashboard').replace(/^pg-/,''); const sc=document.querySelector('.body'); const y=sc?sc.scrollTop:0; goTab(a); if(sc) requestAnimationFrame(()=>sc.scrollTop=y); }catch(_){} } }
 function _affExtract(){ const ds=_AFF.ds; affClose(); try{ S.weekStart=getMon(parseLocal(ds)); openDayExtract(); const i=Math.round((parseLocal(ds)-S.weekStart)/864e5); const sel=document.getElementById('dayextract-select'); if(sel) sel.value=String(i); }catch(e){ toast('Extrait indisponible'); } }
 try{ if(typeof _CK_ACTIONS!=='undefined') _CK_ACTIONS.push(['🧩','Affectations du jour','affectation effectif reaffecter deplacer chantier equipe jour',()=>affOpen()]); }catch(_){}
