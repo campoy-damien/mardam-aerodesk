@@ -28769,7 +28769,7 @@ function _mdPeople(){
     return {p,nom,pre,nomS:nom.join(' '),preS:pre.join(' '),ph:nom.map(_mdPhon),pph:pre.map(_mdPhon),actif:p.actif!==false}; });
   _mdPIdxKey=key; return _mdPIdx;
 }
-function _mdTokSim(t,w,ph){ if(t===w) return 1; if(t.length<4||w.length<4) return 0; const d=_mdLev(t,w), lim=w.length>=7?2:1; if(d<=lim) return d===1?0.82:0.7; if(ph&&_mdPhon(t)===ph&&ph.length>=3) return 0.78; return 0; }
+function _mdTokSim(t,w,ph){ if(t===w) return 1; if(t.length===3&&w.length===4&&w.startsWith(t)&&!_MD_STOP.has(t)) return 0.72; /* « bao » dicté pour BAOU */ if(t.length<4||w.length<4) return 0; const d=_mdLev(t,w), lim=w.length>=7?2:1; if(d<=lim) return d===1?0.82:0.7; if(ph&&_mdPhon(t)===ph&&ph.length>=3) return 0.78; return 0; }
 // Repère les personnes citées dans la phrase : [{ids:[...], span:[i,j], score, words}]
 function _mdFindPeople(T){
   const IDX=_mdPeople(), hits=[]; let i=0;
@@ -28900,7 +28900,7 @@ const _MD_SCREENS=[
   ['docatr',/ (doc|documentation) atr| navx| nav x/,'ATR NavX'],
   ['docboeing',/ (doc|documentation) boeing|aviation ?id/,'Documentation Boeing'],
   ['forecast',/ prevision/,'Prévision 3 mois'],
-  ['master',/ master/,'Master planning'],
+  ['master',/ master| vue d ensemble/,'Master planning'],
   ['slot',/ slot| hangar| positions? hangar/,'Slot Hangar'],
   ['stockage',/ stockage/,'Stockage'],
   ['recycling',/ recyclage/,'A/C Recyclage'],
@@ -28910,7 +28910,7 @@ const _MD_SCREENS=[
   ['autorisations',/ autorisations?( |$)/,'Autorisations'],
   ['todo',/ to ?do| liste de taches| mes taches/,'To-Do'],
   ['checklist',/ check ?list/,'Check-list'],
-  ['kpi',/ kpi|indicateurs/,'Tableau KPI'],
+  ['kpi',/ kpi|indicateurs| chiffres cles| statistiques| stats /,'Tableau KPI'],
   ['programme',/ programme/,'Programme activité'],
   ['chantiers',/ chantiers?( |$)/,'Chantiers'],
   ['simulation',/ simulation/,'Simulation'],
@@ -28933,7 +28933,7 @@ const _MD_JL=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi']
 function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.getDate()} ${_MD_ML[d.getMonth()]}${d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():''}`; }
 function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.trim():''; }
 // ── Compréhension : phrase → plan (sans rien exécuter) ──
-const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur) /;
+const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur|apparaitre|remonte|remonter|balance|ramene|sors moi|fais voir) /;
 const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour)( |$)/;
 const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
 function _mdParse(raw){
@@ -29005,6 +29005,10 @@ function _mdNavRun(P){
   else if(scr==='forecast'){ openForecast(); say='Voici la prévision à 3 mois.'; }
   else if(scr==='fiche'){ const id=P.person&&P.person.ids[0]; goTab('personnel'); if(id) setTimeout(()=>editPersonnel(id),60); say=`Voici la fiche de ${_mdPName(byId(id))}.`; }
   else if(scr==='mardam'){ goTab('ai'); say='Voici ma page.'; }
+  else if(['formations','autorisations','certif'].includes(scr)&&P.person&&P.person.ids&&P.person.ids.length===1){ const e=byId(P.person.ids[0]); goTab(scr);
+    const inp=document.getElementById({formations:'form-search',autorisations:'auto-search',certif:'certif-search'}[scr]);
+    if(inp&&e){ inp.value=e.nom||''; inp.dispatchEvent(new Event('input')); }
+    say=`Voici ${scr==='certif'?'le certifying staff':'les '+scr} de ${_mdPName(e)}.`; setTimeout(()=>_mdFlash(pg()),80); }
   else { goTab(scr); say=`J'ouvre ${P.label}.`; setTimeout(()=>_mdFlash(pg()),80); }
   return say;
 }
@@ -29126,7 +29130,7 @@ function _mdAnon(raw,P){
   (P&&P.ppl||[]).slice().sort((a,b)=>b.span[0]-a.span[0]).forEach(h=>{ const code='P'+(++np); map[code]={type:'p',ids:h.ids,words:h.words}; T.splice(h.span[0],h.span[1]-h.span[0],'['+code+']'); });
   (P&&P.msn||[]).forEach(m=>{ const code='A'+(++na); map[code]={type:'a',msn:m.msn,cands:m.cands}; const k=T.indexOf(m.msn); if(k>=0) T[k]='['+code+']'; });
   // tout mot inconnu qui ressemble à un nom propre dans la phrase d'origine est masqué aussi
-  const caps=String(raw).match(/\b[A-ZÉÈ][a-zéèêëàâîïôöûüç'-]{2,}\b/g)||[];
+  const caps=(String(raw).replace(/(^|[.!?…]\s*|[«"“]\s*)[A-ZÉÈÀÂÎÔÛ][a-zéèêëàâîïôöûüç'’-]*/g,'$1').match(/\b[A-ZÉÈ][a-zéèêëàâîïôöûüç'-]{2,}\b/g))||[];
   caps.forEach(w=>{ const nw=_mdNorm(w); if(!_MD_STOP.has(nw)){ const k=T.indexOf(nw); if(k>=0){ const code='X'+(Object.keys(map).length+1); map[code]={type:'x',words:nw}; T[k]='['+code+']'; } } });
   return {text:T.join(' '),map};
 }
@@ -29152,7 +29156,7 @@ Exemples :
 Les dates se calculent à partir d'aujourd'hui : {TODAY}. « la semaine prochaine » = lundi de la semaine suivante ; un mois sans année = sa prochaine occurrence.`;
 }
 
-async function _mdAI(raw,P){
+async function _mdAI(raw,P,opt){ opt=opt||{};
   const c=_mdCfg(); const an=_mdAnon(raw,P); const today=_mdToday();
   const hist=MD.hist.slice(-7,-1).filter(h=>h.who==='me').slice(-3).map(h=>_mdAnon(h.html.replace(/&[a-z]+;/g,' '),_mdParse(h.html)).text);
   const body={token:c.token,model:c.model,system:_mdAISys().replace('{TODAY}',`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
@@ -29161,7 +29165,11 @@ async function _mdAI(raw,P){
     const r=await fetch(c.gas,{method:'POST',body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(to);
     const j=await r.json(); if(j.error){ _mdUseErr('script',j.error); throw new Error(j.error); }
     _mdUseRec(j,c.model); if(j.status&&j.status!==200){ throw new Error('api '+j.status); }
-    const txt=(j.body&&j.body.content&&j.body.content[0]&&j.body.content[0].text)||''; MD.lastAI=txt.replace(/\s+/g,' ').trim().slice(0,300)||'(vide)'; const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
+    const blocks=(j.body&&Array.isArray(j.body.content))?j.body.content:[];
+    const txt=blocks.filter(x=>x&&x.type==='text'&&x.text).map(x=>x.text).join('\n');
+    MD.lastAI=txt.replace(/\s+/g,' ').trim().slice(0,300)||`(vide · arrêt : ${j.body&&j.body.stop_reason||'?'} · blocs : ${blocks.map(x=>x&&x.type).join(',')||'aucun'})`;
+    if(!txt.trim()&&!opt.retry) return _mdAI(raw,P,{retry:true});   // réponse vide : un seul nouvel essai
+    const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
     return _mdFromAI(JSON.parse(m[0]),an.map,P);
   }catch(e){ if(!MD.aiErr) _mdUseErr(e&&e.name==='AbortError'?'net':'net',e&&e.message||e); console.warn('Mardam IA',e); return null; }
 }
@@ -29295,6 +29303,7 @@ function _mdBenchCases(){
   const W3=(()=>{ let y=today.getFullYear(); if(3<wkN(today)-8) y++; return addD(getMon(_mdYmd(y,0,4)),14); })();
   const later=st=>p=>p.kind==='later'&&p.stage===st;
   const L=[
+    ["Fais moi apparaître l'écran des chiffres clés ?",nav('kpi')],['balance moi les stats',nav('kpi')],["Remonte moi à la vue d'ensemble du mois de février.",nav('master',p=>p.month&&p.month.m===1)],
     ['ouvre le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['montre-moi le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['le planning de la semaine prochaine',nav('weekly',wk(nextMon))],
     ['ouvre le planning',nav('weekly',wk(mon))],['affiche le planning hebdo',nav('weekly')],['va sur la semaine 3',nav('weekly',wk(W3))],['ouvre la semaine 3',nav('weekly',wk(W3))],
     ['montre-moi le master de janvier',nav('master',p=>p.month&&p.month.m===0&&p.month.y===jan.y)],['ouvre le master planning',nav('master')],['affiche le master du mois prochain',nav('master',p=>p.month&&p.month.m===(today.getMonth()+1)%12)],
