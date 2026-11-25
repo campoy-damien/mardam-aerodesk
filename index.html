@@ -28955,7 +28955,7 @@ function _mdParse(raw){
   const msn=_mdFindMsn(T,used), tm=_mdTime(T);
   Object.assign(P,{ppl,msn,tm});
   // Filtre de catégories (« affiche seulement les techniciens », « affiche tout le monde »)
-  if((/ (seulement|que|uniquement) les /.test(nn)||/ (seulement|uniquement) $/.test(nn))&&/ (affiche|montre|garde|filtre|laisse)/.test(nn)){ const cats=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); if(cats.length) return Object.assign(P,{kind:'filter',cats}); }
+  if((/ (seulement|que|uniquement) les /.test(nn)||/ (seulement|uniquement) $/.test(nn))&&/ (affiche|montre|garde|filtre|laisse|voir)/.test(nn)&&!(_mdTime(T).week||_mdTime(T).range||_mdTime(T).day||_mdTime(T).month)){ const cats=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); if(cats.length) return Object.assign(P,{kind:'filter',cats}); }
   if(/ (affiche|montre|remets) (tout le monde|toutes les categories|tous les gens|tout le personnel) /.test(nn)) return Object.assign(P,{kind:'filter',cats:'all'});
   const isNav=_MD_NAVV.test(nn)||/^(le |la |l |les |mon |ma )?(planning|master|brief|slot|hangar|stockage|recyclage|kpi|programme|chantiers|formations|autorisations|to ?do|check ?list|personnel|tableau de bord|accueil|notice|prevision|affectations|mode tv|aeromargin|fiche)( |$)/.test(T.join(' '));
   const isAct=_MD_ACTV.test(T.join(' '))&&!/^(passe en mode|mets moi sur|lance)/.test(T.join(' '));
@@ -28969,7 +28969,10 @@ function _mdParse(raw){
     if(/ fiche /.test(nn)&&ppl.length) scr=['fiche','Fiche personnel'];
     if(!scr&&(tm.week||tm.range||tm.day)) scr=['weekly','Planning hebdo'];
     if(!scr&&tm.month) scr=['master','Master planning'];
-    if(scr){ Object.assign(P,{kind:'nav',screen:scr[0],label:scr[1]}); _mdNavDates(P); return P; }
+    if(scr){ Object.assign(P,{kind:'nav',screen:scr[0],label:scr[1]});
+      // « les gars en intérim la semaine prochaine » : planning + filtre de catégories
+      if(['weekly','master'].includes(scr[0])&&!ppl.length){ const cats=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); if(cats.length) P.cats=cats; }
+      _mdNavDates(P); return P; }
   }
   return P;
 }
@@ -28991,10 +28994,11 @@ function _mdFlash(el){ if(!el) return; el.classList.remove('md-flash'); void el.
 function _mdNavRun(P){
   const scr=P.screen; let say='';
   const pg=()=>document.querySelector('.page.on .sh')||document.querySelector('.page.on');
-  if(scr==='weekly'){ S.weekStart=P.date||getMon(new Date()); goTab('weekly'); try{ renderWeekly(); }catch(_){} say=`J'ouvre le planning de la semaine ${wkN(S.weekStart)}.`; setTimeout(()=>_mdFlash(document.getElementById('weeklyGrid')||pg()),80); }
+  const cats=()=>{ if(!Array.isArray(P.cats)||!P.cats.length) return ''; const all=[...new Set((S.personnel||[]).filter(p=>p.actif!==false&&!p.archived).map(p=>p.categorie||'autre'))]; S[scr==='master'?'masterHiddenCats':'weeklyHiddenCats']=all.filter(c=>!P.cats.includes(c)); try{ save(); }catch(_){} return ', avec seulement : '+P.cats.map(c=>String(_dayExtractCatLbl(c)).replace(/\.+$/,'')).join(', '); };
+  if(scr==='weekly'){ S.weekStart=P.date||getMon(new Date()); const cs=cats(); goTab('weekly'); try{ renderWeekly(); }catch(_){} say=`J'ouvre le planning de la semaine ${wkN(S.weekStart)}${cs}.`; setTimeout(()=>_mdFlash(document.getElementById('weeklyGrid')||pg()),80); }
   else if(scr==='master'){ const m=P.month||{m:new Date().getMonth(),y:new Date().getFullYear()}; S.masterMonth=m.m; S.masterYear=m.y; goTab('master'); const yr=document.getElementById('mp-year'); if(yr) yr.value=String(m.y);
     if(P.person&&P.person.ids.length===1){ const em=document.getElementById('mp-emp'); if(em) em.value=P.person.ids[0]; }
-    try{ renderMaster(); }catch(_){} say=`Voici le master de ${_MD_ML[m.m]} ${m.y}.`; setTimeout(()=>_mdFlash(document.getElementById('masterGrid')||pg()),80); }
+    const cs=cats(); try{ renderMaster(); }catch(_){} say=`Voici le master de ${_MD_ML[m.m]} ${m.y}${cs}.`; setTimeout(()=>_mdFlash(document.getElementById('masterGrid')||pg()),80); }
   else if(scr==='briefw'){ openBriefWeek(fmt(P.date||new Date())); say=`Voici le brief de la semaine ${wkN(P.date||new Date())}.`; }
   else if(scr==='briefj'){ openBrief(); say='Voici le brief du jour.'; }
   else if(scr==='aff'){ affOpen(fmt(P.date||new Date())); say=`J'ouvre les affectations de ${_mdDayTxt(P.date||_mdToday())}.`; }
@@ -29108,7 +29112,7 @@ function _mdExec(P,text,how){
       return _mdReply(`Le ${m.d.getDate()} ${_MD_ML[m.d.getMonth()]} tombe un <b>${_MD_JL[m.d.getDay()]}</b>. Tu veux dire lequel ?`,null,MD.pending.choices.map(c=>({l:c.l,fn:c.fn})).concat([{l:'✕ Annuler',fn:()=>{ MD.pending=null; _mdReply('D\'accord.'); }}]));
     }
     let say=''; try{ say=_mdNavRun(P); }catch(e){ console.warn('Mardam nav',e); say="Je n'ai pas réussi à ouvrir cet écran."; }
-    MD.ctx.last=P; _mdReply(say); _mdLog({said:text,how,label:P.label+(P.date?' · '+fmt(P.date):'')+(P.month?` · ${P.month.m+1}/${P.month.y}`:''),result:'ok'}); return;
+    MD.ctx.last=P; _mdReply(say); _mdLog({said:text,how,label:P.label+(P.date?' · '+fmt(P.date):'')+(P.month?` · ${P.month.m+1}/${P.month.y}`:'')+(P.cats?' · '+P.cats.join('+'):''),result:'ok'}); return;
   }
   if(P.kind==='filter'){ const s=_mdFilterRun(P); _mdReply(s); _mdLog({said:text,how,label:'filtre catégories',result:'ok'}); return; }
   if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Pour l'instant je sais ouvrir les écrans.`;
@@ -29139,7 +29143,7 @@ function _mdAISys(){
   const scr=[..._MD_SCREENS.map(x=>x[0]),'fiche'].filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${k} = ${((_MD_SCREENS.find(x=>x[0]===k)||[])[2]||'Fiche personnel')}${_MD_AI_HINT[k]?' ('+_MD_AI_HINT[k]+')':''}`).join('\n');
   return `Tu traduis les demandes orales (souvent familières, mal transcrites par la dictée) d'un responsable de production aéronautique en UN ordre JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte ni balises autour. Choisis l'écran le plus proche du sens, même si les mots sont différents.
 Formats :
-{"type":"nav","screen":"<code écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null"}
+{"type":"nav","screen":"<code écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null","cats":[catégories à garder, pour weekly ou master] ou null}
 {"type":"filter","cats":["technicien","chef","interimaire","expert","alternant","responsable","sheetmetal","prestataire"] ou "all"}
 {"type":"control","act":"yes|no|undo|mute|unmute|help|reset|journal"}
 {"type":"question","topic":"résumé court"}   (toute demande d'information : qui, où, quand, combien…)
@@ -29152,6 +29156,7 @@ Exemples :
 « remonte moi la vue d ensemble du mois de fevrier » → {"type":"nav","screen":"master","date":null,"month":"<février à venir AAAA-02>","person":null}
 « balance moi la page de [P1] » → {"type":"nav","screen":"fiche","date":null,"month":null,"person":"P1"}
 « je veux voir que les gars en interim » → {"type":"filter","cats":["interimaire"]}
+« je veux voir les gars en interim la semaine prochaine » → {"type":"nav","screen":"weekly","date":"<lundi suivant>","month":null,"person":null,"cats":["interimaire"]}
 « qui bosse sur [A1] demain » → {"type":"question","topic":"équipe de [A1] demain"}
 Les dates se calculent à partir d'aujourd'hui : {TODAY}. « la semaine prochaine » = lundi de la semaine suivante ; un mois sans année = sa prochaine occurrence.`;
 }
@@ -29181,6 +29186,7 @@ function _mdFromAI(o,map,P){
     if(o.date&&/^\d{4}-\d{2}-\d{2}$/.test(o.date)){ const d=parseLocal(o.date); out.date=['aff','quiou'].includes(o.screen)?d:getMon(d); }
     if(o.month&&/^\d{4}-\d{2}$/.test(o.month)) out.month={y:+o.month.slice(0,4),m:+o.month.slice(5,7)-1};
     if(o.screen==='master'&&!out.month&&out.date) out.month={m:out.date.getMonth(),y:out.date.getFullYear()};
+    const known=_MD_CATW.map(x=>x[0]); if(Array.isArray(o.cats)&&['weekly','master'].includes(o.screen)){ const c=o.cats.filter(x=>known.includes(x)); if(c.length) out.cats=c; }
     return out; }
   if(o.type==='filter') return Object.assign(out,{kind:'filter',cats:o.cats});
   if(o.type==='control') return Object.assign(out,{kind:'ctl',act:o.act});
@@ -29304,6 +29310,7 @@ function _mdBenchCases(){
   const later=st=>p=>p.kind==='later'&&p.stage===st;
   const L=[
     ["Fais moi apparaître l'écran des chiffres clés ?",nav('kpi')],['balance moi les stats',nav('kpi')],["Remonte moi à la vue d'ensemble du mois de février.",nav('master',p=>p.month&&p.month.m===1)],
+    ['Je veux voir les gars en intérim la semaine prochaine.',nav('weekly',p=>wk(nextMon)(p)&&p.cats&&p.cats.join()==='interimaire')],['montre moi le master de janvier avec seulement les techniciens',nav('master',p=>p.month&&p.month.m===0&&p.cats&&p.cats.includes('technicien'))],['je veux voir que les gains d’intérim',p=>p.kind==='filter'&&p.cats.includes('interimaire')],
     ['ouvre le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['montre-moi le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['le planning de la semaine prochaine',nav('weekly',wk(nextMon))],
     ['ouvre le planning',nav('weekly',wk(mon))],['affiche le planning hebdo',nav('weekly')],['va sur la semaine 3',nav('weekly',wk(W3))],['ouvre la semaine 3',nav('weekly',wk(W3))],
     ['montre-moi le master de janvier',nav('master',p=>p.month&&p.month.m===0&&p.month.y===jan.y)],['ouvre le master planning',nav('master')],['affiche le master du mois prochain',nav('master',p=>p.month&&p.month.m===(today.getMonth()+1)%12)],
