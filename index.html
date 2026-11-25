@@ -7178,7 +7178,7 @@ function _hgPlan(day0,week){
       if(groups.length===1&&groups[0].from===0&&groups[0].to===week.length-1) groups=null; }
     let top=p===3?noseMid:y0;
     // étiquette sur le tarmac
-    const ly=Yd+(p===3?Math.round(SREF*0.30)+16:22), lx=p===3?cx+BW*0.30:cx;
+    const ly=Yd+(p===3?Math.round(SREF*0.30)+16:22), lx=cx;
     if(!inf){ const s=SREF*0.72; g+=`<rect x="${cx-s/2}" y="${top}" width="${s}" height="${s*0.9}" rx="14" fill="#fff" fill-opacity=".35" stroke="${C.dark}" stroke-width="2" stroke-dasharray="7 6" opacity=".7"/><text x="${cx}" y="${top+s*0.45+6}" ${F} font-size="18" font-weight="800" fill="${C.dark}" opacity=".7" text-anchor="middle">Libre</text>`; return; }
     const s=SREF*(_HG_SCALE[inf.kind]||1), k=s/200;
     if(p===3) top=Yd-0.80*s;   // dérive toujours à l'extérieur des portes
@@ -28537,7 +28537,10 @@ function _bsData(mon){
   const CH={};
   P.forEach(p=>days.forEach(ds=>['AM','PM'].forEach(h=>{ const e=cell(p,ds,h); if(!e||e.type!=='travail') return;
     [e.chantierId,e.chantierId2].filter(c=>c&&!_isTache(c)).forEach(cid=>{ const c=CH[cid]=CH[cid]||{n:new Set(),chefs:{}}; c.n.add(p.id); if(p.categorie==='chef') c.chefs[p.id]=(c.chefs[p.id]||0)+1; }); })));
-  const chantiers=Object.entries(CH).map(([cid,c])=>{ const t=Object.entries(c.chefs).sort((a,b)=>b[1]-a[1]); const chefs=t.length?t.filter(([,v])=>v>=t[0][1]*0.4).slice(0,2).map(([id])=>byId(id)).filter(Boolean):[];
+  // chef d'équipe renseigné sur le chantier (fiche chantier, ou réglages Stockage / Recyclage / Airbus) en priorité
+  const _bsChefFiche=cid=>{ const c=(S.chantiers||[]).find(x=>x.id===cid); if(c) return c.chef||'';
+    if(cid==='STO'||cid.startsWith('STO_')) return S.stockage?.config?.chef||''; if(cid==='REC'||cid.startsWith('REC_')) return S.recycling?.config?.chef||''; if(cid==='AIRBUS') return S.airbus?.config?.chef||''; return ''; };
+  const chantiers=Object.entries(CH).map(([cid,c])=>{ const fc=byId(_bsChefFiche(cid)); const t=Object.entries(c.chefs).sort((a,b)=>b[1]-a[1]); const chefs=fc?[fc]:t.length?t.filter(([,v])=>v>=t[0][1]*0.4).slice(0,2).map(([id])=>byId(id)).filter(Boolean):[];
     return {cid,col:_chColor(cid),...(_bsChLbl(cid)),n:c.n.size,chefs}; }).sort((a,b)=>b.n-a.n);
   // Formations (externes + internes), regroupées par intitulé
   const F={};
