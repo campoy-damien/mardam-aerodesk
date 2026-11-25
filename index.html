@@ -2564,6 +2564,72 @@ body.th-bento .af-cpf button{border-radius:999px}
 body.th-bento .bs-prev{border-radius:18px;background:rgba(255,255,255,.06)}
 body.th-bento .bs-msgrow textarea{border-radius:14px}
 @media(max-width:760px){.bs-msgrow{flex-direction:column}.bs-msgrow .btn{align-self:flex-end}.bs-prev{padding:6px;max-height:none}}
+
+/* ═══ 🎙 Mardam ═══ */
+.dk-sq.md-tile{background:linear-gradient(160deg,#ff9fd0,#8f7bff 55%,#3fd0ff)}.dk-sq.md-tile svg{inset:20%;width:60%;height:60%;color:#fff}
+#md-fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:9300;width:58px;height:58px;border-radius:50%;border:0;display:none;place-items:center;cursor:pointer;color:#03121a;background:radial-gradient(circle at 35% 30%,#7fe8ff,#00a8e8 70%);box-shadow:0 0 0 6px rgba(0,210,255,.16),0 0 26px rgba(0,210,255,.55)}
+#md-fab svg{width:26px;height:26px}
+body:not(.th-bento) #md-fab{display:grid}
+body:not(.th-bento) #fam-mardam{display:none!important}
+html.md-open #md-fab{opacity:.0;pointer-events:none}
+#md-panel{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);z-index:9400;width:min(560px,calc(100vw - 24px));display:none;flex-direction:column;max-height:min(70vh,560px);color:#e8ecff}
+#md-panel.on{display:flex;animation:mdIn .22s ease-out}
+@keyframes mdIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+body.th-bento #md-panel{background:rgba(22,28,48,.98);border:1px solid rgba(255,255,255,.12);border-radius:26px;box-shadow:0 24px 60px rgba(0,0,0,.55);font-family:'Space Grotesk',sans-serif}
+body:not(.th-bento) #md-panel{background:rgba(8,16,30,.98);border:1px solid rgba(0,210,255,.4);border-radius:14px;box-shadow:0 0 34px rgba(0,210,255,.18),0 20px 50px rgba(0,0,0,.5);font-family:'Outfit',sans-serif}
+.md-hd{display:flex;align-items:center;gap:9px;padding:14px 16px 6px}
+.md-av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}.md-av svg{width:16px;height:16px}
+body.th-bento .md-av{background:linear-gradient(135deg,#ff9fd0,#8f7bff 55%,#3fd0ff);color:#fff}
+body:not(.th-bento) .md-av{background:rgba(0,210,255,.12);border:1px solid #00d2ff;color:#00d2ff}
+.md-nm{font-size:14px;letter-spacing:.3px}body:not(.th-bento) .md-nm{color:#00d2ff;text-transform:uppercase;font-size:12.5px;letter-spacing:1px}body.th-bento .md-nm{color:#c9d2ff}
+.md-st{flex:1;font-size:12px;color:#97a3c0}
+.md-ib{border:0;background:rgba(255,255,255,.06);color:#c9d2ff;border-radius:9px;width:32px;height:30px;cursor:pointer;font-size:14px}
+body.th-bento .md-ib{border-radius:999px}
+.md-body{padding:4px 18px 10px;overflow:auto;flex:1}
+.md-you{font-size:13px;color:#97a3c0;font-style:italic;margin-bottom:8px}.md-you b{color:#e8ecff;font-style:normal;font-weight:600}
+.md-wave{display:none;gap:4px;align-items:center;height:30px;margin:2px 0 8px}.md-wave i{width:5px;height:8px;border-radius:3px;background:#b9c4ff;animation:mdW 1s ease-in-out infinite}
+body:not(.th-bento) .md-wave i{background:#00d2ff}
+.md-wave i:nth-child(2){animation-delay:.12s}.md-wave i:nth-child(3){animation-delay:.24s}.md-wave i:nth-child(4){animation-delay:.36s}.md-wave i:nth-child(5){animation-delay:.48s}.md-wave i:nth-child(6){animation-delay:.6s}.md-wave i:nth-child(7){animation-delay:.72s}
+@keyframes mdW{0%,100%{height:6px}50%{height:28px}}
+#md-panel.md-listen .md-wave{display:flex}
+.md-say{font-size:15px;line-height:1.5}.md-say small{color:#97a3c0}
+.md-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.md-b{border:1px solid rgba(255,255,255,.2);background:transparent;color:#e8ecff;font:800 13px inherit;padding:8px 15px;border-radius:999px;cursor:pointer}
+.md-b.p{background:#e8ecff;color:#0a0e19;border-color:transparent}.md-b.sm{padding:5px 11px;font-size:12px}
+body:not(.th-bento) .md-b{border-radius:9px;border-color:rgba(0,210,255,.35);color:#7fe3ff}body:not(.th-bento) .md-b.p{background:#00d2ff;color:#03121a}
+.md-ft{display:flex;gap:8px;align-items:center;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.08)}
+.md-mic{width:44px;height:44px;flex-shrink:0;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer}.md-mic svg{width:20px;height:20px}
+body.th-bento .md-mic{background:#e8ecff;color:#0a0e19}
+body:not(.th-bento) .md-mic{background:radial-gradient(circle at 35% 30%,#7fe8ff,#00a8e8 70%);color:#03121a}
+#md-panel.md-listen .md-mic{box-shadow:0 0 0 6px rgba(255,90,120,.25);background:#ff5a78;color:#fff}
+#md-in,#md-in2{flex:1;min-width:0;height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e8ecff;padding:0 16px;font:500 14px inherit;outline:none}
+body:not(.th-bento) #md-in,body:not(.th-bento) #md-in2{border-radius:10px;border-color:rgba(0,210,255,.25)}
+.md-miss{border:0;background:transparent;color:#97a3c0;font:600 11.5px inherit;cursor:pointer;white-space:nowrap}
+.md-flash{animation:mdFlash 2.4s ease-out}
+@keyframes mdFlash{0%{box-shadow:0 0 0 0 rgba(255,138,61,0)}15%{box-shadow:0 0 0 4px rgba(255,138,61,.85),0 0 30px rgba(255,138,61,.5)}100%{box-shadow:0 0 0 0 rgba(255,138,61,0)}}
+@media(max-width:760px){#md-panel{right:8px;left:8px;width:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-height:62vh}.md-miss{display:none}}
+/* page Mardam */
+.md-sub{font-size:12px;color:var(--t4,#97a3c0)}
+.md-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:1000px){.md-grid{grid-template-columns:1fr}}
+.md-col{display:flex;flex-direction:column;gap:14px}
+.md-card{padding:14px 16px}
+.md-ch{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:13.5px;margin-bottom:10px}
+.md-conv{display:flex;flex-direction:column;min-height:420px}
+#md-hist{flex:1;max-height:56vh;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 10px}
+.md-msg{max-width:86%;padding:9px 13px;border-radius:16px;font-size:13.5px;line-height:1.5}
+.md-msg.me{align-self:flex-end;background:rgba(142,162,255,.18)}.md-msg.md{align-self:flex-start;background:rgba(255,255,255,.05)}
+body:not(.th-bento) .md-msg.me{background:rgba(0,210,255,.14)}
+.md-inrow{display:flex;gap:8px;align-items:center}
+.md-mut{font-size:12px;color:var(--t4,#97a3c0)}
+.md-tb{width:100%;border-collapse:collapse;font-size:12px}.md-tb th{text-align:left;color:var(--t4,#97a3c0);font-weight:700;padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.08)}.md-tb td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+.md-r.ok{color:#5ee08f}.md-r.ko{color:#ff7a90}.md-tag{font-size:10px;font-weight:800;padding:1px 5px;border-radius:5px;background:rgba(142,162,255,.25)}
+.md-ul{margin:6px 0 0;padding-left:16px;font-size:12.5px}.md-ul li{margin:3px 0}
+.md-x{border:0;background:transparent;color:#ff7a90;cursor:pointer}
+.md-f{display:flex;align-items:center;gap:8px;margin:7px 0;flex-wrap:wrap}.md-f label{width:130px;font-size:12px;color:var(--t4,#97a3c0)}
+.md-f input:not([type=checkbox]),.md-f select{flex:1;min-width:160px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;padding:0 10px;font:inherit;font-size:12.5px}
+.md-sep{margin:14px 0 4px;font-weight:800;font-size:12px}
+.md-score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}.md-score b{font-size:28px}.md-score span{font-size:12px;color:var(--t4,#97a3c0)}
 </style>
 </head>
 <body>
@@ -2727,7 +2793,7 @@ body.th-bento .bs-msgrow textarea{border-radius:14px}
 
   <button class="tab" id="tb-todo"      data-fam="outils" onclick="goTab('todo')">✅ To-Do<span class="tab-notif" id="nt-todo"></span></button>
   <button class="tab" id="tb-checklist" data-fam="outils" onclick="goTab('checklist')">🗒️ Check-list<span class="tab-notif" id="nt-checklist"></span></button>
-  <button class="tab" id="tb-ai" data-fam="outils" onclick="goTab('ai')">✦ Assistant IA</button>
+  <button class="tab" id="tb-ai" data-fam="outils" onclick="goTab('ai')">🎙 Mardam</button>
   <button class="tab" id="tb-simulation" data-fam="outils" onclick="goTab('simulation')">🧪 Simulation</button>
   <button class="tab" id="tb-notice" data-fam="outils" onclick="goTab('notice')">📖 Notice</button>
 </div>
@@ -7061,7 +7127,7 @@ function _hgMoveTxt(m){
   }
   return {day,what,man};
 }
-function _hgPlan(day0){
+function _hgPlan(day0,week){
   const F="font-family=\"Segoe UI,Roboto,Helvetica,Arial,sans-serif\""; let g='';
   // ── Plan du hangar vu de dessus : P1 à gauche, P3 au milieu (reculée, dérive dehors), P2 à droite
   const ORDER=[2,3,1], ZC={1:['#64b4ff','rgba(100,180,255,.30)'],2:['#50dc8c','rgba(80,220,140,.30)'],3:['#ffb450','rgba(255,180,80,.33)']};
@@ -7078,9 +7144,10 @@ function _hgPlan(day0){
     <pattern id="hgSlab" width="46" height="46" patternUnits="userSpaceOnUse"><rect width="46" height="46" fill="none" stroke="#c5cfdb" stroke-width=".7"/></pattern>
     <pattern id="hgTar" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#707b89"/><circle cx="2" cy="3" r=".6" fill="#7e8997"/><circle cx="6" cy="6" r=".5" fill="#65707e"/></pattern>
   </defs>`;
-  // tarmac + marquage
-  g+=`<rect x="${HX}" y="${Yd}" width="${HW}" height="${10+tarH}" fill="url(#hgTar)"/><line x1="${HX}" y1="${Yd+10+tarH-18}" x2="${HX+HW}" y2="${Yd+10+tarH-18}" stroke="#ffd34d" stroke-width="3" stroke-dasharray="18 12"/>
-    <text x="${HX+HW-10}" y="${Yd+10+tarH-4}" ${F} font-size="10" font-weight="800" fill="#e6ebf2" text-anchor="end">PARKING / TARMAC</text>`;
+  // tarmac + marquage (agrandi après coup si les étiquettes de la semaine sont plus hautes)
+  let lblBot=0;
+  g+=`<rect x="${HX}" y="${Yd}" width="${HW}" height="@@TARH@@" fill="url(#hgTar)"/><line x1="${HX}" y1="@@TARL@@" x2="${HX+HW}" y2="@@TARL@@" stroke="#ffd34d" stroke-width="3" stroke-dasharray="18 12"/>
+    <text x="${HX+HW-10}" y="@@TART@@" ${F} font-size="10" font-weight="800" fill="#e6ebf2" text-anchor="end">PARKING / TARMAC</text>`;
   // bâtiment
   g+=`<rect x="${HX}" y="${HY}" width="${HW}" height="${IN+depth+8}" rx="6" fill="url(#hgW)"/>`;
   g+=`<rect x="${FX}" y="${FY}" width="${FW}" height="${depth}" fill="#e4e9ef"/><rect x="${FX}" y="${FY}" width="${FW}" height="${depth}" fill="url(#hgSlab)"/>`;
@@ -7104,13 +7171,26 @@ function _hgPlan(day0){
   ORDER.forEach((p,i)=>{
     const cx=FX+i*BW+BW/2, C=_HG_POS[p];
     g+=`<rect x="${cx-52}" y="${FY+12}" width="104" height="24" rx="12" fill="#fff" fill-opacity=".9" stroke="${C.dark}" stroke-width="1.2"/><text x="${cx}" y="${FY+29}" ${F} font-size="13" font-weight="900" fill="${C.dark}" text-anchor="middle">POSITION ${p}</text>`;
-    const inf=_hgInfo(_hgAtX(p,day0)); let top=p===3?noseMid:y0;
+    let inf=_hgInfo(_hgAtX(p,day0)), groups=null;
+    if(Array.isArray(week)&&week.length){ // semaine entière : un groupe par avion, avec ses jours
+      groups=[]; week.forEach((ds,di)=>{ const x=_hgInfo(_hgAtX(p,ds)); const l=groups[groups.length-1]; if(!x) return; if(l&&l.inf.msn===x.msn&&l.to===di-1){ l.to=di; } else groups.push({inf:x,from:di,to:di}); });
+      if(groups.length){ const best=groups.slice().sort((a,b)=>(b.to-b.from)-(a.to-a.from))[0]; inf=best.inf; } else inf=null;
+      if(groups.length===1&&groups[0].from===0&&groups[0].to===week.length-1) groups=null; }
+    let top=p===3?noseMid:y0;
     // étiquette sur le tarmac
     const ly=Yd+(p===3?Math.round(SREF*0.30)+16:22), lx=p===3?cx+BW*0.30:cx;
     if(!inf){ const s=SREF*0.72; g+=`<rect x="${cx-s/2}" y="${top}" width="${s}" height="${s*0.9}" rx="14" fill="#fff" fill-opacity=".35" stroke="${C.dark}" stroke-width="2" stroke-dasharray="7 6" opacity=".7"/><text x="${cx}" y="${top+s*0.45+6}" ${F} font-size="18" font-weight="800" fill="${C.dark}" opacity=".7" text-anchor="middle">Libre</text>`; return; }
     const s=SREF*(_HG_SCALE[inf.kind]||1), k=s/200;
     if(p===3) top=Yd-0.80*s;   // dérive toujours à l'extérieur des portes
     g+=`<g transform="translate(${cx},${top}) scale(${k})">${_hgShape(inf.kind)}</g>`;
+    if(groups){ // plusieurs avions (ou présence partielle) dans la semaine : chaque avion avec ses jours
+      const JJ=['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'], lw=BW-14, gh=27, bh=8+groups.length*gh, ty=p===3?ly:ly+4;
+      lblBot=Math.max(lblBot,ty+bh);
+      g+=`<rect x="${lx-lw/2}" y="${ty}" width="${lw}" height="${bh}" rx="7" fill="${C.dark}" stroke="#fff" stroke-width="1.2"/>`;
+      groups.forEach((gr,k)=>{ const yy=ty+16+k*gh; const dd=gr.from===gr.to?JJ[gr.from]:`${JJ[gr.from]} → ${JJ[gr.to]}`;
+        g+=`<text x="${lx}" y="${yy}" ${F} font-size="11.5" font-weight="900" fill="#fff" text-anchor="middle">${_hgEsc(_hgTr(gr.inf.type,12))} · MSN ${_hgEsc(gr.inf.msn)}</text><text x="${lx}" y="${yy+12}" ${F} font-size="9.5" font-weight="700" fill="#fff" text-anchor="middle" opacity=".88">${dd}${gr.inf.client?' · '+_hgEsc(_hgTr(gr.inf.client,14)):''}</text>`;
+        if(k<groups.length-1) g+=`<line x1="${lx-lw/2+10}" y1="${yy+19}" x2="${lx+lw/2-10}" y2="${yy+19}" stroke="#fff" stroke-opacity=".35"/>`; });
+      return; }
     const lw=Math.max(92,Math.min(BW-14,14+Math.max(inf.type.length*8,('MSN '+inf.msn).length*7.2)));
     const ty=p===3?ly:ly+8;
     g+=`<rect x="${lx-lw/2}" y="${ty}" width="${lw}" height="${inf.client?48:36}" rx="7" fill="${C.dark}" stroke="#fff" stroke-width="1.2"/>
@@ -7118,7 +7198,9 @@ function _hgPlan(day0){
       <text x="${lx}" y="${ty+30}" ${F} font-size="11" font-weight="800" fill="#fff" text-anchor="middle" opacity=".92">MSN ${_hgEsc(inf.msn)}</text>
       ${inf.client?`<text x="${lx}" y="${ty+42}" ${F} font-size="9.5" font-weight="600" fill="#fff" text-anchor="middle" opacity=".82">${_hgEsc(_hgTr(inf.client,20))}</text>`:''}`;
   });
-  return {g,top:HY,bottom:Yd+10+tarH};
+  const tH=Math.max(10+tarH,lblBot-Yd+26);
+  g=g.replace('@@TARH@@',tH).replace(/@@TARL@@/g,Yd+tH-18).replace('@@TART@@',Yd+tH-4);
+  return {g,top:HY,bottom:Yd+tH};
 }
 function _hgSvg(mon){
   const W=1123,H=794, F="font-family=\"Segoe UI,Roboto,Helvetica,Arial,sans-serif\"";
@@ -9147,7 +9229,7 @@ const GUIDE_TAB = {
   formations:"Formations & Autorisations", autorisations:"Formations & Autorisations",
   dashboard:"Tableau de bord", master:"Master Planning", personnel:"Personnel", certif:"Certifying Staff",
   todo:"To-Do / Tâches", programme:"Programme Activité", kpi:"Tableau KPI", airbus:"Airbus Activité",
-  ai:"Assistant IA", simulation:"Simulation"
+  ai:"Mardam", simulation:"Simulation"
 };
 function openGuideForCurrentTab(){
   const cur=[...document.body.classList].find(c=>c.startsWith('tab-'))?.slice(4);
@@ -20503,7 +20585,7 @@ function _kpiWeekNav(dir){
   const ni=idx+dir;
   if(ni>=0&&ni<weeks.length){ window._kpiWeekSel=weeks[ni].mon; renderKPI(); }
 }
-function renderAI(){ try{ aiRenderSuggestions(); }catch(e){} }
+// renderAI : remplacé par la page Mardam
 
 // ── Export PDF des KPI (présentation partenaires) ──
 function _kpiExportWeek(){
@@ -27455,7 +27537,7 @@ function _bnLot4Post(id){
 }
 
 /* ═══ Recherche éclair (Ctrl + K) ═══ */
-const _CK_TABS=[['dashboard','🏠','Tableau de bord'],['programme','📊','Programme activité'],['chantiers','🔧','Chantiers'],['kpi','📈','Tableau KPI'],['master','📅','Master planning'],['weekly','🗓','Planning hebdo'],['slot','🏭','Slot Hangar'],['stockage','🅿️','Stockage'],['recycling','♻️','A/C Recyclage'],['airbus','🛩','Airbus activité'],['personnel','👥','Personnel'],['certif','🛫','Certifying Staff'],['formations','📋','Formations'],['autorisations','🛡','Autorisations'],['todo','✅','To-Do'],['checklist','🗒️','Check-list'],['ai','✦','Assistant IA'],['simulation','🧪','Simulation'],['notice','📖','Notice']];
+const _CK_TABS=[['dashboard','🏠','Tableau de bord'],['programme','📊','Programme activité'],['chantiers','🔧','Chantiers'],['kpi','📈','Tableau KPI'],['master','📅','Master planning'],['weekly','🗓','Planning hebdo'],['slot','🏭','Slot Hangar'],['stockage','🅿️','Stockage'],['recycling','♻️','A/C Recyclage'],['airbus','🛩','Airbus activité'],['personnel','👥','Personnel'],['certif','🛫','Certifying Staff'],['formations','📋','Formations'],['autorisations','🛡','Autorisations'],['todo','✅','To-Do'],['checklist','🗒️','Check-list'],['ai','🎙','Mardam'],['simulation','🧪','Simulation'],['notice','📖','Notice']];
 const _CK_ACTIONS=[
   ['☀️','Brief du jour','brief matin point equipe',()=>openBrief()],
   ['🗓','Brief de la semaine','brief semaine hebdo recap production envoyer personnel formations absences hangar',()=>openBriefWeek()],
@@ -28547,7 +28629,8 @@ function _bsSvg(mon){
     g+=`<rect x="${M}" y="${y}" width="${W-2*M}" height="${h}" rx="8" fill="#fff8e1"/><rect x="${M}" y="${y}" width="4" height="${h}" rx="2" fill="#f5b400"/>`+_bsT(M+14,y+16,'📣 INFOS PRODUCTION',10,800,'#a87400','',' letter-spacing=".5"');
     L.forEach((l,i)=>{ g+=_bsT(M+14,y+32+i*16,l,12,400,'#2b2f38'); }); y+=h+10; }
   // Hangar : schéma (disposition du lundi) + positions du lundi au dimanche (sans mouvements)
-  const hp=_hgPlan(days[0]), pw=290, ph=pw*(hp.bottom-hp.top+12)/592;
+  const hp=_hgPlan(days[0],days), pw=290, ph=pw*(hp.bottom-hp.top+12)/592;
+  hp.g=hp.g.replace(/\sfilter="url\(#hgSh\)"/g,'').replace(/id="hg/g,'id="bshg').replace(/url\(#hg/g,'url(#bshg');
   g+=`<svg x="${M}" y="${y}" width="${pw}" height="${ph}" viewBox="24 ${hp.top-6} 592 ${hp.bottom-hp.top+12}" preserveAspectRatio="xMidYMid meet">${hp.g}</svg>`;
   const TX=M+pw+16, TW=W-M-TX, DW=70, PW=(TW-DW)/3, HR=20, rh=i=>i<5?25:21, posCol={1:'#2979ff',2:'#1e9e5a',3:'#d4870f'};
   const tH=HR+5*25+2*21;
@@ -28617,6 +28700,568 @@ function briefWeekPNG(){
   img.onerror=()=>{ URL.revokeObjectURL(url); toast('Impossible de générer l\'image'); };
   img.src=url;
 }
+
+/* ═══ 🎙 Mardam — assistant vocal (étape 0 : socle + navigation) ═══ */
+// ── Texte : normalisation, nombres dits en lettres ──
+const _MD_UNITS={zero:0,un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,sept:7,huit:8,neuf:9,dix:10,onze:11,douze:12,treize:13,quatorze:14,quinze:15,seize:16};
+const _MD_TENS={vingt:20,vingts:20,trente:30,quarante:40,cinquante:50,soixante:60};
+function _mdStrip(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function _mdWordsToNum(toks){
+  // « cinq cinq deux huit trois » → 55283 ; « vingt cinq » → 25 ; « deux mille vingt sept » → 2027
+  const out=[]; let i=0;
+  const isNumW=t=>t in _MD_UNITS||t in _MD_TENS||t==='cent'||t==='cents'||t==='mille'||t==='et';
+  while(i<toks.length){
+    const t=toks[i];
+    if(!(t in _MD_UNITS||t in _MD_TENS||t==='cent'||t==='mille')||((t==='un'||t==='une')&&!isNumW(toks[i+1]||'')&&!/^\d/.test(toks[i+1]||''))){ out.push(t); i++; continue; }
+    let j=i; const seq=[]; while(j<toks.length&&isNumW(toks[j])&&!(toks[j]==='et'&&!(toks[j+1] in _MD_UNITS))){ if(toks[j]!=='et') seq.push(toks[j]); j++; }
+    if(seq.length>=3&&seq.every(x=>x in _MD_UNITS&&_MD_UNITS[x]<10)){ out.push(seq.map(x=>_MD_UNITS[x]).join('')); i=j; continue; }
+    let total=0, cur=0;
+    seq.forEach((x,k)=>{ if(x in _MD_UNITS){ if(seq[k-1]==='quatre'&&x==='vingt'){} cur+=_MD_UNITS[x]; }
+      else if(x in _MD_TENS){ if(x.startsWith('vingt')&&cur===4){ cur=80; } else cur+=_MD_TENS[x]; }
+      else if(x==='cent'||x==='cents'){ cur=(cur||1)*100; }
+      else if(x==='mille'){ total+=(cur||1)*1000; cur=0; } });
+    out.push(String(total+cur)); i=j;
+  }
+  return out;
+}
+function _mdNorm(s){
+  let n=_mdStrip(s).replace(/[’`´]/g,"'").replace(/(\d)\s*(h|heures?)\s*(\d{2})?/g,(m,a,b,c)=>` ${a}h${c||'00'} `)
+    .replace(/(\d{1,2})\s*\/\s*(\d{1,2})(\s*\/\s*(\d{2,4}))?/g,(m,a,b,c,d)=>` ${a}/${b}${d?'/'+d:''} `)
+    .replace(/\b1er\b|\bpremier\b/g,' 1 ').replace(/quatre[- ]vingts?/g,'quatre vingt').replace(/-/g,' ')
+    .replace(/[^a-z0-9'\/:h ?]/g,' ').replace(/'/g,' ').replace(/\s+/g,' ').trim();
+  const toks=_mdWordsToNum(n.split(' ').filter(Boolean));
+  return toks.join(' ').replace(/\s+/g,' ').trim();
+}
+// ── Similarité de mots (fautes de dictée) ──
+function _mdLev(a,b){ if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m; let p=Array.from({length:n+1},(_,j)=>j); for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return p[n]; }
+function _mdPhon(w){ // phonétique française simplifiée
+  return _mdStrip(w).replace(/[^a-z]/g,'').replace(/ph/g,'f').replace(/qu|q/g,'k').replace(/c([eiy])/g,'s$1').replace(/ck|c/g,'k').replace(/gu([eiy])/g,'g$1').replace(/g([eiy])/g,'j$1')
+    .replace(/eau|au/g,'o').replace(/ou/g,'u').replace(/ai|ei|e[tz]$|er$/g,'e').replace(/[ae]n|[ae]m(?=[bp])/g,'a').replace(/y/g,'i').replace(/[zx]/g,'s').replace(/h/g,'').replace(/w/g,'v')
+    .replace(/(.)\1+/g,'$1').replace(/[estdx]$/,'');
+}
+// Mots courants qui ne sont jamais des noms (évite « matin » → MARTIN)
+const _MD_STOP=new Set(('le la les l un une des de du d au aux a et ou en sur dans pour par avec sans sous chez ce cet cette ces mon ma mes ton ta tes son sa ses notre nos votre vos leur leurs moi toi lui elle eux il ils on nous vous je tu y '+
+ 'est sont suis es etre ai as avons avez ont avoir fait faire fais va vas vais aller viens peux peut veux veut dois doit qui que quoi quand ou comment combien quel quelle quels quelles est-ce pas plus ne non oui ok si '+
+ 'ouvre ouvrir affiche afficher montre montrer mets mettre met ajoute ajouter rajoute inscris inscrire supprime supprimer enleve enlever retire retirer deplace deplacer passe passer copie copier prolonge prolonger cree creer note noter coche cocher repousse archive sors sortir lance lancer donne dis envoie fais '+
+ 'affecte affecter mettre change changer annule annuler valide confirme reprend reprendre seulement que tout tous toute toutes rien aussi pareil meme encore non bon bien '+
+ 'aujourd hui demain hier apres avant matin midi soir journee jour jours semaine semaines mois annee an prochain prochaine dernier derniere suivant suivante fin debut partir jusqu jusque entre '+
+ 'lundi mardi mercredi jeudi vendredi samedi dimanche janvier fevrier mars avril mai juin juillet aout septembre octobre novembre decembre '+
+ 'planning master hebdo slot hangar position positions stockage recyclage airbus personnel certifying staff formation formations autorisation autorisations todo to do list liste check tache taches kpi programme chantier chantiers simulation notice aide tableau bord accueil brief prevision tv mode aeromargin doc documentation atr navx boeing fiche equipe affectation affectations '+
+ 'conge conges malade maladie absent absence absents deplacement rangement logistique visite medicale vm contrat interim interimaire interimaires technicien techniciens chef chefs expert experts alternant alternants responsable responsables projet categorie categories '+
+ 'msn avion avions moteur heure heures minute minutes h son voix silence tais coupe parle sujet nouveau sais savoir bonjour salut merci stp svp sil plait mardam').split(' '));
+// ── Index des personnes ──
+let _mdPIdx=null, _mdPIdxKey='';
+function _mdPeople(){
+  const P=(S.personnel||[]).filter(p=>!p.archived);
+  const key=P.length+':'+P.map(p=>p.id).join('').length;
+  if(_mdPIdx&&_mdPIdxKey===key) return _mdPIdx;
+  _mdPIdx=P.map(p=>{ const nom=_mdNorm(p.nom||'').split(' ').filter(Boolean), pre=_mdNorm(p.prenom||'').split(' ').filter(Boolean);
+    return {p,nom,pre,nomS:nom.join(' '),preS:pre.join(' '),ph:nom.map(_mdPhon),pph:pre.map(_mdPhon),actif:p.actif!==false}; });
+  _mdPIdxKey=key; return _mdPIdx;
+}
+function _mdTokSim(t,w,ph){ if(t===w) return 1; if(t.length<4||w.length<4) return 0; const d=_mdLev(t,w), lim=w.length>=7?2:1; if(d<=lim) return d===1?0.82:0.7; if(ph&&_mdPhon(t)===ph&&ph.length>=3) return 0.78; return 0; }
+// Repère les personnes citées dans la phrase : [{ids:[...], span:[i,j], score, words}]
+function _mdFindPeople(T){
+  const IDX=_mdPeople(), hits=[]; let i=0;
+  while(i<T.length){
+    const t=T[i]; if(_MD_STOP.has(t)||/\d/.test(t)||t.length<2){ i++; continue; }
+    let best=[], bestScore=0, bestLen=1;
+    for(const e of IDX){
+      // nom composé (« perez alvarez ») ou prénom + nom / nom + prénom
+      const tryL=(arr,len,w)=>{ if(len<=0) return 0; let s=0; for(let k=0;k<len;k++){ const v=_mdTokSim(T[i+k]||'',arr[k]||'',null); if(!v) return 0; s+=v; } return s/len*w; };
+      let sc=0, ln=1;
+      const cand=[[e.nom,e.nom.length,3],[[...e.pre,...e.nom],e.pre.length+e.nom.length,3.4],[[...e.nom,...e.pre],e.pre.length+e.nom.length,3.4],[e.pre,e.pre.length,2]];
+      for(const [arr,len,w] of cand){ if(!len||i+len>T.length) continue; const v=tryL(arr,len,w); if(v>sc||(v===sc&&len>ln)){ sc=v; ln=len; } }
+      if(!sc){ // un seul mot du nom composé (« perez » pour PEREZ ALVAREZ)
+        e.nom.forEach((w,k)=>{ const v=_mdTokSim(t,w,e.ph[k])*2.6; if(v>sc){ sc=v; ln=1; } });
+        e.pre.forEach((w,k)=>{ const v=_mdTokSim(t,w,e.pph[k])*1.8; if(v>sc){ sc=v; ln=1; } });
+      }
+      if(!sc) continue;
+      if(!e.actif) sc*=0.8;
+      if(sc>bestScore+0.01||(Math.abs(sc-bestScore)<=0.01&&ln>bestLen)){ best=[e]; bestScore=sc; bestLen=ln; }
+      else if(Math.abs(sc-bestScore)<=0.01&&ln===bestLen) best.push(e);
+    }
+    if(best.length&&bestScore>=1.4){ hits.push({ids:best.map(e=>e.p.id),span:[i,i+bestLen],score:bestScore,words:T.slice(i,i+bestLen).join(' ')}); i+=bestLen; }
+    else i++;
+  }
+  // même personne citée deux fois de suite (« Perez Yosmel ») → fusion
+  const merged=[]; hits.forEach(h=>{ const l=merged[merged.length-1]; if(l&&l.ids.length===1&&h.ids.length===1&&l.ids[0]===h.ids[0]&&l.span[1]===h.span[0]){ l.span[1]=h.span[1]; l.words+=' '+h.words; } else merged.push(h); });
+  return merged;
+}
+// ── Avions / chantiers par MSN ──
+function _mdMsnList(){
+  const L=[]; const add=(msn,cid,lbl)=>{ msn=String(msn||'').replace(/\D/g,''); if(msn) L.push({msn,cid,lbl}); };
+  (S.chantiers||[]).forEach(c=>add(c.msn,c.id,`${c.client||c.nom||''} ${c.avion||''}`.trim()));
+  (S.stockage?.avions||[]).forEach(a=>add(a.msn,'STO_'+a.id,`Stockage ${a.type||''}`));
+  (S.recycling?.avions||[]).forEach(a=>add(a.msn,'REC_'+a.id,`Recyclage ${a.type||''}`));
+  (S.slot?.entries||[]).forEach(e=>add(e.msn,e.avionId||'',e.avionNom||''));
+  return L;
+}
+function _mdFindMsn(T,used){
+  const L=_mdMsnList(), out=[];
+  T.forEach((t,i)=>{ if(used.has(i)||!/^\d{3,6}$/.test(t)) return; if(/^20\d\d$/.test(t)&&!L.some(x=>x.msn===t)) return;
+    const prev=T[i-1]||''; if(['semaine','le','du','au','a','jusqu'].includes(prev)&&+t<=31) return;
+    const ex=L.filter(x=>x.msn===t); if(ex.length){ out.push({msn:t,i,cands:[...new Map(ex.map(x=>[x.cid,x])).values()],exact:true}); return; }
+    if(prev==='msn'||t.length>=4){ const near=L.filter(x=>Math.abs(x.msn.length-t.length)<=1&&_mdLev(x.msn,t)<=1); out.push({msn:t,i,cands:[...new Map(near.map(x=>[x.cid,x])).values()],exact:false}); } });
+  return out;
+}
+// ── Dates ──
+const _MD_WD=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+const _MD_MO=['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+function _mdToday(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function _mdYmd(y,m,d){ const x=new Date(y,m,d); x.setHours(0,0,0,0); return x; }
+function _mdFri(d){ return addD(getMon(d),4); }
+// Un jour à la position i → {d, end, mismatch?, alts?, past?}
+function _mdDayAt(T,i,base,weekShift){
+  const today=_mdToday(); let j=i; if(['le','ce','l','du','au','de','a'].includes(T[j])) j++;
+  const t=T[j], t1=T[j+1];
+  if(t==='aujourd'&&t1==='hui'||t==='aujourdhui') return {d:today,end:j+(t==='aujourdhui'?1:2)};
+  if(t==='demain') return {d:addD(today,1),end:j+1};
+  if(t==='apres'&&t1==='demain') return {d:addD(today,2),end:j+2};
+  if(t==='hier') return {d:addD(today,-1),end:j+1};
+  if(t==='avant'&&t1==='hier') return {d:addD(today,-2),end:j+2};
+  if(t==='fin'&&(t1==='de'||t1==='semaine')){ let k=j+1; while(['de','la','cette','semaine'].includes(T[k])) k++; return {d:_mdFri(today),end:k}; }
+  const wd=_MD_WD.indexOf(t);
+  let k=j, dayN=null, mo=null, yr=null;
+  if(wd>=0) k++;
+  if(/^\d{1,2}$/.test(T[k]||'')&&+T[k]>=1&&+T[k]<=31){ dayN=+T[k]; k++; if(_MD_MO.includes(T[k]||'')){ mo=_MD_MO.indexOf(T[k]); k++; if(/^20\d\d$/.test(T[k]||'')){ yr=+T[k]; k++; } } }
+  else if(/^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(T[k]||'')){ const [a,b,c]=T[k].split('/'); dayN=+a; mo=+b-1; if(c) yr=c.length===2?2000+ +c:+c; k++; }
+  if(dayN!=null&&(mo!=null||wd>=0||['le','du','au'].includes(T[i]))){
+    let past=false, d;
+    if(mo==null){ d=_mdYmd(today.getFullYear(),today.getMonth(),dayN); if(d<today) d=_mdYmd(today.getFullYear(),today.getMonth()+1,dayN); }
+    else if(yr==null){ d=_mdYmd(today.getFullYear(),mo,dayN); if(d<addD(today,-60)) d=_mdYmd(today.getFullYear()+1,mo,dayN); else if(d<addD(today,-1)){ past=true; } }
+    else d=_mdYmd(yr,mo,dayN);
+    const r={d,end:k,past,noYear:yr==null&&mo!=null};
+    if(past) r.alt=_mdYmd(today.getFullYear()+1,mo,dayN);
+    if(wd>=0&&d.getDay()!==wd){ r.mismatch=true; r.wd=wd; const a=[]; for(let s=-3;s<=3;s++){ const x=addD(d,s); if(x.getDay()===wd) a.push(x); } r.alts=[a[0],d]; }
+    return r;
+  }
+  if(wd>=0){
+    let d; const ws=weekShift||0;
+    if(ws){ d=addD(getMon(addD(today,7*ws)),(wd+6)%7); }
+    else { d=new Date(today); let n=0; while(d.getDay()!==wd&&n<8){ d=addD(d,1); n++; } if(T[k]==='prochain'&&d.getTime()===today.getTime()) d=addD(d,7); }
+    if(T[k]==='prochain'||T[k]==='suivant') k++;
+    return {d,end:k};
+  }
+  return null;
+}
+// Toutes les infos de temps de la phrase
+function _mdTime(T){
+  const n=' '+T.join(' ')+' ', today=_mdToday(), R={};
+  let weekShift=0;
+  if(/ semaine (prochaine|suivante) /.test(n)) weekShift=1; else if(/ semaine d apres /.test(n)) weekShift=2; else if(/ semaine (derniere|passee) /.test(n)) weekShift=-1;
+  const plainWeek=/ (toute la semaine|cette semaine|la semaine) /.test(n)||weekShift;
+  // semaine n° X
+  const sw=n.match(/ semaine (\d{1,2})( (20\d\d))? /);
+  if(sw){ const w=+sw[1]; let y=sw[3]?+sw[3]:today.getFullYear(); if(!sw[3]&&w<wkN(today)-8) y++; const j4=_mdYmd(y,0,4); const mon=addD(getMon(j4),(w-1)*7); R.week={from:mon,to:addD(mon,4),n:w}; }
+  // mois
+  const mm=n.match(/ (janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)( (20\d\d))? /);
+  if(mm&&!/ \d{1,2} (janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)/.test(n)){ const m=_MD_MO.indexOf(mm[1]); let y=mm[3]?+mm[3]:today.getFullYear(); if(!mm[3]&&m<today.getMonth()) y++; R.month={m,y}; }
+  if(/ mois prochain /.test(n)){ const d=_mdYmd(today.getFullYear(),today.getMonth()+1,1); R.month={m:d.getMonth(),y:d.getFullYear()}; }
+  if(/ ce mois( ci)? /.test(n)) R.month={m:today.getMonth(),y:today.getFullYear()};
+  // jours et plages
+  const days=[]; for(let i=0;i<T.length;i++){ const r=_mdDayAt(T,i,today,weekShift&&!/\d/.test(T[i+1]||'')?weekShift:0); if(r){ r.at=i; days.push(r); i=r.end-1; } }
+  const between=(a,b)=>T.slice(a,b).join(' ');
+  if(days.length>=2){ const a=days[0], b=days[1], mid=' '+between(a.at,b.at)+' ';
+    if(/ (du|de|entre) /.test(' '+T.slice(Math.max(0,a.at-1),a.at+1).join(' ')+' ')||/ (au|a|et|jusqu) /.test(mid)) R.range={from:a.d,to:b.d<a.d?addD(b.d,7):b.d,a,b}; }
+  if(!R.range&&days.length){ const a=days[0];
+    if(/ a partir (de |d )?/.test(n)) R.range={from:a.d,to:_mdFri(a.d),a,open:true};
+    else if(/ jusqu /.test(n)&&T.slice(0,a.at).includes('jusqu')) R.range={from:today,to:a.d,a,b:a};
+    else R.day=a; }
+  if(!R.range&&/ (d )?aujourd hui (a|jusqu a) la fin de (la )?semaine /.test(n)) R.range={from:today,to:_mdFri(today)};
+  if(!R.range&&!R.day&&!R.week&&plainWeek){ const mon=getMon(addD(today,7*weekShift)); R.week={from:mon,to:addD(mon,4),shift:weekShift}; }
+  // demi-journée, heure
+  if(/ (matin|ce matin|le matin) /.test(n)) R.half='AM';
+  if(/ (apres midi|aprem|apm|cet apres midi) /.test(n)) R.half=R.half?'day':'PM';
+  if(/ (journee|toute la journee|la journee entiere|journee entiere) /.test(n)) R.half='day';
+  const hm=n.match(/ (\d{1,2})h(\d{2}) /); if(hm&&+hm[1]<24){ R.hour=`${hm[1].padStart(2,'0')}:${hm[2]}`; if(!R.half) R.half=+hm[1]<12?'AM':'PM'; }
+  R.mismatch=days.find(x=>x.mismatch)||null; R.past=days.find(x=>x.past)||null;
+  return R;
+}
+// ── Écrans de l'app ──
+const _MD_SCREENS=[
+  ['briefw',/ brief (de la |pour la )?semaine|brief hebdo/,'Brief de la semaine'],
+  ['briefj',/ brief( du jour| de ce matin| d aujourd hui)?( |$)/,'Brief du jour'],
+  ['aff',/ affectations?( du jour)?( |$)/,'Affectations du jour'],
+  ['quiou',/ qui est ou /,'Qui est où'],
+  ['tv',/ mode tv|ecran atelier|mode tele/,'Mode TV'],
+  ['aeromargin',/ aero ?margin|calcul mpa|max power/,'AeroMargin'],
+  ['docairbus',/ (doc|documentation) airbus|airbus ?world/,'Documentation Airbus'],
+  ['docatr',/ (doc|documentation) atr| navx| nav x/,'ATR NavX'],
+  ['docboeing',/ (doc|documentation) boeing|aviation ?id/,'Documentation Boeing'],
+  ['forecast',/ prevision/,'Prévision 3 mois'],
+  ['master',/ master/,'Master planning'],
+  ['slot',/ slot| hangar| positions? hangar/,'Slot Hangar'],
+  ['stockage',/ stockage/,'Stockage'],
+  ['recycling',/ recyclage/,'A/C Recyclage'],
+  ['airbus',/ (activite )?airbus/,'Airbus activité'],
+  ['certif',/ certifying/,'Certifying Staff'],
+  ['formations',/ formations?( |$)/,'Formations'],
+  ['autorisations',/ autorisations?( |$)/,'Autorisations'],
+  ['todo',/ to ?do| liste de taches| mes taches/,'To-Do'],
+  ['checklist',/ check ?list/,'Check-list'],
+  ['kpi',/ kpi|indicateurs/,'Tableau KPI'],
+  ['programme',/ programme/,'Programme activité'],
+  ['chantiers',/ chantiers?( |$)/,'Chantiers'],
+  ['simulation',/ simulation/,'Simulation'],
+  ['notice',/ notice| mode d emploi/,'Notice'],
+  ['mardam',/ (onglet|page|journal|reglages) (de )?mardam/,'Mardam'],
+  ['dashboard',/ tableau de bord| accueil| page d accueil/,'Tableau de bord'],
+  ['personnel',/ personnel| effectifs? /,'Personnel'],
+  ['weekly',/ planning| hebdo| semaine /,'Planning hebdo'],
+];
+const _MD_CATW=[['technicien',/ techniciens?| mecanos?| mecaniciens?/],['chef',/ chefs?( d equipe)?/],['interimaire',/ interimaires?| interim /],['expert',/ experts?/],['alternant',/ alternants?/],['responsable',/ responsables?( projet)?/],['sheetmetal',/ sheet ?metal|tolier/],['prestataire',/ prestataires?/],['recycling',/ recyclage /]];
+
+// ── Réglages, journal ──
+const _MD_DEF={name:'Mardam',voice:'',mute:false,verbose:false,dict:'browser',ai:true,gas:'',token:'',model:'haiku'};
+function _mdCfg(){ if(!S.mardam||typeof S.mardam!=='object') S.mardam={}; S.mardam.cfg=Object.assign({},_MD_DEF,S.mardam.cfg||{}); if(!Array.isArray(S.mardam.journal)) S.mardam.journal=[]; if(!Array.isArray(S.mardam.misses)) S.mardam.misses=[]; return S.mardam.cfg; }
+function _mdName(){ return (_mdCfg().name||'Mardam').trim()||'Mardam'; }
+function _mdLog(e){ _mdCfg(); S.mardam.journal.unshift(Object.assign({at:new Date().toISOString()},e)); if(S.mardam.journal.length>300) S.mardam.journal.length=300; try{ save(); }catch(_){} }
+function _mdMiss(said,why){ _mdCfg(); if(!said) return; if(!S.mardam.misses.some(m=>m.said===said)) S.mardam.misses.unshift({at:new Date().toISOString(),said,why:why||''}); if(S.mardam.misses.length>200) S.mardam.misses.length=200; try{ save(); }catch(_){} }
+const MD={hist:[],pending:null,ctx:{last:null,at:0},listening:false,rec:null,busy:false};
+const _MD_JL=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'], _MD_ML=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.getDate()} ${_MD_ML[d.getMonth()]}${d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():''}`; }
+function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.trim():''; }
+// ── Compréhension : phrase → plan (sans rien exécuter) ──
+const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur) /;
+const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour)( |$)/;
+const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
+function _mdParse(raw){
+  const n=_mdNorm(raw), T=n.replace(/\?/g,' ').split(' ').filter(Boolean), nn=' '+T.join(' ')+' ';
+  const P={raw,n,T,kind:'unknown'};
+  if(!T.length) return P;
+  // Contrôle
+  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6) return Object.assign(P,{kind:'ctl',act:'yes'});
+  if(/ (annule|defais|reviens en arriere sur) (ce que tu viens de faire|la derniere action|ta derniere action) |^ ?(reviens en arriere|defais) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'undo'});
+  if(/ (tais toi|coupe le son|coupe la voix|silence|chut|mode silencieux|arrete de parler) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'mute'});
+  if(/ (remets le son|reparle|tu peux parler|active le son|remets la voix) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'unmute'});
+  if(/^(non|annule|laisse tomber|stop|arrete|pas ca|oublie)( |$)/.test(T.join(' '))&&!/ (ce que tu viens|la derniere|derniere action) /.test(nn)&&T.length<=5) return Object.assign(P,{kind:'ctl',act:'no'});
+  if(/ (qu est ce que tu sais faire|que sais tu faire|tu sais faire quoi|aide moi|comment ca marche|tu peux faire quoi) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'help'});
+  if(/ (nouveau sujet|on change de sujet|oublie tout|repart de zero) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'reset'});
+  if(/ (qu est ce que tu as fait|qu as tu fait|ton journal|ce que tu as fait) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'journal'});
+  if(/^(bonjour|salut|hello|coucou|merci|bravo|super)( |$)/.test(T.join(' '))&&T.length<=4) return Object.assign(P,{kind:'ctl',act:'hello'});
+  // Entités
+  const ppl=_mdFindPeople(T), used=new Set(); ppl.forEach(h=>{ for(let k=h.span[0];k<h.span[1];k++) used.add(k); });
+  const msn=_mdFindMsn(T,used), tm=_mdTime(T);
+  Object.assign(P,{ppl,msn,tm});
+  // Filtre de catégories (« affiche seulement les techniciens », « affiche tout le monde »)
+  if((/ (seulement|que|uniquement) les /.test(nn)||/ (seulement|uniquement) $/.test(nn))&&/ (affiche|montre|garde|filtre|laisse)/.test(nn)){ const cats=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); if(cats.length) return Object.assign(P,{kind:'filter',cats}); }
+  if(/ (affiche|montre|remets) (tout le monde|toutes les categories|tous les gens|tout le personnel) /.test(nn)) return Object.assign(P,{kind:'filter',cats:'all'});
+  const isNav=_MD_NAVV.test(nn)||/^(le |la |l |les |mon |ma )?(planning|master|brief|slot|hangar|stockage|recyclage|kpi|programme|chantiers|formations|autorisations|to ?do|check ?list|personnel|tableau de bord|accueil|notice|prevision|affectations|mode tv|aeromargin|fiche)( |$)/.test(T.join(' '));
+  const isAct=_MD_ACTV.test(T.join(' '))&&!/^(passe en mode|mets moi sur|lance)/.test(T.join(' '));
+  const isQ=_MD_QW.test(T.join(' '))||/\?/.test(raw);
+  // Questions et actions : reconnues, livrées aux étapes suivantes
+  if(isQ&&!isNav){ return Object.assign(P,{kind:'later',stage:1,what:'question'}); }
+  if(isAct&&!(isNav&&!ppl.length&&!msn.length)){ return Object.assign(P,{kind:'later',stage:_mdStageOf(nn),what:'action'}); }
+  if(isNav){
+    let scr=null; for(const [id,re,lbl] of _MD_SCREENS){ if(re.test(nn)){ scr=[id,lbl]; break; } }
+    if(!scr&&ppl.length&&/ (fiche|profil|montre|ouvre|affiche) /.test(nn)) scr=['fiche','Fiche personnel'];
+    if(/ fiche /.test(nn)&&ppl.length) scr=['fiche','Fiche personnel'];
+    if(!scr&&(tm.week||tm.range||tm.day)) scr=['weekly','Planning hebdo'];
+    if(!scr&&tm.month) scr=['master','Master planning'];
+    if(scr){ Object.assign(P,{kind:'nav',screen:scr[0],label:scr[1]}); _mdNavDates(P); return P; }
+  }
+  return P;
+}
+function _mdStageOf(nn){
+  if(/ (position|hangar|sors|sortir|to ?do|taches?|note|post it|pense bete|prolong|interim|contrat|cree|nouveau profil|nouvel|nouvelle personne|archive|chantier .* (finit|termine)|brief|check ?list|coche|repousse)/.test(nn)) return 3;
+  return 2;
+}
+// Date utile pour l'écran visé
+function _mdNavDates(P){
+  const tm=P.tm||{}, today=_mdToday();
+  const d=tm.range?.from||tm.day?.d||tm.week?.from||null;
+  if(P.screen==='master'){ if(tm.month){ P.month=tm.month; } else if(d){ P.month={m:d.getMonth(),y:d.getFullYear()}; } }
+  if(['weekly','briefw'].includes(P.screen)){ P.date=getMon(d||today); }
+  if(['aff','quiou'].includes(P.screen)){ P.date=d||today; }
+  if(P.ppl&&P.ppl.length) P.person=P.ppl[0];
+}
+// ── Exécution d'un plan de navigation (avec la preuve à l'écran) ──
+function _mdFlash(el){ if(!el) return; el.classList.remove('md-flash'); void el.offsetWidth; el.classList.add('md-flash'); setTimeout(()=>el.classList.remove('md-flash'),2600); }
+function _mdNavRun(P){
+  const scr=P.screen; let say='';
+  const pg=()=>document.querySelector('.page.on .sh')||document.querySelector('.page.on');
+  if(scr==='weekly'){ S.weekStart=P.date||getMon(new Date()); goTab('weekly'); try{ renderWeekly(); }catch(_){} say=`J'ouvre le planning de la semaine ${wkN(S.weekStart)}.`; setTimeout(()=>_mdFlash(document.getElementById('weeklyGrid')||pg()),80); }
+  else if(scr==='master'){ const m=P.month||{m:new Date().getMonth(),y:new Date().getFullYear()}; S.masterMonth=m.m; S.masterYear=m.y; goTab('master'); const yr=document.getElementById('mp-year'); if(yr) yr.value=String(m.y);
+    if(P.person&&P.person.ids.length===1){ const em=document.getElementById('mp-emp'); if(em) em.value=P.person.ids[0]; }
+    try{ renderMaster(); }catch(_){} say=`Voici le master de ${_MD_ML[m.m]} ${m.y}.`; setTimeout(()=>_mdFlash(document.getElementById('masterGrid')||pg()),80); }
+  else if(scr==='briefw'){ openBriefWeek(fmt(P.date||new Date())); say=`Voici le brief de la semaine ${wkN(P.date||new Date())}.`; }
+  else if(scr==='briefj'){ openBrief(); say='Voici le brief du jour.'; }
+  else if(scr==='aff'){ affOpen(fmt(P.date||new Date())); say=`J'ouvre les affectations de ${_mdDayTxt(P.date||_mdToday())}.`; }
+  else if(scr==='quiou'){ _dayRecap(fmt(P.date||new Date())); say=`Voici qui est où ${_mdDayTxt(P.date||_mdToday())}.`; }
+  else if(scr==='tv'){ tvOpen(); say='Mode TV lancé.'; }
+  else if(scr==='aeromargin'){ amOpen(); say="J'ouvre AeroMargin."; }
+  else if(scr.startsWith('doc')){ docOpen(scr.slice(3)); say=`J'ouvre ${P.label}.`; }
+  else if(scr==='forecast'){ openForecast(); say='Voici la prévision à 3 mois.'; }
+  else if(scr==='fiche'){ const id=P.person&&P.person.ids[0]; goTab('personnel'); if(id) setTimeout(()=>editPersonnel(id),60); say=`Voici la fiche de ${_mdPName(byId(id))}.`; }
+  else if(scr==='mardam'){ goTab('ai'); say='Voici ma page.'; }
+  else { goTab(scr); say=`J'ouvre ${P.label}.`; setTimeout(()=>_mdFlash(pg()),80); }
+  return say;
+}
+function _mdFilterRun(P){
+  const onMaster=!!document.getElementById('pg-master')?.classList.contains('on'), k=onMaster?'masterHiddenCats':'weeklyHiddenCats';
+  const all=[...new Set((S.personnel||[]).filter(p=>p.actif!==false&&!p.archived).map(p=>p.categorie||'autre'))];
+  S[k]=P.cats==='all'?[]:all.filter(c=>!P.cats.includes(c)); try{ save(); }catch(_){}
+  if(onMaster) renderMaster(); else { if(!document.getElementById('pg-weekly')?.classList.contains('on')) goTab('weekly'); renderWeekly(); }
+  const lbl=P.cats==='all'?'toutes les catégories':P.cats.map(c=>String(_dayExtractCatLbl(c)).replace(/\.+$/,'')).join(', ');
+  setTimeout(()=>_mdFlash(document.getElementById(onMaster?'masterGrid':'weeklyGrid')),80);
+  return P.cats==='all'?"J'affiche de nouveau tout le monde.":`J'affiche seulement : ${lbl}.`;
+}
+
+// ── Voix de Mardam (synthèse du navigateur, voix féminine française par défaut) ──
+const _MD_FEM=/(amelie|amélie|audrey|aurelie|aurélie|marie|julie|hortense|denise|celine|céline|léa|virginie|chantal|sylvie|eloise|éloïse|vivienne|brigitte|joséphine|josephine|coralie|yvette|female|femme)/i;
+function _mdVoices(){ try{ return speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang)); }catch(_){ return []; } }
+function _mdVoice(){ const vs=_mdVoices(), c=_mdCfg(); if(c.voice){ const f=vs.find(v=>v.name===c.voice); if(f) return f; }
+  return vs.find(v=>_MD_FEM.test(v.name)&&/fr.FR/i.test(v.lang)&&/natural|online|premium|enhanced|amélioré/i.test(v.name))||vs.find(v=>_MD_FEM.test(v.name)&&/fr.FR/i.test(v.lang))||vs.find(v=>_MD_FEM.test(v.name))||vs.find(v=>/fr.FR/i.test(v.lang))||vs[0]||null; }
+function _mdSpeak(t,force){ const c=_mdCfg(); if((c.mute&&!force)||!('speechSynthesis' in window)||!t) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/<[^>]+>/g,'').replace(/MSN/g,'M S N')); u.lang='fr-FR'; const v=_mdVoice(); if(v) u.voice=v; u.rate=1.04; u.pitch=1.02; speechSynthesis.speak(u); }catch(_){} }
+try{ if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>{ if(document.getElementById('md-set')) _mdRenderSettings(); }; }catch(_){}
+// ── Panneau ──
+const _MD_MIC=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/></svg>`;
+function _mdIsAdmin(){ try{ return ((typeof _currentUser!=='undefined'&&_currentUser&&_currentUser.role)||JSON.parse(sessionStorage.getItem('mard_auth')||'{}').role)==='admin'; }catch(_){ return false; } }
+function _mdPanel(){
+  let p=document.getElementById('md-panel'); if(p) return p;
+  p=document.createElement('div'); p.id='md-panel'; p.setAttribute('role','dialog'); p.setAttribute('aria-label',_mdName());
+  p.innerHTML=`<div class="md-hd"><span class="md-av">${_MD_MIC}</span><b class="md-nm"></b><span class="md-st"></span><button type="button" class="md-ib" id="md-mute" title="Couper / remettre la voix" onclick="_mdToggleMute()"></button><button type="button" class="md-ib" title="Ouvrir la page ${_bfEsc(_mdName())}" onclick="goTab('ai');_mdClose()">☰</button><button type="button" class="md-ib" title="Fermer" onclick="_mdClose()">✕</button></div>
+  <div class="md-body"><div class="md-you"></div><div class="md-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="md-say"></div><div class="md-acts"></div></div>
+  <div class="md-ft"><button type="button" class="md-mic" onclick="_mdListen()" title="Parler (Ctrl + Espace)">${_MD_MIC}</button><input id="md-in" type="text" autocomplete="off" placeholder="Parle-moi ou écris ici…" onkeydown="if(event.key==='Enter'&&this.value.trim()){const v=this.value;this.value='';_mdHandle(v);}"><button type="button" class="md-miss" onclick="_mdNotUnderstood()" title="Signaler que je n'ai pas compris">Pas compris</button></div>`;
+  document.body.appendChild(p); _mdMuteBtn(); return p;
+}
+function _mdMuteBtn(){ const b=document.getElementById('md-mute'); if(b) b.textContent=_mdCfg().mute?'🔇':'🔊'; const n=document.querySelector('#md-panel .md-nm'); if(n) n.textContent=_mdName(); }
+function _mdToggleMute(){ const c=_mdCfg(); c.mute=!c.mute; try{ save(); }catch(_){} if(c.mute) try{ speechSynthesis.cancel(); }catch(_){} _mdMuteBtn(); if(document.getElementById('md-set')) _mdRenderSettings(); }
+function _mdOpen(){ if(!_mdIsAdmin()){ toast('Mardam est réservé au compte administrateur'); return; } const p=_mdPanel(); p.classList.add('on'); document.documentElement.classList.add('md-open'); _mdMuteBtn(); }
+function _mdClose(){ const p=document.getElementById('md-panel'); if(p) p.classList.remove('on','md-listen'); document.documentElement.classList.remove('md-open'); try{ MD.rec&&MD.rec.abort(); }catch(_){} try{ speechSynthesis.cancel(); }catch(_){} MD.listening=false; }
+function _mdState(t){ const s=document.querySelector('#md-panel .md-st'); if(s) s.textContent=t||''; }
+function _mdYou(t,interim){ const y=document.querySelector('#md-panel .md-you'); if(y) y.innerHTML=t?`Tu as dit : <b>« ${_bfEsc(t)} »</b>${interim?' <span class="md-dots">…</span>':''}`:''; }
+function _mdShow(html,acts){ const s=document.querySelector('#md-panel .md-say'); if(s) s.innerHTML=html||''; const a=document.querySelector('#md-panel .md-acts'); if(a){ a.innerHTML=''; (acts||[]).forEach(b=>{ const x=document.createElement('button'); x.type='button'; x.className='md-b'+(b.primary?' p':''); x.innerHTML=b.l; x.onclick=()=>{ b.fn(); }; a.appendChild(x); }); } }
+function _mdReply(html,speak,acts,meta){ _mdShow(html,acts); _mdSpeak(speak!=null?speak:html); MD.hist.push({who:'md',html,at:Date.now()}); if(MD.hist.length>80) MD.hist.shift(); if(document.getElementById('md-hist')) _mdRenderHist(); }
+// ── Écoute (dictée du navigateur) ──
+function _mdSR(){ return window.SpeechRecognition||window.webkitSpeechRecognition||null; }
+function _mdListen(){
+  _mdOpen(); const p=_mdPanel(); const SR=_mdSR();
+  if(MD.listening){ try{ MD.rec.stop(); }catch(_){} return; }
+  if(!SR){ _mdShow("La dictée n'est pas disponible dans ce navigateur. Écris ta demande dans la case ci-dessous."); document.getElementById('md-in')?.focus(); return; }
+  try{ speechSynthesis.cancel(); }catch(_){}
+  const r=new SR(); MD.rec=r; r.lang='fr-FR'; r.interimResults=true; r.continuous=false; r.maxAlternatives=3;
+  let fin=null, alts=[];
+  r.onstart=()=>{ MD.listening=true; p.classList.add('md-listen'); _mdState('J\'écoute…'); _mdYou(''); };
+  r.onresult=e=>{ let txt=''; for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i]; txt+=res[0].transcript; if(res.isFinal){ fin=(fin||'')+res[0].transcript; alts=[...res].map(a=>a.transcript); } } _mdYou((fin||txt).trim(),!fin); };
+  r.onerror=e=>{ MD.listening=false; p.classList.remove('md-listen'); _mdState('');
+    if(e.error==='not-allowed'||e.error==='service-not-allowed') _mdShow("Je n'ai pas accès au micro. Autorise le micro pour cette page dans les réglages du navigateur, ou écris ta demande ci-dessous.");
+    else if(e.error==='no-speech') _mdShow("Je n'ai rien entendu. Appuie sur le micro et parle-moi.");
+    else if(e.error==='network') _mdShow("La dictée a besoin d'internet sur cet appareil. Écris ta demande ci-dessous.");
+    else if(e.error!=='aborted') _mdShow('La dictée s\'est arrêtée ('+_bfEsc(e.error)+'). Réessaie ou écris ta demande.'); };
+  r.onend=()=>{ MD.listening=false; p.classList.remove('md-listen'); _mdState(''); if(fin&&fin.trim()) _mdHandle(fin.trim(),alts); };
+  try{ r.start(); }catch(e){ _mdShow("Impossible de lancer la dictée. Réessaie ou écris ta demande."); }
+}
+// ── Traitement d'une demande ──
+async function _mdHandle(text,alts){
+  _mdOpen(); _mdYou(text); MD.hist.push({who:'me',html:_bfEsc(text),at:Date.now()});
+  // Réponse à une question en attente (confirmation ou choix)
+  if(MD.pending){ const q=_mdParse(text); const pend=MD.pending;
+    if(pend.choices){ const pick=_mdPickChoice(pend.choices,q); if(pick){ MD.pending=null; pick.fn(); return; } }
+    if(q.kind==='ctl'&&q.act==='yes'&&pend.run){ MD.pending=null; pend.run(); return; }
+    if(q.kind==='ctl'&&q.act==='no'){ MD.pending=null; _mdReply("D'accord, j'annule. Rien n'a été changé.",'D\'accord, j\'annule.'); _mdLog({said:text,how:'local',label:pend.label||'',result:'annulé'}); return; }
+  }
+  // Plusieurs transcriptions possibles : on garde la première que l'on comprend
+  let P=_mdParse(text);
+  if(P.kind==='unknown'&&alts&&alts.length>1){ for(const a of alts.slice(1)){ const q=_mdParse(a); if(q.kind!=='unknown'){ P=q; break; } } }
+  let how='local';
+  if(P.kind==='unknown'&&_mdAIready()){ _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; } }
+  _mdExec(P,text,how);
+}
+function _mdPickChoice(ch,q){ const t=' '+q.n+' '; const ord=[/ (premier|premiere|1|un|le 1er) /,/ (deuxieme|second|seconde|2|deux) /,/ (troisieme|3|trois) /];
+  for(let i=0;i<ch.length;i++){ if(ord[i]&&ord[i].test(t)) return ch[i]; }
+  return ch.find(c=>c.match&&c.match(q))||null; }
+function _mdExec(P,text,how){
+  const nm=_mdName(); MD.ctx.at=Date.now();
+  if(P.kind==='ctl'){
+    const a=P.act;
+    if(a==='mute'){ const c=_mdCfg(); c.mute=true; try{save();}catch(_){} try{ speechSynthesis.cancel(); }catch(_){} _mdMuteBtn(); _mdReply('Voix coupée. Je continue à te répondre par écrit.',''); }
+    else if(a==='unmute'){ const c=_mdCfg(); c.mute=false; try{save();}catch(_){} _mdMuteBtn(); _mdReply('Voix remise.'); }
+    else if(a==='help') _mdReply(`Pour l'instant je sais <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
+    else if(a==='reset'){ MD.ctx={last:null,at:0}; MD.pending=null; _mdReply('C\'est noté, on repart de zéro.'); }
+    else if(a==='journal'){ const L=(S.mardam?.journal||[]).filter(j=>new Date(j.at).toDateString()===new Date().toDateString()); _mdReply(L.length?`Aujourd'hui j'ai traité <b>${L.length}</b> demande${L.length>1?'s':''} : `+L.slice(0,5).map(j=>_bfEsc(j.label||j.said)).join(', ')+(L.length>5?'…':'')+'. Le détail est dans mon journal.':"Je n'ai encore rien fait aujourd'hui.",null,[{l:'Voir le journal',fn:()=>{ goTab('ai'); }}]); }
+    else if(a==='undo'){ const last=(S.mardam?.journal||[]).find(j=>j.undo&&!j.undone); if(!last) _mdReply("Je n'ai rien modifié à annuler : pour l'instant je n'ai fait qu'ouvrir des écrans."); }
+    else if(a==='hello') _mdReply(/merci/.test(P.n)?'Avec plaisir !':`Salut Damien ! Dis-moi ce que je t'ouvre.`);
+    else if(a==='yes'||a==='no') _mdReply("Je n'avais rien en attente. Dis-moi ce que tu veux faire.");
+    _mdLog({said:text,how,label:'contrôle : '+a,result:'ok'}); return;
+  }
+  if(P.kind==='nav'){
+    if(P.screen==='fiche'&&(!P.person||P.person.ids.length!==1)){ return _mdAskPerson(P,text,how); }
+    if(P.tm?.mismatch){ const m=P.tm.mismatch; const pick=d=>{ P.date=getMon(d); if(['aff','quiou'].includes(P.screen)) P.date=d; if(P.screen==='master') P.month={m:d.getMonth(),y:d.getFullYear()}; const s=_mdNavRun(P); _mdReply(s); _mdLog({said:text,how,label:P.label,result:'ok'}); };
+      MD.pending={label:P.label,choices:m.alts.map(d=>({l:_mdDayTxt(d),fn:()=>pick(d),match:q=>q.tm?.day&&fmt(q.tm.day.d)===fmt(d)}))};
+      return _mdReply(`Le ${m.d.getDate()} ${_MD_ML[m.d.getMonth()]} tombe un <b>${_MD_JL[m.d.getDay()]}</b>. Tu veux dire lequel ?`,null,MD.pending.choices.map(c=>({l:c.l,fn:c.fn})).concat([{l:'✕ Annuler',fn:()=>{ MD.pending=null; _mdReply('D\'accord.'); }}]));
+    }
+    let say=''; try{ say=_mdNavRun(P); }catch(e){ console.warn('Mardam nav',e); say="Je n'ai pas réussi à ouvrir cet écran."; }
+    MD.ctx.last=P; _mdReply(say); _mdLog({said:text,how,label:P.label+(P.date?' · '+fmt(P.date):'')+(P.month?` · ${P.month.m+1}/${P.month.y}`:''),result:'ok'}); return;
+  }
+  if(P.kind==='filter'){ const s=_mdFilterRun(P); _mdReply(s); _mdLog({said:text,how,label:'filtre catégories',result:'ok'}); return; }
+  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Pour l'instant je sais ouvrir les écrans.`;
+    _mdReply(s,`Je ne sais pas encore ${what}. Ça arrive à l'étape ${P.stage}.`); _mdLog({said:text,how,label:`étape ${P.stage} (${P.what})`,result:'pas encore'}); return; }
+  _mdMiss(text,'non compris'); _mdLog({said:text,how,label:'',result:'pas compris'});
+  _mdReply(`Je n'ai pas compris. Essaie par exemple : « ouvre le planning de la semaine prochaine », « montre-moi le master de janvier » ou « ouvre la fiche de Dupont ».${_mdAIready()?'':'<br><small>L\'IA traductrice n\'est pas branchée : elle m\'aidera pour les phrases inhabituelles.</small>'}`,"Je n'ai pas compris. Tu peux reformuler ?");
+}
+function _mdAskPerson(P,text,how){
+  const ids=P.person?P.person.ids:[]; if(!ids.length) return _mdReply("Je n'ai pas reconnu la personne. Redis-moi son nom ?");
+  MD.pending={label:P.label,choices:ids.slice(0,4).map(id=>({l:_bfEsc(_mdPName(byId(id))),fn:()=>{ P.person={ids:[id]}; const s=_mdNavRun(P); _mdReply(s); _mdLog({said:text,how,label:P.label,result:'ok'}); },match:q=>q.ppl&&q.ppl.some(h=>h.ids.length===1&&h.ids[0]===id)}))};
+  _mdReply(`Il y a ${ids.length} personnes qui correspondent à « ${_bfEsc(P.person.words)} ». Laquelle ?`,'Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})));
+}
+function _mdNotUnderstood(){ const me=[...MD.hist].reverse().find(h=>h.who==='me'); if(!me){ toast('Rien à signaler'); return; } const said=me.html.replace(/&[a-z]+;/g,' '); _mdMiss(said,'signalé'); toast('Noté : je vais apprendre cette phrase'); }
+// ── IA traductrice (via ton script Google Apps Script, phrase anonymisée) ──
+function _mdAIready(){ const c=_mdCfg(); return !!(c.ai&&c.gas&&/^https:\/\/script\.google(usercontent)?\.com\//.test(c.gas)&&navigator.onLine!==false); }
+function _mdAnon(raw,P){
+  // remplace les noms et MSN reconnus par des codes avant l'envoi
+  let T=P&&P.T?P.T.slice():_mdNorm(raw).split(' '); const map={}; let np=0, na=0;
+  (P&&P.ppl||[]).slice().sort((a,b)=>b.span[0]-a.span[0]).forEach(h=>{ const code='P'+(++np); map[code]={type:'p',ids:h.ids,words:h.words}; T.splice(h.span[0],h.span[1]-h.span[0],'['+code+']'); });
+  (P&&P.msn||[]).forEach(m=>{ const code='A'+(++na); map[code]={type:'a',msn:m.msn,cands:m.cands}; const k=T.indexOf(m.msn); if(k>=0) T[k]='['+code+']'; });
+  // tout mot inconnu qui ressemble à un nom propre dans la phrase d'origine est masqué aussi
+  const caps=String(raw).match(/\b[A-ZÉÈ][a-zéèêëàâîïôöûüç'-]{2,}\b/g)||[];
+  caps.forEach(w=>{ const nw=_mdNorm(w); if(!_MD_STOP.has(nw)){ const k=T.indexOf(nw); if(k>=0){ const code='X'+(Object.keys(map).length+1); map[code]={type:'x',words:nw}; T[k]='['+code+']'; } } });
+  return {text:T.join(' '),map};
+}
+const _MD_AI_SYS=`Tu traduis les demandes orales d'un responsable de production aéronautique en ordres JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], [A2], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte autour.
+Formats possibles :
+{"type":"nav","screen":"<écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null"}
+  écrans : weekly (planning hebdo), master, briefw (brief de la semaine), briefj (brief du jour), aff (affectations du jour), quiou (qui est où), slot (hangar), stockage, recycling, airbus, personnel, fiche (fiche d'une personne), certif, formations, autorisations, todo, checklist, kpi, programme, chantiers, simulation, notice, dashboard, forecast (prévision 3 mois), tv, aeromargin, docairbus, docatr, docboeing, mardam
+{"type":"filter","cats":["technicien","chef","interimaire","expert","alternant","responsable","sheetmetal","prestataire"] ou "all"}
+{"type":"control","act":"yes|no|undo|mute|unmute|help|reset|journal"}
+{"type":"question","topic":"résumé court"}
+{"type":"action","stage":2 ou 3,"what":"résumé court"}  (stage 2 = planning, absences, formations, visites médicales ; stage 3 = hangar, to-do, pense-bête, intérim, création de profil, chantiers, brief)
+{"type":"unknown"}
+Les dates sont calculées à partir d'aujourd'hui : {TODAY}. « la semaine prochaine » = lundi de la semaine suivante.`;
+async function _mdAI(raw,P){
+  const c=_mdCfg(); const an=_mdAnon(raw,P); const today=_mdToday();
+  const hist=MD.hist.slice(-7,-1).filter(h=>h.who==='me').slice(-3).map(h=>_mdAnon(h.html.replace(/&[a-z]+;/g,' '),_mdParse(h.html)).text);
+  const body={token:c.token,model:c.model,system:_MD_AI_SYS.replace('{TODAY}',`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
+  try{
+    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
+    const r=await fetch(c.gas,{method:'POST',body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(to);
+    const j=await r.json(); if(j.error) throw new Error(j.error);
+    const txt=(j.body&&j.body.content&&j.body.content[0]&&j.body.content[0].text)||''; const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
+    return _mdFromAI(JSON.parse(m[0]),an.map,P);
+  }catch(e){ console.warn('Mardam IA',e); return null; }
+}
+function _mdFromAI(o,map,P){
+  const out=Object.assign({},P||{},{via:'ia'});
+  const person=o.person&&map[o.person]&&map[o.person].type==='p'?{ids:map[o.person].ids,words:map[o.person].words}:null;
+  if(o.type==='nav'&&o.screen){ const lbl=(_MD_SCREENS.find(s=>s[0]===o.screen)||[])[2]||(o.screen==='fiche'?'Fiche personnel':o.screen);
+    Object.assign(out,{kind:'nav',screen:o.screen,label:lbl,person});
+    if(o.date&&/^\d{4}-\d{2}-\d{2}$/.test(o.date)){ const d=parseLocal(o.date); out.date=['aff','quiou'].includes(o.screen)?d:getMon(d); }
+    if(o.month&&/^\d{4}-\d{2}$/.test(o.month)) out.month={y:+o.month.slice(0,4),m:+o.month.slice(5,7)-1};
+    if(o.screen==='master'&&!out.month&&out.date) out.month={m:out.date.getMonth(),y:out.date.getFullYear()};
+    return out; }
+  if(o.type==='filter') return Object.assign(out,{kind:'filter',cats:o.cats});
+  if(o.type==='control') return Object.assign(out,{kind:'ctl',act:o.act});
+  if(o.type==='question') return Object.assign(out,{kind:'later',stage:1,what:'question'});
+  if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===3?3:2,what:'action'});
+  return null;
+}
+async function _mdAITest(){
+  const c=_mdCfg(); const el=document.getElementById('md-aitest'); if(el) el.textContent='Test en cours…';
+  if(!c.gas){ if(el) el.textContent='Colle d\'abord l\'adresse du script.'; return; }
+  try{ const r=await fetch(c.gas,{method:'POST',body:JSON.stringify({token:c.token,ping:true})}); const j=await r.json();
+    if(el) el.textContent=j.ok?'✓ Connexion au script OK':(j.error==='token'?'✕ Jeton refusé par le script':'✕ Réponse inattendue : '+JSON.stringify(j).slice(0,80)); }
+  catch(e){ if(el) el.textContent='✕ Impossible de joindre le script ('+(e.message||e)+')'; }
+}
+
+// ── Page Mardam (remplace l'ancien « Assistant IA ») ──
+function renderAI(){ _mdRenderTab(); }
+function _mdRenderTab(){
+  const pg=document.getElementById('pg-ai'); if(!pg) return;
+  if(!pg.querySelector('#md-tab')){
+    pg.innerHTML=`<div id="md-tab"><div class="sh"><div class="sh-title">🎙 <em id="md-ttl">Mardam</em></div><div class="md-sub">Ton assistant : parle-lui ou écris-lui. Étape 0 : ouvrir les écrans et filtrer.</div></div>
+    <div class="md-grid"><section class="gc md-card md-conv"><div class="md-ch">💬 Conversation</div><div id="md-hist"></div><div class="md-inrow"><button type="button" class="md-mic" onclick="_mdListen()" title="Parler">${_MD_MIC}</button><input id="md-in2" type="text" placeholder="Écris ta demande et appuie sur Entrée…" onkeydown="if(event.key==='Enter'&&this.value.trim()){const v=this.value;this.value='';_mdHandle(v);}"></div></section>
+    <div class="md-col"><section class="gc md-card"><div class="md-ch">🧪 Banc d'essai <button type="button" class="md-b p sm" onclick="_mdBenchRun()">Lancer</button></div><div id="md-bench"><div class="md-mut">Teste toutes les phrases connues et donne le taux de réussite mesuré.</div></div></section>
+    <section class="gc md-card"><div class="md-ch">📓 Journal</div><div id="md-jr"></div></section>
+    <section class="gc md-card"><div class="md-ch">🙊 Phrases non comprises</div><div id="md-miss"></div></section>
+    <section class="gc md-card"><div class="md-ch">⚙️ Réglages</div><div id="md-set"></div></section></div></div></div>`;
+  }
+  const t=document.getElementById('md-ttl'); if(t) t.textContent=_mdName();
+  _mdRenderHist(); _mdRenderJournal(); _mdRenderMiss(); _mdRenderSettings();
+}
+function _mdRenderHist(){ const el=document.getElementById('md-hist'); if(!el) return;
+  el.innerHTML=MD.hist.length?MD.hist.map(h=>`<div class="md-msg ${h.who}">${h.html}</div>`).join(''):`<div class="md-mut">Appuie sur 🎙 et dis par exemple « ouvre le planning de la semaine prochaine ».</div>`; el.scrollTop=el.scrollHeight; }
+function _mdRenderJournal(){ const el=document.getElementById('md-jr'); if(!el) return; const L=(S.mardam?.journal||[]).slice(0,40);
+  el.innerHTML=L.length?`<table class="md-tb"><tr><th>Quand</th><th>Ta phrase</th><th>Compris</th><th></th></tr>${L.map(j=>{ const d=new Date(j.at); return `<tr><td>${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${_bfEsc(j.said)}</td><td>${_bfEsc(j.label||'—')}${j.how==='ia'?' <span class="md-tag">IA</span>':''}</td><td class="md-r ${j.result==='ok'?'ok':j.result==='pas compris'?'ko':''}">${_bfEsc(j.result)}</td></tr>`; }).join('')}</table>`:'<div class="md-mut">Rien pour l\'instant.</div>'; }
+function _mdRenderMiss(){ const el=document.getElementById('md-miss'); if(!el) return; const L=(S.mardam?.misses||[]).slice(0,30);
+  el.innerHTML=L.length?`<div class="md-mut">Je les apprendrai à la prochaine mise à jour.</div><ul class="md-ul">${L.map((m,i)=>`<li>« ${_bfEsc(m.said)} » <button type="button" class="md-x" title="Retirer" onclick="S.mardam.misses.splice(${i},1);save();_mdRenderMiss()">✕</button></li>`).join('')}</ul>`:'<div class="md-mut">Aucune pour l\'instant.</div>'; }
+function _mdRenderSettings(){ const el=document.getElementById('md-set'); if(!el) return; const c=_mdCfg(); const vs=_mdVoices(); const cur=_mdVoice();
+  el.innerHTML=`<div class="md-f"><label>Nom</label><input value="${_bfEsc(c.name)}" onchange="_mdCfg().name=this.value.trim()||'Mardam';save();_mdRenderTab();_mdMuteBtn()"></div>
+  <div class="md-f"><label>Voix</label><select onchange="_mdCfg().voice=this.value;save()">${vs.length?vs.map(v=>`<option value="${_bfEsc(v.name)}" ${cur&&cur.name===v.name?'selected':''}>${_bfEsc(v.name)} (${v.lang})</option>`).join(''):'<option>Voix de l\'appareil</option>'}</select><button type="button" class="md-b sm" onclick="_mdSpeak('Bonjour Damien, je suis '+_mdName()+'. Dis-moi ce que je t\\'ouvre.',true)">▶ Écouter</button></div>
+  <div class="md-f"><label>Son</label><button type="button" class="md-b sm ${c.mute?'':'p'}" onclick="_mdToggleMute()">${c.mute?'🔇 Coupé':'🔊 Activé'}</button></div>
+  <div class="md-f"><label>Dictée sur PC</label><select onchange="_mdCfg().dict=this.value;save()"><option value="browser" ${c.dict==='browser'?'selected':''}>Celle du navigateur (Edge : Microsoft)</option><option value="local" disabled>Dictée locale sur le PC — arrive à une prochaine étape</option></select></div>
+  <div class="md-sep">IA traductrice (seulement quand je ne suis pas sûr de moi)</div>
+  <div class="md-f"><label>Activée</label><input type="checkbox" ${c.ai?'checked':''} onchange="_mdCfg().ai=this.checked;save()"></div>
+  <div class="md-f"><label>Adresse du script</label><input placeholder="https://script.google.com/macros/s/…/exec" value="${_bfEsc(c.gas)}" onchange="_mdCfg().gas=this.value.trim();save()"></div>
+  <div class="md-f"><label>Jeton secret</label><input type="password" value="${_bfEsc(c.token)}" onchange="_mdCfg().token=this.value.trim();save()"></div>
+  <div class="md-f"><label>Modèle</label><select onchange="_mdCfg().model=this.value;save()"><option value="haiku" ${c.model==='haiku'?'selected':''}>Claude Haiku 5.5 (le moins cher)</option><option value="sonnet" ${c.model==='sonnet'?'selected':''}>Claude Sonnet 5.5 (le plus fin)</option></select></div>
+  <div class="md-f"><label></label><button type="button" class="md-b sm" onclick="_mdAITest()">Tester la connexion</button> <span id="md-aitest" class="md-mut"></span></div>
+  <div class="md-mut">Seule ta phrase part, avec les noms et MSN remplacés par des codes. Ni fichier, ni planning, ni liste du personnel.</div>`; }
+// ── Banc d'essai : phrases + résultat attendu, mesuré sur les données réelles ──
+function _mdBenchCases(){
+  const today=_mdToday(), mon=getMon(today), nextMon=addD(mon,7);
+  const P=(S.personnel||[]).filter(p=>p.actif!==false&&!p.archived&&p.nom&&p.nom.length>=5);
+  const uniq=P.filter(p=>P.filter(q=>_mdNorm(q.nom)===_mdNorm(p.nom)).length===1);
+  const a=uniq[3]||P[0], b=uniq[11]||P[1], c=uniq[20]||P[2];
+  const typo=w=>{ const s=String(w); return s.length>5?s.slice(0,2)+s.slice(3):s; };
+  const nav=(scr,chk)=>p=>p.kind==='nav'&&p.screen===scr&&(!chk||chk(p));
+  const wk=d=>p=>p.date&&fmt(p.date)===fmt(d);
+  const jan={m:0,y:today.getMonth()===0?today.getFullYear():today.getFullYear()+1};
+  const W3=(()=>{ let y=today.getFullYear(); if(3<wkN(today)-8) y++; return addD(getMon(_mdYmd(y,0,4)),14); })();
+  const later=st=>p=>p.kind==='later'&&p.stage===st;
+  const L=[
+    ['ouvre le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['montre-moi le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['le planning de la semaine prochaine',nav('weekly',wk(nextMon))],
+    ['ouvre le planning',nav('weekly',wk(mon))],['affiche le planning hebdo',nav('weekly')],['va sur la semaine 3',nav('weekly',wk(W3))],['ouvre la semaine 3',nav('weekly',wk(W3))],
+    ['montre-moi le master de janvier',nav('master',p=>p.month&&p.month.m===0&&p.month.y===jan.y)],['ouvre le master planning',nav('master')],['affiche le master du mois prochain',nav('master',p=>p.month&&p.month.m===(today.getMonth()+1)%12)],
+    ['ouvre le brief du jour',nav('briefj')],['ouvre le brief de la semaine',nav('briefw',wk(mon))],['montre-moi le brief de la semaine prochaine',nav('briefw',wk(nextMon))],
+    ['ouvre les affectations de demain',nav('aff',p=>fmt(p.date)===fmt(addD(today,1)))],['ouvre les affectations du jour',nav('aff',p=>fmt(p.date)===fmt(today))],
+    ['montre-moi le slot hangar',nav('slot')],['ouvre le hangar',nav('slot')],['ouvre le stockage',nav('stockage')],['montre le recyclage',nav('recycling')],['ouvre l\'activité Airbus',nav('airbus')],
+    ['ouvre le personnel',nav('personnel')],['ouvre les formations',nav('formations')],['montre les autorisations',nav('autorisations')],['ouvre ma to do list',nav('todo')],['ouvre ma todo',nav('todo')],['ouvre la check-list',nav('checklist')],
+    ['montre-moi les KPI',nav('kpi')],['ouvre le programme activité',nav('programme')],['ouvre les chantiers',nav('chantiers')],['ouvre le tableau de bord',nav('dashboard')],['retourne à l\'accueil',nav('dashboard')],
+    ['ouvre la prévision',nav('forecast')],['passe en mode TV',nav('tv')],['lance le mode TV',nav('tv')],['ouvre AeroMargin',nav('aeromargin')],['ouvre la doc Airbus',nav('docairbus')],['ouvre ATR NavX',nav('docatr')],['ouvre la documentation Boeing',nav('docboeing')],
+    ['ouvre qui est où demain',nav('quiou',p=>fmt(p.date)===fmt(addD(today,1)))],['ouvre les certifying staff',nav('certif')],
+    [`montre-moi la fiche de ${a.nom}`,nav('fiche',p=>p.person&&p.person.ids.includes(a.id))],[`ouvre la fiche de ${b.prenom} ${b.nom}`,nav('fiche',p=>p.person&&p.person.ids.includes(b.id))],[`ouvre la fiche de ${typo(c.nom)}`,nav('fiche',p=>p.person&&p.person.ids.includes(c.id))],[`ouvre la fiche de ${typo(a.nom)}`,nav('fiche',p=>p.person&&p.person.ids.includes(a.id))],
+    ['affiche seulement les techniciens',p=>p.kind==='filter'&&p.cats.includes('technicien')],['affiche que les chefs d\'équipe',p=>p.kind==='filter'&&p.cats.includes('chef')],['affiche tout le monde',p=>p.kind==='filter'&&p.cats==='all'],
+    ['oui vas-y',p=>p.kind==='ctl'&&p.act==='yes'],['non annule',p=>p.kind==='ctl'&&p.act==='no'],['annule ce que tu viens de faire',p=>p.kind==='ctl'&&p.act==='undo'],['tais-toi',p=>p.kind==='ctl'&&p.act==='mute'],['coupe le son',p=>p.kind==='ctl'&&p.act==='mute'],
+    ['nouveau sujet',p=>p.kind==='ctl'&&p.act==='reset'],["qu'est-ce que tu sais faire ?",p=>p.kind==='ctl'&&p.act==='help'],["qu'est-ce que tu as fait ce matin ?",p=>p.kind==='ctl'&&p.act==='journal'],
+
+    // série écrite à part (tournures différentes) — 27/30 avant correction
+    ["tu peux m'ouvrir le planning de la semaine prochaine",nav('weekly',wk(nextMon))],['montre planning semaine prochaine',nav('weekly',wk(nextMon))],['je veux voir le master de février',nav('master',p=>p.month&&p.month.m===1)],
+    ['ouvre-moi la to-do',nav('todo')],['emmène-moi sur le slot',nav('slot')],['affiche le hangar',nav('slot')],['va dans les formations',nav('formations')],['ouvre le brief',nav('briefj')],['lance AeroMargin',nav('aeromargin')],['ouvre Airbus World',nav('docairbus')],
+    [`montre-moi ${b.nom}`,nav('fiche',p=>p.person&&p.person.ids.includes(b.id))],['affiche les intérimaires seulement',p=>p.kind==='filter'&&p.cats.includes('interimaire')],['remets tout le monde',p=>p.kind==='filter'&&p.cats==='all'],
+    ['montre-moi qui est où aujourd’hui',nav('quiou',p=>fmt(p.date)===fmt(today))],['ouvre le Master',nav('master')],['planning hebdo',nav('weekly')],['retour au tableau de bord',nav('dashboard')],['ouvre le brief de la semaine 50',nav('briefw',p=>wkN(p.date)===50)],
+    ['vas-y',p=>p.kind==='ctl'&&p.act==='yes'],["c'est bon",p=>p.kind==='ctl'&&p.act==='yes'],['laisse tomber',p=>p.kind==='ctl'&&p.act==='no'],['arrête de parler',p=>p.kind==='ctl'&&p.act==='mute'],
+    ['ouvre les affectations de jeudi',nav('aff',p=>p.date.getDay()===4)],['montre le stockage avion',nav('stockage')],['affiche le programme',nav('programme')],['ouvre le personnel intérimaire',nav('personnel')],
+    // reconnues comme questions / actions des étapes suivantes
+    [`où est ${a.nom} jeudi ?`,later(1)],['qui est absent jeudi ?',later(1)],['combien on est sur le 55304 cette semaine ?',later(1)],['quand est la prochaine formation EWIS ?',later(1)],
+    [`mets ${a.nom} en congé jeudi et vendredi`,later(2)],[`affecte ${a.nom}, ${b.nom} et ${c.nom} sur le 55304 toute la semaine`,later(2)],[`inscris ${b.nom} à la formation MOE du lundi 1er février`,later(2)],
+    ['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',later(3)],["rajoute dans ma to do list la préparation de l'ODM de Callard",later(3)],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,later(3)],
+  ];
+  return L;
+}
+function _mdBenchRun(){
+  const el=document.getElementById('md-bench'); if(!el) return; const L=_mdBenchCases(); let ok=0; const fails=[]; const t0=performance.now();
+  L.forEach(([s,chk])=>{ let p; try{ p=_mdParse(s); }catch(e){ p={kind:'erreur'}; } if(chk(p)) ok++; else fails.push([s,p]); });
+  const ms=performance.now()-t0, pct=Math.round(ok/L.length*1000)/10;
+  el.innerHTML=`<div class="md-score"><b>${pct} %</b> <span>${ok} / ${L.length} phrases comprises par le moteur de l'app · ${(ms/L.length).toFixed(1)} ms par phrase</span></div>${fails.length?`<div class="md-mut">Ratées :</div><ul class="md-ul">${fails.map(([s,p])=>`<li>« ${_bfEsc(s)} » → ${_bfEsc(p.kind)}${p.screen?' / '+p.screen:''}</li>`).join('')}</ul>`:''}<div class="md-mut">Le score avec l'IA traductrice sera mesuré quand ton script sera branché.</div>`;
+  return {ok,total:L.length,pct,fails:fails.map(f=>f[0])};
+}
+// ── Démarrage : bouton micro (dock en Bento, coin en Cockpit), raccourci Ctrl + Espace ──
+function _mdInit(){
+  const adm=_mdIsAdmin();
+  document.getElementById('fam-mardam')?.remove(); document.getElementById('md-fab')?.remove();
+  const tb=document.getElementById('tb-ai'); if(tb){ tb.textContent='🎙 '+_mdName(); tb.style.display=adm?'':'none'; }
+  if(!adm) return;
+  const row=document.getElementById('famRow');
+  if(row){ const b=document.createElement('button'); b.className='fam-btn'; b.id='fam-mardam'; b.type='button'; b.dataset.t=_mdName(); b.title=_mdName()+' — parle-moi (Ctrl + Espace)';
+    b.innerHTML=`<span class="dk-ic"><span class="dk-sq md-tile">${_MD_MIC}</span></span><span class="fi">🎙</span><span class="fl">${_bfEsc(_mdName())}</span>`; b.onclick=()=>_mdListen();
+    const first=row.querySelector('#fam-home'); row.insertBefore(b,first?first.nextSibling:row.firstChild); }
+  const f=document.createElement('button'); f.id='md-fab'; f.type='button'; f.title=_mdName()+' — parle-moi (Ctrl + Espace)'; f.innerHTML=_MD_MIC; f.onclick=()=>_mdListen(); document.body.appendChild(f);
+  try{ if(typeof _CK_ACTIONS!=='undefined'&&!_CK_ACTIONS.some(a=>a[1]==='Parler à Mardam')) _CK_ACTIONS.push(['🎙','Parler à Mardam','mardam assistant vocal voix micro parler dicter',()=>_mdListen()]); }catch(_){}
+}
+document.addEventListener('keydown',e=>{ if(e.ctrlKey&&(e.code==='Space'||e.key===' ')&&!e.altKey&&!e.metaKey){ if(!_mdIsAdmin()) return; e.preventDefault(); _mdListen(); } if(e.key==='Escape'&&document.getElementById('md-panel')?.classList.contains('on')) _mdClose(); });
+try{ _mdInit(); }catch(e){ console.warn('Mardam:',e); }
+try{ if(typeof _lsAfterLogin==='function'){ const _mdAL=_lsAfterLogin; _lsAfterLogin=function(){ const r=_mdAL.apply(this,arguments); try{ _mdInit(); }catch(_){} return r; }; } }catch(_){}
 </script>
 
 <!-- Modal confirmation formations internes -->
