@@ -2629,6 +2629,13 @@ body:not(.th-bento) .md-msg.me{background:rgba(0,210,255,.14)}
 .md-f{display:flex;align-items:center;gap:8px;margin:7px 0;flex-wrap:wrap}.md-f label{width:130px;font-size:12px;color:var(--t4,#97a3c0)}
 .md-f input:not([type=checkbox]),.md-f select{flex:1;min-width:160px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;padding:0 10px;font:inherit;font-size:12.5px}
 .md-sep{margin:14px 0 4px;font-weight:800;font-size:12px}
+.md-use-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.md-use-kpi>div{padding:9px 10px;border-radius:12px;background:rgba(142,162,255,.1)}.md-use-kpi b{display:block;font-size:19px}.md-use-kpi span{font-size:11px;color:var(--t4,#97a3c0)}
+body:not(.th-bento) .md-use-kpi>div{border-radius:8px;background:rgba(0,210,255,.07);border:1px solid rgba(0,210,255,.2)}body:not(.th-bento) .md-use-kpi b{color:#00d2ff;font-family:'JetBrains Mono',monospace}
+.md-use-left{margin:4px 0 8px}.md-use-lh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.md-use-lh b{font-size:22px;color:#5ee08f}.md-use-left.low .md-use-lh b{color:#ff7a90}
+.md-use-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin:6px 0 4px}.md-use-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5ee08f,#3fd0ff)}.md-use-left.low .md-use-bar i{background:#ff7a90}
+body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-bar i{border-radius:3px;background:linear-gradient(90deg,#00d2ff,#00e5b0)}
+.md-use-err{padding:8px 11px;border-radius:10px;background:rgba(255,90,120,.12);border:1px solid rgba(255,90,120,.35);font-size:12.5px;margin-bottom:10px}
+@media(max-width:520px){.md-use-kpi b{font-size:16px}}
 .md-score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}.md-score b{font-size:28px}.md-score span{font-size:12px;color:var(--t4,#97a3c0)}
 </style>
 </head>
@@ -29069,7 +29076,8 @@ async function _mdHandle(text,alts){
   let P=_mdParse(text);
   if(P.kind==='unknown'&&alts&&alts.length>1){ for(const a of alts.slice(1)){ const q=_mdParse(a); if(q.kind!=='unknown'){ P=q; break; } } }
   let how='local';
-  if(P.kind==='unknown'&&_mdAIready()){ _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; } }
+  if(P.kind==='unknown'&&_mdAIready()){ MD.aiErr=null; _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; }
+    else if(MD.aiErr&&['credit','key','token','nokey'].includes(MD.aiErr.k)){ const m=_MD_USE_ERR[MD.aiErr.k]; _mdMiss(text,'IA indisponible : '+m.t); _mdReply(`Je n'ai pas compris seule, et je ne peux pas demander à l'IA : <b>${m.t}</b>. ${m.d}`, m.say, [{l:'Voir le compteur',f:"goTab('ai');setTimeout(()=>_mdFlash(document.getElementById('md-use')),300)"}]); _mdLog({said:text,how:'local',label:'IA indisponible',result:m.t}); return; } }
   _mdExec(P,text,how);
 }
 function _mdPickChoice(ch,q){ const t=' '+q.n+' '; const ord=[/ (premier|premiere|1|un|le 1er) /,/ (deuxieme|second|seconde|2|deux) /,/ (troisieme|3|trois) /];
@@ -29139,10 +29147,11 @@ async function _mdAI(raw,P){
   try{
     const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
     const r=await fetch(c.gas,{method:'POST',body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(to);
-    const j=await r.json(); if(j.error) throw new Error(j.error);
+    const j=await r.json(); if(j.error){ _mdUseErr('script',j.error); throw new Error(j.error); }
+    _mdUseRec(j,c.model); if(j.status&&j.status!==200){ throw new Error('api '+j.status); }
     const txt=(j.body&&j.body.content&&j.body.content[0]&&j.body.content[0].text)||''; const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
     return _mdFromAI(JSON.parse(m[0]),an.map,P);
-  }catch(e){ console.warn('Mardam IA',e); return null; }
+  }catch(e){ if(!MD.aiErr) _mdUseErr(e&&e.name==='AbortError'?'net':'net',e&&e.message||e); console.warn('Mardam IA',e); return null; }
 }
 function _mdFromAI(o,map,P){
   const out=Object.assign({},P||{},{via:'ia'});
@@ -29158,6 +29167,66 @@ function _mdFromAI(o,map,P){
   if(o.type==='question') return Object.assign(out,{kind:'later',stage:1,what:'question'});
   if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===3?3:2,what:'action'});
   return null;
+}
+// ── Compteur IA : consommation calculée à partir de ce que renvoie chaque réponse ──
+// Tarifs publiés par Anthropic (dollars par million de tokens, relevés le 25/11/2026)
+const _MD_PRICE={haiku:{i:0.10,o:0.50,n:'Claude Haiku 5.5'},sonnet:{i:2,o:10,n:'Claude Sonnet 5.5'}};
+const _MD_USE_ERR={credit:{t:'crédits épuisés',d:'Recharge ton compte API (page Billing), puis réessaie.',say:"Je n'ai plus de crédit pour l'IA. Recharge ton compte."},
+  key:{t:'clé API refusée',d:'Vérifie la propriété ANTHROPIC_API_KEY dans ton script Google.',say:"La clé API est refusée. Vérifie ton script."},
+  token:{t:'jeton secret refusé',d:'Le jeton des réglages doit être identique à MARDAM_TOKEN dans le script.',say:"Le jeton secret ne correspond pas à celui du script."},
+  nokey:{t:'clé absente du script',d:'Ajoute la propriété ANTHROPIC_API_KEY dans ton script Google.',say:"Il manque la clé API dans le script."},
+  busy:{t:'IA saturée ou limite atteinte',d:'Réessaie dans une minute.',say:"L'IA est saturée, réessaie dans une minute."},
+  net:{t:'script injoignable',d:'Vérifie la connexion et l\'adresse du script.',say:"Je n'arrive pas à joindre le script."},
+  other:{t:'erreur de l\'IA',d:'Le détail est dans le compteur.',say:"L'IA a renvoyé une erreur."}};
+function _mdUse(){ _mdCfg(); const u=S.mardam.usage=S.mardam.usage&&typeof S.mardam.usage==='object'?S.mardam.usage:{}; if(!u.days||typeof u.days!=='object') u.days={}; if(!('loaded' in u)) u.loaded=null; if(!('alert' in u)) u.alert=1; return u; }
+function _mdUseErr(k,raw){ const u=_mdUse(); const map={token:'token','cle-api-absente':'nokey'}; const kk=map[k]||k; MD.aiErr={k:kk,raw:String(raw||'')}; u.lastErr={at:new Date().toISOString(),k:kk,raw:String(raw||'').slice(0,160)}; try{ save(); }catch(_){} }
+function _mdUseRec(j,model){
+  const u=_mdUse(), b=j&&j.body||{}, us=b.usage||{};
+  if(j&&j.status&&j.status!==200){ const e=b.error||{}, msg=String(e.message||'');
+    const k=/credit balance|crédit|billing/i.test(msg)?'credit':e.type==='authentication_error'||j.status===401?'key':(e.type==='rate_limit_error'||e.type==='overloaded_error'||j.status===429||j.status===529)?'busy':'other';
+    _mdUseErr(k,(e.type||j.status)+' '+msg); return; }
+  const mk=/sonnet/.test(b.model||'')?'sonnet':/haiku/.test(b.model||'')?'haiku':(model==='sonnet'?'sonnet':'haiku'), pr=_MD_PRICE[mk];
+  const it=(us.input_tokens||0)+(us.cache_read_input_tokens||0)+(us.cache_creation_input_tokens||0), ot=us.output_tokens||0;
+  const cost=it/1e6*pr.i+ot/1e6*pr.o, ds=fmt(new Date());
+  const d=u.days[ds]=u.days[ds]||{n:0,i:0,o:0,c:0}; d.n++; d.i+=it; d.o+=ot; d.c+=cost; d[mk]=(d[mk]||0)+1;
+  const keys=Object.keys(u.days).sort(); if(keys.length>400) keys.slice(0,keys.length-400).forEach(k=>delete u.days[k]);
+  u.lastOk=new Date().toISOString(); u.lastErr=null; try{ save(); }catch(_){}
+  const r=_mdUseLeft(); if(r!=null&&r<u.alert&&u.alertDay!==ds){ u.alertDay=ds; try{ save(); }catch(_){} toast(`⚠ Mardam : il reste environ ${_mdUsd(r)} de crédit IA`); }
+  const el=document.getElementById('md-use'); if(el) _mdRenderUse();
+}
+function _mdUsd(v){ v=+v||0; return (v<0.01&&v>0?v.toFixed(4):v.toFixed(2)).replace('.',',')+' $'; }
+function _mdUseSum(from,to){ const u=_mdUse(); let r={n:0,i:0,o:0,c:0}; Object.entries(u.days).forEach(([k,d])=>{ if((!from||k>=from)&&(!to||k<=to)){ r.n+=d.n; r.i+=d.i; r.o+=d.o; r.c+=d.c; } }); return r; }
+function _mdUseLeft(){ const u=_mdUse(); if(!u.loaded||!(u.loaded.amount>0)) return null; return u.loaded.amount-_mdUseSum(u.loaded.date||'').c; }
+function _mdUseSetLoaded(){ const a=parseFloat(String(document.getElementById('md-use-amt').value).replace(',','.')), d=document.getElementById('md-use-date').value||fmt(new Date());
+  const u=_mdUse(); u.loaded=a>0?{amount:a,date:d}:null; u.alertDay=null; save(); _mdRenderUse(); toast(a>0?'Montant chargé enregistré':'Montant effacé'); }
+function _mdRenderUse(){
+  const el=document.getElementById('md-use'); if(!el) return; const u=_mdUse(), c=_mdCfg(), now=new Date();
+  const m0=fmt(new Date(now.getFullYear(),now.getMonth(),1)), M=_mdUseSum(m0), T=_mdUseSum(fmt(now),fmt(now)), left=_mdUseLeft();
+  const pct=left==null?0:Math.max(0,Math.min(100,left/u.loaded.amount*100)), low=left!=null&&left<u.alert;
+  const per=M.n?M.c/M.n:(_MD_PRICE[c.model]||_MD_PRICE.haiku).i*600/1e6+(_MD_PRICE[c.model]||_MD_PRICE.haiku).o*100/1e6;
+  const months=[...Array(6)].map((_,k)=>{ const d=new Date(now.getFullYear(),now.getMonth()-k,1), e=new Date(d.getFullYear(),d.getMonth()+1,0); return {l:_MD_ML[d.getMonth()]+(d.getFullYear()!==now.getFullYear()?' '+d.getFullYear():''),s:_mdUseSum(fmt(d),fmt(e))}; }).filter((x,k)=>k===0||x.s.n);
+  const err=u.lastErr?_MD_USE_ERR[u.lastErr.k]||_MD_USE_ERR.other:null;
+  el.innerHTML=`${err?`<div class="md-use-err">⚠ Dernier appel : <b>${err.t}</b> — ${err.d}<br><small>${new Date(u.lastErr.at).toLocaleString('fr-FR')}</small></div>`:''}
+  <div class="md-use-kpi"><div><b>${M.n}</b><span>appel${M.n>1?'s':''} ce mois</span></div><div><b>${_mdUsd(M.c)}</b><span>coût estimé ce mois</span></div><div><b>${T.n}</b><span>aujourd'hui</span></div></div>
+  <div class="md-use-left ${low?'low':''}">${left==null?`<div class="md-mut">Indique ci-dessous le montant que tu as chargé : je calcule ce qu'il te reste.</div>`:`<div class="md-use-lh"><span>Solde estimé</span><b>${_mdUsd(left)}</b><span class="md-mut">sur ${_mdUsd(u.loaded.amount)} chargés le ${parseLocal(u.loaded.date).toLocaleDateString('fr-FR')}</span></div><div class="md-use-bar"><i style="width:${pct}%"></i></div>
+    <div class="md-mut">≈ ${Math.max(0,Math.floor(left/per)).toLocaleString('fr-FR')} appels restants au coût moyen de ${_mdUsd(per)} par appel${low?' · <b style="color:#ff7a90">solde bas</b>':''}</div>`}</div>
+  <div class="md-f"><label>Montant chargé ($)</label><input id="md-use-amt" inputmode="decimal" placeholder="ex. 10" value="${u.loaded?String(u.loaded.amount).replace('.',','):''}" style="max-width:110px"><input id="md-use-date" type="date" value="${u.loaded?u.loaded.date:fmt(now)}" style="max-width:160px"><button type="button" class="md-b sm p" onclick="_mdUseSetLoaded()">Enregistrer</button></div>
+  <div class="md-f"><label>Alerte sous</label><select onchange="_mdUse().alert=+this.value;_mdUse().alertDay=null;save();_mdRenderUse()">${[0.5,1,2,5].map(v=>`<option value="${v}" ${u.alert===v?'selected':''}>${_mdUsd(v)}</option>`).join('')}</select></div>
+  ${months.length>1||M.n?`<table class="md-tb" style="margin-top:6px"><tr><th>Mois</th><th>Appels</th><th>Tokens envoyés / reçus</th><th>Coût estimé</th></tr>${months.map(x=>`<tr><td>${x.l}</td><td>${x.s.n}</td><td>${x.s.i.toLocaleString('fr-FR')} / ${x.s.o.toLocaleString('fr-FR')}</td><td>${_mdUsd(x.s.c)}</td></tr>`).join('')}</table>`:''}
+  <div class="md-acts"><button type="button" class="md-b sm" onclick="window.open('https://platform.claude.com/settings/billing','_blank','noopener')">↗ Voir mon solde officiel</button></div>
+  <div class="md-mut" style="margin-top:8px">Estimation calculée par l'app avec les tarifs publiés (${_MD_PRICE[c.model==='sonnet'?'sonnet':'haiku'].n} : ${String(_MD_PRICE[c.model==='sonnet'?'sonnet':'haiku'].i).replace('.',',')} $ / ${String(_MD_PRICE[c.model==='sonnet'?'sonnet':'haiku'].o).replace('.',',')} $ par million de tokens envoyés / reçus). Le chiffre qui fait foi est sur ta page Billing. Les appels faits depuis un autre appareil s'ajoutent ici après la synchro.</div>`;
+}
+// Test complet : un vrai petit appel à l'IA (coût ≈ 0,0001 $) pour vérifier la clé et les crédits
+async function _mdAITestFull(){
+  const c=_mdCfg(), el=document.getElementById('md-aitest'); if(el) el.textContent='Test complet en cours…';
+  if(!c.gas){ if(el) el.textContent='Colle d\'abord l\'adresse du script.'; return; }
+  MD.aiErr=null;
+  try{ const r=await fetch(c.gas,{method:'POST',body:JSON.stringify({token:c.token,model:c.model,system:'Réponds uniquement : OK',messages:[{role:'user',content:'Test de liaison'}]})}); const j=await r.json();
+    if(j.error){ _mdUseErr(j.error==='token'?'token':j.error==='cle-api-absente'?'nokey':'other',j.error); }
+    else { _mdUseRec(j,c.model); }
+    const e=MD.aiErr; if(el) el.textContent=e?'✕ '+(_MD_USE_ERR[e.k]||_MD_USE_ERR.other).t+' — '+(_MD_USE_ERR[e.k]||_MD_USE_ERR.other).d:'✓ Tout fonctionne : script, jeton, clé API et crédits ('+((j.body&&j.body.model)||c.model)+')';
+  }catch(err){ _mdUseErr('net',err.message||err); if(el) el.textContent='✕ Impossible de joindre le script ('+(err.message||err)+')'; }
+  _mdRenderUse();
 }
 async function _mdAITest(){
   const c=_mdCfg(); const el=document.getElementById('md-aitest'); if(el) el.textContent='Test en cours…';
@@ -29177,10 +29246,11 @@ function _mdRenderTab(){
     <div class="md-col"><section class="gc md-card"><div class="md-ch">🧪 Banc d'essai <button type="button" class="md-b p sm" onclick="_mdBenchRun()">Lancer</button></div><div id="md-bench"><div class="md-mut">Teste toutes les phrases connues et donne le taux de réussite mesuré.</div></div></section>
     <section class="gc md-card"><div class="md-ch">📓 Journal</div><div id="md-jr"></div></section>
     <section class="gc md-card"><div class="md-ch">🙊 Phrases non comprises</div><div id="md-miss"></div></section>
+    <section class="gc md-card" id="md-use-card"><div class="md-ch">💳 Compteur IA</div><div id="md-use"></div></section>
     <section class="gc md-card"><div class="md-ch">⚙️ Réglages</div><div id="md-set"></div></section></div></div></div>`;
   }
   const t=document.getElementById('md-ttl'); if(t) t.textContent=_mdName();
-  _mdRenderHist(); _mdRenderJournal(); _mdRenderMiss(); _mdRenderSettings();
+  _mdRenderHist(); _mdRenderJournal(); _mdRenderMiss(); _mdRenderUse(); _mdRenderSettings();
 }
 function _mdRenderHist(){ const el=document.getElementById('md-hist'); if(!el) return;
   el.innerHTML=MD.hist.length?MD.hist.map(h=>`<div class="md-msg ${h.who}">${h.html}</div>`).join(''):`<div class="md-mut">Appuie sur 🎙 et dis par exemple « ouvre le planning de la semaine prochaine ».</div>`; el.scrollTop=el.scrollHeight; }
@@ -29194,11 +29264,11 @@ function _mdRenderSettings(){ const el=document.getElementById('md-set'); if(!el
   <div class="md-f"><label>Son</label><button type="button" class="md-b sm ${c.mute?'':'p'}" onclick="_mdToggleMute()">${c.mute?'🔇 Coupé':'🔊 Activé'}</button></div>
   <div class="md-f"><label>Dictée sur PC</label><select onchange="_mdCfg().dict=this.value;save()"><option value="browser" ${c.dict==='browser'?'selected':''}>Celle du navigateur (Edge : Microsoft)</option><option value="local" disabled>Dictée locale sur le PC — arrive à une prochaine étape</option></select></div>
   <div class="md-sep">IA traductrice (seulement quand je ne suis pas sûr de moi)</div>
-  <div class="md-f"><label>Activée</label><input type="checkbox" ${c.ai?'checked':''} onchange="_mdCfg().ai=this.checked;save()"></div>
+  <div class="md-f"><label>IA</label><button type="button" class="md-b sm ${c.ai?'p':''}" onclick="_mdCfg().ai=!_mdCfg().ai;save();_mdRenderSettings()">${c.ai?'✓ Activée':'✕ Désactivée'}</button></div>
   <div class="md-f"><label>Adresse du script</label><input placeholder="https://script.google.com/macros/s/…/exec" value="${_bfEsc(c.gas)}" onchange="_mdCfg().gas=this.value.trim();save()"></div>
   <div class="md-f"><label>Jeton secret</label><input type="password" value="${_bfEsc(c.token)}" onchange="_mdCfg().token=this.value.trim();save()"></div>
   <div class="md-f"><label>Modèle</label><select onchange="_mdCfg().model=this.value;save()"><option value="haiku" ${c.model==='haiku'?'selected':''}>Claude Haiku 5.5 (le moins cher)</option><option value="sonnet" ${c.model==='sonnet'?'selected':''}>Claude Sonnet 5.5 (le plus fin)</option></select></div>
-  <div class="md-f"><label></label><button type="button" class="md-b sm" onclick="_mdAITest()">Tester la connexion</button> <span id="md-aitest" class="md-mut"></span></div>
+  <div class="md-f"><label></label><button type="button" class="md-b sm" onclick="_mdAITest()">Tester la connexion</button><button type="button" class="md-b sm p" onclick="_mdAITestFull()" title="Envoie un vrai petit message à l'IA (≈ 0,0001 $)">Test complet</button> <span id="md-aitest" class="md-mut"></span></div>
   <div class="md-mut">Seule ta phrase part, avec les noms et MSN remplacés par des codes. Ni fichier, ni planning, ni liste du personnel.</div>`; }
 // ── Banc d'essai : phrases + résultat attendu, mesuré sur les données réelles ──
 function _mdBenchCases(){
