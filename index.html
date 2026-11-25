@@ -28926,8 +28926,8 @@ const _MD_CATW=[['technicien',/ techniciens?| mecanos?| mecaniciens?/],['chef',/
 const _MD_DEF={name:'Mardam',voice:'',mute:false,verbose:false,dict:'browser',ai:true,gas:'',token:'',model:'haiku'};
 function _mdCfg(){ if(!S.mardam||typeof S.mardam!=='object') S.mardam={}; S.mardam.cfg=Object.assign({},_MD_DEF,S.mardam.cfg||{}); if(!Array.isArray(S.mardam.journal)) S.mardam.journal=[]; if(!Array.isArray(S.mardam.misses)) S.mardam.misses=[]; return S.mardam.cfg; }
 function _mdName(){ return (_mdCfg().name||'Mardam').trim()||'Mardam'; }
-function _mdLog(e){ _mdCfg(); S.mardam.journal.unshift(Object.assign({at:new Date().toISOString()},e)); if(S.mardam.journal.length>300) S.mardam.journal.length=300; try{ save(); }catch(_){} }
-function _mdMiss(said,why){ _mdCfg(); if(!said) return; if(!S.mardam.misses.some(m=>m.said===said)) S.mardam.misses.unshift({at:new Date().toISOString(),said,why:why||''}); if(S.mardam.misses.length>200) S.mardam.misses.length=200; try{ save(); }catch(_){} }
+function _mdLog(e){ _mdCfg(); if(MD.lastAI&&!e.ai){ e.ai=MD.lastAI; MD.lastAI=null; } S.mardam.journal.unshift(Object.assign({at:new Date().toISOString()},e)); if(S.mardam.journal.length>300) S.mardam.journal.length=300; try{ save(); }catch(_){} try{ _mdRenderJournal(); }catch(_){} }
+function _mdMiss(said,why){ _mdCfg(); if(!said) return; if(!S.mardam.misses.some(m=>m.said===said)) S.mardam.misses.unshift({at:new Date().toISOString(),said,why:why||''}); if(S.mardam.misses.length>200) S.mardam.misses.length=200; try{ save(); }catch(_){} try{ _mdRenderMiss(); }catch(_){} }
 const MD={hist:[],pending:null,ctx:{last:null,at:0},listening:false,rec:null,busy:false};
 const _MD_JL=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'], _MD_ML=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.getDate()} ${_MD_ML[d.getMonth()]}${d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():''}`; }
@@ -29130,26 +29130,38 @@ function _mdAnon(raw,P){
   caps.forEach(w=>{ const nw=_mdNorm(w); if(!_MD_STOP.has(nw)){ const k=T.indexOf(nw); if(k>=0){ const code='X'+(Object.keys(map).length+1); map[code]={type:'x',words:nw}; T[k]='['+code+']'; } } });
   return {text:T.join(' '),map};
 }
-const _MD_AI_SYS=`Tu traduis les demandes orales d'un responsable de production aéronautique en ordres JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], [A2], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte autour.
-Formats possibles :
-{"type":"nav","screen":"<écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null"}
-  écrans : weekly (planning hebdo), master, briefw (brief de la semaine), briefj (brief du jour), aff (affectations du jour), quiou (qui est où), slot (hangar), stockage, recycling, airbus, personnel, fiche (fiche d'une personne), certif, formations, autorisations, todo, checklist, kpi, programme, chantiers, simulation, notice, dashboard, forecast (prévision 3 mois), tv, aeromargin, docairbus, docatr, docboeing, mardam
+const _MD_AI_HINT={dashboard:"page d'accueil, tableau de bord",weekly:'planning de la semaine, planning hebdo, effectifs semaine par semaine',master:"vue d'ensemble du mois ou de l'année, planning mensuel",briefw:'récap à envoyer au personnel pour la semaine',briefj:'récap du jour, point du matin',aff:"affectations du jour par chantier, qui travaille sur quel avion aujourd'hui",quiou:"où sont les gens, qui est où aujourd'hui",tv:'affichage écran atelier',slot:'positions des avions dans le hangar, plan du hangar',stockage:'avions en stockage',recycling:'avions en recyclage / démantèlement',airbus:'activité Airbus Part 21',personnel:'liste du personnel, effectifs, annuaire',fiche:"fiche d'une personne précise (mettre person)",certif:'certifying staff, habilitations B1 B2',formations:'formations, sessions de formation, échéances de formation',autorisations:'autorisations, droits, habilitations internes',todo:'liste de tâches, to-do',checklist:'check-list',kpi:'chiffres clés, indicateurs, statistiques, KPI',programme:"programme d'activité, charge prévue",chantiers:'liste des chantiers / avions en cours',simulation:'simulation de charge',notice:"mode d'emploi, aide de l'application",forecast:'prévision à 3 mois',aeromargin:'calcul MPA moteurs',docairbus:'documentation Airbus',docatr:'documentation ATR',docboeing:'documentation Boeing',mardam:'page de l’assistant Mardam (journal, réglages)'};
+function _mdAISys(){
+  const scr=[..._MD_SCREENS.map(x=>x[0]),'fiche'].filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${k} = ${((_MD_SCREENS.find(x=>x[0]===k)||[])[2]||'Fiche personnel')}${_MD_AI_HINT[k]?' ('+_MD_AI_HINT[k]+')':''}`).join('\n');
+  return `Tu traduis les demandes orales (souvent familières, mal transcrites par la dictée) d'un responsable de production aéronautique en UN ordre JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte ni balises autour. Choisis l'écran le plus proche du sens, même si les mots sont différents.
+Formats :
+{"type":"nav","screen":"<code écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null"}
 {"type":"filter","cats":["technicien","chef","interimaire","expert","alternant","responsable","sheetmetal","prestataire"] ou "all"}
 {"type":"control","act":"yes|no|undo|mute|unmute|help|reset|journal"}
-{"type":"question","topic":"résumé court"}
-{"type":"action","stage":2 ou 3,"what":"résumé court"}  (stage 2 = planning, absences, formations, visites médicales ; stage 3 = hangar, to-do, pense-bête, intérim, création de profil, chantiers, brief)
-{"type":"unknown"}
-Les dates sont calculées à partir d'aujourd'hui : {TODAY}. « la semaine prochaine » = lundi de la semaine suivante.`;
+{"type":"question","topic":"résumé court"}   (toute demande d'information : qui, où, quand, combien…)
+{"type":"action","stage":2 ou 3,"what":"résumé court"}  (stage 2 = planning, absences, formations, visites médicales ; stage 3 = hangar, to-do, intérim, création de profil, chantiers, brief)
+{"type":"unknown"}  (seulement si la demande n'a vraiment aucun rapport)
+Écrans (code = nom (sens)) :
+${scr}
+Exemples :
+« fais moi apparaitre l ecran des chiffres cles » → {"type":"nav","screen":"kpi","date":null,"month":null,"person":null}
+« remonte moi la vue d ensemble du mois de fevrier » → {"type":"nav","screen":"master","date":null,"month":"<février à venir AAAA-02>","person":null}
+« balance moi la page de [P1] » → {"type":"nav","screen":"fiche","date":null,"month":null,"person":"P1"}
+« je veux voir que les gars en interim » → {"type":"filter","cats":["interimaire"]}
+« qui bosse sur [A1] demain » → {"type":"question","topic":"équipe de [A1] demain"}
+Les dates se calculent à partir d'aujourd'hui : {TODAY}. « la semaine prochaine » = lundi de la semaine suivante ; un mois sans année = sa prochaine occurrence.`;
+}
+
 async function _mdAI(raw,P){
   const c=_mdCfg(); const an=_mdAnon(raw,P); const today=_mdToday();
   const hist=MD.hist.slice(-7,-1).filter(h=>h.who==='me').slice(-3).map(h=>_mdAnon(h.html.replace(/&[a-z]+;/g,' '),_mdParse(h.html)).text);
-  const body={token:c.token,model:c.model,system:_MD_AI_SYS.replace('{TODAY}',`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
+  const body={token:c.token,model:c.model,system:_mdAISys().replace('{TODAY}',`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
   try{
     const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
     const r=await fetch(c.gas,{method:'POST',body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(to);
     const j=await r.json(); if(j.error){ _mdUseErr('script',j.error); throw new Error(j.error); }
     _mdUseRec(j,c.model); if(j.status&&j.status!==200){ throw new Error('api '+j.status); }
-    const txt=(j.body&&j.body.content&&j.body.content[0]&&j.body.content[0].text)||''; const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
+    const txt=(j.body&&j.body.content&&j.body.content[0]&&j.body.content[0].text)||''; MD.lastAI=txt.replace(/\s+/g,' ').trim().slice(0,300)||'(vide)'; const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
     return _mdFromAI(JSON.parse(m[0]),an.map,P);
   }catch(e){ if(!MD.aiErr) _mdUseErr(e&&e.name==='AbortError'?'net':'net',e&&e.message||e); console.warn('Mardam IA',e); return null; }
 }
@@ -29194,7 +29206,7 @@ function _mdUseRec(j,model){
   const r=_mdUseLeft(); if(r!=null&&r<u.alert&&u.alertDay!==ds){ u.alertDay=ds; try{ save(); }catch(_){} toast(`⚠ Mardam : il reste environ ${_mdUsd(r)} de crédit IA`); }
   const el=document.getElementById('md-use'); if(el) _mdRenderUse();
 }
-function _mdUsd(v){ v=+v||0; return (v<0.01&&v>0?v.toFixed(4):v.toFixed(2)).replace('.',',')+' $'; }
+function _mdUsd(v){ v=+v||0; return (v>0&&v<0.0001?'< 0,0001':v>0&&v<0.01?v.toFixed(4):v.toFixed(2)).replace('.',',')+' $'; }
 function _mdUseSum(from,to){ const u=_mdUse(); let r={n:0,i:0,o:0,c:0}; Object.entries(u.days).forEach(([k,d])=>{ if((!from||k>=from)&&(!to||k<=to)){ r.n+=d.n; r.i+=d.i; r.o+=d.o; r.c+=d.c; } }); return r; }
 function _mdUseLeft(){ const u=_mdUse(); if(!u.loaded||!(u.loaded.amount>0)) return null; return u.loaded.amount-_mdUseSum(u.loaded.date||'').c; }
 function _mdUseSetLoaded(){ const a=parseFloat(String(document.getElementById('md-use-amt').value).replace(',','.')), d=document.getElementById('md-use-date').value||fmt(new Date());
@@ -29255,7 +29267,7 @@ function _mdRenderTab(){
 function _mdRenderHist(){ const el=document.getElementById('md-hist'); if(!el) return;
   el.innerHTML=MD.hist.length?MD.hist.map(h=>`<div class="md-msg ${h.who}">${h.html}</div>`).join(''):`<div class="md-mut">Appuie sur 🎙 et dis par exemple « ouvre le planning de la semaine prochaine ».</div>`; el.scrollTop=el.scrollHeight; }
 function _mdRenderJournal(){ const el=document.getElementById('md-jr'); if(!el) return; const L=(S.mardam?.journal||[]).slice(0,40);
-  el.innerHTML=L.length?`<table class="md-tb"><tr><th>Quand</th><th>Ta phrase</th><th>Compris</th><th></th></tr>${L.map(j=>{ const d=new Date(j.at); return `<tr><td>${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${_bfEsc(j.said)}</td><td>${_bfEsc(j.label||'—')}${j.how==='ia'?' <span class="md-tag">IA</span>':''}</td><td class="md-r ${j.result==='ok'?'ok':j.result==='pas compris'?'ko':''}">${_bfEsc(j.result)}</td></tr>`; }).join('')}</table>`:'<div class="md-mut">Rien pour l\'instant.</div>'; }
+  el.innerHTML=L.length?`<table class="md-tb"><tr><th>Quand</th><th>Ta phrase</th><th>Compris</th><th></th></tr>${L.map(j=>{ const d=new Date(j.at); return `<tr><td>${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${_bfEsc(j.said)}</td><td>${_bfEsc(j.label||'—')}${j.how==='ia'?' <span class="md-tag">IA</span>':''}${j.ai?`<div class="md-mut" title="Réponse brute de l'IA">IA → ${_bfEsc(String(j.ai).slice(0,140))}</div>`:''}</td><td class="md-r ${j.result==='ok'?'ok':j.result==='pas compris'?'ko':''}">${_bfEsc(j.result)}</td></tr>`; }).join('')}</table>`:'<div class="md-mut">Rien pour l\'instant.</div>'; }
 function _mdRenderMiss(){ const el=document.getElementById('md-miss'); if(!el) return; const L=(S.mardam?.misses||[]).slice(0,30);
   el.innerHTML=L.length?`<div class="md-mut">Je les apprendrai à la prochaine mise à jour.</div><ul class="md-ul">${L.map((m,i)=>`<li>« ${_bfEsc(m.said)} » <button type="button" class="md-x" title="Retirer" onclick="S.mardam.misses.splice(${i},1);save();_mdRenderMiss()">✕</button></li>`).join('')}</ul>`:'<div class="md-mut">Aucune pour l\'instant.</div>'; }
 function _mdRenderSettings(){ const el=document.getElementById('md-set'); if(!el) return; const c=_mdCfg(); const vs=_mdVoices(); const cur=_mdVoice();
