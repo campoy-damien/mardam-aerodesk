@@ -2631,6 +2631,10 @@ body:not(.th-bento) .md-msg.me{background:rgba(0,210,255,.14)}
 .md-sep{margin:14px 0 4px;font-weight:800;font-size:12px}
 .md-b.bad{border-color:rgba(255,122,144,.5);color:#ff9aac}
 .md-warn{color:#ffb45c}
+.md-jwrap{max-height:62vh;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+.md-jtb{table-layout:fixed;width:100%}.md-jtb td{overflow-wrap:anywhere;word-break:break-word;line-height:1.35}.md-jtb th{position:sticky;top:0;z-index:1;background:var(--bg2,#151b2e)}
+body:not(.th-bento) .md-jtb th{background:#0b1626}
+.md-jtb td:first-child{font-size:11px;color:var(--t4,#97a3c0)}.md-jtb td .md-mut{font-size:10.5px;margin-top:2px}
 .md-badbox{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,122,144,.08);border:1px solid rgba(255,122,144,.35)}body:not(.th-bento) .md-badbox{border-radius:10px}
 .md-badq{font-size:13px;font-weight:700;margin-bottom:8px}.md-badbox .md-mut{margin-top:6px}
 #md-bad-in,.md-sc-add input{flex:1;min-width:0;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;padding:0 14px;font:500 13px inherit;outline:none}
@@ -28966,8 +28970,9 @@ function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.tr
 const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur|apparaitre|remonte|remonter|balance|ramene|sors moi|fais voir) /;
 const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer)( |$)/;
 const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
+function _mdDictFix(n){ return (' '+n+' ').replace(/ (formations?) (et oui|e oui|eh oui|e wis|ewi|ewiz|et wiz|et ouïs?|i wis) /g,' $1 ewis ').trim(); }
 function _mdParse(raw){
-  const n=_mdNorm(raw), T=n.replace(/\?/g,' ').split(' ').filter(Boolean), nn=' '+T.join(' ')+' ';
+  const n=_mdDictFix(_mdNorm(raw)), T=n.replace(/\?/g,' ').split(' ').filter(Boolean), nn=' '+T.join(' ')+' ';
   const P={raw,n,T,kind:'unknown'};
   if(!T.length) return P;
   // Contrôle
@@ -29116,7 +29121,10 @@ async function _mdHandle(text,alts){
     if(q.kind==='ctl'&&q.act==='yes'&&pend.run){ MD.pending=null; pend.run(); return; }
     if(q.kind==='ctl'&&q.act==='no'){ MD.pending=null; _mdReply("D'accord, j'annule. Rien n'a été changé.",'D\'accord, j\'annule.',[],{noBad:true}); _mdLog({said:text,how:'local',label:pend.label||'',result:'annulé'}); return; }
     MD.pending=null;
-    if(pend.complete&&!(q.kind==='ctl'&&['stop','mute','reset','help'].includes(q.act))&&!(q.kind==='act'||q.kind==='nav'&&q.T.length>4||q.kind==='q')){ text=pend.base+' '+text; alts=null; }
+    // correction pendant une confirmation : « je te parlais de la formation EWIS », « non, plutôt l'après-midi »
+    if(pend.run&&pend.base&&/^(non )?(je te parlais|je parlais|je voulais dire|plutot|c est plutot|pas ca|je veux dire|en fait)/.test(q.T.join(' '))){ text=pend.base+' '+text.replace(/^(non[ ,]*)?(je te parlais (de|du|des)|je parlais (de|du|des)|je voulais dire|je veux dire|plut[oô]t|c'est plut[oô]t|pas [çc]a|en fait)[ ,]*/i,''); alts=null; }
+    const newCmd=q.kind==='act'&&q.ppl&&q.ppl.length&&_MD_ACTV.test(q.T.join(' '))||q.kind==='nav'&&_MD_NAVV.test(' '+q.T.join(' ')+' ')&&q.T.length>3||_MD_QW.test(q.T.join(' '))||(q.kind==='ctl'&&['stop','mute','reset','help','undo'].includes(q.act));
+    if(pend.complete&&!newCmd){ text=pend.base+' '+text.replace(/^(je te parlais (de|du|des)|je parlais (de|du|des)|je voulais dire|c est|c'est|plutot|plutôt)\s+/i,''); alts=null; }
   }
   // Raccourci personnel (« point prod » = « qui est absent cette semaine »)
   const orig=text, sc=_mdShortFind(text); let said=text;
@@ -29127,7 +29135,7 @@ async function _mdHandle(text,alts){
   if(P.kind==='unknown'&&alts&&alts.length>1){ for(const a of alts.slice(1)){ const q=_mdParse(a); if(q.kind!=='unknown'){ P=q; break; } } }
   let how='local';
   if(P.kind==='unknown'&&_mdAIready()){ MD.aiErr=null; _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; }
-    else if(MD.aiErr&&['credit','key','token','nokey'].includes(MD.aiErr.k)){ const m=_MD_USE_ERR[MD.aiErr.k]; _mdMiss(text,'IA indisponible : '+m.t); _mdReply(`Je n'ai pas compris seule, et je ne peux pas demander à l'IA : <b>${m.t}</b>. ${m.d}`, m.say, [{l:'Voir le compteur',fn:()=>{ goTab('ai'); setTimeout(()=>_mdFlash(document.getElementById('md-use')),300); }}]); _mdLog({said:text,how:'local',label:'IA indisponible',result:m.t}); return; } }
+    else if(MD.aiErr&&['credit','key','token','nokey','trunc'].includes(MD.aiErr.k)){ const m=_MD_USE_ERR[MD.aiErr.k]; _mdMiss(text,'IA indisponible : '+m.t); _mdReply(`Je n'ai pas compris seule, et je ne peux pas demander à l'IA : <b>${m.t}</b>. ${m.d}`, m.say, [{l:'Voir le compteur',fn:()=>{ goTab('ai'); setTimeout(()=>_mdFlash(document.getElementById('md-use')),300); }}]); _mdLog({said:text,how:'local',label:'IA indisponible',result:m.t}); return; } }
   _mdExec(P,said,how);
 }
 function _mdPickChoice(ch,q){ const t=' '+q.n+' '; const ord=[/ (premier|premiere|1|un|le 1er) /,/ (deuxieme|second|seconde|2|deux) /,/ (troisieme|3|trois) /];
@@ -29228,6 +29236,7 @@ async function _mdAI(raw,P,opt){ opt=opt||{};
     const blocks=(j.body&&Array.isArray(j.body.content))?j.body.content:[];
     const txt=blocks.filter(x=>x&&x.type==='text'&&x.text).map(x=>x.text).join('\n');
     MD.lastAI=txt.replace(/\s+/g,' ').trim().slice(0,300)||`(vide · arrêt : ${j.body&&j.body.stop_reason||'?'} · blocs : ${blocks.map(x=>x&&x.type).join(',')||'aucun'})`;
+    if(!txt.trim()&&j.body&&j.body.stop_reason==='max_tokens'){ _mdUseErr('trunc','réflexion trop longue (max_tokens)'); return null; }
     if(!txt.trim()&&!opt.retry) return _mdAI(raw,P,{retry:true});   // réponse vide : un seul nouvel essai
     const m=txt.match(/\{[\s\S]*\}/); if(!m) return null;
     return _mdFromAI(JSON.parse(m[0]),an.map,P);
@@ -29281,6 +29290,7 @@ const _MD_USE_ERR={credit:{t:'crédits épuisés',d:'Recharge ton compte API (pa
   nokey:{t:'clé absente du script',d:'Ajoute la propriété ANTHROPIC_API_KEY dans ton script Google.',say:"Il manque la clé API dans le script."},
   busy:{t:'IA saturée ou limite atteinte',d:'Réessaie dans une minute.',say:"L'IA est saturée, réessaie dans une minute."},
   net:{t:'script injoignable',d:'Vérifie la connexion et l\'adresse du script.',say:"Je n'arrive pas à joindre le script."},
+  trunc:{t:'réponse de l\'IA coupée',d:'Mets à jour ton script « Mardam relais » avec la nouvelle version (réflexion désactivée, réponse plus longue autorisée).',say:"La réponse de l'IA a été coupée. Il faut mettre à jour le script."},
   other:{t:'erreur de l\'IA',d:'Le détail est dans le compteur.',say:"L'IA a renvoyé une erreur."}};
 function _mdUse(){ _mdCfg(); const u=S.mardam.usage=S.mardam.usage&&typeof S.mardam.usage==='object'?S.mardam.usage:{}; if(!u.days||typeof u.days!=='object') u.days={}; if(!('loaded' in u)) u.loaded=null; if(!('alert' in u)) u.alert=1; return u; }
 function _mdUseErr(k,raw){ const u=_mdUse(); const map={token:'token','cle-api-absente':'nokey'}; const kk=map[k]||k; MD.aiErr={k:kk,raw:String(raw||'')}; u.lastErr={at:new Date().toISOString(),k:kk,raw:String(raw||'').slice(0,160)}; try{ save(); }catch(_){} }
@@ -29348,7 +29358,7 @@ const _MDQ_PROD=new Set(['technicien','interimaire','sheetmetal','chef','expert'
 const _MDQ_LBL={form_next:'prochaine formation',form_who:'qui part en formation',form_person:'formations d\'une personne',form_exp:'formations qui expirent',aut_person:'autorisations d\'une personne',aut_exp:'autorisations qui expirent',
   where:'où est quelqu\'un',who_on:'équipe d\'un avion',count:'combien on est',present:'qui travaille',free:'qui est libre',absent:'qui est absent',back:'quand revient quelqu\'un',p_abs:'absences d\'une personne',
   contract:'fin de contrat',int_end:'fins d\'intérim',int_start:'arrivées d\'intérimaires',pos:'position hangar',msn_hangar:'avion au hangar',hangar_day:'occupation hangar',chef:'chef d\'équipe',resp:'responsable',msn_count:'effectif d\'un avion',ch_list:'chantiers en cours',
-  any_exp:'formations et autorisations qui expirent',any_person:'échéances d\'une personne',dispo:'disponibles Part 145',
+  any_exp:'formations et autorisations qui expirent',any_person:'échéances d\'une personne',dispo:'disponibles Part 145',need:'besoin en mécanos de la semaine',
   vm_person:'visite médicale d\'une personne',vm_list:'visites médicales',todo:'to-do',under:'sous-effectif',hours:'jours travaillés'};
 function _mdqCell(pid,ds,h){ return (S.planning||{})[`${pid}_${ds}_${h}`]||null; }
 function _mdqStaff(ds){ return (S.personnel||[]).filter(p=>!p.archived&&p.actif!==false&&(!ds||_enContrat(p,ds))); }
@@ -29452,6 +29462,7 @@ function _mdQDetect(P){
   if(per&&has(/ (conges?|vacances|absent|absente|absences?|malade|maladie|off|arret) /)) return {i:'p_abs'};
   if(has(/ (absents?|absentes?|absences?|en conges?|conges|vacances|malades?|maladie|arrets?|pas la|off|manquants?|manque a l appel|manquent a l appel|pas venus?) /)) return {i:'absent'};
   if(per&&has(/ (ou est|ou sera|ou etait|il est ou|elle est ou|est ou|ou bosse|ou travaille|que fait|qu est ce que fait|qu est ce qu il fait|qu est ce qu elle fait|fait quoi|sur quoi|affecte|occupe|il fait|elle fait|planning de|ou il|ou elle) /)) return {i:'where'};
+  if((has(/ (besoins?|la charge|charge de travail) /)||has(/ il (me |nous )?(faut|faudra|faudrait) /)&&has(/ combien /))&&!per&&!msn&&!has(/ (formation|autorisation|visite) /)) return {i:'need'};
   if(has(/ (part ?145|capacite|etp|equivalents? temps plein) /)&&has(/ (disponibles?|dispos?|combien|nombre|effectifs?|capacite|etp|present|presents) /)) return {i:'dispo'};
   if(has(/ (libres?|disponibles?|dispo|dispos|sans affectation|sans chantier|pas affecte|pas affectes|non affectes?|rien a faire|n a rien|n ont rien|inoccupes?|pas de chantier|aucun chantier|pas d affectation|aucune affectation) /)) return {i:'free',cats:catOf()};
   if(has(/ combien /)&&has(/ (on est|on sera|sommes|personnes|gars|monde|presents?|travaillent|bossent|techniciens?|effectifs?|y a t il|il y a|on a|interimaires?|chefs?|mecanos?) /)) return {i:'count',cats:catOf()};
@@ -29631,6 +29642,18 @@ const _MDQ_RUN={
   aut_exp(P){ return _MDQ_RUN._exp(P,'a'); },
   any_exp(P){ return _MDQ_RUN._exp(P,'b'); },
   any_person(P,t,h){ return _MDQ_RUN._person(P,t,h,'b'); },
+  need(P){ const per=_mdqPer(P.tm,'week',P.n), mon=getMon(per.from), wEnd=addD(mon,6), wk=`${mon.getFullYear()}-S${wkN(mon)}`, L=[];
+    (S.chantiers||[]).filter(c=>['encours','futur'].includes(c.statut)).forEach(c=>{ const d=c.debut?parseLocal(c.debut):null,f=c.fin?parseLocal(c.fin):null; const ov=S.besoinOverrides?.[`${c.id}_${wk}`]; const hasOv=ov!==undefined&&ov!==null&&ov!==''; const dansP=(!d||d<=wEnd)&&(!f||f>=mon);
+      const n=dansP?(hasOv?(parseInt(ov)||0):(c.ressources?.technicien||0)):(hasOv?(parseInt(ov)||0):0); if(n>0) L.push({c,n}); });
+    let st=0, sr=0; try{ st=_stockBesoinSemaine(mon)||0; }catch(_){} try{ sr=_structBesoinSemaine(mon)||0; }catch(_){}
+    let tot=0; try{ tot=_besoinP145Semaine(mon); }catch(_){ tot=L.reduce((a,x)=>a+x.n,0)+st+sr; }
+    // capacité : même calcul que le DISPO
+    const ABS=new Set(['conge','maladie','formation','ecole','absence','deplacement','ferie','we']); const isP=p=>p.categorie==='sheetmetal'||_isInterimP145(p)||p.categorie==='technicien'; let demi=0;
+    S.personnel.filter(p=>p.actif!==false&&!p.archived&&isP(p)&&_presentSemaine(p,mon,addD(mon,4))).forEach(p=>{ [0,1,2,3,4].forEach(i=>{ const ds=fmt(addD(mon,i)); if(isHol(ds)) return; ['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`]; if(!ABS.has(e?e.type:'travail')) demi+=0.5; }); }); });
+    const etp=Math.round(demi/5*10)/10, ec=Math.round((etp-tot)*10)/10, wl=`semaine ${wkN(mon)}`, f=v=>String(v).replace('.',',');
+    const s=`${_mdqCap(wl)} : besoin de ${_mdqPl(tot,'mécano')} en Part 145${L.length?` sur ${_mdqPl(L.length,'chantier')}`:''}. Tu en as ${f(etp)} disponibles, soit un écart de ${ec>=0?'+':''}${f(ec)}.`;
+    L.sort((a,b)=>b.n-a.n);
+    _mdAns({say:s,html:`<b>${s}</b>`,items:L.map(x=>`${_bfEsc(_mdqChTxt(x.c.id))} — ${x.n}`).concat(st?[`Stockage — ${st}`]:[]).concat(sr?[`Structure — ${sr}`]:[]),title:`Besoin ${wl}`,view:{l:'Voir la semaine',fn:()=>{ S.weekStart=mon; goTab('weekly'); try{ renderWeekly(); }catch(_){} setTimeout(()=>_mdFlash(document.getElementById('weekSummary')),150); }}}); return 'ok'; },
   dispo(P){ // même calcul que le « DISPO » du tableau de bord (Part 145 : techniciens, intérimaires Part 145, sheet metal)
     const per=_mdqPer(P.tm,'week',P.n), mon=getMon(per.from); const ABS=new Set(['conge','maladie','formation','ecole','absence','deplacement','ferie','we']);
     const isP=p=>p.categorie==='sheetmetal'||_isInterimP145(p)||p.categorie==='technicien'; const R=[]; let theo=0, demi=0;
@@ -29646,7 +29669,7 @@ function _mdQRun(P,text,how){
 }
 
 // ═══ Mardam 0.6 — apprendre : mauvaises réponses, export pour Claude, raccourcis personnels ═══
-const _MD_VER='0.8';
+const _MD_VER='0.9.1';
 function _mdBad(){ _mdCfg(); if(!Array.isArray(S.mardam.bad)) S.mardam.bad=[]; return S.mardam.bad; }
 function _mdShorts(){ _mdCfg(); if(!Array.isArray(S.mardam.short)) S.mardam.short=[]; return S.mardam.short; }
 function _mdTxt(h){ const d=document.createElement('div'); d.innerHTML=String(h||'').replace(/<li>/g,' • ').replace(/<br\s*\/?>/g,' '); return (d.textContent||'').replace(/\s+/g,' ').trim(); }
@@ -29752,7 +29775,7 @@ function _mdAParse(P,raw){
   if(msn||has(/ (chantier|affecte|affecter|affectation) /)) return {a:del?'unassign':'assign'};
   return null;
 }
-function _mdaFormWords(T,nn){ const i=T.indexOf('formation'); if(i<0) return ''; const stop=new Set(['le','la','du','de','des','lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche','demain','aujourd','semaine','toute','matin','apres','journee','pour','et','avec','en','au','a','ce','cette']); const w=[]; for(let k=i+1;k<T.length&&w.length<4;k++){ if(stop.has(T[k])||/^\d/.test(T[k])) { if(w.length) break; else continue; } w.push(T[k]); } return w.join(' '); }
+function _mdaFormWords(T,nn){ const i=T.indexOf('formation'); if(i<0) return ''; const stop=new Set(['le','la','du','de','des','lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche','demain','aujourd','hui','semaine','toute','tout','matin','apres','midi','journee','pour','et','avec','en','au','a','ce','cette','prochain','prochaine','janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre','er','premier','partir','jusqu','du','au','ou']); const w=[]; for(let k=i+1;k<T.length&&w.length<4;k++){ if(stop.has(T[k])||/^\d/.test(T[k])) { if(w.length) break; else continue; } w.push(T[k]); } return w.join(' '); }
 // ── Outils ──
 function _mdaEnsure(){ _mdCfg(); return S.mardam; }
 function _mdaDays(tm,{allowWeekend}={}){ tm=tm||{}; const L=[];
@@ -29784,7 +29807,7 @@ function _mdActRun(P,text,how){
   if(r.err){ _mdReply(r.err,r.errSay||r.err.replace(/<[^>]+>/g,''),[],{noBad:false}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'impossible'}); return; }
   if(!r.changes.length&&!r.note){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
   const go=()=>_mdaApply(r,text,how,A);
-  MD.pending={label:_MDA_LBL[A.a],run:go,choices:[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }},{l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }}]};
+  MD.pending={label:_MDA_LBL[A.a],run:go,base:P.raw||text,choices:[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }},{l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }}]};
   const det=(r.lines||[]).concat((r.warn||[]).map(w=>`<span class="md-warn">⚠ ${w}</span>`));
   _mdReply(`<b>${r.html||_bfEsc(r.say)}</b>${det.length?_mdqUl(det,40):''}<div class="md-mut" style="margin-top:6px">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+' · ':''}Rien n'est changé tant que tu n'as pas confirmé.</div>`,r.say+' Je confirme ?',[{l:'✓ Oui, je confirme',fn:MD.pending.choices[0].fn,primary:true},{l:'✕ Non',fn:MD.pending.choices[1].fn}],{noBad:true});
 }
@@ -29921,8 +29944,9 @@ function _mdRenderTab(){
 }
 function _mdRenderHist(){ const el=document.getElementById('md-hist'); if(!el) return;
   el.innerHTML=MD.hist.length?MD.hist.map(h=>`<div class="md-msg ${h.who}">${h.html}</div>`).join(''):`<div class="md-mut">Appuie sur 🎙 et dis par exemple « ouvre le planning de la semaine prochaine ».</div>`; el.scrollTop=el.scrollHeight; }
+function _mdAiShort(t){ t=String(t||''); try{ const o=JSON.parse(t); Object.keys(o).forEach(k=>{ if(o[k]===null||o[k]==='') delete o[k]; }); return JSON.stringify(o).replace(/"([a-z_]+)":/g,'$1:').slice(0,160); }catch(_){ return t.slice(0,160); } }
 function _mdRenderJournal(){ const el=document.getElementById('md-jr'); if(!el) return; const L=(S.mardam?.journal||[]).slice(0,40);
-  el.innerHTML=L.length?`<table class="md-tb"><tr><th>Quand</th><th>Ta phrase</th><th>Compris</th><th></th></tr>${L.map(j=>{ const d=new Date(j.at); return `<tr><td>${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${_bfEsc(j.said)}</td><td>${_bfEsc(j.label||'—')}${j.how==='ia'?' <span class="md-tag">IA</span>':''}${j.ai?`<div class="md-mut" title="Réponse brute de l'IA">IA → ${_bfEsc(String(j.ai).slice(0,140))}</div>`:''}</td><td class="md-r ${j.result==='ok'?'ok':j.result==='pas compris'?'ko':''}">${_bfEsc(j.result)}</td></tr>`; }).join('')}</table>`:'<div class="md-mut">Rien pour l\'instant.</div>'; }
+  el.innerHTML=L.length?`<div class="md-jwrap"><table class="md-tb md-jtb"><colgroup><col style="width:58px"><col style="width:40%"><col><col style="width:74px"></colgroup><tr><th>Quand</th><th>Ta phrase</th><th>Compris</th><th>Résultat</th></tr>${L.map(j=>{ const d=new Date(j.at); return `<tr><td>${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</td><td>${_bfEsc(j.said)}</td><td>${_bfEsc(j.label||'—')}${j.how==='ia'?' <span class="md-tag">IA</span>':''}${j.ai?`<div class="md-mut" title="Réponse de l'IA">IA → ${_bfEsc(_mdAiShort(j.ai))}</div>`:''}</td><td class="md-r ${j.result==='ok'||j.result==='fait'?'ok':j.result==='pas compris'||j.result==='erreur'?'ko':''}">${_bfEsc(j.result)}${j.undone?'<br><small class="md-mut">annulé</small>':''}</td></tr>`; }).join('')}</table></div>`:'<div class="md-mut">Rien pour l\'instant.</div>'; }
 function _mdRenderMiss(){ const el=document.getElementById('md-miss'); if(!el) return; const M=(S.mardam?.misses||[]).slice(0,40), B=_mdBad().slice(0,40);
   const d=x=>new Date(x).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
   el.innerHTML=`<div class="md-acts" style="margin:0 0 8px"><button type="button" class="md-b p sm" onclick="_mdCopyForClaude()">📋 Copier pour Claude</button>${M.length||B.length?'<button type="button" class="md-b sm" onclick="_mdLearnClear()">🗑 Vider</button>':''}</div><div id="md-copied" class="md-mut"></div><pre id="md-export" style="display:none;white-space:pre-wrap;font-size:11px;max-height:220px;overflow:auto;user-select:all"></pre>
@@ -29989,11 +30013,13 @@ function _mdBenchCases(){
         [`prochaine visite médicale de ${b.nom} ?`,q('vm_person')],['qui a une visite médicale la semaine prochaine ?',q('vm_list')],["qu'est-ce que j'ai dans ma to-do ?",q('todo')],['quelles tâches sont en retard ?',q('todo')],
         ['est-ce que je suis en sous-effectif la semaine prochaine ?',q('under')],['il me manque du monde cette semaine ?',q('under')],['qui a le plus de jours travaillés ce mois-ci ?',q('hours')],['quels chantiers cette semaine ?',q('ch_list')],
         ["Peux tu me donner le nombre de personnes que j'ai de disponible en part 145 la semaine prochaine ?",q('dispo')],['Tu peux me dire ce qui expire dans 2 semaines ?',q('any_exp')],['Qui a les formations qui expirent dans un mois.',q('form_exp')],
+        ['Peux tu me donner mon besoin en mécano sur la semaine 50 ?',q('need')],['Balance moi combien de mécanos il me faut en semaine 50 ?',q('need')],['il me faut combien de gars la semaine prochaine ?',q('need')],["c'est quoi la charge la semaine prochaine ?",q('need')],
         ['donne-moi le détail',p=>p.kind==='ctl'&&p.act==='detail'],["c'est qui ?",p=>p.kind==='ctl'&&p.act==='detail']]; })(),
     ...(()=>{ const act=x=>p=>p.kind==='act'&&p.A.a===x; const it=(S.personnel||[]).find(x=>x.categorie==='interimaire'&&!x.archived)||a; return [
     [`mets ${a.nom} en congé jeudi et vendredi`,act('abs')],[`affecte ${a.nom}, ${b.nom} et ${c.nom} sur le 55304 toute la semaine`,p=>act('assign')(p)&&p.ppl.length===3],[`inscris ${b.nom} à la formation MOE du lundi 1er février`,act('form')],[`inscrit ${b.nom} a la formation EWIS mardi`,act('form')],
     [`Mets moi ${a.nom} en visite médicale vendredi à 08h20.`,p=>act('vm')(p)&&_mdaHour(p.raw,p.tm)==='08:20'],[`ajoute la visite médicale à ${b.nom} le 25 janvier à 12h30`,act('vm')],[`annule la visite médicale de ${b.nom}`,act('vm_del')],[`supprime la formation de ${c.nom} du jeudi 3 avril`,act('form_del')],
     [`${a.nom} est malade demain`,p=>act('abs')(p)&&p.A.type==='maladie'],[`pose une absence à ${b.nom} lundi matin`,p=>act('abs')(p)&&p.A.type==='absence'],[`enlève le congé de ${a.nom} vendredi`,act('abs_del')],[`retire ${c.nom} du 55304 demain`,act('unassign')],[`mets ${a.nom} sur le 55304 demain matin`,act('assign')],
+    ['Inscris Mohamed en formation et oui, le 7 décembre. toute la journée',p=>act('form')(p)&&p.A.fx&&p.A.fx.names.some(n=>/ewis/i.test(n))],
     ["Mets moi une note dans mon pense-bête de rappeler Larbi demain matin à 08h00.",p=>act('note')(p)&&/^rappeler Larbi/i.test(p.A.text)],['rappelle-moi de commander les joints vendredi',p=>act('note')(p)&&/^commander les joints/.test(p.A.text)]]; })(),
     ['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',later(3)],["rajoute dans ma to do list la préparation de l'ODM de Callard",later(3)],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,later(3)],
   ];
