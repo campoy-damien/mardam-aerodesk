@@ -2630,6 +2630,7 @@ body:not(.th-bento) .md-msg.me{background:rgba(0,210,255,.14)}
 .md-f input:not([type=checkbox]),.md-f select{flex:1;min-width:160px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;padding:0 10px;font:inherit;font-size:12.5px}
 .md-sep{margin:14px 0 4px;font-weight:800;font-size:12px}
 .md-b.bad{border-color:rgba(255,122,144,.5);color:#ff9aac}
+.md-warn{color:#ffb45c}
 .md-badbox{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,122,144,.08);border:1px solid rgba(255,122,144,.35)}body:not(.th-bento) .md-badbox{border-radius:10px}
 .md-badq{font-size:13px;font-weight:700;margin-bottom:8px}.md-badbox .md-mut{margin-top:6px}
 #md-bad-in,.md-sc-add input{flex:1;min-width:0;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;padding:0 14px;font:500 13px inherit;outline:none}
@@ -4100,7 +4101,7 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
-        • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
+        • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran, et modifie le planning et le pense-bête après ton « oui » (affectations, absences, formations, visites médicales), avec ↩ Annuler. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
         • <strong style="color:#60b4ff">🗓 Brief de la semaine</strong> — bouton du tableau de bord : une page à envoyer au personnel après la réunion de production (tes infos, schéma du hangar avec chaque avion et ses jours, chantiers avec leur chef d'équipe, formations, absences, arrivées / départs d'intérimaires, visites médicales), en PDF ou en image.<br>
         • <strong style="color:#00d2ff">🧩 Affectations du jour en plein écran</strong> — seuls les chantiers occupés, ＋ Ajouter un chantier, glisser-déposer avec défilement automatique au bord, sélection multiple, filtre Catégories, colonnes jusqu'en bas.<br>
         • <strong style="color:#60b4ff">👻 Intérimaires hors contrat masqués</strong> — un intérimaire dont le contrat est terminé n'apparaît plus dans les semaines suivantes du Planning Hebdo, du Master et des affectations (sauf si tu le recherches).<br>
@@ -4525,7 +4526,7 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
 
     <div class="notice-section" id="n-ai" style="background:linear-gradient(135deg,rgba(28,24,56,0.94),rgba(14,22,40,0.94));border:1px solid rgba(143,123,255,0.28);border-radius:14px;overflow:hidden">
       <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleNotice(this)">
-        <span style="font-size:20px">🎙</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:#b9a8ff">Mardam, l'assistant vocal</div><div style="font-size:11px;color:var(--t4)">L'app calcule les réponses ; l'IA ne fait que traduire ta phrase · compte administrateur uniquement</div></div>
+        <span style="font-size:20px">🎙</span><div style="flex:1"><div style="font-size:14px;font-weight:800;color:#b9a8ff">Mardam, l'assistant vocal</div><div style="font-size:11px;color:var(--t4)">L'app calcule les réponses et fait les modifications après ton « oui » ; l'IA ne fait que traduire ta phrase · compte administrateur uniquement</div></div>
         <span class="notice-chevron" style="color:var(--t4);font-size:12px;transition:transform .2s">▼</span>
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
@@ -4534,9 +4535,11 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
         • <strong style="color:#ffd060">Ouvrir les écrans</strong> — « ouvre le planning de la semaine prochaine », « le master de février », « la fiche de Baou », « le brief de la semaine », « les autorisations de Callard »…<br>
         • <strong style="color:#ffd060">Filtrer</strong> — « affiche seulement les intérimaires », « les gars en intérim la semaine prochaine », « affiche tout le monde ».<br>
         • <strong style="color:#ffd060">Répondre à tes questions</strong> — formations et autorisations (« la prochaine formation EWIS ? », « qui a une formation qui expire avant fin janvier ? »), planning et absences (« où est Delhumeau jeudi ? », « qui est absent cette semaine ? », « qui est libre demain ? », « quand revient Quessard ? »), intérim (« le contrat de Dupont finit quand ? »), hangar (« qu'est-ce qu'il y a en position 2 jeudi ? », « quand le 9388 rentre ? »), chantiers (« qui est sur le 55304 demain ? », « le chef d'équipe du 2919 ? »), visites médicales, to-do, sous-effectif et jours travaillés.<br>
-        • <strong style="color:#ffd060">La réponse</strong> — une phrase courte avec le nombre ; les noms sont dans la bulle. Dis <b>« le détail »</b> (ou « c'est qui ? ») pour qu'elle les lise. Le bouton <b>👁 Voir</b> ouvre l'écran qui prouve la réponse. Les jours travaillés sont comptés au planning, pas aux heures pointées.<br>
+        • <strong style="color:#ffd060">La réponse</strong> — une phrase courte avec le nombre ; les noms sont dans la bulle. Dis <b>« le détail »</b> (ou « c'est qui ? ») pour qu'elle les lise. Le bouton <b>👁 Voir</b> ouvre l'écran qui prouve la réponse. Les jours travaillés sont comptés au planning, pas aux heures pointées. « Libre », « combien on est » et « disponibles en Part 145 » comptent la même population que le <b>DISPO</b> du tableau de bord (techniciens, intérimaires Part 145, sheet metal) ; cite une catégorie (« les chefs ») ou dis « tout le monde » pour élargir.<br>
         • <strong style="color:#ffd060">Comment elle comprend</strong> — l'app essaie d'abord seule (noms et prénoms, même mal dictés : « canard » → Callard, « bao » → Baou, « Lewis » → EWIS ; dates : « jeudi », « de lundi à vendredi », « semaine 49 », matin / après-midi). Si elle ne comprend pas et que l'IA est branchée, elle demande à l'IA de traduire la phrase en une demande que l'app sait traiter.<br>
-        • <strong style="color:#ffd060">Pas encore</strong> — les modifications (affecter, inscrire, poser une visite, positions hangar, to-do, prolongations…) arrivent aux étapes 2 et 3, toujours avec confirmation avant d'agir.
+        • <strong style="color:#ffd060">Modifier le planning</strong> — « affecte Delhumeau, Quessard et Baou sur le 55304 toute la semaine », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain », « mets Dupont en congé du 22 au 26 décembre », « retire Besnard du 2341 lundi », « supprime la formation de Madalla du 3 avril ». Si le moment n'est pas précis, elle demande <b>matin, après-midi ou journée</b>. Elle <b>répète ce qu'elle va faire et attend ton « oui »</b> ; elle ne remplace jamais un congé, une maladie ou une formation par une affectation, et ne touche pas les jours hors contrat (elle te le dit). Ensuite elle montre les cases modifiées ; <b>↩ Annuler</b> (ou « annule ce que tu viens de faire ») remet tout comme avant.<br>
+        • <strong style="color:#ffd060">Pense-bête</strong> — « mets-moi une note : rappeler Larbi demain à 8h », « rappelle-moi de commander les joints vendredi » (rappel à la date dite).<br>
+        • <strong style="color:#ffd060">Pas encore</strong> — positions hangar, to-do, prolongations d'intérim, nouveau profil, mise à jour des dates de formation et d'autorisation (étape 3).
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔒 <strong>Ce qui sort de l'application</strong> — uniquement ta phrase, envoyée à l'IA <b>seulement si l'app ne l'a pas comprise seule</b>, avec les noms des personnes et les MSN remplacés par des codes ([P1], [A1]). Aucun fichier, aucun planning, aucune liste du personnel. La dictée passe par le service vocal de l'appareil (Apple ou Microsoft). Les réponses sont toujours calculées par l'app sur tes données : l'IA n'invente rien et ne modifie rien.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💳 <strong>Compteur IA</strong> (onglet Mardam) — appels du mois, coût estimé et solde estimé à partir du montant que tu as chargé ; alerte sous un seuil ; bouton vers ta page Billing, qui fait foi. Si les crédits sont épuisés ou la clé refusée, Mardam te le dit. Brancher l'IA : compte API Claude à ton nom (crédits prépayés, rechargement automatique désactivé), clé API rangée dans les propriétés de ton script Google « Mardam relais », adresse /exec et jeton secret dans les Réglages, puis « Test complet ».</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ff9aac;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🧠 <strong>La faire progresser</strong> — sous chaque réponse, <b>✕ Mauvaise réponse</b> : dis ce que tu attendais. Les phrases pas comprises et les réponses à corriger s'accumulent dans <b>🙊 Phrases à apprendre</b> ; <b>📋 Copier pour Claude</b> les copie pour les envoyer, une nouvelle version numérotée corrige (le numéro est affiché en haut de l'onglet Mardam). <b>🔁 Mes raccourcis</b> : « point prod » = « qui est absent cette semaine » ; chaque raccourci est testé, une traduction que Mardam ne comprend pas est refusée.</div>
@@ -9241,7 +9244,10 @@ const GUIDE_DATA = {
     {t:"L'IA traductrice", d:"Si l'app ne comprend pas ta phrase seule, et seulement dans ce cas, elle l'envoie à l'IA <b>sans les noms ni les MSN</b> (remplacés par [P1], [A1]) pour la traduire. Rien d'autre ne sort : ni fichier, ni planning. Réglages : adresse du script « Mardam relais », jeton secret, modèle, puis <b>Test complet</b>. Le <b>💳 Compteur IA</b> suit les appels et ton solde estimé.", ill:null},
     {t:"Quand elle se trompe", d:"Sous chaque réponse, <b>✕ Mauvaise réponse</b> : dis ou écris ce que tu attendais. Tout s'accumule dans <b>🙊 Phrases à apprendre</b> ; <b>📋 Copier pour Claude</b> copie la liste à envoyer pour la prochaine version (numéro affiché en haut de l'onglet), puis <b>🗑 Vider</b>.", ill:null},
     {t:"Mes raccourcis", d:"Carte <b>🔁 Mes raccourcis</b> : « point prod » = « qui est absent cette semaine ». Quand tu dis exactement l'expression (avec ou sans « stp »), Mardam la remplace par sa traduction. Chaque raccourci est <b>testé</b> : une traduction qu'elle ne comprend pas est refusée.", ill:null},
-    {t:"Pas encore", d:"Les modifications (affecter, inscrire en formation, poser une visite médicale, positions hangar, to-do, prolongations, nouveau profil) arrivent aux étapes suivantes, toujours avec <b>confirmation avant d'agir</b> et preuve à l'écran.", ill:null},
+    {t:"Modifier le planning", d:"« Affecte Delhumeau et Baou sur le 55304 toute la semaine », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain », « retire Besnard du 2341 lundi ». Si le moment n'est pas précis, elle demande <b>matin, après-midi ou journée</b>. Elle répète ce qu'elle va faire et <b>attend ton « oui »</b> (bouton ✓ ou à la voix).", ill:null},
+    {t:"Les garde-fous", d:"Une affectation ne remplace jamais un congé, une maladie ou une formation ; les jours hors contrat ne sont pas touchés ; ce qui sera remplacé est listé avant ton « oui ». Après, elle ouvre le planning sur les cases modifiées. <b>↩ Annuler</b> (ou « annule ce que tu viens de faire ») remet tout comme avant.", ill:null},
+    {t:"Pense-bête", d:"« Mets-moi une note : rappeler Larbi demain à 8h », « rappelle-moi de commander les joints vendredi ». La note arrive sur ton pense-bête du tableau de bord, avec un rappel à la date dite.", ill:null},
+    {t:"Pas encore", d:"Positions hangar, to-do, prolongations d'intérim, nouveau profil, mise à jour des dates de formation et d'autorisation : étape 3, avec les mêmes garde-fous.", ill:null},
   ]},
   "Simulation": { icon:"🧪", color:"#60ffd0", steps:[
     {t:"À quoi ça sert", d:"La <b>Simulation</b> (famille Outils) permet de <b>tester un scénario</b> (charge, affectations) sans toucher au planning réel.", ill:null},
@@ -28802,6 +28808,10 @@ function _mdFindPeople(T){
       let sc=0, ln=1;
       const cand=[[e.nom,e.nom.length,3],[[...e.pre,...e.nom],e.pre.length+e.nom.length,3.4],[[...e.nom,...e.pre],e.pre.length+e.nom.length,3.4],[e.pre,e.pre.length,2]];
       for(const [arr,len,w] of cand){ if(!len||i+len>T.length) continue; const v=tryL(arr,len,w); if(v>sc||(v===sc&&len>ln)){ sc=v; ln=len; } }
+      // prénom reconnu + nom mal découpé par la dictée (« Léo Saint Garin », « Léo cinga » → Léo SINGARIN)
+      if(e.pre.length&&_mdTokSim(t,e.pre[0],e.pph[0])>=0.82){ const nj=e.nom.join(''), nph=_mdPhon(nj);
+        for(let k=1;k<=3&&i+k<T.length;k++){ const parts=T.slice(i+1,i+1+k); if(parts.some(x=>_MD_STOP.has(x)||/\d/.test(x))) break; const cj=parts.join(''); if(nj.length<6||cj.length<4) continue;
+          const d=_mdLev(cj,nj); if(d<=Math.ceil(nj.length*0.4)||(_mdPhon(cj).startsWith(nph.slice(0,4))&&Math.abs(cj.length-nj.length)<=4)){ const v=3.2-d*0.05; if(v>sc){ sc=v; ln=1+k; } } } }
       if(!sc){ // un seul mot du nom composé (« perez » pour PEREZ ALVAREZ)
         e.nom.forEach((w,k)=>{ const v=_mdTokSim(t,w,e.ph[k])*2.6; if(v>sc){ sc=v; ln=1; } });
         e.pre.forEach((w,k)=>{ const v=_mdTokSim(t,w,e.pph[k])*1.8; if(v>sc){ sc=v; ln=1; } });
@@ -28954,7 +28964,7 @@ function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.g
 function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.trim():''; }
 // ── Compréhension : phrase → plan (sans rien exécuter) ──
 const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur|apparaitre|remonte|remonter|balance|ramene|sors moi|fais voir) /;
-const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour)( |$)/;
+const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer)( |$)/;
 const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
 function _mdParse(raw){
   const n=_mdNorm(raw), T=n.replace(/\?/g,' ').split(' ').filter(Boolean), nn=' '+T.join(' ')+' ';
@@ -28982,11 +28992,13 @@ function _mdParse(raw){
   const isAct=_MD_ACTV.test(T.join(' '))&&!/^(passe en mode|mets moi sur|lance)/.test(T.join(' '));
   const isQ=_MD_QW.test(T.join(' '))||/\?/.test(raw);
   // Questions et actions : reconnues, livrées aux étapes suivantes
+  // « Baou est malade demain » : une modification sans verbe
+  if(ppl.length&&!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sera|seront|sont) (malade|malades|en conges?|en vacances|absent|absente|absents|en arret|en deplacement|a l ecole) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&A.a==='abs') return Object.assign(P,{kind:'act',A}); }
   // Questions (étape 1) : la réponse est calculée par l'app
   const q=_mdQDetect(P), qFirst=_MD_QW.test(T.join(' '))||/\?/.test(raw)||/ (montre|affiche|dis|donne|ouvre|sors|balance)( moi)? (qui|quand|combien|ou est|ou sont|quels?|quelles?|les absents|ce qu|si) /.test(nn);
   if(q&&!isAct&&(qFirst||!isNav)) return Object.assign(P,{kind:'q',q});
   if(isQ&&!isNav){ return Object.assign(P,{kind:'unknown',qHint:true}); }
-  if(isAct&&!(isNav&&!ppl.length&&!msn.length)){ return Object.assign(P,{kind:'later',stage:_mdStageOf(nn),what:'action'}); }
+  if(isAct&&!(isNav&&!ppl.length&&!msn.length)){ P.raw=raw; const A=_mdAParse(P,raw); if(A) return Object.assign(P,{kind:'act',A}); return Object.assign(P,{kind:'later',stage:_mdStageOf(nn),what:'action'}); }
   if(isNav){
     let scr=null; for(const [id,re,lbl] of _MD_SCREENS){ if(re.test(nn)){ scr=[id,lbl]; break; } }
     if(!scr&&ppl.length&&/ (fiche|profil|montre|ouvre|affiche) /.test(nn)) scr=['fiche','Fiche personnel'];
@@ -29102,7 +29114,9 @@ async function _mdHandle(text,alts){
   if(MD.pending){ const q=_mdParse(text); const pend=MD.pending;
     if(pend.choices){ const pick=_mdPickChoice(pend.choices,q); if(pick){ MD.pending=null; pick.fn(); return; } }
     if(q.kind==='ctl'&&q.act==='yes'&&pend.run){ MD.pending=null; pend.run(); return; }
-    if(q.kind==='ctl'&&q.act==='no'){ MD.pending=null; _mdReply("D'accord, j'annule. Rien n'a été changé.",'D\'accord, j\'annule.'); _mdLog({said:text,how:'local',label:pend.label||'',result:'annulé'}); return; }
+    if(q.kind==='ctl'&&q.act==='no'){ MD.pending=null; _mdReply("D'accord, j'annule. Rien n'a été changé.",'D\'accord, j\'annule.',[],{noBad:true}); _mdLog({said:text,how:'local',label:pend.label||'',result:'annulé'}); return; }
+    MD.pending=null;
+    if(pend.complete&&!(q.kind==='ctl'&&['stop','mute','reset','help'].includes(q.act))&&!(q.kind==='act'||q.kind==='nav'&&q.T.length>4||q.kind==='q')){ text=pend.base+' '+text; alts=null; }
   }
   // Raccourci personnel (« point prod » = « qui est absent cette semaine »)
   const orig=text, sc=_mdShortFind(text); let said=text;
@@ -29126,10 +29140,10 @@ function _mdExec(P,text,how){
     if(a==='mute'){ const c=_mdCfg(); c.mute=true; try{save();}catch(_){} try{ speechSynthesis.cancel(); }catch(_){} _mdMuteBtn(); _mdReply('Voix coupée. Je continue à te répondre par écrit.',''); }
     else if(a==='unmute'){ const c=_mdCfg(); c.mute=false; try{save();}catch(_){} _mdMuteBtn(); _mdReply('Voix remise.'); }
     else if(a==='detail'){ _mdDetail(); }
-    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
+    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais <b>modifier le planning</b> après ton « oui » (« affecte Baou sur le 55304 demain », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain ») et <b>ton pense-bête</b> (« rappelle-moi d'appeler Larbi demain »). Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
     else if(a==='reset'){ MD.ctx={last:null,at:0}; MD.pending=null; _mdReply('C\'est noté, on repart de zéro.'); }
     else if(a==='journal'){ const L=(S.mardam?.journal||[]).filter(j=>new Date(j.at).toDateString()===new Date().toDateString()); _mdReply(L.length?`Aujourd'hui j'ai traité <b>${L.length}</b> demande${L.length>1?'s':''} : `+L.slice(0,5).map(j=>_bfEsc(j.label||j.said)).join(', ')+(L.length>5?'…':'')+'. Le détail est dans mon journal.':"Je n'ai encore rien fait aujourd'hui.",null,[{l:'Voir le journal',fn:()=>{ goTab('ai'); }}]); }
-    else if(a==='undo'){ const last=(S.mardam?.journal||[]).find(j=>j.undo&&!j.undone); if(!last) _mdReply("Je n'ai rien modifié à annuler : pour l'instant je n'ai fait qu'ouvrir des écrans."); }
+    else if(a==='undo'){ _mdaUndo(); }
     else if(a==='hello') _mdReply(/merci/.test(P.n)?'Avec plaisir !':`Salut Damien ! Dis-moi ce que je t'ouvre.`);
     else if(a==='yes'||a==='no') _mdReply("Je n'avais rien en attente. Dis-moi ce que tu veux faire.");
     _mdLog({said:text,how,label:'contrôle : '+a,result:'ok'}); return;
@@ -29144,7 +29158,8 @@ function _mdExec(P,text,how){
     MD.ctx.last=P; _mdReply(say); _mdLog({said:text,how,label:P.label+(P.date?' · '+fmt(P.date):'')+(P.month?` · ${P.month.m+1}/${P.month.y}`:'')+(P.cats?' · '+P.cats.join('+'):''),result:'ok'}); return;
   }
   if(P.kind==='filter'){ const s=_mdFilterRun(P); _mdReply(s); _mdLog({said:text,how,label:'filtre catégories',result:'ok'}); return; }
-  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Pour l'instant je sais ouvrir les écrans.`;
+  if(P.kind==='act'){ _mdActRun(P,text,how); return; }
+  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Je sais déjà répondre à tes questions, ouvrir les écrans, filtrer et modifier le planning (affectations, absences, formations, visites médicales) ainsi que ton pense-bête.`;
     _mdReply(s,`Je ne sais pas encore ${what}. Ça arrive à l'étape ${P.stage}.`); _mdLog({said:text,how,label:`étape ${P.stage} (${P.what})`,result:'pas encore'}); return; }
   if(P.kind==='q'){ _mdQRun(P,text,how); return; }
   if(P.qHint){ _mdMiss(text,'question non reconnue'); _mdLog({said:text,how,label:'question non reconnue',result:'pas compris'}); _mdReply(`J'ai compris que c'est une question, mais je ne sais pas encore y répondre. Je l'ai notée pour l'apprendre.${_mdAIready()?'':'<br><small>L\'IA traductrice n\'est pas branchée : elle m\'aide pour les phrases inhabituelles.</small>'}`,"Je ne sais pas encore répondre à cette question. Je l'ai notée."); return; }
@@ -29172,8 +29187,9 @@ function _mdAnon(raw,P){
 }
 const _MD_AI_HINT={dashboard:"page d'accueil, tableau de bord",weekly:'planning de la semaine, planning hebdo, effectifs semaine par semaine',master:"vue d'ensemble du mois ou de l'année, planning mensuel",briefw:'récap à envoyer au personnel pour la semaine',briefj:'récap du jour, point du matin',aff:"affectations du jour par chantier, qui travaille sur quel avion aujourd'hui",quiou:"où sont les gens, qui est où aujourd'hui",tv:'affichage écran atelier',slot:'positions des avions dans le hangar, plan du hangar',stockage:'avions en stockage',recycling:'avions en recyclage / démantèlement',airbus:'activité Airbus Part 21',personnel:'liste du personnel, effectifs, annuaire',fiche:"fiche d'une personne précise (mettre person)",certif:'certifying staff, habilitations B1 B2',formations:'formations, sessions de formation, échéances de formation',autorisations:'autorisations, droits, habilitations internes',todo:'liste de tâches, to-do',checklist:'check-list',kpi:'chiffres clés, indicateurs, statistiques, KPI',programme:"programme d'activité, charge prévue",chantiers:'liste des chantiers / avions en cours',simulation:'simulation de charge',notice:"mode d'emploi, aide de l'application",forecast:'prévision à 3 mois',aeromargin:'calcul MPA moteurs',docairbus:'documentation Airbus',docatr:'documentation ATR',docboeing:'documentation Boeing',mardam:'page de l’assistant Mardam (journal, réglages)'};
 function _mdAISys(){
-  const scr=[..._MD_SCREENS.map(x=>x[0]),'fiche'].filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${k} = ${((_MD_SCREENS.find(x=>x[0]===k)||[])[2]||'Fiche personnel')}${_MD_AI_HINT[k]?' ('+_MD_AI_HINT[k]+')':''}`).join('\n');
-  return `Tu traduis les demandes orales (souvent familières, mal transcrites par la dictée) d'un responsable de production aéronautique en UN ordre JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte ni balises autour. Choisis l'écran le plus proche du sens, même si les mots sont différents.
+  const scr=[..._MD_SCREENS.map(x=>x[0]),'fiche'].filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${k}=${_MD_AI_HINT[k]||((_MD_SCREENS.find(x=>x[0]===k)||[])[2]||'Fiche personnel')}`).join(' ; ');
+  return `Aujourd'hui : {TODAY}.
+Tu traduis les demandes orales (souvent familières, mal transcrites par la dictée) d'un responsable de production aéronautique en UN ordre JSON pour son application de planning. Les noms de personnes sont remplacés par des codes [P1], [P2], les avions (MSN) par [A1], les mots masqués par [X1]. Réponds UNIQUEMENT par un objet JSON, sans texte ni balises autour. Choisis l'écran le plus proche du sens, même si les mots sont différents.
 Formats :
 {"type":"nav","screen":"<code écran>","date":"AAAA-MM-JJ ou null","month":"AAAA-MM ou null","person":"P1 ou null","cats":[catégories à garder, pour weekly ou master] ou null}
 {"type":"filter","cats":["technicien","chef","interimaire","expert","alternant","responsable","sheetmetal","prestataire"] ou "all"}
@@ -29181,16 +29197,19 @@ Formats :
 {"type":"question","intent":"<code question>","person":"P1 ou null","msn":"A1 ou null","formation":"nom de la formation/autorisation tel que dit, ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM ou null","pos":1|2|3 ou null,"cats":[catégories] ou null}
   codes question : ${Object.entries(_MDQ_LBL).map(([k,v])=>k+' = '+v).join(' ; ')}
   (date = un jour précis ; from/to = une période ; sans date, laisse null : l'app prend aujourd'hui ou la période par défaut)
-{"type":"action","stage":2 ou 3,"what":"résumé court"}  (stage 2 = planning, absences, formations, visites médicales ; stage 3 = hangar, to-do, intérim, création de profil, chantiers, brief)
+{"type":"action","act":"assign|unassign|abs|abs_del|form|form_del|vm|vm_del|note","person":["P1","P2"] ou null,"msn":"A1 ou null","formation":"nom dit ou null","abs":"conge|conge_prev|maladie|absence|deplacement|ecole ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM|day ou null","time":"HH:MM ou null","text":"texte de la note ou null"}
+  (assign = affecter sur un avion, unassign = retirer d'un avion, abs = poser congé/maladie/absence, form = inscrire en formation, vm = visite médicale, note = pense-bête ; *_del = supprimer. L'app demande toujours confirmation.)
+{"type":"action","stage":3,"what":"résumé court"}  (autres modifications pas encore possibles : hangar, to-do, intérim, création de profil, chantiers)
 {"type":"unknown"}  (seulement si la demande n'a vraiment aucun rapport)
-Écrans (code = nom (sens)) :
+Écrans (code=sens) :
 ${scr}
 Exemples :
-« fais moi apparaitre l ecran des chiffres cles » → {"type":"nav","screen":"kpi","date":null,"month":null,"person":null}
-« remonte moi la vue d ensemble du mois de fevrier » → {"type":"nav","screen":"master","date":null,"month":"<février à venir AAAA-02>","person":null}
-« balance moi la page de [P1] » → {"type":"nav","screen":"fiche","date":null,"month":null,"person":"P1"}
+« fais moi apparaitre l ecran des chiffres cles » → {"type":"nav","screen":"kpi"}
+« remonte moi la vue d ensemble du mois de fevrier » → {"type":"nav","screen":"master","month":"<février à venir AAAA-02>"}
+« balance moi la page de [P1] » → {"type":"nav","screen":"fiche","person":"P1"}
 « je veux voir que les gars en interim » → {"type":"filter","cats":["interimaire"]}
-« je veux voir les gars en interim la semaine prochaine » → {"type":"nav","screen":"weekly","date":"<lundi suivant>","month":null,"person":null,"cats":["interimaire"]}
+« je veux voir les gars en interim la semaine prochaine » → {"type":"nav","screen":"weekly","date":"<lundi suivant>","cats":["interimaire"]}
+« colle [P1] et [P2] sur [A1] toute la journee de jeudi » → {"type":"action","act":"assign","person":["P1","P2"],"msn":"A1","date":"<jeudi>","half":"day"}
 « qui bosse sur [A1] demain » → {"type":"question","intent":"who_on","msn":"A1","date":"<demain>"}
 « c est quand que [P1] se repointe » → {"type":"question","intent":"back","person":"P1"}
 « y a du monde qui sort en formation ewis bientot » → {"type":"question","intent":"form_who","formation":"ewis"}
@@ -29200,7 +29219,7 @@ Les dates se calculent à partir d'aujourd'hui : {TODAY}. « la semaine prochain
 async function _mdAI(raw,P,opt){ opt=opt||{};
   const c=_mdCfg(); const an=_mdAnon(raw,P); const today=_mdToday();
   const hist=MD.hist.slice(-7,-1).filter(h=>h.who==='me').slice(-3).map(h=>_mdAnon(h.html.replace(/&[a-z]+;/g,' '),_mdParse(h.html)).text);
-  const body={token:c.token,model:c.model,system:_mdAISys().replace('{TODAY}',`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
+  const body={token:c.token,model:c.model,system:_mdAISys().replace(/\{TODAY\}/g,`${_MD_JL[today.getDay()]} ${fmt(today)}`),messages:[...(hist.length?[{role:'user',content:'Demandes précédentes (contexte) : '+hist.join(' | ')},{role:'assistant',content:'{"type":"unknown"}'}]:[]),{role:'user',content:an.text}]};
   try{
     const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),9000);
     const r=await fetch(c.gas,{method:'POST',body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(to);
@@ -29233,12 +29252,24 @@ function _mdFromAI(o,map,P){
     if(o.msn&&map[o.msn]&&map[o.msn].type==='a') out.msn=[{msn:map[o.msn].msn,cands:map[o.msn].cands||[],exact:true}];
     const tm={}; if(ok(o.from)&&ok(o.to)) tm.range={from:parseLocal(o.from),to:parseLocal(o.to)}; else if(ok(o.date)) tm.day={d:parseLocal(o.date)}; if(o.half==='AM'||o.half==='PM') tm.half=o.half; out.tm=Object.assign({},P&&P.tm||{},tm);
     if(o.formation){ const k=/^aut/.test(o.intent)?'a':'f'; q.fx=_mdqFindForm(_mdNorm(String(o.formation)).split(' '),k); q.kind=k; }
-    else if(P&&P.T){ const k=/^aut/.test(o.intent)?'a':'f'; q.fx=_mdqFindForm(P.T,k); }
+    else if(P&&P.T){ const k=/^aut/.test(o.intent)?'a':'f'; const f=_mdqFindForm(P.T,k); q.fx=f&&f.sure?f:null; }
+    if(o.intent==='form_exp'&&!q.fx&&!/ formations? /.test(' '+(P&&P.n||'')+' ')) q.i='any_exp';
+    if(o.intent==='form_person'&&!q.fx&&!/ formations? /.test(' '+(P&&P.n||'')+' ')) q.i='any_person';
     if(+o.pos>=1&&+o.pos<=3) q.pos=+o.pos; else if(o.intent==='pos') q.pos=1;
     const known=_MD_CATW.map(x=>x[0]); if(Array.isArray(o.cats)){ const c=o.cats.filter(x=>known.includes(x)); if(c.length) q.cats=c; }
     if(o.intent==='hours') q.least=/moins/.test(P&&P.n||'');
     return Object.assign(out,{kind:'q',q}); }
-  if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===3?3:2,what:'action'});
+  if(o.type==='action'&&o.act&&_MDA_BUILD[o.act]){
+    const ok=d=>d&&/^\d{4}-\d{2}-\d{2}$/.test(d); const codes=Array.isArray(o.person)?o.person:o.person?[o.person]:[];
+    out.ppl=codes.filter(c=>map[c]&&map[c].type==='p').map(c=>({ids:map[c].ids,words:map[c].words,span:[0,0]}));
+    if(o.msn&&map[o.msn]&&map[o.msn].type==='a') out.msn=[{msn:map[o.msn].msn,cands:map[o.msn].cands||[],exact:true}];
+    const tm={}; if(ok(o.from)&&ok(o.to)) tm.range={from:parseLocal(o.from),to:parseLocal(o.to)}; else if(ok(o.date)) tm.day={d:parseLocal(o.date)};
+    if(['AM','PM','day'].includes(o.half)) tm.half=o.half; if(/^\d{1,2}:\d{2}$/.test(o.time||'')) tm.hour=o.time.padStart(5,'0'); out.tm=Object.assign({},P&&P.tm||{},tm); out.raw=P&&P.raw||"";
+    const A={a:o.act}; if(/^abs/.test(o.act)){ const t=_MDA_ABS.find(x=>x[0]===o.abs)||_MDA_ABS.find(x=>x[0]==='absence'); A.type=t[0]; A.tl=t[2]; }
+    if(/^form/.test(o.act)&&o.formation){ const f=_mdqFindForm(_mdNorm(String(o.formation)).split(' '),'f'); A.fx=f&&f.sure?f:null; A.words=A.fx?'':String(o.formation); }
+    if(o.act==='note'){ let t=String(o.text||''); Object.entries(map).forEach(([c,v])=>{ const e=v.type==='p'&&v.ids&&v.ids.length===1?byId(v.ids[0]):null; t=t.split('['+c+']').join(e?_mdPName(e):(v.words||v.msn||'')); }); A.text=t.trim(); }
+    return Object.assign(out,{kind:'act',A}); }
+  if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===2?2:3,what:'action'});
   return null;
 }
 // ── Compteur IA : consommation calculée à partir de ce que renvoie chaque réponse ──
@@ -29317,6 +29348,7 @@ const _MDQ_PROD=new Set(['technicien','interimaire','sheetmetal','chef','expert'
 const _MDQ_LBL={form_next:'prochaine formation',form_who:'qui part en formation',form_person:'formations d\'une personne',form_exp:'formations qui expirent',aut_person:'autorisations d\'une personne',aut_exp:'autorisations qui expirent',
   where:'où est quelqu\'un',who_on:'équipe d\'un avion',count:'combien on est',present:'qui travaille',free:'qui est libre',absent:'qui est absent',back:'quand revient quelqu\'un',p_abs:'absences d\'une personne',
   contract:'fin de contrat',int_end:'fins d\'intérim',int_start:'arrivées d\'intérimaires',pos:'position hangar',msn_hangar:'avion au hangar',hangar_day:'occupation hangar',chef:'chef d\'équipe',resp:'responsable',msn_count:'effectif d\'un avion',ch_list:'chantiers en cours',
+  any_exp:'formations et autorisations qui expirent',any_person:'échéances d\'une personne',dispo:'disponibles Part 145',
   vm_person:'visite médicale d\'une personne',vm_list:'visites médicales',todo:'to-do',under:'sous-effectif',hours:'jours travaillés'};
 function _mdqCell(pid,ds,h){ return (S.planning||{})[`${pid}_${ds}_${h}`]||null; }
 function _mdqStaff(ds){ return (S.personnel||[]).filter(p=>!p.archived&&p.actif!==false&&(!ds||_enContrat(p,ds))); }
@@ -29326,7 +29358,10 @@ function _mdqSh(d){ return `${_MD_JL[d.getDay()].slice(0,3)}. ${d.getDate()}/${S
 function _mdqRange(a,b){ return fmt(a)===fmt(b)?_mdqSh(a):`${_mdqSh(a)} → ${_mdqSh(b)}`; }
 function _mdqIn(n){ const k=Math.round((n-_mdToday())/864e5); return k===0?"aujourd'hui":k===1?'demain':k>1?`dans ${k} jours`:k===-1?'hier':`il y a ${-k} jours`; }
 function _mdqPer(tm,def,nn){
-  tm=tm||{}; const t=_mdToday(), before=/ (avant|d ici) /.test(nn||'');
+  tm=tm||{}; nn=' '+String(nn||'').replace(/[?.!,;]/g,' ').replace(/\s+/g,' ').trim()+' '; const t=_mdToday(), before=/ (avant|d ici) /.test(nn);
+  const NUM={un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,huit:8,dix:10,quinze:15,trente:30};
+  const rel=(nn||'').match(/ (?:dans|sous|d ici|pour)(?: les)? (\d+|un|une|deux|trois|quatre|cinq|six|huit|dix|quinze|trente) (jours?|semaines?|mois) /)||(nn||'').match(/ (?:les |aux )?(\d+|deux|trois|quatre|cinq|six|huit|dix|quinze|trente) prochaine?s (jours|semaines|mois) /);
+  if(rel&&!tm.range&&!tm.day){ const n=+rel[1]||NUM[rel[1]]||1, u=rel[2]; const to=/^mois/.test(u)?_mdYmd(t.getFullYear(),t.getMonth()+n,t.getDate()):addD(t,n*(/^semaine/.test(u)?7:1)); return {from:t,to,lbl:`d'ici ${n===1&&/^mois/.test(u)?'un':n} ${/^mois/.test(u)?'mois':/^semaine/.test(u)?(n>1?'semaines':'semaine'):(n>1?'jours':'jour')}`,kind:'range'}; }
   if(tm.range) return {from:tm.range.from,to:tm.range.to,lbl:`du ${_mdDayTxt(tm.range.from)} au ${_mdDayTxt(tm.range.to)}`,half:tm.half,kind:'range'};
   if(tm.day) return before?{from:t,to:tm.day.d,lbl:`d'ici le ${_mdDayTxt(tm.day.d)}`,kind:'range'}:{from:tm.day.d,to:tm.day.d,lbl:_mdqDayLbl(tm.day.d),half:tm.half,kind:'day'};
   if(tm.week){ const w=tm.week; const lbl=w.n?`la semaine ${w.n}`:w.shift===1?'la semaine prochaine':w.shift===2?'dans deux semaines':w.shift===-1?'la semaine dernière':'cette semaine'; return {from:w.from,to:w.to,lbl,half:tm.half,kind:'week'}; }
@@ -29335,6 +29370,7 @@ function _mdqPer(tm,def,nn){
   if(def==='week'){ const m=getMon(t); return {from:m,to:addD(m,4),lbl:'cette semaine',kind:'week',half:tm.half}; }
   if(def==='month') return {from:_mdYmd(t.getFullYear(),t.getMonth(),1),to:_mdYmd(t.getFullYear(),t.getMonth()+1,0),lbl:'ce mois-ci',kind:'month'};
   if(def==='60') return {from:t,to:addD(t,60),lbl:'dans les deux prochains mois',kind:'future'};
+  if(def==='30') return {from:t,to:addD(t,30),lbl:'dans les 30 prochains jours',kind:'future'};
   if(def==='future') return {from:t,to:addD(t,365),lbl:'',kind:'future'};
   return {from:t,to:t,lbl:"aujourd'hui",half:tm.half,kind:'day'};
 }
@@ -29407,6 +29443,7 @@ function _mdQDetect(P){
   if(has(/ (le plus|le moins) (d heures|travaille|bosse|de jours|d heure) /)||has(/ (plus|moins) d heures /)||has(/ (heures|jours) travailles /)) return {i:'hours',least:has(/ le moins /)};
   const kind=isA&&!isF?'a':'f', fx0=_mdqFindForm(Tx,kind), fx=fx0&&(fx0.sure||isF||isA)?fx0:null;
   if(has(EXP)&&(isF||isA||fx)) return per?{i:kind==='a'?'aut_person':'form_person',exp:true,fx,kind}:{i:kind==='a'?'aut_exp':'form_exp',fx,kind};
+  if(has(EXP)) return per?{i:'any_person',exp:true}:{i:'any_exp'};
   if(per&&(isF||isA||fx)&&!has(/ (prochaine|prochain) /)&&!has(/ (quand|date) .*(part|va|passe|fait)/)) return {i:kind==='a'?'aut_person':'form_person',fx,kind};
   const nq=nn.replace(/ (semaine|mois|annee|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) (prochaine?|suivante?|d apres) /g,' ');
   if((isF||fx)&&has(/ (qui|combien|inscrits?|participants?|part|partent|va|vont|passent|fait|font) /)&&!/ (quand|date|prochaine|prochain) /.test(nq)) return {i:'form_who',fx};
@@ -29415,6 +29452,7 @@ function _mdQDetect(P){
   if(per&&has(/ (conges?|vacances|absent|absente|absences?|malade|maladie|off|arret) /)) return {i:'p_abs'};
   if(has(/ (absents?|absentes?|absences?|en conges?|conges|vacances|malades?|maladie|arrets?|pas la|off|manquants?|manque a l appel|manquent a l appel|pas venus?) /)) return {i:'absent'};
   if(per&&has(/ (ou est|ou sera|ou etait|il est ou|elle est ou|est ou|ou bosse|ou travaille|que fait|qu est ce que fait|qu est ce qu il fait|qu est ce qu elle fait|fait quoi|sur quoi|affecte|occupe|il fait|elle fait|planning de|ou il|ou elle) /)) return {i:'where'};
+  if(has(/ (part ?145|capacite|etp|equivalents? temps plein) /)&&has(/ (disponibles?|dispos?|combien|nombre|effectifs?|capacite|etp|present|presents) /)) return {i:'dispo'};
   if(has(/ (libres?|disponibles?|dispo|dispos|sans affectation|sans chantier|pas affecte|pas affectes|non affectes?|rien a faire|n a rien|n ont rien|inoccupes?|pas de chantier|aucun chantier|pas d affectation|aucune affectation) /)) return {i:'free',cats:catOf()};
   if(has(/ combien /)&&has(/ (on est|on sera|sommes|personnes|gars|monde|presents?|travaillent|bossent|techniciens?|effectifs?|y a t il|il y a|on a|interimaires?|chefs?|mecanos?) /)) return {i:'count',cats:catOf()};
   if(has(/ (qui est la|qui travaille|qui bosse|qui sera la|qui est present|qui sont presents|qui vient) /)) return {i:'present',cats:catOf()};
@@ -29440,7 +29478,7 @@ const _MDQ_RUN={
     const nx=L.find(x=>x.ds>=t), last=[...L].reverse().find(x=>x.ds<t), nm=_mdPName(e);
     if(nx){ const d=parseLocal(nx.ds); const s=`La prochaine visite médicale de ${nm} est ${_mdqDayLbl(d)==="aujourd'hui"?"aujourd'hui":'le '+_mdDayTxt(d)}${nx.h?' à '+String(nx.h).replace(':','h'):''}.`; _mdAns({say:s,html:s,view:_mdqVWeek(d,e)}); }
     else { const s=`Aucune visite médicale à venir pour ${nm} au planning.${last?` La dernière était le ${_mdDayTxt(parseLocal(last.ds))}.`:''}`; _mdAns({say:s,html:s,view:last?_mdqVWeek(parseLocal(last.ds),e):null}); } return 'ok'; },
-  vm_list(P){ const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'week',P.n):{from:_mdToday(),to:addD(_mdToday(),30),lbl:'dans les 30 prochains jours'};
+  vm_list(P){ const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'week',P.n):_mdqPer(null,'30',P.n);
     const a=fmt(per.from), b=fmt(per.to), L=[];
     Object.entries(S.planning||{}).forEach(([k,v])=>{ if(!v||!v.vm) return; const m=k.match(/^(.*)_(\d{4}-\d{2}-\d{2})_(AM|PM)$/); if(!m||m[2]<a||m[2]>b) return; const e=byId(m[1]); if(!e||e.archived) return; L.push({e,ds:m[2],h:v.vm}); });
     L.sort((x,y)=>x.ds.localeCompare(y.ds)||String(x.h).localeCompare(String(y.h)));
@@ -29512,19 +29550,22 @@ const _MDQ_RUN={
       if(H.length===1) return (H[0]==='AM'?a:b)||'rien de prévu'; if(a===b) return a?a+' toute la journée':'rien de prévu'; return `le matin ${a||'rien de prévu'}, l'après-midi ${b||'rien de prévu'}`; };
     if(days.length===1){ const d=days[0], wd=d.getDay(); const l=line(d); const s=`${_mdqCap(per.lbl)}${_mdqHalfLbl(per)}, ${nm} ${l==='rien de prévu'?"n'a rien de prévu":l==='pas sous contrat'?"n'est pas sous contrat":'est '+l}.${(wd===0||wd===6)&&l==='rien de prévu'?' (c\'est le week-end)':''}`; _mdAns({say:s,html:_bfEsc(s),view:_mdqVWeek(d,e)}); return 'ok'; }
     const it=days.map(d=>`${_mdqSh(d)} : ${_bfEsc(line(d))}`); const s=`Voici le planning de ${nm} ${per.lbl}.`; _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:it,title:`Planning de ${nm}`,view:_mdqVWeek(per.from,e)}); return 'ok'; },
-  _people(P,test){ const per=_mdqPer(P.tm,'day',P.n), days=_mdqDays(per.from,per.to), H=_mdqHalves(per); const cats=P.q.cats;
-    const R=[]; (S.personnel||[]).filter(p=>!p.archived&&p.actif!==false&&(cats?cats.includes(p.categorie):_MDQ_PROD.has(p.categorie))).forEach(p=>{ let n=0,tot=0; days.forEach(d=>{ const ds=fmt(d); if(!_enContrat(p,ds)) return; H.forEach(h=>{ tot++; if(test(_mdqCell(p.id,ds,h))) n++; }); }); if(tot&&n) R.push({p,n,tot}); });
+  _people(P,test){ const per=_mdqPer(P.tm,'day',P.n), days=_mdqDays(per.from,per.to), H=_mdqHalves(per); const cats=P.q.cats; MD.popNote=cats?'':/ (part ?21|recyclage|iq|tout le monde|tous|hors part ?145) /.test(' '+(P.n||'')+' ')?' <small>(tout le personnel de production)</small>':' <small>(Part 145 : techniciens, intérimaires Part 145, sheet metal)</small>';
+    const allP=/ (part ?21|recyclage|iq|tout le monde|tous|hors part ?145) /.test(' '+(P.n||'')+' ');
+    // par défaut : la population du « DISPO » Part 145 (techniciens, intérimaires Part 145, sheet metal) ; une catégorie citée ou « tout le monde » élargit
+    const p145=p=>p.categorie==='technicien'||p.categorie==='sheetmetal'||_isInterimP145(p);
+    const R=[]; (S.personnel||[]).filter(p=>!p.archived&&p.actif!==false&&(cats?cats.includes(p.categorie)&&(allP||!_isHorsP145(p)):allP?_MDQ_PROD.has(p.categorie)||_isHorsP145(p):p145(p))).forEach(p=>{ let n=0,tot=0; days.forEach(d=>{ const ds=fmt(d); if(!_enContrat(p,ds)) return; H.forEach(h=>{ tot++; if(test(_mdqCell(p.id,ds,h))) n++; }); }); if(tot&&n) R.push({p,n,tot}); });
     return {per,days,H,R}; },
   free(P){ const {per,days,H,R}=_MDQ_RUN._people(P,e=>!e||!e.type||(e.type==='travail'&&!e.chantierId&&!e.chantierId2)); const full=R.filter(r=>r.n===r.tot), part=R.filter(r=>r.n<r.tot);
     const s=full.length||part.length?`${_mdqPl(full.length,'personne libre','personnes libres')} ${per.lbl}${_mdqHalfLbl(per)}${part.length?`, et ${part.length} en partie`:''}.`:`Personne n'est libre ${per.lbl}${_mdqHalfLbl(per)} : tout le monde est affecté ou absent.`;
-    _mdAns({say:s,html:`<b>${_mdqCap(s)}</b>`,items:_mdqSortP(full.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))).concat(_mdqSortP(part.map(r=>r.p)).map(p=>{ const r=part.find(x=>x.p===p); return `${_bfEsc(_mdPName(p))} <small>(${r.n} demi-journée${r.n>1?'s':''} libre${r.n>1?'s':''})</small>`; })),title:'Personnes libres',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
+    _mdAns({say:s,html:`<b>${_mdqCap(s)}</b>${MD.popNote||''}`,items:_mdqSortP(full.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))).concat(_mdqSortP(part.map(r=>r.p)).map(p=>{ const r=part.find(x=>x.p===p); return `${_bfEsc(_mdPName(p))} <small>(${r.n} demi-journée${r.n>1?'s':''} libre${r.n>1?'s':''})</small>`; })),title:'Personnes libres',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
   present(P){ const {per,days,R}=_MDQ_RUN._people(P,e=>e&&e.type==='travail'); const s=R.length?`${_mdqPl(R.length,'personne')} au travail ${per.lbl}${_mdqHalfLbl(per)}.`:`Personne n'est au travail ${per.lbl}${_mdqHalfLbl(per)}.`;
-    _mdAns({say:s,html:`<b>${_mdqCap(s)}</b>`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
+    _mdAns({say:s,html:`<b>${_mdqCap(s)}</b>${MD.popNote||''}`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
   count(P){ const {per,days,H,R}=_MDQ_RUN._people(P,e=>e&&e.type==='travail'); const cl=P.q.cats?P.q.cats.map(c=>String(_dayExtractCatLbl(c)).replace(/\.+$/,'').toLowerCase()).join(', '):'';
     if(days.length===1&&H.length===2){ const ds=fmt(days[0]); const am=R.filter(r=>_mdqCell(r.p.id,ds,'AM')?.type==='travail').length, pm=R.filter(r=>_mdqCell(r.p.id,ds,'PM')?.type==='travail').length;
-      const s=am===pm?`${_mdqCap(per.lbl)}, ${_mdqPl(am,'personne')}${cl?' ('+cl+')':''} au travail.`:`${_mdqCap(per.lbl)}${cl?' ('+cl+')':''} : ${am} au travail le matin, ${pm} l'après-midi.`; _mdAns({say:s,html:`<b>${s}</b>`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:_mdqVAff(days[0])}); return 'ok'; }
+      const s=am===pm?`${_mdqCap(per.lbl)}, ${_mdqPl(am,'personne')}${cl?' ('+cl+')':''} au travail.`:`${_mdqCap(per.lbl)}${cl?' ('+cl+')':''} : ${am} au travail le matin, ${pm} l'après-midi.`; _mdAns({say:s,html:`<b>${s}</b>${MD.popNote||''}`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:_mdqVAff(days[0])}); return 'ok'; }
     const s=`${_mdqCap(per.lbl)}${_mdqHalfLbl(per)}, ${_mdqPl(R.length,'personne')}${cl?' ('+cl+')':''} au travail${days.length>1?' au moins une demi-journée':''}.`;
-    _mdAns({say:s,html:`<b>${s}</b>`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
+    _mdAns({say:s,html:`<b>${s}</b>${MD.popNote||''}`,items:_mdqSortP(R.map(r=>r.p)).map(p=>_bfEsc(_mdPName(p))),title:'Au travail',view:days.length===1?_mdqVAff(days[0]):_mdqVWeek(per.from)}); return 'ok'; },
   absent(P){ const per=_mdqPer(P.tm,'day',P.n), days=_mdqDays(per.from,per.to), H=_mdqHalves(per), R=new Map(); const dem=new Map();
     _mdqStaff().forEach(p=>days.forEach(d=>{ const ds=fmt(d); if(!_enContrat(p,ds)) return; H.forEach(h=>{ const e=_mdqCell(p.id,ds,h); if(!e) return; const map=_MDQ_ABSET.has(e.type)?R:e.type==='conge_prev'?dem:null; if(!map) return; const r=map.get(p)||{types:new Set(),d:[]}; r.types.add(e.type); if(!r.d.some(x=>fmt(x)===ds)) r.d.push(new Date(d)); map.set(p,r); }); }));
     const fmtR=r=>{ const t=[...r.types].map(x=>_MDQ_ABS[x]).join(' + '); return days.length>1?`${t} (${r.d.length===days.length?'toute la période':r.d.map(_mdqSh).join(', ')})`:t; };
@@ -29563,12 +29604,12 @@ const _MDQ_RUN={
     const after=L.filter(g=>!sess.includes(g)); const nAfter=new Set(after.map(g=>g.ds.slice(0,10))).size;
     const s=`La prochaine formation ${first.name} est ${dl}, avec ${_mdqPl(ppl.size,'personne')}.${after.length?` ${nAfter} autre${nAfter>1?'s':''} date${nAfter>1?'s':''} prévue${nAfter>1?'s':''} ensuite.`:''}`;
     _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:_mdqSortP([...ppl.keys()]).map(p=>_bfEsc(_mdPName(p))).concat(after.slice(0,8).map(g=>`<i>Ensuite : ${_mdqSh(parseLocal(g.ds))} — ${_mdqPl(g.pp.size,'personne')}</i>`)),title:`Formation ${first.name}`,view:_mdqVWeek(d0)}); return 'ok'; },
-  form_who(P){ const fx=P.q.fx; const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'week',P.n):_mdqPer(null,'60'); const L=_MDQ_RUN._sessions(fx,per.from,per.to);
+  form_who(P){ const fx=P.q.fx; const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'week',P.n):_mdqPer(null,'60',P.n); const L=_MDQ_RUN._sessions(fx,per.from,per.to);
     const ppl=new Map(); L.forEach(g=>g.pp.forEach((h,p)=>{ const x=ppl.get(p)||[]; x.push(g); ppl.set(p,x); }));
     const lbl=fx?' '+fx.lbl:''; const s=ppl.size?`${_mdqPl(ppl.size,'personne')} en formation${lbl} ${per.lbl}.`:`Personne n'est en formation${lbl} ${per.lbl}.`;
     _mdAns({say:s,html:`<b>${_bfEsc(_mdqCap(s))}</b>`,items:_mdqSortP([...ppl.keys()]).map(p=>{ const gs=ppl.get(p); return `${_bfEsc(_mdPName(p))} — ${gs.map(g=>(fx&&fx.names.length===1?'':_bfEsc(g.name)+' ')+_mdqSh(parseLocal(g.ds))).join(', ')}`; }),title:'En formation',view:L.length?_mdqVWeek(parseLocal(L[0].ds)):null}); return 'ok'; },
-  _rec(kind){ return (kind==='a'?S.autorisations:S.formations)||[]; },
-  _person(P,text,how,kind){ const e=_mdqPerson(P,text,how); if(!e) return null; const fx=P.q.fx, nm=_mdPName(e), word=kind==='a'?'autorisation':'formation';
+  _rec(kind){ if(kind==='b') return [...(S.formations||[]),...(S.autorisations||[])]; return (kind==='a'?S.autorisations:S.formations)||[]; },
+  _person(P,text,how,kind){ const e=_mdqPerson(P,text,how); if(!e) return null; const fx=P.q.fx, nm=_mdPName(e), word=kind==='a'?'autorisation':kind==='b'?'formation ou autorisation':'formation';
     const L=_MDQ_RUN._rec(kind).filter(r=>r.empId===e.id&&_mdqFormMatch(fx,r.type)).sort((a,b)=>String(a.dateExpiration||'9999').localeCompare(String(b.dateExpiration||'9999')));
     const st=r=>tSt(r.dateExpiration), lab={expired:'expirée',warning:'à renouveler',valid:'valide',na:'sans limite'};
     const it=L.map(r=>`${_bfEsc(r.type)} — ${r.dateExpiration?`expire le ${_mdqSh(parseLocal(r.dateExpiration))} ${parseLocal(r.dateExpiration).getFullYear()}`:'sans date d\'expiration'} <small>(${lab[st(r)]})</small>`);
@@ -29576,17 +29617,27 @@ const _MDQ_RUN={
     else if(fx&&L.length<=2){ s=`Pour ${nm}, `+L.map(r=>r.dateExpiration?`${r.type} ${tSt(r.dateExpiration)==='expired'?'a expiré':'expire'} le ${_mdDayTxt(parseLocal(r.dateExpiration))}${tSt(r.dateExpiration)==='warning'?' (à renouveler)':''}`:`${r.type} n'a pas de date d'expiration`).join(', et ')+'.'; }
     else { const c={expired:0,warning:0}; L.forEach(r=>{ const x=st(r); if(c[x]!=null) c[x]++; }); s=`${nm} a ${_mdqPl(L.length,word)}${c.expired||c.warning?` : ${[c.expired?_mdqPl(c.expired,'expirée','expirées'):'',c.warning?`${c.warning} à renouveler`:''].filter(Boolean).join(', ')}`:', toutes valides'}.`; }
     if(kind==='f'&&!P.q.exp){ const nx=_MDQ_RUN._sessions(fx,_mdToday(),addD(_mdToday(),365),e)[0]; if(nx) s+=` Prochaine formation au planning : ${nx.name}, le ${_mdDayTxt(parseLocal(nx.ds))}.`; }
-    _mdAns({say:s,html:_bfEsc(s),items:L.length>1||!fx?it:[],title:`${word==='formation'?'Formations':'Autorisations'} de ${nm}`,view:_mdqVForms(kind,e,'')}); return 'ok'; },
+    if(kind==='b'&&L.length) s=s.replace(/formations? ou autorisations?s?/,L.length>1?'formations et autorisations':'formation ou autorisation');
+    _mdAns({say:s,html:_bfEsc(s),items:L.length>1||!fx?it:[],title:`${kind==='a'?'Autorisations':kind==='b'?'Formations et autorisations':'Formations'} de ${nm}`,view:_mdqVForms(kind==='a'?'a':'f',e,'')}); return 'ok'; },
   form_person(P,t,h){ return _MDQ_RUN._person(P,t,h,'f'); },
   aut_person(P,t,h){ return _MDQ_RUN._person(P,t,h,'a'); },
-  _exp(P,kind){ const fx=P.q.fx, word=kind==='a'?'autorisation':'formation'; const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'month',P.n):_mdqPer(null,'60'); const a=fmt(per.from<_mdToday()?_mdToday():per.from), b=fmt(per.to), t=fmt(_mdToday());
+  _exp(P,kind){ const fx=P.q.fx, word=kind==='a'?'autorisation':kind==='b'?'échéance':'formation'; const per=P.tm&&(P.tm.day||P.tm.week||P.tm.range||P.tm.month)?_mdqPer(P.tm,'month',P.n):_mdqPer(null,'60',P.n); const a=fmt(per.from<_mdToday()?_mdToday():per.from), b=fmt(per.to), t=fmt(_mdToday());
     const R=_MDQ_RUN._rec(kind).filter(r=>r.dateExpiration&&!_empHorsEffectif(r.empId)&&_mdqFormMatch(fx,r.type));
     const soon=R.filter(r=>r.dateExpiration>=a&&r.dateExpiration<=b).sort((x,y)=>x.dateExpiration.localeCompare(y.dateExpiration)), gone=R.filter(r=>r.dateExpiration<t);
     const lbl=fx?' '+fx.lbl:''; const pp=new Set(soon.map(r=>r.empId));
-    const s=`${soon.length?`${_mdqPl(soon.length,word)}${lbl} ${soon.length>1?'expirent':'expire'} ${per.lbl}, pour ${_mdqPl(pp.size,'personne')}.`:`Aucune ${word}${lbl} n'expire ${per.lbl}.`}${gone.length?` Et ${gone.length} ${gone.length>1?'sont déjà expirées':'est déjà expirée'}.`:''}`;
-    _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:soon.map(r=>`${_bfEsc(_mdPName(byId(r.empId)))} — ${_bfEsc(r.type)} · ${_mdqSh(parseLocal(r.dateExpiration))}`).concat(gone.length?[`<i>Déjà expirées : ${gone.slice(0,30).map(r=>_bfEsc(_mdPName(byId(r.empId))+' ('+r.type+')')).join(', ')}${gone.length>30?'…':''}</i>`]:[]),title:`${word==='formation'?'Formations':'Autorisations'} qui expirent`,view:_mdqVForms(kind,null,soon.length?'warning':gone.length?'expired':'')}); return 'ok'; },
+    const s=`${soon.length?`${_mdqPl(soon.length,word)}${lbl} ${soon.length>1?'expirent':'expire'} ${per.lbl}, pour ${_mdqPl(pp.size,'personne')}${kind==='b'?` (${soon.filter(r=>(S.formations||[]).includes(r)).length} formation${soon.filter(r=>(S.formations||[]).includes(r)).length>1?'s':''}, ${soon.filter(r=>(S.autorisations||[]).includes(r)).length} autorisation${soon.filter(r=>(S.autorisations||[]).includes(r)).length>1?'s':''})`:''}.`:`Aucune ${word}${lbl} n'expire ${per.lbl}.`}${gone.length?` Et ${gone.length} ${gone.length>1?'sont déjà expirées':'est déjà expirée'}.`:''}`;
+    _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:soon.map(r=>`${_bfEsc(_mdPName(byId(r.empId)))} — ${_bfEsc(r.type)}${kind==='b'?((S.autorisations||[]).includes(r)?' <small>(autorisation)</small>':' <small>(formation)</small>'):''} · ${_mdqSh(parseLocal(r.dateExpiration))}`).concat(gone.length?[`<i>Déjà expirées : ${gone.slice(0,30).map(r=>_bfEsc(_mdPName(byId(r.empId))+' ('+r.type+')')).join(', ')}${gone.length>30?'…':''}</i>`]:[]),title:`${kind==='a'?'Autorisations':kind==='b'?'Échéances':'Formations'} qui expirent`,view:_mdqVForms(kind==='a'?'a':'f',null,soon.length?'warning':gone.length?'expired':'')}); return 'ok'; },
   form_exp(P){ return _MDQ_RUN._exp(P,'f'); },
   aut_exp(P){ return _MDQ_RUN._exp(P,'a'); },
+  any_exp(P){ return _MDQ_RUN._exp(P,'b'); },
+  any_person(P,t,h){ return _MDQ_RUN._person(P,t,h,'b'); },
+  dispo(P){ // même calcul que le « DISPO » du tableau de bord (Part 145 : techniciens, intérimaires Part 145, sheet metal)
+    const per=_mdqPer(P.tm,'week',P.n), mon=getMon(per.from); const ABS=new Set(['conge','maladie','formation','ecole','absence','deplacement','ferie','we']);
+    const isP=p=>p.categorie==='sheetmetal'||_isInterimP145(p)||p.categorie==='technicien'; const R=[]; let theo=0, demi=0;
+    S.personnel.filter(p=>p.actif!==false&&!p.archived&&isP(p)&&_presentSemaine(p,mon,addD(mon,4))).forEach(p=>{ theo++; let d=0; [0,1,2,3,4].forEach(i=>{ const ds=fmt(addD(mon,i)); if(isHol(ds)) return; ['AM','PM'].forEach(h=>{ const e=S.planning[`${p.id}_${ds}_${h}`]; if(!ABS.has(e?e.type:'travail')) d+=0.5; }); }); demi+=d; if(d>0) R.push({p,d}); });
+    const etp=Math.round(demi/5*10)/10, wl=`semaine ${wkN(mon)}`; const s=`${_mdqCap(per.kind==='week'?per.lbl:wl)}, tu as ${_mdqPl(theo,'personne')} en Part 145, soit ${String(etp).replace('.',',')} équivalent${etp>1?'s':''} temps plein disponible${etp>1?'s':''} (congés, formations externes et absences déduits).`;
+    R.sort((a,b)=>b.d-a.d||(a.p.nom||'').localeCompare(b.p.nom||'','fr'));
+    _mdAns({say:s,html:`<b>${s}</b>`,items:R.map(r=>`${_bfEsc(_mdPName(r.p))} — ${String(r.d).replace('.',',')} j`),title:`Disponibles Part 145 ${wl}`,view:{l:'Voir le détail DISPO',fn:()=>{ try{ _showDispoDetail(mon.getFullYear(),wkN(mon),fmt(mon)); }catch(e){ S.weekStart=mon; goTab('weekly'); } }}}); return 'ok'; },
 };
 function _mdQRun(P,text,how){
   const q=P.q||{}, fn=_MDQ_RUN[q.i]; if(!fn||q.i.startsWith('_')){ _mdReply("Je ne sais pas encore répondre à cette question.",null); _mdMiss(text,'question'); _mdLog({said:text,how,label:'question inconnue',result:'pas compris'}); return; }
@@ -29595,7 +29646,7 @@ function _mdQRun(P,text,how){
 }
 
 // ═══ Mardam 0.6 — apprendre : mauvaises réponses, export pour Claude, raccourcis personnels ═══
-const _MD_VER='0.6';
+const _MD_VER='0.8';
 function _mdBad(){ _mdCfg(); if(!Array.isArray(S.mardam.bad)) S.mardam.bad=[]; return S.mardam.bad; }
 function _mdShorts(){ _mdCfg(); if(!Array.isArray(S.mardam.short)) S.mardam.short=[]; return S.mardam.short; }
 function _mdTxt(h){ const d=document.createElement('div'); d.innerHTML=String(h||'').replace(/<li>/g,' • ').replace(/<br\s*\/?>/g,' '); return (d.textContent||'').replace(/\s+/g,' ').trim(); }
@@ -29673,12 +29724,190 @@ function _mdRenderShort(){
   <div class="md-mut" style="margin-top:6px">Quand tu dis exactement l'expression (avec ou sans « stp »), je la remplace par sa traduction. Une traduction que je ne comprends pas est refusée. Pour une modification du planning, je demanderai toujours confirmation.</div>`;
 }
 
+// ═══ Mardam — étape 2 : modifier le planning et le pense-bête (toujours avec confirmation, annulable) ═══
+const _MDA_ABS=[['conge_prev',/ (demande de conges?|conges? demandes?|conges? a valider|conges? previsionnels?|conges? prev) /,'congé demandé'],['maladie',/ (malade|maladie|arret maladie|en arret|arret de travail) /,'arrêt maladie'],['conge',/ (conges?|vacances|cp|rtt|repos) /,'congé'],['deplacement',/ (deplacement|en mission|deplace) /,'déplacement'],['ecole',/ (ecole|cours|alternance) /,'école'],['absence',/ (absent|absente|absence|absences) /,'absence']];
+const _MDA_LBL={vm:'visite médicale',vm_del:'supprimer une visite médicale',form:'inscrire en formation',form_del:'retirer d\'une formation',abs:'poser une absence',abs_del:'retirer une absence',assign:'affecter',unassign:'retirer d\'un chantier',note:'note au pense-bête'};
+function _mdaHour(raw,tm){ if(tm&&tm.hour) return tm.hour; const r=String(raw||'').toLowerCase();
+  let m=r.match(/\b(\d{1,2})\s*(?:h|heures?|:)\s*(\d{2})\b/); if(m&&+m[1]<24&&+m[2]<60) return `${m[1].padStart(2,'0')}:${m[2]}`;
+  m=r.match(/\b(\d{1,2})\s*(?:h|heures?)\b(?!\s*\d)/); if(m&&+m[1]<24) return `${m[1].padStart(2,'0')}:00`;
+  if(/midi et demi/.test(r)) return '12:30'; if(/\bmidi\b/.test(r)) return '12:00'; return ''; }
+function _mdaDel(nn){ return / (supprime|supprimer|annule|annuler|enleve|enlever|retire|retirer|efface|effacer|desinscris|desinscrire|vire|virer|libere|liberer|plus de) /.test(nn); }
+// Reconnaît une modification
+function _mdAParse(P,raw){
+  const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), del=_mdaDel(nn), per=P.ppl&&P.ppl.length, msn=P.msn&&P.msn.length;
+  if(has(/ (positions?|hangar) /)) return null;                                  // hangar : étape 3
+  if(has(/ (pense bete|post it|postit|notes? de bord|une note|ma note|mes notes|rappelle moi|fais moi penser|rappel dans|un rappel) /)&&!del){
+    let txt=String(raw||'').replace(/^\s*(mardam[ ,]*)?/i,'');
+    const re=/(pense[- ]b[eê]tes?|post[- ]?its?|notes? de bord|une note|un rappel|rappelle[- ]moi|fais[- ]moi penser)/gi; let last=null, m; while((m=re.exec(txt))) last=m;
+    if(last) txt=txt.slice(last.index+last[0].length);
+    txt=txt.replace(/^\s*(de |d'|d’|qu[e'’] ?|à |a |pour |:|,)\s*/i,'').replace(/[.!\s]+$/,'').trim();
+    return {a:'note',text:txt};
+  }
+  const VM=has(/ (visites? medicales?|vm|medecine du travail|medecin du travail) /);
+  if(VM) return {a:del?'vm_del':'vm'};
+  const tk=T.slice(); (P.ppl||[]).forEach(h=>{ for(let i=h.span[0];i<h.span[1];i++) tk[i]=''; });
+  const isF=has(/ formations? /), fx0=_mdqFindForm(tk,'f'), fx=fx0&&(fx0.sure||isF)?fx0:null;
+  if(isF||(fx&&has(/ (inscris|inscrire|inscrit|envoie|envoyer|programme|programmer|pose|desinscris|desinscrire) /))) return {a:del?'form_del':'form',fx,words:isF?_mdaFormWords(T,nn):''};
+  for(const [t,re,l] of _MDA_ABS){ if(re.test(nn)) return {a:del?'abs_del':'abs',type:t,tl:l}; }
+  if(msn||has(/ (chantier|affecte|affecter|affectation) /)) return {a:del?'unassign':'assign'};
+  return null;
+}
+function _mdaFormWords(T,nn){ const i=T.indexOf('formation'); if(i<0) return ''; const stop=new Set(['le','la','du','de','des','lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche','demain','aujourd','semaine','toute','matin','apres','journee','pour','et','avec','en','au','a','ce','cette']); const w=[]; for(let k=i+1;k<T.length&&w.length<4;k++){ if(stop.has(T[k])||/^\d/.test(T[k])) { if(w.length) break; else continue; } w.push(T[k]); } return w.join(' '); }
+// ── Outils ──
+function _mdaEnsure(){ _mdCfg(); return S.mardam; }
+function _mdaDays(tm,{allowWeekend}={}){ tm=tm||{}; const L=[];
+  const push=(a,b)=>{ for(let d=new Date(a);d<=b&&L.length<130;d=addD(d,1)){ const wd=d.getDay(), ds=fmt(d); if((wd===0||wd===6)&&!allowWeekend) continue; if(isHol(ds)) continue; L.push(new Date(d)); } };
+  if(tm.range) push(tm.range.from,tm.range.to); else if(tm.week) push(tm.week.from,tm.week.to); else if(tm.day) L.push(new Date(tm.day.d)); else if(tm.month) push(_mdYmd(tm.month.y,tm.month.m,1),_mdYmd(tm.month.y,tm.month.m+1,0));
+  return L; }
+function _mdaHalves(tm,nn){ if(tm&&tm.half==='AM') return ['AM']; if(tm&&tm.half==='PM') return ['PM']; if((tm&&tm.half==='day')||/ (journee|journees|jours entiers|toute la journee|matin et apres midi|la journee) /.test(nn)) return ['AM','PM']; return null; }
+function _mdaGroup(days,H){ // « lun. 30/11 → ven. 04/12 (journée) »
+  if(!days.length) return ''; const seg=[]; let a=days[0], b=days[0];
+  for(let i=1;i<days.length;i++){ const d=days[i]; const gap=_mdqDays(addD(b,1),addD(d,-1)).length; if(gap===0&&(d-b)/864e5<=3) b=d; else { seg.push([a,b]); a=d; b=d; } } seg.push([a,b]);
+  const h=H.length===2?'journée':H[0]==='AM'?'matin':'après-midi';
+  return seg.map(([x,y])=>fmt(x)===fmt(y)?_mdDayTxt(x):`du ${_mdDayTxt(x)} au ${_mdDayTxt(y)}`).join(', ')+` (${h})`; }
+function _mdaAsk(text,how,q,say,choices){ // demande un complément ; la réponse est ajoutée à la phrase
+  MD.pending={label:'complément',complete:true,base:text,choices:(choices||[]).map(c=>({l:c.l,fn:()=>{ MD.pending=null; _mdHandle(text+' '+c.add); },match:c.match}))};
+  _mdReply(q,say||q.replace(/<[^>]+>/g,''),MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+function _mdaPeople(P,text,how,need){ // tous les noms doivent être uniques
+  const H=(P.ppl||[]); if(!H.length){ if(need===false) return []; _mdaAsk(text,how,'Pour qui ?','Pour qui ?'); return null; }
+  for(const h of H){ if(h.ids.length>1){ MD.pending={label:'choix personne',choices:h.ids.slice(0,4).map(id=>({l:_bfEsc(_mdPName(byId(id))),fn:()=>{ MD.pending=null; h.ids=[id]; _mdActRun(P,text,how); },match:q=>q.ppl&&q.ppl.some(x=>x.ids.length===1&&x.ids[0]===id)}))};
+      _mdReply(`Il y a ${h.ids.length} personnes qui correspondent à « ${_bfEsc(h.words)} ». Laquelle ?`,'Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; } }
+  return [...new Set(H.map(h=>h.ids[0]))].map(byId).filter(Boolean); }
+function _mdaHalfAsk(text,how){ return _mdaAsk(text,how,'Le matin, l\'après-midi ou la journée entière ?','Le matin, l\'après-midi ou la journée ?',[{l:'☀️ Matin',add:'le matin',match:q=>/ matin /.test(' '+q.n+' ')},{l:'🌤 Après-midi',add:"l'après-midi",match:q=>/ apres midi /.test(' '+q.n+' ')},{l:'🗓 Journée',add:'toute la journée',match:q=>/ (journee|journees|jour entier) /.test(' '+q.n+' ')}]); }
+function _mdaCellTxt(e){ return e&&(e.type||e.vm)?(_mdqCellTxt(e)||'')+(e.vm?` · VM ${String(e.vm).replace(':','h')}`:''):'vide'; }
+const _MDA_ABSKEEP=new Set(['conge','conge_prev','maladie','absence','deplacement','ecole','formation','formation_int']);
+// ── Construction du plan de modification ──
+function _mdActRun(P,text,how){
+  const A=P.A, nn=' '+(P.T||[]).join(' ')+' ', tm=P.tm||{}; let r;
+  try{ r=_MDA_BUILD[A.a](P,text,how,A,nn,tm); }catch(e){ console.warn('Mardam action',e); _mdReply("Je n'ai pas réussi à préparer cette modification. Rien n'a été changé."); _mdLog({said:text,how,label:_MDA_LBL[A.a]||A.a,result:'erreur'}); return; }
+  if(!r) return;                                                          // une question a été posée
+  if(r.err){ _mdReply(r.err,r.errSay||r.err.replace(/<[^>]+>/g,''),[],{noBad:false}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'impossible'}); return; }
+  if(!r.changes.length&&!r.note){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
+  const go=()=>_mdaApply(r,text,how,A);
+  MD.pending={label:_MDA_LBL[A.a],run:go,choices:[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }},{l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }}]};
+  const det=(r.lines||[]).concat((r.warn||[]).map(w=>`<span class="md-warn">⚠ ${w}</span>`));
+  _mdReply(`<b>${r.html||_bfEsc(r.say)}</b>${det.length?_mdqUl(det,40):''}<div class="md-mut" style="margin-top:6px">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+' · ':''}Rien n'est changé tant que tu n'as pas confirmé.</div>`,r.say+' Je confirme ?',[{l:'✓ Oui, je confirme',fn:MD.pending.choices[0].fn,primary:true},{l:'✕ Non',fn:MD.pending.choices[1].fn}],{noBad:true});
+}
+function _mdaPlan(keyFn,emps,days,H,mk,opt){ // mk(existing) → nouvel objet, null = supprimer, undefined = ne pas toucher
+  opt=opt||{}; const changes=[], skip={contrat:new Map(),abs:new Map()};
+  emps.forEach(e=>days.forEach(d=>{ const ds=fmt(d); if(!opt.ignoreContract&&!_enContrat(e,ds)){ const a=skip.contrat.get(e)||[]; a.push(d); skip.contrat.set(e,a); return; }
+    H.forEach(h=>{ const k=`${e.id}_${ds}_${h}`, ex=S.planning[k]||null; const nv=mk(ex,e,ds,h); if(nv===undefined) return; if(nv==='skipabs'){ const a=skip.abs.get(e)||[]; a.push({d,h,ex}); skip.abs.set(e,a); return; }
+      const norm=x=>x?JSON.stringify({type:x.type||'',note:x.note||'',chantierId:x.chantierId||'',chantierId2:x.chantierId2||'',formInt:x.formInt||'',vm:x.vm||''}):'';
+      if(norm(ex)===norm(nv)) return; changes.push({k,emp:e,ds,h,before:ex?JSON.parse(JSON.stringify(ex)):null,after:nv}); }); }));
+  const warn=[]; skip.contrat.forEach((L,e)=>warn.push(`${_bfEsc(_mdPName(e))} n'est pas sous contrat ${L.length>1?'sur '+L.length+' jours':'le '+_mdDayTxt(L[0])} : je ne touche pas ${L.length>1?'ces jours':'ce jour'}.`));
+  skip.abs.forEach((L,e)=>{ const t=[...new Set(L.map(x=>(_MDQ_ABS[x.ex.type]||x.ex.type)))].join(', '); warn.push(`${_bfEsc(_mdPName(e))} est en ${_bfEsc(t)} sur ${_mdqPl(L.length,'demi-journée')} : je ne les remplace pas.`); });
+  return {changes,warn};
+}
+function _mdaRepl(changes){ // ce qui sera écrasé
+  const by=new Map(); changes.forEach(c=>{ if(c.before&&c.before.type){ const t=_mdqCellTxt(c.before); const m=by.get(c.emp)||new Map(); m.set(t,(m.get(t)||0)+1); by.set(c.emp,m); } });
+  const L=[]; by.forEach((m,e)=>L.push(`${_bfEsc(_mdPName(e))} : remplace « ${[...m.entries()].map(([t,n])=>_bfEsc(t)+(n>1?` ×${n}`:'')).join(' », « ')} »`)); return L; }
+const _MDA_BUILD={
+  note(P,text,how,A,nn,tm){ if(!A.text||A.text.length<2) return _mdaAsk(text,how,'Qu\'est-ce que je note ?','Qu\'est-ce que je note ?');
+    const t=A.text.charAt(0).toUpperCase()+A.text.slice(1), due=tm.day?fmt(tm.day.d):(tm.range?fmt(tm.range.from):'');
+    return {changes:[],note:{t,due},say:`Je note sur ton pense-bête : « ${t} »${due?`, avec un rappel ${_mdqDayLbl(parseLocal(due))==="aujourd'hui"?"aujourd'hui":'le '+_mdDayTxt(parseLocal(due))}`:''}.`}; },
+  vm(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; if(E.length>1) return {err:'Une visite médicale à la fois, s\'il te plaît : dis-la pour une seule personne.'};
+    const days=_mdaDays(tm,{allowWeekend:true}); if(!days.length) return _mdaAsk(text,how,`Quel jour, la visite médicale de ${_bfEsc(_mdPName(E[0]))} ?`);
+    if(days.length>1) return {err:'Une visite médicale se pose sur un seul jour : redis-moi le jour exact.'};
+    const hr=_mdaHour(P.raw||text,tm); if(!hr) return _mdaAsk(text,how,'À quelle heure ?','À quelle heure ?');
+    const e=E[0], d=days[0], ds=fmt(d), h=+hr.slice(0,2)<12?'AM':'PM', warn=[];
+    const other=['AM','PM'].filter(x=>x!==h).map(x=>S.planning[`${e.id}_${ds}_${x}`]).find(x=>x&&x.vm);
+    const plan=_mdaPlan(null,[e],[d],[h],ex=>Object.assign({type:'',note:'',chantierId:'',chantierId2:'',formInt:''},ex||{},{vm:hr}),{});
+    if(other) { const k=`${e.id}_${ds}_${h==='AM'?'PM':'AM'}`, ex=S.planning[k]; plan.changes.push({k,emp:e,ds,h:h==='AM'?'PM':'AM',before:JSON.parse(JSON.stringify(ex)),after:ex.type?Object.assign({},ex,{vm:''}):null}); warn.push(`Elle remplace la visite de ${String(other.vm).replace(':','h')} déjà prévue ce jour-là.`); }
+    const cur=S.planning[`${e.id}_${ds}_${h}`]; if(cur&&_MDA_ABSKEEP.has(cur.type)&&!/formation/.test(cur.type)) warn.push(`Attention : ce jour-là, ${_bfEsc(_mdPName(e))} est ${_bfEsc(_mdqCellTxt(cur))}.`);
+    return {changes:plan.changes,warn:plan.warn.concat(warn),emps:[e],d0:d,say:`Je mets ${_mdPName(e)} en visite médicale ${_mdDayTxt(d)} à ${hr.replace(':','h')}.`}; },
+  vm_del(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0]; let days=_mdaDays(tm,{allowWeekend:true});
+    const L=Object.entries(S.planning).filter(([k,v])=>v&&v.vm&&k.startsWith(e.id+'_')).map(([k,v])=>({k,v,ds:k.slice(e.id.length+1,e.id.length+11)})).filter(x=>days.length?days.some(d=>fmt(d)===x.ds):x.ds>=fmt(_mdToday())).sort((a,b)=>a.ds.localeCompare(b.ds));
+    const pick=days.length?L:L.slice(0,1); if(!pick.length) return {changes:[],empty:`Je ne trouve pas de visite médicale${days.length?' ce jour-là':' à venir'} pour ${_bfEsc(_mdPName(e))}.`};
+    const changes=pick.map(x=>({k:x.k,emp:e,ds:x.ds,h:x.k.slice(-2),before:JSON.parse(JSON.stringify(x.v)),after:x.v.type?Object.assign({},x.v,{vm:''}):null}));
+    return {changes,emps:[e],d0:parseLocal(pick[0].ds),say:`Je supprime la visite médicale de ${_mdPName(e)} du ${_mdDayTxt(parseLocal(pick[0].ds))} à ${String(pick[0].v.vm).replace(':','h')}.`}; },
+  form(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; try{ ensureFormTypes(); }catch(_){}
+    let fx=A.fx; if(!fx&&A.words){ const f=_mdqFindForm(A.words.split(' '),'f'); if(f&&f.sure) fx=f; }
+    const types=(S.formTypes||[]).map(t=>t.nom).concat(['Global Refresh']); const intNames=fx?fx.names.filter(n=>types.some(t=>_mdNorm(t)===_mdNorm(n))):[];
+    if(fx&&intNames.length>1){ MD.pending={label:'choix formation',choices:intNames.slice(0,5).map(n=>({l:_bfEsc(n),fn:()=>{ MD.pending=null; P.A.fx={names:[n],keys:[_mdNorm(n)],lbl:n,sure:true,full:true}; _mdActRun(P,text,how); },match:q=>_mdNorm(q.n).includes(_mdNorm(n))}))}; _mdReply('Laquelle ?','Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+    if(!fx&&!A.words) return _mdaAsk(text,how,'Quelle formation ?','Quelle formation ?');
+    const days=_mdaDays(tm); if(!days.length) return _mdaAsk(text,how,'Pour quel jour ?','Pour quel jour ?');
+    const H=_mdaHalves(tm,nn); if(!H) return _mdaHalfHalf(text,how,days);
+    const isInt=intNames.length===1, name=isInt?intNames[0]:(fx?fx.names[0]:A.words.replace(/\b\w/g,c=>c.toUpperCase()));
+    const plan=_mdaPlan(null,E,days,H,(ex)=>{ if(ex&&['conge','conge_prev','maladie','absence','ecole','deplacement'].includes(ex.type)) return 'skipabs'; return {type:isInt?'formation_int':'formation',note:isInt?'':name,chantierId:'',chantierId2:'',formInt:isInt?name:'',vm:ex&&ex.vm||''}; });
+    const who=E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0]);
+    return {changes:plan.changes,warn:plan.warn,lines:_mdaRepl(plan.changes),emps:E,d0:days[0],track:isInt&&(typeof _formHasTracking!=='function'||_formHasTracking(name))?name:'',
+      say:`J'inscris ${who} à la formation ${name}${isInt?'':' (formation externe)'} ${_mdaGroup(days,H)}.`,html:`J'inscris ${E.map(e=>_bfEsc(_mdPName(e))).join(', ')} à la formation <b>${_bfEsc(name)}</b>${isInt?'':' (formation externe)'} ${_bfEsc(_mdaGroup(days,H))}.`}; },
+  form_del(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const fx=A.fx; let days=_mdaDays(tm,{allowWeekend:true});
+    const match=v=>v&&(v.type==='formation'||v.type==='formation_int')&&(!fx||_mdqFormMatch(fx,v.type==='formation_int'?v.formInt:v.note));
+    if(!days.length){ // la prochaine session de cette formation
+      const nx=E.flatMap(e=>Object.entries(S.planning).filter(([k,v])=>k.startsWith(e.id+'_')&&match(v)).map(([k])=>k.slice(e.id.length+1,e.id.length+11))).filter(ds=>ds>=fmt(_mdToday())).sort()[0];
+      if(!nx) return {changes:[],empty:`Je ne trouve pas de formation${fx?' '+_bfEsc(fx.lbl):''} à venir pour ${E.map(e=>_bfEsc(_mdPName(e))).join(', ')}.`}; days=[parseLocal(nx)]; }
+    const plan=_mdaPlan(null,E,days,['AM','PM'],ex=>match(ex)?(ex.vm?{type:'',note:'',chantierId:'',chantierId2:'',formInt:'',vm:ex.vm}:null):undefined,{ignoreContract:true});
+    if(!plan.changes.length) return {changes:[],empty:`Je ne trouve pas de formation${fx?' '+_bfEsc(fx.lbl):''} ${days.length===1?'le '+_mdDayTxt(days[0]):'sur cette période'} pour ${E.map(e=>_bfEsc(_mdPName(e))).join(', ')}.`};
+    const nm=[...new Set(plan.changes.map(c=>c.before.type==='formation_int'?c.before.formInt:c.before.note))].filter(Boolean).join(', ');
+    return {changes:plan.changes,emps:E,d0:days[0],untrack:true,say:`Je retire ${E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0])} de la formation ${nm} ${_mdaGroup([...new Set(plan.changes.map(c=>c.ds))].map(parseLocal),['AM','PM']).replace(/ \(journée\)$/,'')}. Les cases redeviennent vides.`}; },
+  abs(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const days=_mdaDays(tm); if(!days.length) return _mdaAsk(text,how,'Pour quel jour ?','Pour quel jour ?');
+    let H=_mdaHalves(tm,nn); if(!H){ if(days.length>=2&&['conge','maladie','conge_prev','deplacement','ecole'].includes(A.type)) H=['AM','PM']; else return _mdaHalfHalf(text,how,days); }
+    const note=['absence','deplacement','ecole'].includes(A.type)?'':'';
+    const plan=_mdaPlan(null,E,days,H,ex=>({type:A.type,note:ex&&ex.type===A.type?ex.note||'':note,chantierId:'',chantierId2:'',formInt:'',vm:ex&&ex.vm||''}));
+    const who=E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0]);
+    return {changes:plan.changes,warn:plan.warn,lines:_mdaRepl(plan.changes),emps:E,d0:days[0],say:`Je mets ${who} en ${A.tl} ${_mdaGroup(days,H)}.`,html:`Je mets ${E.map(e=>_bfEsc(_mdPName(e))).join(', ')} en <b>${_bfEsc(A.tl)}</b> ${_bfEsc(_mdaGroup(days,H))}.`}; },
+  abs_del(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const days=_mdaDays(tm); if(!days.length) return _mdaAsk(text,how,'Pour quel jour ?','Pour quel jour ?');
+    const H=_mdaHalves(tm,nn)||['AM','PM']; const types=A.type==='conge'?['conge','conge_prev']:[A.type];
+    const plan=_mdaPlan(null,E,days,H,ex=>ex&&types.includes(ex.type)?(ex.vm?{type:'',note:'',chantierId:'',chantierId2:'',formInt:'',vm:ex.vm}:null):undefined,{ignoreContract:true});
+    if(!plan.changes.length) return {changes:[],empty:`Je ne trouve pas de ${_bfEsc(A.tl)} à retirer sur cette période.`};
+    return {changes:plan.changes,emps:E,d0:days[0],say:`Je retire le ${A.tl} de ${E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0])} ${_mdaGroup([...new Set(plan.changes.map(c=>c.ds))].map(parseLocal),H)}. Les cases redeviennent vides.`}; },
+  assign(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const m=_mdqMsn(P);
+    if(!m) return _mdaAsk(text,how,'Sur quel avion ? Donne-moi son MSN.','Sur quel avion ?');
+    const chs=(S.chantiers||[]).filter(c=>m.cids.includes(c.id)); const ch=chs.find(c=>c.statut==='encours')||chs.find(c=>c.statut==='futur')||chs[0];
+    const cid=ch?ch.id:m.cids[0]; if(!cid) return {err:`Je ne trouve aucun chantier pour le MSN <b>${_bfEsc(m.msn)}</b>.`};
+    const days=_mdaDays(tm); if(!days.length) return _mdaAsk(text,how,'Pour quand ?','Pour quand ?');
+    const H=_mdaHalves(tm,nn); if(!H) return _mdaHalfHalf(text,how,days);
+    const plan=_mdaPlan(null,E,days,H,ex=>{ if(ex&&_MDA_ABSKEEP.has(ex.type)) return 'skipabs'; if(ex&&ex.type==='travail'&&(ex.chantierId===cid||ex.chantierId2===cid)) return undefined; return {type:'travail',note:'',chantierId:cid,chantierId2:'',formInt:'',vm:ex&&ex.vm||''}; });
+    const lbl=_mdqChTxt(cid), who=E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0]);
+    return {changes:plan.changes,warn:plan.warn,lines:_mdaRepl(plan.changes),emps:E,d0:days[0],empty:`${E.map(e=>_bfEsc(_mdPName(e))).join(', ')} ${E.length>1?'sont':'est'} déjà sur ${_bfEsc(lbl)} sur cette période.`,
+      say:`J'affecte ${who} sur ${lbl} ${_mdaGroup(days,H)}.`,html:`J'affecte ${E.map(e=>_bfEsc(_mdPName(e))).join(', ')} sur <b>${_bfEsc(lbl)}</b> ${_bfEsc(_mdaGroup(days,H))}.`}; },
+  unassign(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const m=_mdqMsn(P); const days=_mdaDays(tm); if(!days.length) return _mdaAsk(text,how,'Pour quand ?','Pour quand ?');
+    const H=_mdaHalves(tm,nn)||['AM','PM'];
+    const plan=_mdaPlan(null,E,days,H,ex=>{ if(!ex||ex.type!=='travail') return undefined; if(m&&!(m.cids.includes(ex.chantierId)||m.cids.includes(ex.chantierId2))) return undefined; return ex.vm?{type:'',note:'',chantierId:'',chantierId2:'',formInt:'',vm:ex.vm}:null; },{ignoreContract:true});
+    if(!plan.changes.length) return {changes:[],empty:`${E.map(e=>_bfEsc(_mdPName(e))).join(', ')} n'${E.length>1?'ont':'a'} pas d'affectation${m?' sur le '+_bfEsc(m.msn):''} sur cette période.`};
+    return {changes:plan.changes,emps:E,d0:days[0],lines:_mdaRepl(plan.changes),say:`Je retire ${E.length>1?_mdqPl(E.length,'personne'):_mdPName(E[0])}${m?' du '+m.msn:' de leur chantier'} ${_mdaGroup([...new Set(plan.changes.map(c=>c.ds))].map(parseLocal),H)}. Les cases redeviennent vides.`}; },
+};
+function _mdaHalfHalf(text,how,days){ return _mdaHalfAsk(text,how); }
+// ── Application, preuve et annulation ──
+function _mdaApply(r,text,how,A){
+  const rec={id:'mc'+Date.now().toString(36),at:new Date().toISOString(),label:_MDA_LBL[A.a],said:text,cells:r.changes.map(c=>({k:c.k,before:c.before,after:c.after})),notes:[],tracks:[],untracked:[]};
+  r.changes.forEach(c=>{ if(c.after===null) delete S.planning[c.k]; else S.planning[c.k]=c.after; });
+  if(r.track){ if(!S.formTracking) S.formTracking=[]; [...new Set(r.changes.map(c=>c.emp.id+'|'+c.ds))].forEach(x=>{ const [eid,ds]=x.split('|'); if(!S.formTracking.find(t=>t.empId===eid&&t.date===ds&&t.formInt===r.track)){ const t={id:uid(),empId:eid,date:ds,formInt:r.track,status:'planned'}; S.formTracking.push(t); rec.tracks.push(t.id); } }); }
+  if(r.untrack&&S.formTracking){ r.changes.forEach(c=>{ const b=c.before; if(b&&b.type==='formation_int'){ const i=S.formTracking.findIndex(t=>t.empId===c.emp.id&&t.date===c.ds&&t.formInt===b.formInt&&t.status==='planned'&&!r.changes.some(x=>x.emp.id===c.emp.id&&x.ds===c.ds&&x.after&&x.after.type==='formation_int')); if(i>=0){ rec.untracked.push(S.formTracking[i]); S.formTracking.splice(i,1); } } }); }
+  if(r.note){ const me=_ntMe(); const n={id:'nt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:r.note.t,c:'y',due:r.note.due||'',sh:false,by:me.login,byN:me.nom,at:Date.now(),done:0,doneDs:''}; _ntAll().push(n); rec.notes.push(n.id); }
+  _mdaEnsure(); S.mardam.changes=(S.mardam.changes||[]); S.mardam.changes.unshift(rec); if(S.mardam.changes.length>30) S.mardam.changes.length=30;
+  save(); _mdaRefresh();
+  const view=r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:_mdaView(r);
+  _mdReply(`✅ <b>C'est fait.</b> ${_bfEsc(_mdaDone(r.say))}<div class="md-mut">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+'. ':''}Tu peux annuler.</div>`,"C'est fait.",[Object.assign({primary:true},{l:'👁 '+view.l,fn:view.fn}),{l:'↩ Annuler',fn:()=>_mdaUndo(rec.id)}],{noBad:false});
+  _mdLog({said:text,how,label:'modification : '+_MDA_LBL[A.a],result:'fait',undo:rec.id});
+  setTimeout(()=>{ try{ view.fn(); }catch(_){} },350);                   // la preuve à l'écran
+}
+function _mdaDone(s){ return String(s).replace(/^Je mets /,"J'ai mis ").replace(/^J'inscris /,"J'ai inscrit ").replace(/^J'affecte /,"J'ai affecté ").replace(/^Je retire /,"J'ai retiré ").replace(/^Je supprime /,"J'ai supprimé ").replace(/^Je note /,"J'ai noté ").replace(/ Les cases redeviennent vides\./,' Les cases sont vides.'); }
+function _mdaView(r){ const e=r.emps&&r.emps.length===1?r.emps[0]:null, d=r.d0||(r.changes[0]?parseLocal(r.changes[0].ds):_mdToday());
+  return {l:'Voir le planning',fn:()=>{ S.weekStart=getMon(d); goTab('weekly'); const i=document.getElementById('week-search'); if(i) i.value=e?(e.nom||''):''; try{ renderWeekly(); }catch(_){}
+    setTimeout(()=>{ (r.changes||[]).forEach(c=>{ document.querySelectorAll(`.hd[data-emp="${c.emp.id}"][data-ds="${c.ds}"][data-half="${c.h}"]`).forEach(el=>_mdFlash(el)); }); _mdFlash(document.getElementById('weeklyGrid')); },150); }}; }
+function _mdaRefresh(){ try{ if(document.querySelector('#pg-weekly.on')) renderWeekly(); }catch(_){} try{ if(document.querySelector('#pg-master.on')) renderMaster(); }catch(_){} try{ _ntRefresh(); }catch(_){} try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){} try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#pg-dashboard.on')&&typeof renderDashboard==='function') renderDashboard(); }catch(_){} }
+function _mdaUndo(id){
+  const L=(S.mardam&&S.mardam.changes)||[]; const rec=id?L.find(x=>x.id===id):L.find(x=>!x.undone);
+  if(!rec){ _mdReply("Je n'ai aucune modification récente à annuler.",null,[],{noBad:true}); return; }
+  if(rec.undone){ _mdReply('Cette modification est déjà annulée.',null,[],{noBad:true}); return; }
+  let moved=0; rec.cells.forEach(c=>{ const cur=S.planning[c.k]||null; if(JSON.stringify(cur)!==JSON.stringify(c.after)) moved++; if(c.before===null) delete S.planning[c.k]; else S.planning[c.k]=c.before; });
+  if(rec.tracks.length&&S.formTracking) S.formTracking=S.formTracking.filter(t=>!rec.tracks.includes(t.id));
+  if(rec.untracked.length){ if(!S.formTracking) S.formTracking=[]; rec.untracked.forEach(t=>S.formTracking.push(t)); }
+  if(rec.notes.length) S.notes=_ntAll().filter(n=>!rec.notes.includes(n.id));
+  rec.undone=new Date().toISOString(); const j=(S.mardam.journal||[]).find(x=>x.undo===rec.id); if(j) j.undone=true;
+  save(); _mdaRefresh();
+  _mdReply(`↩ <b>Annulé</b> : « ${_bfEsc(rec.said)} ». Tout est revenu comme avant.${moved?`<div class="md-mut">${_mdqPl(moved,'case avait','cases avaient')} été retouchée${moved>1?'s':''} depuis : je l'ai${moved>1?'s':''} remise${moved>1?'s':''} comme avant ma modification.</div>`:''}`,'Annulé, tout est revenu comme avant.',[],{noBad:true});
+  _mdLog({said:'annule',how:'local',label:'annulation : '+rec.label,result:'ok'});
+}
+
 // ── Page Mardam (remplace l'ancien « Assistant IA ») ──
 function renderAI(){ _mdRenderTab(); }
 function _mdRenderTab(){
   const pg=document.getElementById('pg-ai'); if(!pg) return;
   if(!pg.querySelector('#md-tab')){
-    pg.innerHTML=`<div id="md-tab"><div class="sh"><div class="sh-title">🎙 <em id="md-ttl">Mardam</em></div><div class="md-sub">Ton assistant : parle-lui ou écris-lui. Étape 1 : réponses à tes questions, ouverture des écrans, filtres. · <b>version Mardam ${_MD_VER}</b></div></div>
+    pg.innerHTML=`<div id="md-tab"><div class="sh"><div class="sh-title">🎙 <em id="md-ttl">Mardam</em></div><div class="md-sub">Ton assistant : parle-lui ou écris-lui. Étape 2 : questions, écrans, filtres et modifications du planning (après ton « oui »). · <b>version Mardam ${_MD_VER}</b></div></div>
     <div class="md-grid"><section class="gc md-card md-conv"><div class="md-ch">💬 Conversation</div><div id="md-hist"></div><div class="md-inrow"><button type="button" class="md-mic" onclick="_mdListen()" title="Parler">${_MD_MIC}</button><input id="md-in2" type="text" placeholder="Écris ta demande et appuie sur Entrée…" onkeydown="if(event.key==='Enter'&&this.value.trim()){const v=this.value;this.value='';_mdHandle(v);}"></div></section>
     <div class="md-col"><section class="gc md-card"><div class="md-ch">🧪 Banc d'essai <button type="button" class="md-b p sm" onclick="_mdBenchRun()">Lancer</button></div><div id="md-bench"><div class="md-mut">Teste toutes les phrases connues et donne le taux de réussite mesuré.</div></div></section>
     <section class="gc md-card"><div class="md-ch">📓 Journal</div><div id="md-jr"></div></section>
@@ -29759,8 +29988,13 @@ function _mdBenchCases(){
         ["qu'est-ce qu'il y a en position 2 jeudi ?",q('pos')],['qui est en position 3 demain ?',q('pos')],['quand le 9388 rentre en hangar ?',q('msn_hangar')],["qu'est-ce qu'il y a dans le hangar demain ?",q('hangar_day')],
         [`prochaine visite médicale de ${b.nom} ?`,q('vm_person')],['qui a une visite médicale la semaine prochaine ?',q('vm_list')],["qu'est-ce que j'ai dans ma to-do ?",q('todo')],['quelles tâches sont en retard ?',q('todo')],
         ['est-ce que je suis en sous-effectif la semaine prochaine ?',q('under')],['il me manque du monde cette semaine ?',q('under')],['qui a le plus de jours travaillés ce mois-ci ?',q('hours')],['quels chantiers cette semaine ?',q('ch_list')],
+        ["Peux tu me donner le nombre de personnes que j'ai de disponible en part 145 la semaine prochaine ?",q('dispo')],['Tu peux me dire ce qui expire dans 2 semaines ?',q('any_exp')],['Qui a les formations qui expirent dans un mois.',q('form_exp')],
         ['donne-moi le détail',p=>p.kind==='ctl'&&p.act==='detail'],["c'est qui ?",p=>p.kind==='ctl'&&p.act==='detail']]; })(),
-    [`mets ${a.nom} en congé jeudi et vendredi`,later(2)],[`affecte ${a.nom}, ${b.nom} et ${c.nom} sur le 55304 toute la semaine`,later(2)],[`inscris ${b.nom} à la formation MOE du lundi 1er février`,later(2)],
+    ...(()=>{ const act=x=>p=>p.kind==='act'&&p.A.a===x; const it=(S.personnel||[]).find(x=>x.categorie==='interimaire'&&!x.archived)||a; return [
+    [`mets ${a.nom} en congé jeudi et vendredi`,act('abs')],[`affecte ${a.nom}, ${b.nom} et ${c.nom} sur le 55304 toute la semaine`,p=>act('assign')(p)&&p.ppl.length===3],[`inscris ${b.nom} à la formation MOE du lundi 1er février`,act('form')],[`inscrit ${b.nom} a la formation EWIS mardi`,act('form')],
+    [`Mets moi ${a.nom} en visite médicale vendredi à 08h20.`,p=>act('vm')(p)&&_mdaHour(p.raw,p.tm)==='08:20'],[`ajoute la visite médicale à ${b.nom} le 25 janvier à 12h30`,act('vm')],[`annule la visite médicale de ${b.nom}`,act('vm_del')],[`supprime la formation de ${c.nom} du jeudi 3 avril`,act('form_del')],
+    [`${a.nom} est malade demain`,p=>act('abs')(p)&&p.A.type==='maladie'],[`pose une absence à ${b.nom} lundi matin`,p=>act('abs')(p)&&p.A.type==='absence'],[`enlève le congé de ${a.nom} vendredi`,act('abs_del')],[`retire ${c.nom} du 55304 demain`,act('unassign')],[`mets ${a.nom} sur le 55304 demain matin`,act('assign')],
+    ["Mets moi une note dans mon pense-bête de rappeler Larbi demain matin à 08h00.",p=>act('note')(p)&&/^rappeler Larbi/i.test(p.A.text)],['rappelle-moi de commander les joints vendredi',p=>act('note')(p)&&/^commander les joints/.test(p.A.text)]]; })(),
     ['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',later(3)],["rajoute dans ma to do list la préparation de l'ODM de Callard",later(3)],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,later(3)],
   ];
   return L;
