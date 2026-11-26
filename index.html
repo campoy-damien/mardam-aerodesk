@@ -4105,7 +4105,7 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
-        • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran, et modifie le planning et le pense-bête après ton « oui » (affectations, absences, formations, visites médicales), avec ↩ Annuler. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
+        • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran, et fait les modifications après ton « oui » (planning, hangar, to-do, pense-bête, prolongations, formations renouvelées, nouveaux profils), avec ↩ Annuler. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
         • <strong style="color:#60b4ff">🗓 Brief de la semaine</strong> — bouton du tableau de bord : une page à envoyer au personnel après la réunion de production (tes infos, schéma du hangar avec chaque avion et ses jours, chantiers avec leur chef d'équipe, formations, absences, arrivées / départs d'intérimaires, visites médicales), en PDF ou en image.<br>
         • <strong style="color:#00d2ff">🧩 Affectations du jour en plein écran</strong> — seuls les chantiers occupés, ＋ Ajouter un chantier, glisser-déposer avec défilement automatique au bord, sélection multiple, filtre Catégories, colonnes jusqu'en bas.<br>
         • <strong style="color:#60b4ff">👻 Intérimaires hors contrat masqués</strong> — un intérimaire dont le contrat est terminé n'apparaît plus dans les semaines suivantes du Planning Hebdo, du Master et des affectations (sauf si tu le recherches).<br>
@@ -4543,7 +4543,12 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
         • <strong style="color:#ffd060">Comment elle comprend</strong> — l'app essaie d'abord seule (noms et prénoms, même mal dictés : « canard » → Callard, « bao » → Baou, « Lewis » → EWIS ; dates : « jeudi », « de lundi à vendredi », « semaine 49 », matin / après-midi). Si elle ne comprend pas et que l'IA est branchée, elle demande à l'IA de traduire la phrase en une demande que l'app sait traiter.<br>
         • <strong style="color:#ffd060">Modifier le planning</strong> — « affecte Delhumeau, Quessard et Baou sur le 55304 toute la semaine », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain », « mets Dupont en congé du 22 au 26 décembre », « retire Besnard du 2341 lundi », « supprime la formation de Madalla du 3 avril ». Si le moment n'est pas précis, elle demande <b>matin, après-midi ou journée</b>. Elle <b>répète ce qu'elle va faire et attend ton « oui »</b> ; elle ne remplace jamais un congé, une maladie ou une formation par une affectation, et ne touche pas les jours hors contrat (elle te le dit). Ensuite elle montre les cases modifiées ; <b>↩ Annuler</b> (ou « annule ce que tu viens de faire ») remet tout comme avant.<br>
         • <strong style="color:#ffd060">Pense-bête</strong> — « mets-moi une note : rappeler Larbi demain à 8h », « rappelle-moi de commander les joints vendredi » (rappel à la date dite).<br>
-        • <strong style="color:#ffd060">Pas encore</strong> — positions hangar, to-do, prolongations d'intérim, nouveau profil, mise à jour des dates de formation et d'autorisation (étape 3).
+        • <strong style="color:#ffd060">Hangar</strong> — « mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine », « sors le 9388 vendredi », « déplace le 9388 en position 1 à partir de lundi », « supprime le 55283 du hangar ». Une position déjà prise ou un avion déjà ailleurs est refusé, avec l'explication.<br>
+        • <strong style="color:#ffd060">To-do</strong> — « rajoute dans ma to-do la préparation de l'ODM de Callard pour vendredi, c'est urgent », « coche la tâche ODM », « la tâche ODM est faite », « supprime la tâche ODM ».<br>
+        • <strong style="color:#ffd060">Contrats</strong> — « prolonge le contrat de Dupont jusqu'au 18 décembre » : elle demande si la prolongation est <b>acceptée</b> (la fin de contrat change) ou seulement <b>demandée</b> (elle reste en attente, comme sur la fiche).<br>
+        • <strong style="color:#ffd060">Formations et autorisations</strong> — « l'EWIS de Baou est renouvelé » : elle demande la date, calcule la nouvelle expiration avec la validité de la formation et montre l'ancienne date avant ton « oui ».<br>
+        • <strong style="color:#ffd060">Nouveau profil</strong> — « crée un nouvel intérimaire Karim Benali, technicien, du 1er au 19 décembre » : prénom, nom, trigramme libre, catégorie, contrat et dates sont montrés avant création ; tu complètes ensuite l'agence et le reste sur la fiche, qu'elle ouvre.<br>
+        • <strong style="color:#ffd060">Pas encore</strong> — créer ou clôturer un chantier, la check-list, archiver une personne.
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔒 <strong>Ce qui sort de l'application</strong> — uniquement ta phrase, envoyée à l'IA <b>seulement si l'app ne l'a pas comprise seule</b>, avec les noms des personnes et les MSN remplacés par des codes ([P1], [A1]). Aucun fichier, aucun planning, aucune liste du personnel. La dictée passe par le service vocal de l'appareil (Apple ou Microsoft). Les réponses sont toujours calculées par l'app sur tes données : l'IA n'invente rien et ne modifie rien.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💳 <strong>Compteur IA</strong> (onglet Mardam) — appels du mois, coût estimé et solde estimé à partir du montant que tu as chargé ; alerte sous un seuil ; bouton vers ta page Billing, qui fait foi. Si les crédits sont épuisés ou la clé refusée, Mardam te le dit. Brancher l'IA : compte API Claude à ton nom (crédits prépayés, rechargement automatique désactivé), clé API rangée dans les propriétés de ton script Google « Mardam relais », adresse /exec et jeton secret dans les Réglages, puis « Test complet ».</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ff9aac;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🧠 <strong>La faire progresser</strong> — sous chaque réponse, <b>✕ Mauvaise réponse</b> : dis ce que tu attendais. Les phrases pas comprises et les réponses à corriger s'accumulent dans <b>🙊 Phrases à apprendre</b> ; <b>📋 Copier pour Claude</b> les copie pour les envoyer, une nouvelle version numérotée corrige (le numéro est affiché en haut de l'onglet Mardam). <b>🔁 Mes raccourcis</b> : « point prod » = « qui est absent cette semaine » ; chaque raccourci est testé, une traduction que Mardam ne comprend pas est refusée.</div>
@@ -9251,7 +9256,9 @@ const GUIDE_DATA = {
     {t:"Modifier le planning", d:"« Affecte Delhumeau et Baou sur le 55304 toute la semaine », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain », « retire Besnard du 2341 lundi ». Si le moment n'est pas précis, elle demande <b>matin, après-midi ou journée</b>. Elle répète ce qu'elle va faire et <b>attend ton « oui »</b> (bouton ✓ ou à la voix).", ill:null},
     {t:"Les garde-fous", d:"Une affectation ne remplace jamais un congé, une maladie ou une formation ; les jours hors contrat ne sont pas touchés ; ce qui sera remplacé est listé avant ton « oui ». Après, elle ouvre le planning sur les cases modifiées. <b>↩ Annuler</b> (ou « annule ce que tu viens de faire ») remet tout comme avant.", ill:null},
     {t:"Pense-bête", d:"« Mets-moi une note : rappeler Larbi demain à 8h », « rappelle-moi de commander les joints vendredi ». La note arrive sur ton pense-bête du tableau de bord, avec un rappel à la date dite.", ill:null},
-    {t:"Pas encore", d:"Positions hangar, to-do, prolongations d'intérim, nouveau profil, mise à jour des dates de formation et d'autorisation : étape 3, avec les mêmes garde-fous.", ill:null},
+    {t:"Hangar et to-do", d:"« Mets le 55283 en position 2 de jeudi à vendredi », « sors le 9388 vendredi », « déplace le 9388 en position 1 à partir de lundi ». « Rajoute dans ma to-do … », « coche la tâche ODM », « supprime la tâche ODM ». Une position déjà prise est refusée avec l'explication.", ill:null},
+    {t:"Contrats, formations, profils", d:"« Prolonge le contrat de Dupont jusqu'au 18 décembre » (acceptée ou seulement demandée ?). « L'EWIS de Baou est renouvelé » : elle demande la date et calcule l'expiration. « Crée un nouvel intérimaire Karim Benali, technicien, du 1er au 19 décembre » : tout est montré avant création, puis elle ouvre la fiche à compléter.", ill:null},
+    {t:"Pas encore", d:"Créer ou clôturer un chantier, la check-list, archiver une personne : plus tard, avec les mêmes garde-fous.", ill:null},
   ]},
   "Simulation": { icon:"🧪", color:"#60ffd0", steps:[
     {t:"À quoi ça sert", d:"La <b>Simulation</b> (famille Outils) permet de <b>tester un scénario</b> (charge, affectations) sans toucher au planning réel.", ill:null},
@@ -28968,15 +28975,18 @@ function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.g
 function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.trim():''; }
 // ── Compréhension : phrase → plan (sans rien exécuter) ──
 const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur|apparaitre|remonte|remonter|balance|ramene|sors moi|fais voir) /;
-const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer)( |$)/;
+const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer|bouge|bouger|repasse|rallonge|rallonger|valide|valider)( |$)/;
 const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
-function _mdDictFix(n){ return (' '+n+' ').replace(/ (formations?) (et oui|e oui|eh oui|e wis|ewi|ewiz|et wiz|et ouïs?|i wis) /g,' $1 ewis ').trim(); }
+function _mdDictFix(n){
+  // dictée : « Mets » entendu « Mais », « Mes », « Mai » ; « Mets Léo » entendu « Météo » ; « Affecte » entendu « Affect »
+  n=(' '+n+' ').replace(/^ (mais|mes|mai|met|mez|mets euh|mais euh) (?!(qui|quand|combien|ou|est ce|pourquoi|comment|quel|quelle|quels|quelles|non|oui|c est|si|alors|bon|attends|sinon|en fait|je|j|tu|il|elle|on|y a|ca|la|les|le|ce|cette|pas|plutot|enfin|aussi|du coup|par contre)\b)(?=\S)/,' mets ').replace(/^ meteo (?=\S)/,' mets leo ').replace(/^ affect (?=\S)/,' affecte ').replace(/^ affecter (?=\S)/,' affecte ').trim();
+  return (' '+n+' ').replace(/ (formations?) (et oui|e oui|eh oui|e wis|ewi|ewiz|et wiz|et ouïs?|i wis) /g,' $1 ewis ').trim(); }
 function _mdParse(raw){
   const n=_mdDictFix(_mdNorm(raw)), T=n.replace(/\?/g,' ').split(' ').filter(Boolean), nn=' '+T.join(' ')+' ';
   const P={raw,n,T,kind:'unknown'};
   if(!T.length) return P;
   // Contrôle
-  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6) return Object.assign(P,{kind:'ctl',act:'yes'});
+  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6&&!/ (tache|taches|formation|autorisation|prolongation|position) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'yes'});
   if(/ (annule|defais|reviens en arriere sur) (ce que tu viens de faire|la derniere action|ta derniere action) |^ ?(reviens en arriere|defais) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'undo'});
   if(/ (tais toi|coupe le son|coupe la voix|silence|chut|mode silencieux|arrete de parler) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'mute'});
   if(/ (remets le son|reparle|tu peux parler|active le son|remets la voix) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'unmute'});
@@ -28994,16 +29004,19 @@ function _mdParse(raw){
   if((/ (seulement|que|uniquement) les /.test(nn)||/ (seulement|uniquement) $/.test(nn))&&/ (affiche|montre|garde|filtre|laisse|voir)/.test(nn)&&!(_mdTime(T).week||_mdTime(T).range||_mdTime(T).day||_mdTime(T).month)){ const cats=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); if(cats.length) return Object.assign(P,{kind:'filter',cats}); }
   if(/ (affiche|montre|remets|mets)( moi| nous)? (de nouveau |a nouveau )?(tout le monde|toutes les categories|tous les gens|tout le personnel) /.test(nn)) return Object.assign(P,{kind:'filter',cats:'all'});
   const isNav=_MD_NAVV.test(nn)||/^(le |la |l |les |mon |ma )?(planning|master|brief|slot|hangar|stockage|recyclage|kpi|programme|chantiers|formations|autorisations|to ?do|check ?list|personnel|tableau de bord|accueil|notice|prevision|affectations|mode tv|aeromargin|fiche)( |$)/.test(T.join(' '));
-  const isAct=_MD_ACTV.test(T.join(' '))&&!/^(passe en mode|mets moi sur|lance)/.test(T.join(' '));
+  const isAct=(_MD_ACTV.test(T.join(' '))||/^(fais|faut|il faut|tu peux|peux tu|tu pourrais|pourrais tu|j aimerais que tu|je veux que tu|il faudrait)( me| moi| nous)? (virer|sortir|mettre|affecter|inscrire|ajouter|rajouter|supprimer|retirer|enlever|deplacer|prolonger|creer|cocher|noter|poser|placer|caler|caser|coller|bouger|renouveler|programmer|passer)( |$)/.test(T.join(' ')))&&!/^(passe en mode|mets moi sur|lance)/.test(T.join(' '));
   const isQ=_MD_QW.test(T.join(' '))||/\?/.test(raw);
   // Questions et actions : reconnues, livrées aux étapes suivantes
   // « Baou est malade demain » : une modification sans verbe
   if(ppl.length&&!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sera|seront|sont) (malade|malades|en conges?|en vacances|absent|absente|absents|en arret|en deplacement|a l ecole) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&A.a==='abs') return Object.assign(P,{kind:'act',A}); }
+  if(!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&(msn.length&&/ (sort|sortira|sortent|rentre|rentrera) /.test(nn)||/^(nouveau|nouvel|nouvelle|une nouvelle|un nouveau) /.test(T.join(' '))||ppl.length&&/ (a|ont) (repasse|renouvele|revalide|passe son|passe sa|passe ses|refait) /.test(nn))){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&['slot_out','slot_set','pers_new','form_upd','aut_upd'].includes(A.a)) return Object.assign(P,{kind:'act',A}); }
+  if(!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sont|a ete|ont ete) (faite?s?|terminee?s?|finie?s?|reglee?s?|renouvelee?s?|revalidee?s?|repassee?s?) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&['todo_done','form_upd','aut_upd'].includes(A.a)) return Object.assign(P,{kind:'act',A}); }
   // Questions (étape 1) : la réponse est calculée par l'app
   const q=_mdQDetect(P), qFirst=_MD_QW.test(T.join(' '))||/\?/.test(raw)||/ (montre|affiche|dis|donne|ouvre|sors|balance)( moi)? (qui|quand|combien|ou est|ou sont|quels?|quelles?|les absents|ce qu|si) /.test(nn);
   if(q&&!isAct&&(qFirst||!isNav)) return Object.assign(P,{kind:'q',q});
+  // une demande de modification reste une modification, même dite comme une question (« peux-tu mettre … ? »)
+  if(isAct&&!(isNav&&!ppl.length&&!msn.length)){ P.raw=raw; const A=_mdAParse(P,raw); if(A) return Object.assign(P,{kind:'act',A}); if(!isQ) return Object.assign(P,{kind:'later',stage:_mdStageOf(nn),what:'action'}); }
   if(isQ&&!isNav){ return Object.assign(P,{kind:'unknown',qHint:true}); }
-  if(isAct&&!(isNav&&!ppl.length&&!msn.length)){ P.raw=raw; const A=_mdAParse(P,raw); if(A) return Object.assign(P,{kind:'act',A}); return Object.assign(P,{kind:'later',stage:_mdStageOf(nn),what:'action'}); }
   if(isNav){
     let scr=null; for(const [id,re,lbl] of _MD_SCREENS){ if(re.test(nn)){ scr=[id,lbl]; break; } }
     if(!scr&&ppl.length&&/ (fiche|profil|montre|ouvre|affiche) /.test(nn)) scr=['fiche','Fiche personnel'];
@@ -29148,7 +29161,7 @@ function _mdExec(P,text,how){
     if(a==='mute'){ const c=_mdCfg(); c.mute=true; try{save();}catch(_){} try{ speechSynthesis.cancel(); }catch(_){} _mdMuteBtn(); _mdReply('Voix coupée. Je continue à te répondre par écrit.',''); }
     else if(a==='unmute'){ const c=_mdCfg(); c.mute=false; try{save();}catch(_){} _mdMuteBtn(); _mdReply('Voix remise.'); }
     else if(a==='detail'){ _mdDetail(); }
-    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais <b>modifier le planning</b> après ton « oui » (« affecte Baou sur le 55304 demain », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain ») et <b>ton pense-bête</b> (« rappelle-moi d'appeler Larbi demain »). Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
+    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais <b>modifier le planning</b> après ton « oui » (« affecte Baou sur le 55304 demain », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain ») et <b>ton pense-bête</b> (« rappelle-moi d'appeler Larbi demain »), le <b>hangar</b> (« mets le 55283 en position 2 jeudi et vendredi », « sors le 9388 vendredi »), ta <b>to-do</b>, les <b>prolongations</b>, les <b>formations renouvelées</b> et les <b>nouveaux profils</b>. Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
     else if(a==='reset'){ MD.ctx={last:null,at:0}; MD.pending=null; _mdReply('C\'est noté, on repart de zéro.'); }
     else if(a==='journal'){ const L=(S.mardam?.journal||[]).filter(j=>new Date(j.at).toDateString()===new Date().toDateString()); _mdReply(L.length?`Aujourd'hui j'ai traité <b>${L.length}</b> demande${L.length>1?'s':''} : `+L.slice(0,5).map(j=>_bfEsc(j.label||j.said)).join(', ')+(L.length>5?'…':'')+'. Le détail est dans mon journal.':"Je n'ai encore rien fait aujourd'hui.",null,[{l:'Voir le journal',fn:()=>{ goTab('ai'); }}]); }
     else if(a==='undo'){ _mdaUndo(); }
@@ -29167,7 +29180,7 @@ function _mdExec(P,text,how){
   }
   if(P.kind==='filter'){ const s=_mdFilterRun(P); _mdReply(s); _mdLog({said:text,how,label:'filtre catégories',result:'ok'}); return; }
   if(P.kind==='act'){ _mdActRun(P,text,how); return; }
-  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Je sais déjà répondre à tes questions, ouvrir les écrans, filtrer et modifier le planning (affectations, absences, formations, visites médicales) ainsi que ton pense-bête.`;
+  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Je sais déjà répondre à tes questions, ouvrir les écrans, filtrer, modifier le planning, le hangar, la to-do, le pense-bête, les contrats, les formations et autorisations, et créer un profil.`;
     _mdReply(s,`Je ne sais pas encore ${what}. Ça arrive à l'étape ${P.stage}.`); _mdLog({said:text,how,label:`étape ${P.stage} (${P.what})`,result:'pas encore'}); return; }
   if(P.kind==='q'){ _mdQRun(P,text,how); return; }
   if(P.qHint){ _mdMiss(text,'question non reconnue'); _mdLog({said:text,how,label:'question non reconnue',result:'pas compris'}); _mdReply(`J'ai compris que c'est une question, mais je ne sais pas encore y répondre. Je l'ai notée pour l'apprendre.${_mdAIready()?'':'<br><small>L\'IA traductrice n\'est pas branchée : elle m\'aide pour les phrases inhabituelles.</small>'}`,"Je ne sais pas encore répondre à cette question. Je l'ai notée."); return; }
@@ -29205,9 +29218,9 @@ Formats :
 {"type":"question","intent":"<code question>","person":"P1 ou null","msn":"A1 ou null","formation":"nom de la formation/autorisation tel que dit, ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM ou null","pos":1|2|3 ou null,"cats":[catégories] ou null}
   codes question : ${Object.entries(_MDQ_LBL).map(([k,v])=>k+' = '+v).join(' ; ')}
   (date = un jour précis ; from/to = une période ; sans date, laisse null : l'app prend aujourd'hui ou la période par défaut)
-{"type":"action","act":"assign|unassign|abs|abs_del|form|form_del|vm|vm_del|note","person":["P1","P2"] ou null,"msn":"A1 ou null","formation":"nom dit ou null","abs":"conge|conge_prev|maladie|absence|deplacement|ecole ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM|day ou null","time":"HH:MM ou null","text":"texte de la note ou null"}
-  (assign = affecter sur un avion, unassign = retirer d'un avion, abs = poser congé/maladie/absence, form = inscrire en formation, vm = visite médicale, note = pense-bête ; *_del = supprimer. L'app demande toujours confirmation.)
-{"type":"action","stage":3,"what":"résumé court"}  (autres modifications pas encore possibles : hangar, to-do, intérim, création de profil, chantiers)
+{"type":"action","act":"assign|unassign|abs|abs_del|form|form_del|vm|vm_del|note|slot_set|slot_out|slot_move|slot_del|todo_add|todo_done|todo_del|prolong|form_upd|aut_upd|pers_new","pos":1|2|3 ou null,"person":["P1","P2"] ou null,"msn":"A1 ou null","formation":"nom dit ou null","abs":"conge|conge_prev|maladie|absence|deplacement|ecole ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM|day ou null","time":"HH:MM ou null","text":"texte de la note ou null"}
+  (assign/unassign = affecter/retirer d'un avion ; abs = congé/maladie/absence ; form = inscrire en formation ; vm = visite médicale ; note = pense-bête ; slot_* = hangar (position, sortie, déplacement) ; todo_* = to-do ; prolong = prolonger un contrat ; form_upd/aut_upd = nouvelle date de formation/autorisation ; pers_new = nouveau profil (text = prénom nom) ; *_del = supprimer. L'app confirme toujours.)
+{"type":"action","stage":3,"what":"résumé court"}  (autres modifications pas encore possibles)
 {"type":"unknown"}  (seulement si la demande n'a vraiment aucun rapport)
 Écrans (code=sens) :
 ${scr}
@@ -29276,6 +29289,11 @@ function _mdFromAI(o,map,P){
     if(['AM','PM','day'].includes(o.half)) tm.half=o.half; if(/^\d{1,2}:\d{2}$/.test(o.time||'')) tm.hour=o.time.padStart(5,'0'); out.tm=Object.assign({},P&&P.tm||{},tm); out.raw=P&&P.raw||"";
     const A={a:o.act}; if(/^abs/.test(o.act)){ const t=_MDA_ABS.find(x=>x[0]===o.abs)||_MDA_ABS.find(x=>x[0]==='absence'); A.type=t[0]; A.tl=t[2]; }
     if(/^form/.test(o.act)&&o.formation){ const f=_mdqFindForm(_mdNorm(String(o.formation)).split(' '),'f'); A.fx=f&&f.sure?f:null; A.words=A.fx?'':String(o.formation); }
+    if(/^slot_/.test(o.act)) A.pos=+o.pos>=1&&+o.pos<=3?+o.pos:(o.act==='slot_set'||o.act==='slot_move'?0:undefined);
+    if((o.act==='slot_set'||o.act==='slot_move')&&!A.pos) return Object.assign(out,{kind:'unknown'});
+    if(/^(form_upd|aut_upd)$/.test(o.act)&&o.formation){ const f=_mdqFindForm(_mdNorm(String(o.formation)).split(' '),o.act==='aut_upd'?'a':'f'); A.fx=f; }
+    if(o.act==='pers_new'&&o.text){ const w=String(o.text).trim().split(/\s+/); if(w.length>=2) A.nm={prenom:w[0].charAt(0).toUpperCase()+w[0].slice(1).toLowerCase(),nom:w.slice(1).join(' ').toUpperCase()}; }
+    if(/^todo_/.test(o.act)&&o.text){ out.raw='to do '+String(o.text); out.T=_mdNorm(String(o.text)).split(' '); }
     if(o.act==='note'){ let t=String(o.text||''); Object.entries(map).forEach(([c,v])=>{ const e=v.type==='p'&&v.ids&&v.ids.length===1?byId(v.ids[0]):null; t=t.split('['+c+']').join(e?_mdPName(e):(v.words||v.msn||'')); }); A.text=t.trim(); }
     return Object.assign(out,{kind:'act',A}); }
   if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===2?2:3,what:'action'});
@@ -29669,7 +29687,7 @@ function _mdQRun(P,text,how){
 }
 
 // ═══ Mardam 0.6 — apprendre : mauvaises réponses, export pour Claude, raccourcis personnels ═══
-const _MD_VER='0.9.1';
+const _MD_VER='1.0.1';
 function _mdBad(){ _mdCfg(); if(!Array.isArray(S.mardam.bad)) S.mardam.bad=[]; return S.mardam.bad; }
 function _mdShorts(){ _mdCfg(); if(!Array.isArray(S.mardam.short)) S.mardam.short=[]; return S.mardam.short; }
 function _mdTxt(h){ const d=document.createElement('div'); d.innerHTML=String(h||'').replace(/<li>/g,' • ').replace(/<br\s*\/?>/g,' '); return (d.textContent||'').replace(/\s+/g,' ').trim(); }
@@ -29758,7 +29776,8 @@ function _mdaDel(nn){ return / (supprime|supprimer|annule|annuler|enleve|enlever
 // Reconnaît une modification
 function _mdAParse(P,raw){
   const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), del=_mdaDel(nn), per=P.ppl&&P.ppl.length, msn=P.msn&&P.msn.length;
-  if(has(/ (positions?|hangar) /)) return null;                                  // hangar : étape 3
+  const A3=_mdA3Parse(P,raw); if(A3) return A3;
+  if(has(/ (positions?|hangar) /)) return null;
   if(has(/ (pense bete|post it|postit|notes? de bord|une note|ma note|mes notes|rappelle moi|fais moi penser|rappel dans|un rappel) /)&&!del){
     let txt=String(raw||'').replace(/^\s*(mardam[ ,]*)?/i,'');
     const re=/(pense[- ]b[eê]tes?|post[- ]?its?|notes? de bord|une note|un rappel|rappelle[- ]moi|fais[- ]moi penser)/gi; let last=null, m; while((m=re.exec(txt))) last=m;
@@ -29805,11 +29824,13 @@ function _mdActRun(P,text,how){
   try{ r=_MDA_BUILD[A.a](P,text,how,A,nn,tm); }catch(e){ console.warn('Mardam action',e); _mdReply("Je n'ai pas réussi à préparer cette modification. Rien n'a été changé."); _mdLog({said:text,how,label:_MDA_LBL[A.a]||A.a,result:'erreur'}); return; }
   if(!r) return;                                                          // une question a été posée
   if(r.err){ _mdReply(r.err,r.errSay||r.err.replace(/<[^>]+>/g,''),[],{noBad:false}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'impossible'}); return; }
-  if(!r.changes.length&&!r.note){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
-  const go=()=>_mdaApply(r,text,how,A);
-  MD.pending={label:_MDA_LBL[A.a],run:go,base:P.raw||text,choices:[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }},{l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }}]};
+  if(!r.changes.length&&!r.note&&!(r.objs&&r.objs.length)){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
+  const go=v=>{ if(v){ r.objs=v.objs; r.doneNote=v.done; } _mdaApply(r,text,how,A); };
+  const no={l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }};
+  const yes=r.variants?r.variants.map(v=>({l:v.l,fn:()=>{ MD.pending=null; go(v); },match:q=>v.match.test(' '+q.n+' ')})):[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }}];
+  MD.pending={label:_MDA_LBL[A.a],run:()=>go(r.variants?r.variants[0]:null),base:P.raw||text,choices:yes.concat([no])};
   const det=(r.lines||[]).concat((r.warn||[]).map(w=>`<span class="md-warn">⚠ ${w}</span>`));
-  _mdReply(`<b>${r.html||_bfEsc(r.say)}</b>${det.length?_mdqUl(det,40):''}<div class="md-mut" style="margin-top:6px">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+' · ':''}Rien n'est changé tant que tu n'as pas confirmé.</div>`,r.say+' Je confirme ?',[{l:'✓ Oui, je confirme',fn:MD.pending.choices[0].fn,primary:true},{l:'✕ Non',fn:MD.pending.choices[1].fn}],{noBad:true});
+  _mdReply(`<b>${r.html||_bfEsc(r.say)}</b>${det.length?_mdqUl(det,40):''}${r.ask?`<div style="margin-top:6px">${_bfEsc(r.ask)}</div>`:''}<div class="md-mut" style="margin-top:6px">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+' · ':''}Rien n'est changé tant que tu n'as pas confirmé.</div>`,r.say+(r.ask?' '+r.ask:' Je confirme ?'),MD.pending.choices.map((c,i)=>({l:c.l,fn:c.fn,primary:i===0})),{noBad:true});
 }
 function _mdaPlan(keyFn,emps,days,H,mk,opt){ // mk(existing) → nouvel objet, null = supprimer, undefined = ne pas toucher
   opt=opt||{}; const changes=[], skip={contrat:new Map(),abs:new Map()};
@@ -29898,19 +29919,24 @@ function _mdaApply(r,text,how,A){
   r.changes.forEach(c=>{ if(c.after===null) delete S.planning[c.k]; else S.planning[c.k]=c.after; });
   if(r.track){ if(!S.formTracking) S.formTracking=[]; [...new Set(r.changes.map(c=>c.emp.id+'|'+c.ds))].forEach(x=>{ const [eid,ds]=x.split('|'); if(!S.formTracking.find(t=>t.empId===eid&&t.date===ds&&t.formInt===r.track)){ const t={id:uid(),empId:eid,date:ds,formInt:r.track,status:'planned'}; S.formTracking.push(t); rec.tracks.push(t.id); } }); }
   if(r.untrack&&S.formTracking){ r.changes.forEach(c=>{ const b=c.before; if(b&&b.type==='formation_int'){ const i=S.formTracking.findIndex(t=>t.empId===c.emp.id&&t.date===c.ds&&t.formInt===b.formInt&&t.status==='planned'&&!r.changes.some(x=>x.emp.id===c.emp.id&&x.ds===c.ds&&x.after&&x.after.type==='formation_int')); if(i>=0){ rec.untracked.push(S.formTracking[i]); S.formTracking.splice(i,1); } } }); }
+  rec.objs=(r.objs||[]).map(o=>({coll:o.coll,id:o.id,before:o.before,after:o.after}));
+  (r.objs||[]).forEach(o=>{ const arr=_mdaColl(o.coll); const i=arr.findIndex(x=>x.id===o.id); if(o.after===null){ if(i>=0) arr.splice(i,1); } else if(i>=0) arr[i]=o.after; else arr.push(o.after); });
   if(r.note){ const me=_ntMe(); const n={id:'nt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:r.note.t,c:'y',due:r.note.due||'',sh:false,by:me.login,byN:me.nom,at:Date.now(),done:0,doneDs:''}; _ntAll().push(n); rec.notes.push(n.id); }
   _mdaEnsure(); S.mardam.changes=(S.mardam.changes||[]); S.mardam.changes.unshift(rec); if(S.mardam.changes.length>30) S.mardam.changes.length=30;
   save(); _mdaRefresh();
-  const view=r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:_mdaView(r);
-  _mdReply(`✅ <b>C'est fait.</b> ${_bfEsc(_mdaDone(r.say))}<div class="md-mut">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+'. ':''}Tu peux annuler.</div>`,"C'est fait.",[Object.assign({primary:true},{l:'👁 '+view.l,fn:view.fn}),{l:'↩ Annuler',fn:()=>_mdaUndo(rec.id)}],{noBad:false});
+  const view=r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:r.view==='slot'?{l:'Voir le hangar',fn:()=>{ goTab('slot'); try{ renderSlotGrid(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('#pg-slot .slot-grid, #pg-slot table')||document.querySelector('.page.on')),200); }}
+    :r.view==='todo'?{l:'Voir la to-do',fn:()=>{ goTab('todo'); try{ renderTodo(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('.page.on')),150); }}
+    :r.view==='fiche'&&r.emps&&r.emps[0]?{l:'Voir la fiche',fn:()=>{ goTab('personnel'); try{ renderPersonnel(); }catch(_){} setTimeout(()=>{ try{ openPanel(r.emps[0].id); }catch(_){ try{ editPersonnel(r.emps[0].id); }catch(__){} } },120); }}
+    :r.view==='form'||r.view==='aut'?_mdqVForms(r.view==='aut'?'a':'f',r.emps&&r.emps[0],''):_mdaView(r);
+  _mdReply(`✅ <b>C'est fait.</b> ${_bfEsc(_mdaDone(r.say))}${r.doneNote?` — <b>${_bfEsc(r.doneNote)}</b>.`:''}<div class="md-mut">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+'. ':''}Tu peux annuler.</div>`,"C'est fait.",[Object.assign({primary:true},{l:'👁 '+view.l,fn:view.fn}),{l:'↩ Annuler',fn:()=>_mdaUndo(rec.id)}],{noBad:false});
   _mdLog({said:text,how,label:'modification : '+_MDA_LBL[A.a],result:'fait',undo:rec.id});
-  setTimeout(()=>{ try{ view.fn(); }catch(_){} },350);                   // la preuve à l'écran
+  setTimeout(()=>{ try{ if(r.view!=='fiche'&&typeof closePanel==='function') closePanel(); }catch(_){} try{ view.fn(); }catch(_){} },350);                   // la preuve à l'écran
 }
-function _mdaDone(s){ return String(s).replace(/^Je mets /,"J'ai mis ").replace(/^J'inscris /,"J'ai inscrit ").replace(/^J'affecte /,"J'ai affecté ").replace(/^Je retire /,"J'ai retiré ").replace(/^Je supprime /,"J'ai supprimé ").replace(/^Je note /,"J'ai noté ").replace(/ Les cases redeviennent vides\./,' Les cases sont vides.'); }
+function _mdaDone(s){ return String(s).replace(/^Je crée /,"J'ai créé ").replace(/^Je prolonge /,"J'ai prolongé ").replace(/^Je coche /,"J'ai coché ").replace(/^J'ajoute /,"J'ai ajouté ").replace(/^Je passe /,"J'ai passé ").replace(/^Je mets à jour /,"J'ai mis à jour ").replace(/^Le (\S+) sort /,'Le $1 sort désormais ').replace(/^Je mets /,"J'ai mis ").replace(/^J'inscris /,"J'ai inscrit ").replace(/^J'affecte /,"J'ai affecté ").replace(/^Je retire /,"J'ai retiré ").replace(/^Je supprime /,"J'ai supprimé ").replace(/^Je note /,"J'ai noté ").replace(/ Les cases redeviennent vides\./,' Les cases sont vides.'); }
 function _mdaView(r){ const e=r.emps&&r.emps.length===1?r.emps[0]:null, d=r.d0||(r.changes[0]?parseLocal(r.changes[0].ds):_mdToday());
   return {l:'Voir le planning',fn:()=>{ S.weekStart=getMon(d); goTab('weekly'); const i=document.getElementById('week-search'); if(i) i.value=e?(e.nom||''):''; try{ renderWeekly(); }catch(_){}
     setTimeout(()=>{ (r.changes||[]).forEach(c=>{ document.querySelectorAll(`.hd[data-emp="${c.emp.id}"][data-ds="${c.ds}"][data-half="${c.h}"]`).forEach(el=>_mdFlash(el)); }); _mdFlash(document.getElementById('weeklyGrid')); },150); }}; }
-function _mdaRefresh(){ try{ if(document.querySelector('#pg-weekly.on')) renderWeekly(); }catch(_){} try{ if(document.querySelector('#pg-master.on')) renderMaster(); }catch(_){} try{ _ntRefresh(); }catch(_){} try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){} try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#pg-dashboard.on')&&typeof renderDashboard==='function') renderDashboard(); }catch(_){} }
+function _mdaRefresh(){ try{ if(document.querySelector('#pg-slot.on')){ renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels(); } }catch(_){} try{ if(document.querySelector('#pg-todo.on')) renderTodo(); }catch(_){} try{ if(document.querySelector('#pg-personnel.on')) renderPersonnel(); }catch(_){} try{ if(document.querySelector('#pg-formations.on')) renderForms(); }catch(_){} try{ if(document.querySelector('#pg-autorisations.on')&&typeof renderAutorisations==='function') renderAutorisations(); }catch(_){} try{ popSelects(); }catch(_){} try{ renderDash(); }catch(_){} try{ if(document.querySelector('#pg-weekly.on')) renderWeekly(); }catch(_){} try{ if(document.querySelector('#pg-master.on')) renderMaster(); }catch(_){} try{ _ntRefresh(); }catch(_){} try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){} try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#pg-dashboard.on')&&typeof renderDashboard==='function') renderDashboard(); }catch(_){} }
 function _mdaUndo(id){
   const L=(S.mardam&&S.mardam.changes)||[]; const rec=id?L.find(x=>x.id===id):L.find(x=>!x.undone);
   if(!rec){ _mdReply("Je n'ai aucune modification récente à annuler.",null,[],{noBad:true}); return; }
@@ -29919,18 +29945,150 @@ function _mdaUndo(id){
   if(rec.tracks.length&&S.formTracking) S.formTracking=S.formTracking.filter(t=>!rec.tracks.includes(t.id));
   if(rec.untracked.length){ if(!S.formTracking) S.formTracking=[]; rec.untracked.forEach(t=>S.formTracking.push(t)); }
   if(rec.notes.length) S.notes=_ntAll().filter(n=>!rec.notes.includes(n.id));
+  (rec.objs||[]).slice().reverse().forEach(o=>{ const arr=_mdaColl(o.coll); const i=arr.findIndex(x=>x.id===o.id); if(o.before===null){ if(i>=0) arr.splice(i,1); } else if(i>=0) arr[i]=o.before; else arr.push(o.before); });
   rec.undone=new Date().toISOString(); const j=(S.mardam.journal||[]).find(x=>x.undo===rec.id); if(j) j.undone=true;
   save(); _mdaRefresh();
   _mdReply(`↩ <b>Annulé</b> : « ${_bfEsc(rec.said)} ». Tout est revenu comme avant.${moved?`<div class="md-mut">${_mdqPl(moved,'case avait','cases avaient')} été retouchée${moved>1?'s':''} depuis : je l'ai${moved>1?'s':''} remise${moved>1?'s':''} comme avant ma modification.</div>`:''}`,'Annulé, tout est revenu comme avant.',[],{noBad:true});
   _mdLog({said:'annule',how:'local',label:'annulation : '+rec.label,result:'ok'});
 }
 
+// ═══ Mardam — étape 3 : hangar, to-do, prolongations, formations/autorisations, nouveau profil ═══
+Object.assign(_MDA_LBL,{slot_set:'positionner un avion',slot_out:'sortir un avion du hangar',slot_move:'changer un avion de position',slot_del:'retirer un avion du hangar',todo_add:'ajouter une tâche',todo_done:'cocher une tâche',todo_del:'supprimer une tâche',prolong:'prolonger un contrat',form_upd:'mettre à jour une formation',aut_upd:'mettre à jour une autorisation',pers_new:'créer un profil'});
+const _MDA_CATN=[['interimaire',/ (interimaire|interimaires|interim) /],['chef',/ (chef d equipe|chef equipe|team leader|tl) /],['sheetmetal',/ (sheet metal|sheetmetal|tolier|structure) /],['alternant',/ (alternant|alternante|apprenti) /],['stagiaire',/ (stagiaire) /],['expert',/ (expert) /],['prestataire',/ (prestataire|presta) /],['recycling',/ (recyclage) /],['part21',/ (part ?21) /],['technicien',/ (technicien|technicienne|mecano|mecanicien|meca) /]];
+function _mdaColl(c){ if(c==='slot'){ if(!S.slot) S.slot={entries:[]}; if(!Array.isArray(S.slot.entries)) S.slot.entries=[]; return S.slot.entries; } if(c==='todos'){ if(!Array.isArray(S.todos)) S.todos=[]; return S.todos; } if(c==='autorisations'){ if(!Array.isArray(S.autorisations)) S.autorisations=[]; return S.autorisations; } return S[c]; }
+const _mdaCp=o=>o?JSON.parse(JSON.stringify(o)):null;
+function _mdaWd(a,b){ let n=0; for(let d=parseLocal(a);d<=parseLocal(b);d=addD(d,1)){ const wd=d.getDay(); if(wd&&wd!==6&&!isHol(fmt(d))) n++; } return n; }
+function _mdaLastDay(tm){ return tm.range?tm.range.to:tm.day?tm.day.d:tm.week?tm.week.to:null; }
+function _mdaFirstDay(tm){ return tm.range?tm.range.from:tm.day?tm.day.d:tm.week?tm.week.from:null; }
+function _mdA3Parse(P,raw){
+  const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), del=_mdaDel(nn), per=!!(P.ppl&&P.ppl.length), msn=!!(P.msn&&P.msn.length);
+  // nouveau profil
+  if(has(/ (cree|creer|ajoute|ajouter|rajoute|enregistre|nouveau|nouvel|nouvelle) /)&&has(/ (profil|fiche|interimaire|technicien|technicienne|mecano|mecanicien|personne|salarie|recrue|chef d equipe|sheet metal|alternant|stagiaire|expert|prestataire) /)&&has(/ (nouveau|nouvel|nouvelle|cree|creer|profil|fiche) /)&&!has(/ (to ?do|tache|note|pense bete) /)) return {a:'pers_new'};
+  if(has(/ (prolonge|prolonger|prolongation|rallonge|rallonger|prolonges) /)&&per) return {a:'prolong'};
+  if(per&&has(/ (renouvele|renouvelee|renouveles|renouvelle|renouveler|mets a jour|met a jour|mise a jour|repasse|a repasse|revalide|revalidee|nouvelle date|passe son|passe sa|a passe|refait|recyclage de|recycle) /)){ const tk=T.slice(); (P.ppl||[]).forEach(h=>{ for(let i=h.span[0];i<h.span[1];i++) tk[i]=''; }); const isA=has(/ (autorisations?|habilitations?) /); const fx=_mdqFindForm(tk,isA?'a':'f'); const fxa=!isA&&!fx?_mdqFindForm(tk,'a'):null; if(fx||fxa||isA||has(/ formations? /)) return {a:(isA||fxa&&!fx)?'aut_upd':'form_upd',fx:fx||fxa}; }
+  // hangar
+  if(msn&&has(/ (positions?|pos|hangar|sors|sortir|sort|sortie|rentre|entre|deplace|deplacer|bouge|bouger|p[123]) /)){
+    const pm=nn.match(/ (?:position|pos|p) ?(1|2|3|un|deux|trois) /), pos=pm?({un:1,deux:2,trois:3}[pm[1]]||+pm[1]):0;
+    if(del&&!pos) return {a:'slot_del'};
+    if(has(/ (sors|sortir|sort|sortie|sortira) /)) return {a:'slot_out'};
+    if(pos&&has(/ (deplace|deplacer|bouge|bouger|change|changer|passe|bascule) /)) return {a:'slot_move',pos};
+    if(pos) return {a:'slot_set',pos};
+  }
+  // to-do
+  if(has(/ (to ?do|todo|ma liste de taches|liste des taches|mes taches) /)||has(/ (une tache|la tache|cette tache|taches?) /)&&!msn){
+    if(has(/ (coche|cocher|fait|faite|faites|terminee?s?|finie?s?|valide|valider|regle|reglee) /)&&!has(/ (rajoute|ajoute|ajouter|mets|note) /)) return {a:'todo_done'};
+    if(del) return {a:'todo_del'};
+    return {a:'todo_add'};
+  }
+  return null;
+}
+function _mdaTodoText(raw){ let t=String(raw||''); const re=/(to[- ]?do(?:[- ]list)?|liste de t[aâ]ches|ma liste|mes t[aâ]ches|une t[aâ]che)/gi; let last=null,m; while((m=re.exec(t))) last=m;
+  if(last){ const after=t.slice(last.index+last[0].length).trim(), before=t.slice(0,last.index); t=after.length>3?after:before.replace(/^\s*(mets|met|rajoute|ajoute|ajouter|note|inscris)( moi)?\s*/i,'').replace(/\s*(dans|sur|à|a)\s*(ma|la|mon)?\s*$/i,''); }
+  return t.replace(/^\s*(de |d'|d’|:|,)\s*/i,'').replace(/[,;]?\s*(c'est |c’est |en )?(urgent|urgente|important|importante|prioritaire|asap)\s*[.!]*$/i,'').replace(/[.!\s]+$/,'').trim(); }
+function _mdaTodoFind(nn){ const w=nn.split(' ').filter(x=>x.length>=3&&!_MD_STOP.has(x)&&!/^(tache|taches|coche|cocher|faite?|fait|todo|liste|supprime|supprimer|enleve|retire|efface|terminee?|finie?|valide|reglee?)$/.test(x));
+  const L=(S.todos||[]).filter(t=>!t.done||/ (supprime|supprimer|enleve|retire|efface) /.test(nn)).map(t=>{ const k=' '+_mdNorm(t.text||'')+' '; const sc=w.reduce((a,x)=>a+(k.includes(' '+x)?1:0),0); return {t,sc}; }).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
+  if(!L.length) return []; const best=L[0].sc; return L.filter(x=>x.sc===best).map(x=>x.t); }
+function _mdaPersName(raw){
+  const words=String(raw||'').replace(/[,;.!?:«»"“”()]/g,' ').split(/\s+/).filter(w=>w&&/[a-zA-ZÀ-ÿ]/.test(w)); const N=words.map(w=>_mdNorm(w));
+  const KEY=/^(profil|fiche|interimaire|technicien|technicienne|mecano|mecanicien|personne|salarie|recrue|chef|sheet|alternant|alternante|stagiaire|expert|prestataire|gars)$/;
+  const FILL=new Set(['un','une','le','la','de','d','du','nouveau','nouvel','nouvelle','qui','s','appelle','appele','nomme','nommee','pour','intérimaire','interimaire','technicien','technicienne','mecano','mecanicien','equipe','metal','profil','fiche','personne','en','comme','a','avec','nom','prenom','c','est','il','elle','m']);
+  const STOP=/^(du|de|des|au|a|le|la|les|jusqu|partir|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|demain|aujourd|janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre|categorie|agence|chez|sur|en|comme|technicien|technicienne|mecano|mecanicien|chef|interimaire|sheet|alternant|stagiaire|expert|part|recyclage|cdi|cdd|tel|telephone)$/;
+  let i=N.findIndex(x=>KEY.test(x)); if(i<0) return null; const out=[];
+  for(let j=i+1;j<words.length&&out.length<3;j++){ const n=N[j]; if(!n) continue; if(!out.length&&FILL.has(n)) continue; if(STOP.test(n)||/\d/.test(n)) { if(out.length) break; else continue; } out.push(words[j].replace(/^[«"“]|[»"”]$/g,'')); }
+  if(out.length<2) return null; const cap=s=>s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();
+  return {prenom:cap(out[0]),nom:out.slice(1).join(' ').toUpperCase()};
+}
+function _mdaTri(pre,nom){ const n=_mdStrip(nom).toUpperCase().replace(/[^A-Z]/g,''), p=_mdStrip(pre).toUpperCase().replace(/[^A-Z]/g,''); const used=new Set((S.personnel||[]).map(x=>String(x.trigramme||'').toUpperCase()));
+  const c=[n.slice(0,2)+p.slice(0,1),n.slice(0,3),p.slice(0,1)+n.slice(0,2),n.slice(0,1)+p.slice(0,1)+n.slice(-1)]; for(const x of c){ if(x.length===3&&!used.has(x)) return x; } for(let k=1;k<10;k++){ const x=n.slice(0,2)+k; if(!used.has(x)) return x; } return n.slice(0,3); }
+Object.assign(_MDA_BUILD,{
+  slot_set(P,text,how,A,nn,tm){ const m=_mdqMsn(P); if(!m) return _mdaAsk(text,how,'Quel avion ? Donne-moi son MSN.','Quel avion ?');
+    const a=_mdaFirstDay(tm), b=_mdaLastDay(tm); if(!a) return _mdaAsk(text,how,'À partir de quand, et jusqu\'à quand ?','Pour quelles dates ?');
+    const debut=fmt(a), fin=fmt(b<a?a:b), pos=A.pos, E=_mdaColl('slot');
+    const cf=E.filter(e=>parseInt(e.pos)===pos&&e.msn!==m.msn&&!(e.fin<debut||e.debut>fin)); if(cf.length) return {err:`La position ${pos} est déjà prise par le MSN <b>${_bfEsc(cf[0].msn||'?')}</b> du ${_mdDayTxt(parseLocal(cf[0].debut))} au ${_mdDayTxt(parseLocal(cf[0].fin))}. Sors-le d'abord ou choisis une autre position.`};
+    const other=E.filter(e=>e.msn===m.msn&&parseInt(e.pos)!==pos&&!(e.fin<debut||e.debut>fin)); if(other.length) return {err:`Le ${_bfEsc(m.msn)} est déjà en position ${other[0].pos} du ${_mdDayTxt(parseLocal(other[0].debut))} au ${_mdDayTxt(parseLocal(other[0].fin))}. Dis plutôt « déplace le ${_bfEsc(m.msn)} en position ${pos} à partir de … ».`};
+    const same=E.find(e=>e.msn===m.msn&&parseInt(e.pos)===pos&&!(e.fin<debut||e.debut>fin));
+    const av=getSlotAvions().find(x=>String(x.msn||'').toUpperCase()===String(m.msn).toUpperCase());
+    const after=same?Object.assign(_mdaCp(same),{debut:same.debut<debut?same.debut:debut,fin:same.fin>fin?same.fin:fin}):{id:uid(),pos,avionId:av?av.id:'',avionNom:av?.nom||'',msn:m.msn,debut,fin,nbJours:0,notes:'',createdAt:fmt(new Date()),type:av?.type||''};
+    after.nbJours=_mdaWd(after.debut,after.fin);
+    const warn=av?[]:[`Le MSN ${_bfEsc(m.msn)} n'est fiché dans aucun chantier, stockage ou recyclage : il sera noté tel quel.`];
+    return {changes:[],objs:[{coll:'slot',id:after.id,before:same?_mdaCp(same):null,after}],warn,view:'slot',
+      say:`Je mets le ${m.msn} en position ${pos} ${debut===fin?'le '+_mdDayTxt(parseLocal(debut)):`du ${_mdDayTxt(parseLocal(debut))} au ${_mdDayTxt(parseLocal(fin))}`} (${_mdqPl(after.nbJours,'jour ouvré','jours ouvrés')}).`}; },
+  slot_out(P,text,how,A,nn,tm){ const m=_mdqMsn(P); if(!m) return _mdaAsk(text,how,'Quel avion ?','Quel avion ?'); const d=_mdaFirstDay(tm); if(!d) return _mdaAsk(text,how,`Le ${_bfEsc(m.msn)} sort quel jour ?`,'Il sort quel jour ?');
+    const ds=fmt(d), E=_mdaColl('slot').filter(e=>e.msn===m.msn).sort((a,b)=>String(a.debut).localeCompare(String(b.debut))); const e=E.find(x=>x.debut<=ds&&x.fin>=ds)||E.find(x=>x.debut>fmt(_mdToday()))||E.find(x=>x.fin>=fmt(_mdToday()));
+    if(!e) return {err:`Je ne trouve pas le ${_bfEsc(m.msn)} dans le hangar en ce moment.`};
+    if(ds<e.debut) return {err:`Le ${_bfEsc(m.msn)} ne rentre que le ${_mdDayTxt(parseLocal(e.debut))} : il ne peut pas sortir avant.`};
+    const after=Object.assign(_mdaCp(e),{fin:ds}); after.nbJours=_mdaWd(after.debut,after.fin);
+    return {changes:[],objs:[{coll:'slot',id:e.id,before:_mdaCp(e),after}],view:'slot',say:`Le ${m.msn} sort de la position ${e.pos} le ${_mdDayTxt(d)} (au lieu du ${_mdDayTxt(parseLocal(e.fin))}).`}; },
+  slot_del(P,text,how,A,nn,tm){ const m=_mdqMsn(P); if(!m) return _mdaAsk(text,how,'Quel avion ?','Quel avion ?'); const t=fmt(_mdToday()); const d=_mdaFirstDay(tm), ds=d?fmt(d):'';
+    if(ds&&_mdaColl('slot').some(e=>e.msn===m.msn&&e.debut<ds&&e.fin>=ds)) return _MDA_BUILD.slot_out(P,text,how,A,nn,tm);   // « vire-le vendredi » = il sort vendredi
+    const E=_mdaColl('slot').filter(e=>e.msn===m.msn&&(ds?e.debut<=ds&&e.fin>=ds:e.fin>=t)); if(!E.length) return {err:`Je ne trouve pas de passage à venir du ${_bfEsc(m.msn)} dans le hangar.`};
+    return {changes:[],objs:E.map(e=>({coll:'slot',id:e.id,before:_mdaCp(e),after:null})),view:'slot',say:`Je retire le ${m.msn} du planning hangar (${E.map(e=>`position ${e.pos}, du ${_mdqSh(parseLocal(e.debut))} au ${_mdqSh(parseLocal(e.fin))}`).join(' ; ')}).`}; },
+  slot_move(P,text,how,A,nn,tm){ const m=_mdqMsn(P); if(!m) return _mdaAsk(text,how,'Quel avion ?','Quel avion ?'); const d=_mdaFirstDay(tm)||_mdToday(), ds=fmt(d), pos=A.pos;
+    const e=_mdaColl('slot').find(x=>x.msn===m.msn&&x.debut<=ds&&x.fin>=ds)||_mdaColl('slot').filter(x=>x.msn===m.msn&&x.debut>ds).sort((a,b)=>a.debut.localeCompare(b.debut))[0];
+    if(!e) return {err:`Je ne trouve pas le ${_bfEsc(m.msn)} dans le hangar à cette date. Pour le placer, dis « mets le ${_bfEsc(m.msn)} en position ${pos} du … au … ».`};
+    if(parseInt(e.pos)===pos) return {changes:[],objs:[],empty:`Le ${_bfEsc(m.msn)} est déjà en position ${pos}.`};
+    const from=e.debut>ds?e.debut:ds; const cf=_mdaColl('slot').filter(x=>parseInt(x.pos)===pos&&x.id!==e.id&&!(x.fin<from||x.debut>e.fin)); if(cf.length) return {err:`La position ${pos} est prise par le MSN <b>${_bfEsc(cf[0].msn||'?')}</b> du ${_mdDayTxt(parseLocal(cf[0].debut))} au ${_mdDayTxt(parseLocal(cf[0].fin))}.`};
+    const objs=[]; if(from===e.debut){ const a=Object.assign(_mdaCp(e),{pos}); objs.push({coll:'slot',id:e.id,before:_mdaCp(e),after:a}); }
+    else { const a=Object.assign(_mdaCp(e),{fin:fmt(addD(parseLocal(from),-1))}); a.nbJours=_mdaWd(a.debut,a.fin); const b=Object.assign(_mdaCp(e),{id:uid(),pos,debut:from}); b.nbJours=_mdaWd(b.debut,b.fin); objs.push({coll:'slot',id:e.id,before:_mdaCp(e),after:a},{coll:'slot',id:b.id,before:null,after:b}); }
+    return {changes:[],objs,view:'slot',say:`Je passe le ${m.msn} de la position ${e.pos} à la position ${pos} à partir du ${_mdDayTxt(parseLocal(from))}, jusqu'au ${_mdDayTxt(parseLocal(e.fin))}.`}; },
+  todo_add(P,text,how,A,nn,tm){ let t=_mdaTodoText(P.raw||text); if(!t||t.length<3) return _mdaAsk(text,how,'Qu\'est-ce que j\'ajoute dans ta to-do ?','Qu\'est-ce que j\'ajoute ?');
+    t=t.charAt(0).toUpperCase()+t.slice(1); const pr=/ (urgent|urgente|important|importante|prioritaire|asap|vite) /.test(nn)?'high':/ (pas urgent|quand j ai le temps|a l occasion) /.test(nn)?'low':'medium'; const due=tm.day?fmt(tm.day.d):tm.range?fmt(tm.range.to):'';
+    const o={id:uid(),text:t,priority:pr,due,assign:'',done:false,createdAt:fmt(new Date())};
+    return {changes:[],objs:[{coll:'todos',id:o.id,before:null,after:o}],view:'todo',say:`J'ajoute dans ta to-do : « ${t} »${due?`, pour le ${_mdDayTxt(parseLocal(due))}`:''}${pr==='high'?', priorité haute':''}.`}; },
+  todo_done(P,text,how,A,nn){ const L=_mdaTodoFind(nn); if(!L.length) return {err:"Je ne trouve pas cette tâche dans ta to-do. Dis un mot qu'elle contient (ex. « coche la tâche ODM »)."};
+    if(L.length>1){ MD.pending={label:'choix tâche',choices:L.slice(0,4).map(t=>({l:_bfEsc(String(t.text).slice(0,40)),fn:()=>{ MD.pending=null; P.A.only=t.id; _mdActRun(P,text,how); },match:q=>_mdNorm(t.text).includes(q.n)}))}; _mdReply('Laquelle ?','Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+    const t=A.only?(S.todos||[]).find(x=>x.id===A.only):L[0]; const after=Object.assign(_mdaCp(t),{done:true,doneAt:fmt(new Date())});
+    return {changes:[],objs:[{coll:'todos',id:t.id,before:_mdaCp(t),after}],view:'todo',say:`Je coche la tâche « ${t.text} ».`}; },
+  todo_del(P,text,how,A,nn){ const L=_mdaTodoFind(nn); if(!L.length) return {err:"Je ne trouve pas cette tâche dans ta to-do."};
+    if(L.length>1&&!A.only){ MD.pending={label:'choix tâche',choices:L.slice(0,4).map(t=>({l:_bfEsc(String(t.text).slice(0,40)),fn:()=>{ MD.pending=null; P.A.only=t.id; _mdActRun(P,text,how); }}))}; _mdReply('Laquelle ?','Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+    const t=A.only?(S.todos||[]).find(x=>x.id===A.only):L[0]; return {changes:[],objs:[{coll:'todos',id:t.id,before:_mdaCp(t),after:null}],view:'todo',say:`Je supprime la tâche « ${t.text} ».`}; },
+  prolong(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0];
+    const d=_mdaLastDay(tm); if(!d) return _mdaAsk(text,how,`Jusqu'à quand, le contrat de ${_bfEsc(_mdPName(e))} ?`,"Jusqu'à quand ?");
+    const anchor=_interimAnchorEnd(e), nf=fmt(d); if(anchor&&nf<=anchor) return {err:`Le contrat de ${_bfEsc(_mdPName(e))} va déjà jusqu'au ${_mdDayTxt(parseLocal(anchor))}${(e.prolongations||[]).some(p=>p.statut==='demandee')?' (prolongation demandée comprise)':''}. Donne une date après.`};
+    const nd=anchor?fmt(addD(parseLocal(anchor),1)):'';
+    const mk=st=>{ const a=_mdaCp(e); if(!Array.isArray(a.prolongations)) a.prolongations=[]; a.prolongations.push({id:uid(),ancienneFin:anchor||'',nouveauDebut:nd,gap:0,nouvelleFin:nf,ref:'',date:fmt(new Date()),statut:st}); if(st==='acceptee'){ a.dateFin=nf; } return a; };
+    const base={changes:[],view:'fiche',emps:[e],say:`Je prolonge le contrat ${e.categorie==='interimaire'?"d'intérim ":''}de ${_mdPName(e)} jusqu'au ${_mdDayTxt(d)}${anchor?` (fin actuelle : ${_mdDayTxt(parseLocal(anchor))})`:''}.`};
+    return Object.assign(base,{objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after:mk('acceptee')}],ask:'Elle est acceptée par l\'agence, ou seulement demandée ?',
+      variants:[{l:'✓ Oui, acceptée',match:/ (acceptee?|accepte|validee?|ok|oui) /,objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after:mk('acceptee')}],done:'prolongation acceptée'},{l:'📝 Oui, demandée seulement',match:/ (demandee?|demande|en attente|pas encore) /,objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after:mk('demandee')}],done:'prolongation demandée : la date de fin changera quand tu l\'accepteras'}]}); },
+  _upd(P,text,how,A,nn,tm,kind){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0], fx=A.fx, coll=kind==='a'?'autorisations':'formations', word=kind==='a'?'autorisation':'formation';
+    if(!fx) return _mdaAsk(text,how,`Quelle ${word} ?`,`Quelle ${word} ?`);
+    const recs=_mdaColl(coll).filter(r=>r.empId===e.id&&_mdqFormMatch(fx,r.type));
+    if(fx.names.length>1&&recs.length!==1){ MD.pending={label:'choix '+word,choices:fx.names.slice(0,5).map(n=>({l:_bfEsc(n),fn:()=>{ MD.pending=null; P.A.fx={names:[n],keys:[_mdNorm(n)],lbl:n,sure:true,full:true}; _mdActRun(P,text,how); }}))}; _mdReply('Laquelle ?','Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+    const name=recs[0]?recs[0].type:fx.names[0];
+    const obt=tm.day?tm.day.d:(tm.range&&!/ (jusqu|valable|expire) /.test(nn)?tm.range.from:null);
+    let exp=tm.range&&/ (jusqu|valable|expire) /.test(nn)?tm.range.to:null;
+    if(!obt&&!exp) return _mdaAsk(text,how,`À quelle date ${_bfEsc(_mdPName(e))} a passé ${_bfEsc(name)} ?`,'À quelle date ?',[{l:"Aujourd'hui",add:"aujourd'hui"},{l:'Hier',add:'hier'}]);
+    let expS=exp?fmt(exp):'';
+    if(!expS&&kind!=='a'){ const v=_formValidity(name); if(v&&v.suivi&&v.num) expS=calcExpirationMU(fmt(obt),v.num,v.unit); }
+    if(!expS&&kind==='a'){ const old=recs[0]; if(old&&old.dateObtention&&old.dateExpiration&&obt){ const ms=parseLocal(old.dateExpiration)-parseLocal(old.dateObtention); if(ms>0) expS=fmt(new Date(obt.getTime()+ms)); } }
+    if(!expS&&kind==='a') return _mdaAsk(text,how,`Jusqu'à quand est valable la nouvelle ${_bfEsc(name)} ?`,"Jusqu'à quand ?");
+    const obtS=obt?fmt(obt):(recs[0]?.dateObtention||'');
+    const before=recs[0]?_mdaCp(recs[0]):null, after=Object.assign(before?_mdaCp(before):{id:uid(),empId:e.id,type:name,notes:''},{dateObtention:obtS,dateExpiration:expS});
+    return {changes:[],objs:[{coll,id:after.id,before,after}],view:kind==='a'?'aut':'form',emps:[e],warn:before?[]:[`${_bfEsc(_mdPName(e))} n'avait pas encore de ligne « ${_bfEsc(name)} » : je la crée.`],
+      say:`Je mets à jour ${name} de ${_mdPName(e)} : ${obtS?'obtenue le '+_mdDayTxt(parseLocal(obtS))+', ':''}${expS?'valable jusqu\'au '+_mdDayTxt(parseLocal(expS)):'sans date d\'expiration'}${before&&before.dateExpiration?` (avant : ${_mdDayTxt(parseLocal(before.dateExpiration))})`:''}.`}; },
+  form_upd(P,t,h,A,nn,tm){ return _MDA_BUILD._upd(P,t,h,A,nn,tm,'f'); },
+  aut_upd(P,t,h,A,nn,tm){ return _MDA_BUILD._upd(P,t,h,A,nn,tm,'a'); },
+  pers_new(P,text,how,A,nn,tm){ const nm=A.nm||_mdaPersName(P.raw||text); if(!nm) return _mdaAsk(text,how,'Quel est son prénom et son nom ?','Son prénom et son nom ?');
+    let cat='technicien'; for(const [c,re] of _MDA_CATN){ if(re.test(nn)){ cat=c; break; } }
+    const activite=cat==='interimaire'?(/ part ?21 /.test(nn)?'part21':/ recyclage /.test(nn)?'recycling':/ (sheet metal|structure) /.test(nn)?'sheetmetal':''):'';
+    const a=_mdaFirstDay(tm), b=tm.range?tm.range.to:null;
+    if(cat==='interimaire'&&!a) return _mdaAsk(text,how,`Du combien au combien, la mission de ${_bfEsc(nm.prenom)} ${_bfEsc(nm.nom)} ?`,'Du combien au combien ?');
+    const dup=(S.personnel||[]).find(p=>_mdNorm(p.nom||'')===_mdNorm(nm.nom)&&_mdNorm(p.prenom||'')===_mdNorm(nm.prenom));
+    if(dup) return {err:`${_bfEsc(_mdPName(dup))} existe déjà${dup.archived?' (archivé)':''}. Ouvre sa fiche pour la modifier.`};
+    const tri=_mdaTri(nm.prenom,nm.nom); const contrat=typeof _contratDefault==='function'?_contratDefault(cat):'';
+    const o={id:uid(),prenom:nm.prenom,nom:nm.nom,trigramme:tri,societe:'',categorie:cat,tel:'',email:'',dateEmbauche:cat==='interimaire'?'':(a?fmt(a):''),dateFin:cat==='interimaire'&&b?fmt(b):'',activite,agence:'',debutContrat:cat==='interimaire'&&a?fmt(a):'',tauxHoraire:null,niveau:'',contrat,actif:true};
+    const homo=(S.personnel||[]).filter(p=>_mdNorm(p.nom||'')===_mdNorm(nm.nom)); const lbl=(CATS&&CATS[cat]?.lbl)||cat;
+    return {changes:[],objs:[{coll:'personnel',id:o.id,before:null,after:o}],view:'fiche',emps:[o],warn:homo.length?[`Il y a déjà ${homo.map(p=>_bfEsc(_mdPName(p))).join(', ')} : vérifie que ce n'est pas la même personne.`]:[],
+      lines:[`Prénom : <b>${_bfEsc(o.prenom)}</b> · Nom : <b>${_bfEsc(o.nom)}</b> · Trigramme : <b>${tri}</b>`,`Catégorie : ${_bfEsc(lbl)}${activite?' · activité '+activite:''}${contrat?' · contrat '+_bfEsc(contrat):''}`].concat(cat==='interimaire'?[`Mission : ${a?'du '+_mdDayTxt(a):''}${b?' au '+_mdDayTxt(b):' (fin à préciser)'}`]:a?[`Arrivée : ${_mdDayTxt(a)}`]:[]),
+      say:`Je crée la fiche de ${o.prenom} ${o.nom}, ${String(lbl).toLowerCase()}${cat==='interimaire'&&a?`, en mission du ${_mdDayTxt(a)}${b?' au '+_mdDayTxt(b):''}`:''}. Tu pourras compléter l'agence, le téléphone et le reste sur sa fiche.`}; },
+});
+
 // ── Page Mardam (remplace l'ancien « Assistant IA ») ──
 function renderAI(){ _mdRenderTab(); }
 function _mdRenderTab(){
   const pg=document.getElementById('pg-ai'); if(!pg) return;
   if(!pg.querySelector('#md-tab')){
-    pg.innerHTML=`<div id="md-tab"><div class="sh"><div class="sh-title">🎙 <em id="md-ttl">Mardam</em></div><div class="md-sub">Ton assistant : parle-lui ou écris-lui. Étape 2 : questions, écrans, filtres et modifications du planning (après ton « oui »). · <b>version Mardam ${_MD_VER}</b></div></div>
+    pg.innerHTML=`<div id="md-tab"><div class="sh"><div class="sh-title">🎙 <em id="md-ttl">Mardam</em></div><div class="md-sub">Ton assistant : parle-lui ou écris-lui. Questions, écrans, filtres et modifications (après ton « oui »). · <b>version Mardam ${_MD_VER}</b></div></div>
     <div class="md-grid"><section class="gc md-card md-conv"><div class="md-ch">💬 Conversation</div><div id="md-hist"></div><div class="md-inrow"><button type="button" class="md-mic" onclick="_mdListen()" title="Parler">${_MD_MIC}</button><input id="md-in2" type="text" placeholder="Écris ta demande et appuie sur Entrée…" onkeydown="if(event.key==='Enter'&&this.value.trim()){const v=this.value;this.value='';_mdHandle(v);}"></div></section>
     <div class="md-col"><section class="gc md-card"><div class="md-ch">🧪 Banc d'essai <button type="button" class="md-b p sm" onclick="_mdBenchRun()">Lancer</button></div><div id="md-bench"><div class="md-mut">Teste toutes les phrases connues et donne le taux de réussite mesuré.</div></div></section>
     <section class="gc md-card"><div class="md-ch">📓 Journal</div><div id="md-jr"></div></section>
@@ -30019,9 +30177,12 @@ function _mdBenchCases(){
     [`mets ${a.nom} en congé jeudi et vendredi`,act('abs')],[`affecte ${a.nom}, ${b.nom} et ${c.nom} sur le 55304 toute la semaine`,p=>act('assign')(p)&&p.ppl.length===3],[`inscris ${b.nom} à la formation MOE du lundi 1er février`,act('form')],[`inscrit ${b.nom} a la formation EWIS mardi`,act('form')],
     [`Mets moi ${a.nom} en visite médicale vendredi à 08h20.`,p=>act('vm')(p)&&_mdaHour(p.raw,p.tm)==='08:20'],[`ajoute la visite médicale à ${b.nom} le 25 janvier à 12h30`,act('vm')],[`annule la visite médicale de ${b.nom}`,act('vm_del')],[`supprime la formation de ${c.nom} du jeudi 3 avril`,act('form_del')],
     [`${a.nom} est malade demain`,p=>act('abs')(p)&&p.A.type==='maladie'],[`pose une absence à ${b.nom} lundi matin`,p=>act('abs')(p)&&p.A.type==='absence'],[`enlève le congé de ${a.nom} vendredi`,act('abs_del')],[`retire ${c.nom} du 55304 demain`,act('unassign')],[`mets ${a.nom} sur le 55304 demain matin`,act('assign')],
+    [`Mais ${a.nom} en congé le 11 décembre matin ?`,p=>act('abs')(p)&&p.tm&&p.tm.half==='AM'],[`Peux-tu mettre ${b.nom} en congé du 23 décembre au 31 décembre ?`,act('abs')],[`Affect ${b.nom}, en congé toute la journée du 23 décembre au 31 décembre.`,act('abs')],[`Météo ${a.nom} en visite médicale vendredi à 08h20.`,act('vm')],
     ['Inscris Mohamed en formation et oui, le 7 décembre. toute la journée',p=>act('form')(p)&&p.A.fx&&p.A.fx.names.some(n=>/ewis/i.test(n))],
     ["Mets moi une note dans mon pense-bête de rappeler Larbi demain matin à 08h00.",p=>act('note')(p)&&/^rappeler Larbi/i.test(p.A.text)],['rappelle-moi de commander les joints vendredi',p=>act('note')(p)&&/^commander les joints/.test(p.A.text)]]; })(),
-    ['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',later(3)],["rajoute dans ma to do list la préparation de l'ODM de Callard",later(3)],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,later(3)],
+    ...(()=>{ const act=x=>p=>p.kind==='act'&&p.A.a===x; return [['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',p=>act('slot_set')(p)&&p.A.pos===2],["rajoute dans ma to do list la préparation de l'ODM de Callard",act('todo_add')],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,act('prolong')],
+      ['sors le 9388 vendredi',act('slot_out')],['déplace le 9388 en position 1 à partir de lundi',p=>act('slot_move')(p)&&p.A.pos===1],['supprime le 9388 du hangar',act('slot_del')],['coche la tâche ODM',act('todo_done')],['la tâche ODM est faite',act('todo_done')],['supprime la tâche ODM',act('todo_del')],
+      [`l'EWIS de ${a.nom} est renouvelé`,act('form_upd')],[`mets à jour le CACES de ${b.nom}, passé le 20 novembre`,act('form_upd')],[`renouvelle l'autorisation de ${c.nom}`,act('aut_upd')],['crée un nouvel intérimaire Karim Benali technicien du 1er au 19 décembre',act('pers_new')],['ajoute un nouveau technicien Paul Martin',act('pers_new')]]; })(),
   ];
   return L;
 }
