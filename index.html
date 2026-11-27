@@ -678,6 +678,15 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .bv-date{font-size:23px;font-weight:800;color:#fff;text-transform:capitalize}.bv-sub{font-size:12.5px;color:#8fa3bf}
 .bv-warn{color:#ffb340;font-weight:700;font-size:12px;margin-bottom:8px}
 .bv-kp{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.bv-kclick{cursor:pointer;transition:transform .12s,box-shadow .12s}.bv-kclick:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.25)}.bv-kclick.on{box-shadow:0 0 0 2px #00d2ff,0 6px 18px rgba(0,0,0,.3)}
+.bv-kmore{position:absolute;right:10px;top:8px;font-style:normal;font-size:10px;font-weight:800;opacity:.55}
+.bv-kd{margin:-4px 0 14px;animation:bvKd .18s ease-out}@keyframes bvKd{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.bv-kdh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}.bv-kdh b{font-size:15px}.bv-kdh .bv-kx{margin-left:auto;border:0;background:rgba(255,255,255,.08);color:inherit;border-radius:8px;width:28px;height:26px;cursor:pointer}
+.bv-kg{margin:10px 0 0}.bv-kgt{font-size:12px;font-weight:800;margin-bottom:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.bv-kgt>span:first-of-type{font-weight:900;opacity:.7}
+.bv-kcs{display:flex;flex-wrap:wrap;gap:5px}.bv-kc{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 3px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);font-size:12px}.bv-kc .bv-av{width:24px;height:24px;font-size:8.5px}.bv-kc small{font-size:10.5px;opacity:.65}
+.bv-kn{font-size:11px;margin-top:10px}.bv-kom{display:flex;flex-direction:column;gap:6px}.bv-kor{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px}
+body:not(.th-bento) #m-brief .bv-kc{border-radius:7px}body:not(.th-bento) #m-brief .bv-kclick.on{box-shadow:0 0 0 1px #00d2ff,0 0 18px rgba(0,210,255,.3)}
+body.th-bento #m-brief .bv-kclick.on{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 8px 22px rgba(0,0,0,.3)}body.th-bento #m-brief .bv-kmore{color:inherit}
 .bv-k{border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);position:relative;overflow:hidden}
 .bv-k i{position:absolute;left:0;top:0;bottom:0;width:3px}.bv-k b{font-size:25px;font-weight:900;display:block;line-height:1.1;color:#fff}.bv-k b small{font-size:14px;color:#7f90aa}.bv-k span{font-size:11px;color:#8fa3bf;font-weight:600}
 .bv-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;align-items:start}.bv-col{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -685,6 +694,19 @@ tbody td{padding:11px 14px;color:var(--t1);vertical-align:middle}
 .bv-bt{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#9fb0c8;display:flex;align-items:center;gap:7px;margin-bottom:9px}.bv-bt em{margin-left:auto;font-style:normal;color:#6f80a0;letter-spacing:0;text-transform:none;font-weight:700;font-size:11px}.bv-bt em a{color:#7fd4ff;text-decoration:none}
 .bv-man{margin:4px 0 2px;padding:5px 9px;border-radius:8px;background:rgba(255,179,64,.1);border:1px solid rgba(255,179,64,.35);color:#ffc266;font-size:11.5px;font-weight:700}
 .bw-safety{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bw-safety.sf-4{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.sf-who{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;opacity:.7;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf-sc .bw-cl{min-height:2.4em}.sf-foot{font-size:11.5px;margin-top:8px;line-height:1.6}.sf-foot a{color:#7fd4ff;text-decoration:none;font-weight:700}.sf-b{color:#e8eef8}
+.sf-starts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px;align-items:end}.sf-starts .bv-okb{height:30px}.sf-starts label{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:#8fa3bf;font-weight:700}.sf-starts input{height:30px!important;padding:0 8px!important;font-size:12px!important;border-radius:8px!important}
+@media(max-width:900px){.bw-safety.sf-4{grid-template-columns:1fr 1fr}}
+.sf-top{display:flex;align-items:center;gap:8px;margin-bottom:12px}.sf-filt{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.sf-sel{height:34px;border-radius:9px;padding:0 10px;font-size:12.5px;width:auto!important;min-width:0}
+.sf-sum{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.sf-tag{font-size:11px!important;padding:2px 8px!important}
+.sf-tw{overflow:auto;max-height:62vh;border-radius:12px;border:1px solid rgba(255,255,255,.07)}.sf-tb{width:100%;border-collapse:collapse;font-size:12.5px}.sf-tb th{position:sticky;top:0;background:#111a2c;text-align:left;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:#8fa3bf;padding:9px 10px;z-index:1}
+.sf-tb td{padding:9px 10px;border-top:1px solid rgba(255,255,255,.06);vertical-align:top}.sf-tb tbody tr{cursor:pointer}.sf-tb tbody tr:hover{background:rgba(0,210,255,.05)}.sf-tb small{opacity:.6}.sf-txt{max-width:300px}
+.sf-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.sf-grid textarea{width:100%;resize:vertical}@media(max-width:760px){.sf-grid{grid-template-columns:1fr!important}.sf-grid .field{grid-column:auto!important}}
+.sf-chk{display:flex!important;align-items:center;gap:6px;font-size:12px;font-weight:600;min-height:38px}.sf-chk input{width:auto!important;height:auto!important}
+.sf-ah{display:flex;align-items:center;justify-content:space-between;margin:4px 0 8px}.sf-acts{display:flex;flex-direction:column;gap:6px}.sf-act{display:grid;grid-template-columns:2.2fr 1.4fr 150px 96px 30px;gap:6px;align-items:center}.sf-done.on{color:#6effc4;border-color:rgba(110,255,196,.45)}.sf-act input[type=text],.sf-act input[type=date]{height:34px}.sf-act.late input[type=date]{color:#ff8fa3;border-color:rgba(255,143,163,.6)}
+@media(max-width:760px){.sf-act{grid-template-columns:1fr 1fr}}
+body.th-bento .sf-tw{border-radius:18px}body.th-bento .sf-tb th{background:#1a2034}body.th-bento .sf-sel{border-radius:999px}
 .bw-sc{border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:10px 12px;text-align:center}
 .bw-big{font-size:44px;font-weight:900;line-height:1}.bw-cl{font-size:10.5px;font-weight:800;color:#9fb0c8;text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
 .bw-rec{font-size:11px;color:#9fb0c8;margin-top:6px}.bw-rec b{color:#fff}.bw-prog{height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}.bw-prog i{display:block;height:100%}
@@ -4105,6 +4127,8 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
+        • <strong style="color:#ffd166">🦺 Sécurité : 4 compteurs et registre</strong> — dans le Brief du jour : compteurs tout le personnel et intérimaires (avec arrêt / sans accident), chacun avec sa date de départ ; fiche complète par événement (personne, lieu, faits, témoins, lésion, jours d'arrêt, analyse, actions correctives avec échéance) ; <b>📋 Registre sécurité</b> filtrable et exportable en PDF (aussi par Ctrl+K). Les noms ne sortent jamais dans le brief imprimé.<br>
+        • <strong style="color:#60b4ff">🔎 Chiffres du brief cliquables</strong> — présents, affectés / besoin, absents, en formation, ordres de mission : un clic affiche le détail nominatif.<br>
         • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran, et fait les modifications après ton « oui » (planning, hangar, to-do, pense-bête, prolongations, formations renouvelées, nouveaux profils), avec ↩ Annuler. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
         • <strong style="color:#60b4ff">🗓 Brief de la semaine</strong> — bouton du tableau de bord : une page à envoyer au personnel après la réunion de production (tes infos, schéma du hangar avec chaque avion et ses jours, chantiers avec leur chef d'équipe, formations, absences, arrivées / départs d'intérimaires, visites médicales), en PDF ou en image.<br>
         • <strong style="color:#00d2ff">🧩 Affectations du jour en plein écran</strong> — seuls les chantiers occupés, ＋ Ajouter un chantier, glisser-déposer avec défilement automatique au bord, sélection multiple, filtre Catégories, colonnes jusqu'en bas.<br>
@@ -4548,7 +4572,15 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
         • <strong style="color:#ffd060">Contrats</strong> — « prolonge le contrat de Dupont jusqu'au 18 décembre » : elle demande si la prolongation est <b>acceptée</b> (la fin de contrat change) ou seulement <b>demandée</b> (elle reste en attente, comme sur la fiche).<br>
         • <strong style="color:#ffd060">Formations et autorisations</strong> — « l'EWIS de Baou est renouvelé » : elle demande la date, calcule la nouvelle expiration avec la validité de la formation et montre l'ancienne date avant ton « oui ».<br>
         • <strong style="color:#ffd060">Nouveau profil</strong> — « crée un nouvel intérimaire Karim Benali, technicien, du 1er au 19 décembre » : prénom, nom, trigramme libre, catégorie, contrat et dates sont montrés avant création ; tu complètes ensuite l'agence et le reste sur la fiche, qu'elle ouvre.<br>
-        • <strong style="color:#ffd060">Pas encore</strong> — créer ou clôturer un chantier, la check-list, archiver une personne.
+        • <strong style="color:#ffd060">Sécurité</strong> — « déclare un accident avec arrêt pour Baou hier, chute de l'escabeau en soute, entorse cheville droite, 5 jours d'arrêt », « Besnard s'est coupé à la main ce matin en position 2 », « note un soin bénin pour Guérin », « clos l'accident de Baou » ; questions : « combien de jours sans accident ? », « c'était quand le dernier accident ? », « quelles actions sécurité sont en retard ? », « ouvre le registre sécurité ». S'il manque des informations, Mardam pose une par une les questions du registre (heure, lieu, faits, lésion, témoins, arrêt et reprise, cause, actions correctives) : réponds, dis « passe » pour sauter une question, « c'est tout » pour finir, « annule » pour tout abandonner. Il montre ensuite le récapitulatif et attend ton « oui ». Si tu parles, le micro se relance tout seul entre les questions.<br>
+        • <strong style="color:#ffd060">Chantiers</strong> — « crée un chantier MSN 9412 ATR 72 pour Air France du 4 au 18 janvier » (il demande ce qui manque), « mets Walid chef d'équipe sur le 9412 », « le 9412 finit le 20 décembre », « clôture le chantier 9412 » (stockage ou départ), « supprime le chantier 9412 ».<br>
+        • <strong style="color:#ffd060">Personnel</strong> — « Baou passe chef d'équipe », « le numéro de Baou c'est 06… », « archive Dupont, démission », « réintègre Dupont », « passe Dupont hors production », « supprime définitivement la fiche de Dupont ».<br>
+        • <strong style="color:#ffd060">Congés, check-list, pense-bête</strong> — « valide les congés de Besnard », « refuse la demande de Guérin », « ajoute à la check-list : vérifier les extincteurs tous les lundis à 8h », « coche les extincteurs », « la note Larbi est faite », « supprime la note Larbi ».<br>
+        • <strong style="color:#ffd060">Formations, autorisations, sécurité</strong> — « Baou a fait sa formation EWIS », « ajoute le pushback à Baou jusqu'au 30 juin », « supprime l'autorisation pushback de Baou », « mets le départ des compteurs sécurité au 1er janvier », « ajoute une action à l'accident de Baou : rappel port des gants, Walid, vendredi », « l'action gants est faite ».<br>
+        • <strong style="color:#ffd060">Planning, hangar, avions</strong> — « copie cette semaine sur la semaine prochaine » (seules les cases vides), « ajoute un jour férié le 26 décembre », « rentre le MSN 5566 ATR 72 en stockage », « passe le 4321 du stockage au recyclage », « le 4321 quitte le site », « nouveau MSN Airbus 12345 A320 NEO peinture ».<br>
+        • <strong style="color:#ffd060">Exports et outils</strong> — « exporte le planning de la semaine prochaine en PDF », « sors le master en Excel », « imprime le brief du jour », « exporte le registre sécurité », « propose-moi les équipes », « repère les oublis », « actualise la météo », « seuil des nacelles à 45 », « passe en thème Bento », « envoie tout sur le Drive », « fais une sauvegarde ».<br>
+        • <strong style="color:#ffd060">Questions en plus</strong> — « qui a le pushback ? », « combien d'avions en stockage ? », « qui peut signer le CRS demain ? », « qu'est-ce qu'il me reste dans la check-list ? », « des demandes de congé en attente ? ».<br>
+        • <strong style="color:#ffd060">Garde-fous</strong> — suppression définitive et récupération depuis le Drive : double confirmation (« je confirme »). Restaurer une sauvegarde, importer le fichier RH ou un pointage : Mardam ouvre le bouton pour choisir le fichier. Les comptes et les mots de passe ne se gèrent jamais à la voix. Une annulation de clôture, de création de chantier ou d'avion n'est possible que tant que l'application n'a pas été rechargée.
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔒 <strong>Ce qui sort de l'application</strong> — uniquement ta phrase, envoyée à l'IA <b>seulement si l'app ne l'a pas comprise seule</b>, avec les noms des personnes et les MSN remplacés par des codes ([P1], [A1]). Aucun fichier, aucun planning, aucune liste du personnel. La dictée passe par le service vocal de l'appareil (Apple ou Microsoft). Les réponses sont toujours calculées par l'app sur tes données : l'IA n'invente rien et ne modifie rien.</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ffd060;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">💳 <strong>Compteur IA</strong> (onglet Mardam) — appels du mois, coût estimé et solde estimé à partir du montant que tu as chargé ; alerte sous un seuil ; bouton vers ta page Billing, qui fait foi. Si les crédits sont épuisés ou la clé refusée, Mardam te le dit. Brancher l'IA : compte API Claude à ton nom (crédits prépayés, rechargement automatique désactivé), clé API rangée dans les propriétés de ton script Google « Mardam relais », adresse /exec et jeton secret dans les Réglages, puis « Test complet ».</div>
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #ff9aac;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🧠 <strong>La faire progresser</strong> — sous chaque réponse, <b>✕ Mauvaise réponse</b> : dis ce que tu attendais. Les phrases pas comprises et les réponses à corriger s'accumulent dans <b>🙊 Phrases à apprendre</b> ; <b>📋 Copier pour Claude</b> les copie pour les envoyer, une nouvelle version numérotée corrige (le numéro est affiché en haut de l'onglet Mardam). <b>🔁 Mes raccourcis</b> : « point prod » = « qui est absent cette semaine » ; chaque raccourci est testé, une traduction que Mardam ne comprend pas est refusée.</div>
@@ -9198,7 +9230,7 @@ const GUIDE_DATA = {
     {t:"Brief du jour", d:"Le bouton <b>☀️ Brief du jour</b> ouvre le point du jour : chiffres clés, <b>📣 message du brief</b> (consigne sécurité ou info du jour, enregistrée pour la date et imprimée), <b>chantiers en cartes</b> (chef d'équipe, équipe en trigrammes — inspecteurs en cyan —, effectif / besoin, avancement), présences & mouvements, formations et visites, <b>✈️ entrées / sorties d'avions</b> à 7 jours, échéances et tâches. Les rubriques vides sont masquées. Flèches pour changer de jour, <b>🖨 Imprimer / PDF</b> pour le partager.", ill:null},
     {t:"Météo et alertes", d:"Le brief affiche la <b>météo de Francazal</b> (modèles Météo-France via Open-Meteo) : conditions actuelles, 4 jours et le déroulé heure par heure. Des <b>bandeaux d'alerte</b> apparaissent en cas de <b>risque d'orage</b> ⛈️, <b>vent fort / coup de vent / tempête</b> 💨🌪️ (rafales ≥ 60 / 80 / 100 km/h), de rafales au-dessus du <b>seuil nacelles</b> (réglable, 45 km/h par défaut), de brouillard ou de gel — pour le jour du brief et le lendemain. Lien direct vers la <b>vigilance officielle Météo-France</b>. Connexion Internet nécessaire.", ill:null},
     {t:"Suivre les avions", d:"Dans le brief, rubrique <b>📡 Suivi des avions</b> : tape une <b>immatriculation</b> (F-HBNA, EC-NAZ…) ou un <b>n° de vol</b> (AFR1234…) puis <b>Entrée</b> — l'app reconnaît le type et ouvre l'avion ou le vol sur <b>Flightradar24</b>. Les recherches récentes restent en raccourcis (✕ pour les retirer). Le bouton <b>📡 Radar LFBF</b> ouvre Flightradar24 centré sur Francazal, et la carte <b>Trafic en direct</b> (▶ Afficher la carte) montre les avions en vol autour du site directement dans le brief. <b>⛶ Plein écran</b> agrandit le brief sur tout l'écran.", ill:null},
-    {t:"Widgets du brief", d:"<b>🦺 Sécurité</b> : deux compteurs (jours sans accident avec arrêt / sans accident) avec leur record ; « ✎ Déclarer un événement » les remet à zéro (ou fixe la date de départ). <b>📊 La semaine en chiffres</b> : taux de présence, part d'intérim, heures planifiées (7 h / jour) face au besoin, absentéisme maladie, avec l'écart à la semaine précédente. <b>🏖 Congés à valider</b> : valide ou refuse les congés prévisionnels, avec alerte si le seuil de la catégorie est dépassé ou si c'est un chef d'équipe. <b>🧑‍🔧 Fins de mission intérim</b> (15 jours) : ⟳ Prolonger (+1 / +3 mois) ou Laisser finir.", ill:null},
+    {t:"Widgets du brief", d:"<b>🦺 Sécurité</b> : quatre compteurs (tout le personnel et intérimaires : sans accident avec arrêt / sans accident) avec leur record et leur propre date de départ (⚙️ Dates de départ). « ✎ Déclarer un événement » ouvre la fiche (personne, lieu, faits, témoins, lésion, arrêt, analyse, actions correctives) ; un accident d'intérimaire remet aussi à zéro les compteurs de tout le personnel, un soin bénin ne remet rien à zéro. <b>📋 Registre sécurité</b> : historique filtrable et PDF ; les noms et les lésions n'apparaissent jamais dans le brief imprimé. <b>📊 La semaine en chiffres</b> : taux de présence, part d'intérim, heures planifiées (7 h / jour) face au besoin, absentéisme maladie, avec l'écart à la semaine précédente. <b>🏖 Congés à valider</b> : valide ou refuse les congés prévisionnels, avec alerte si le seuil de la catégorie est dépassé ou si c'est un chef d'équipe. <b>🧑‍🔧 Fins de mission intérim</b> (15 jours) : ⟳ Prolonger (+1 / +3 mois) ou Laisser finir.", ill:null},
     {t:"Ordres de mission", d:"Chaque <b>formation externe</b> ou <b>déplacement</b> saisi au planning déclenche un rappel « ordre de mission ». Les jours d'école des alternants se saisissent en <b>🎒 École</b> : pas d'ordre de mission. Si une demande n'est pas utile, clique <b>Pas besoin</b>. Il apparaît dans la rubrique <b>📝 Ordres de mission à faire</b> du brief (en rouge à J-2) et en pastille jaune sur le bouton ☀️ Brief du jour, <b>jusqu'à ce que tu cliques ✓ Fait</b> ou au plus tard <b>jusqu'au jour J</b> (premier jour de la formation ou du déplacement) : ensuite le rappel disparaît.", ill:null},
     {t:"Compétences critiques", d:"La carte <b>🎯 Compétences critiques</b> compte, pour chaque compétence choisie, combien de détenteurs valides sont présents le pire jour de chaque semaine, sur 8 semaines. <b>Rouge</b> = personne, <b>orange</b> = sous le seuil. Clique un chiffre pour le détail, <b>⚙️</b> pour choisir les compétences et les seuils.", ill:null},
     {t:"Besoin d'aide", d:"Sur n'importe quelle page, le bouton <b>❓ Aide</b> de la barre d'onglets ouvre ce guide <b>directement sur l'onglet où tu es</b>.", ill:null},
@@ -9258,7 +9290,11 @@ const GUIDE_DATA = {
     {t:"Pense-bête", d:"« Mets-moi une note : rappeler Larbi demain à 8h », « rappelle-moi de commander les joints vendredi ». La note arrive sur ton pense-bête du tableau de bord, avec un rappel à la date dite.", ill:null},
     {t:"Hangar et to-do", d:"« Mets le 55283 en position 2 de jeudi à vendredi », « sors le 9388 vendredi », « déplace le 9388 en position 1 à partir de lundi ». « Rajoute dans ma to-do … », « coche la tâche ODM », « supprime la tâche ODM ». Une position déjà prise est refusée avec l'explication.", ill:null},
     {t:"Contrats, formations, profils", d:"« Prolonge le contrat de Dupont jusqu'au 18 décembre » (acceptée ou seulement demandée ?). « L'EWIS de Baou est renouvelé » : elle demande la date et calcule l'expiration. « Crée un nouvel intérimaire Karim Benali, technicien, du 1er au 19 décembre » : tout est montré avant création, puis elle ouvre la fiche à compléter.", ill:null},
-    {t:"Pas encore", d:"Créer ou clôturer un chantier, la check-list, archiver une personne : plus tard, avec les mêmes garde-fous.", ill:null},
+    {t:"Sécurité", d:"« Déclare un accident avec arrêt pour Baou hier, chute de l'escabeau, entorse cheville droite, 5 jours d'arrêt », « Besnard s'est coupé à la main ce matin », « note un soin bénin pour Guérin », « clos l'accident de Baou ». Questions : « combien de jours sans accident ? », « le dernier accident ? », « les actions sécurité en retard ? ». S'il manque des informations, Mardam pose les questions du registre une par une (« passe » pour sauter, « c'est tout » pour finir), puis montre le récapitulatif avant ton « oui ».", ill:null},
+    {t:"Chantiers, personnel, congés", d:"« Crée un chantier MSN 9412 ATR 72 pour Air France du 4 au 18 janvier », « mets Walid chef d'équipe sur le 9412 », « clôture le chantier 9412 », « archive Dupont, démission », « Baou passe chef d'équipe », « valide les congés de Besnard ».", ill:null},
+    {t:"Check-list, notes, autorisations", d:"« Ajoute à la check-list : vérifier les extincteurs tous les lundis à 8h », « coche les extincteurs », « la note Larbi est faite », « ajoute le pushback à Baou jusqu'au 30 juin », « Baou a fait sa formation EWIS ».", ill:null},
+    {t:"Avions, planning, exports", d:"« Rentre le MSN 5566 ATR 72 en stockage », « le 4321 quitte le site », « copie cette semaine sur la semaine prochaine », « ajoute un jour férié le 26 décembre », « exporte le planning en PDF », « passe en thème Bento », « envoie tout sur le Drive ».", ill:null},
+    {t:"Garde-fous", d:"Suppressions définitives et récupération depuis le Drive : double confirmation. Comptes et mots de passe : jamais à la voix. Les fichiers (sauvegarde, RH, pointage) se choisissent avec le bouton que Mardam affiche.", ill:null},
   ]},
   "Simulation": { icon:"🧪", color:"#60ffd0", steps:[
     {t:"À quoi ça sert", d:"La <b>Simulation</b> (famille Outils) permet de <b>tester un scénario</b> (charge, affectations) sans toucher au planning réel.", ill:null},
@@ -21097,22 +21133,25 @@ function _briefData(ds){
 }
 
 /* ── Brief du jour v2 : chantiers en cartes, avions entrées/sorties, message du brief, ordres de mission ── */
-// Ordres de mission : blocs continus de formation externe / déplacement par personne (week-ends et fériés ignorés)
+// Ordres de mission : un bloc par personne ET par formation (ou déplacement), jours ouvrés consécutifs (week-ends et fériés ignorés)
 function _omBlocks(){
   const t0=fmt(new Date()), from=fmt(addD(new Date(),-45)), to=fmt(addD(new Date(),180));
-  const by={};
+  const by={}, byOld={}, nk=t=>_mdNorm?_mdNorm(String(t||'')).trim():String(t||'').toLowerCase().trim();
   Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e||(e.type!=='formation'&&e.type!=='deplacement')) return;
     const pp=k.split('_'), h=pp.pop(), id=pp.shift(), ds=pp.join('_'); if(ds<from||ds>to) return;
-    const p=byId(id); if(!p||p.archived) return;
-    ((by[id+'|'+e.type]=by[id+'|'+e.type]||{})[ds]=e.note||''); });
+    const p=byId(id); if(!p||p.archived) return; const note=String(e.note||'').trim();
+    const g=(by[id+'|'+e.type+'|'+nk(note)]=by[id+'|'+e.type+'|'+nk(note)]||{id,type:e.type,note,days:{}}); g.days[ds]=1;
+    (byOld[id+'|'+e.type]=byOld[id+'|'+e.type]||{})[ds]=1; });
+  const chain=(id,type,days,mk)=>{ const L=[]; let cur=null; Object.keys(days).sort().forEach(d=>{ if(cur&&d<=_bfPrevWork(cur.end,1)){ cur.end=d; return; } if(cur) L.push(cur); cur=mk(d); }); if(cur) L.push(cur); return L; };
+  // anciens blocs (toutes formations confondues) : un ordre déjà validé avant la séparation reste validé
+  const old=[]; Object.entries(byOld).forEach(([kk,days])=>{ const [id,type]=kk.split('|'); chain(id,type,days,d=>({empId:id,type,start:d,end:d})).forEach(b=>{ b.key=`${id}_${type}_${b.start}`; old.push(b); }); });
   const out=[];
-  Object.entries(by).forEach(([kk,days])=>{ const [id,type]=kk.split('|'); const ds=Object.keys(days).sort(); let cur=null;
-    ds.forEach(d=>{ if(cur){ let n=_bfPrevWork(cur.end,1); if(d<=n){ cur.end=d; if(days[d]&&!cur.notes.includes(days[d])) cur.notes.push(days[d]); return; } out.push(cur); }
-      cur={empId:id,type,start:d,end:d,notes:days[d]?[days[d]]:[]}; });
-    if(cur) out.push(cur); });
-  out.forEach(b=>{ b.key=`${b.empId}_${b.type}_${b.start}`; b.done=!!(S.omDone&&S.omDone[b.key]); b.j=Math.round((parseLocal(b.start)-parseLocal(t0))/86400000); });
+  Object.values(by).forEach(g=>chain(g.id,g.type,g.days,d=>({empId:g.id,type:g.type,start:d,end:d,notes:g.note?[g.note]:[],form:g.note})).forEach(b=>out.push(b)));
+  out.forEach(b=>{ const slug=b.form?'_'+nk(b.form).replace(/\s+/g,'-').slice(0,40):''; b.key=`${b.empId}_${b.type}_${b.start}${slug}`;
+    const o=old.find(x=>x.empId===b.empId&&x.type===b.type&&x.start<=b.start&&b.start<=x.end);
+    b.done=!!(S.omDone&&(S.omDone[b.key]||(o&&S.omDone[o.key]))); b.j=Math.round((parseLocal(b.start)-parseLocal(t0))/86400000); });
   // Rappel jusqu'au jour J (premier jour de la formation / du déplacement), puis il disparaît
-  return out.filter(b=>!b.done && b.start>=t0).sort((a,b)=>a.start.localeCompare(b.start));
+  return out.filter(b=>!b.done && b.start>=t0).sort((a,b)=>a.start.localeCompare(b.start)||String(a.empId).localeCompare(String(b.empId))||String(a.form||'').localeCompare(String(b.form||'')));
 }
 function _omSkip(key){ if(!S.omDone) S.omDone={}; S.omDone[key]='nr:'+fmt(new Date()); save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('Demande d\'ordre de mission écartée'); }
 function _omValidate(key){ if(!S.omDone) S.omDone={}; S.omDone[key]=fmt(new Date()); save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('📝 Ordre de mission noté comme fait'); }
@@ -21301,12 +21340,9 @@ function _bwExtSave(id){ const p=byId(id), el=document.getElementById('bw-ext-'+
   const old=p.dateFin; p.dateFin=el.value; window._bwExt=null; save(); _briefRender(); try{ renderPersonnel(); }catch(_){} toast(`⟳ Mission de ${p.prenom} ${p.nom} prolongée jusqu'au ${disp(p.dateFin)} (au lieu du ${disp(old)})`); }
 function _bwExtAck(id){ const p=byId(id); if(!p) return; if(!S.intEndAck) S.intEndAck={}; S.intEndAck[id]=p.dateFin; save(); _briefRender(); }
 // ── Sécurité : deux compteurs (sans accident avec arrêt / sans accident)
-function _bwSafety(ds){
-  if(!S.safety) S.safety={since:fmt(new Date()),events:[]};
-  const sf=S.safety, ev=(sf.events||[]).filter(e=>e.date<=ds).sort((a,b)=>a.date.localeCompare(b.date));
-  const calc=f=>{ const dates=ev.filter(f).map(e=>e.date); let prev=sf.since, rec=0; dates.forEach(d=>{ rec=Math.max(rec,Math.round((parseLocal(d)-parseLocal(prev))/86400000)); prev=d; });
-    const cur=Math.max(0,Math.round((parseLocal(ds)-parseLocal(prev))/86400000)); return {cur,rec:Math.max(rec,cur),last:dates.length?dates[dates.length-1]:null}; };
-  return {arret:calc(e=>e.arret),tout:calc(()=>true),last:ev[ev.length-1]||null,ev};
+function _bwSafety(ds){ // compatibilité (écran TV) : mêmes calculs que la carte Sécurité
+  const C=_sfCount(ds), ev=_sfNorm().events.filter(e=>e.date<=ds).sort((a,b)=>a.date.localeCompare(b.date));
+  return {arret:C.all_arret,tout:C.all_tout,int_arret:C.int_arret,int_tout:C.int_tout,last:ev[ev.length-1]||null,ev};
 }
 window._bwSafeForm=false;
 function _bwSafeToggle(){ window._bwSafeForm=!window._bwSafeForm; _briefRender(); }
@@ -21318,6 +21354,117 @@ function _bwSafeSave(){
   window._bwSafeForm=false; save(); _briefRender(); toast(t==='since'?'Date de départ du compteur enregistrée':'🦺 Événement enregistré');
 }
 function _bwSafeDel(id){ if(!S.safety) return; S.safety.events=S.safety.events.filter(e=>e.id!==id); save(); _briefRender(); }
+
+// ═══ 🦺 Sécurité : 4 compteurs (tout le personnel / intérimaires), registre et fiches d'événement ═══
+const _SF_T={arret:{l:'Accident avec arrêt',c:'#6effc4'},sans:{l:'Accident sans arrêt',c:'#7fd4ff'},soin:{l:'Soin bénin',c:'#c3cfdf'}};
+const _SF_C=[['all_arret','Tous','sans accident avec arrêt','#6effc4'],['all_tout','Tous','sans accident','#7fd4ff'],['int_arret','Intérimaires','sans accident avec arrêt','#ffd166'],['int_tout','Intérimaires','sans accident','#ffb38a']];
+function _sfNorm(){
+  if(!S.safety) S.safety={since:fmt(new Date()),events:[]};
+  const sf=S.safety; if(!Array.isArray(sf.events)) sf.events=[];
+  if(!sf.starts||typeof sf.starts!=='object') sf.starts={};
+  _SF_C.forEach(([k])=>{ if(!sf.starts[k]) sf.starts[k]=sf.since||fmt(new Date()); });
+  sf.events.forEach(e=>{ if(!e.type) e.type=e.arret?'arret':'sans'; if(e.faits==null) e.faits=e.desc||''; if(e.interim==null){ const p=e.empId&&byId(e.empId); e.interim=!!(p&&p.categorie==='interimaire'); } if(!Array.isArray(e.actions)) e.actions=[]; if(!e.statut) e.statut='ouvert'; });
+  return sf;
+}
+function _sfName(e){ const p=e.empId&&byId(e.empId); return p?`${p.nom||''} ${p.prenom||''}`.trim():(e.nomLibre||'—'); }
+function _sfLate(e){ const t=fmt(new Date()); return (e.actions||[]).filter(a=>!a.done&&a.due&&a.due<t).length; }
+function _sfCount(ds){
+  const sf=_sfNorm(), out={};
+  _SF_C.forEach(([k])=>{ const start=sf.starts[k], intOnly=k.startsWith('int'), arretOnly=k.endsWith('arret');
+    const dates=sf.events.filter(e=>e.date&&e.date<=ds&&e.date>=start&&(!intOnly||e.interim)&&(arretOnly?e.type==='arret':(e.type==='arret'||e.type==='sans'))).map(e=>e.date).sort();
+    let prev=start, rec=0; dates.forEach(d=>{ rec=Math.max(rec,Math.round((parseLocal(d)-parseLocal(prev))/864e5)); prev=d; });
+    const cur=ds<start?0:Math.max(0,Math.round((parseLocal(ds)-parseLocal(prev))/864e5)); out[k]={cur,rec:Math.max(rec,cur),start,last:dates[dates.length-1]||null}; });
+  return out;
+}
+// Carte du brief
+window._sfStartsForm=false;
+function _sfBox(R,print,box){
+  const sf=_sfNorm(), C=_sfCount(R.ds);
+  const cnt=([k,who,lbl,col])=>{ const c=C[k]; return `<div class="bw-sc sf-sc" title="Depuis le ${disp(c.start)}${c.last?' · dernier événement le '+disp(c.last):''}"><div class="sf-who">${k.startsWith('int')?'🦺':'👷'} ${who}</div><div class="bw-big" style="color:${col};${print?'':`text-shadow:0 0 26px ${hexRgba(col,.35)}`}">${c.cur}</div><div class="bw-cl">jours ${lbl}</div><div class="bw-rec">Record : <b>${c.rec} j</b>${c.cur>=c.rec&&c.cur>0?' 🏆':''}</div><div class="bw-prog"><i style="width:${Math.min(100,c.rec?c.cur/c.rec*100:100)}%;background:${col}"></i></div></div>`; };
+  let sb=`<div class="bw-safety sf-4">${_SF_C.map(cnt).join('')}</div>`;
+  const ev=sf.events.filter(e=>e.date<=R.ds).sort((a,b)=>(a.date+(a.heure||'')).localeCompare(b.date+(b.heure||''))), last=ev[ev.length-1];
+  const late=sf.events.reduce((a,e)=>a+_sfLate(e),0);
+  sb+=`<div class="bv-mut sf-foot">${last?`Dernier événement : <b class="sf-b">${disp(last.date)}</b> · ${_SF_T[last.type].l.toLowerCase()}${last.interim?' · intérimaire':''}`:'Aucun événement déclaré'}${!print?` · <a href="#" onclick="event.preventDefault();_sfRegOpen()">📋 Registre sécurité (${sf.events.length})</a> · <a href="#" onclick="event.preventDefault();window._sfStartsForm=!window._sfStartsForm;_briefRender()">⚙️ Dates de départ</a>`:''}${late&&!print?` · <span style="color:#ff8fa3;font-weight:800">${late} action${late>1?'s':''} en retard</span>`:''}</div>`;
+  if(!print&&window._sfStartsForm) sb+=`<div class="sf-starts">${_SF_C.map(([k,who,lbl])=>`<label><span>${who} · ${lbl}</span><input type="date" id="sf-st-${k}" value="${sf.starts[k]}"></label>`).join('')}<button class="bv-okb" onclick="_sfStartsSave()">Enregistrer</button></div>`;
+  return box('🦺','Sécurité',sb,print?'':`<a href="#" onclick="event.preventDefault();_sfEdit()">✎ Déclarer un événement</a>`);
+}
+function _sfStartsSave(){ const sf=_sfNorm(); for(const [k] of _SF_C){ const v=document.getElementById('sf-st-'+k)?.value; if(!v){ toast('Indique les 4 dates'); return; } sf.starts[k]=v; } window._sfStartsForm=false; save(); _briefRender(); toast('🦺 Dates de départ des compteurs enregistrées'); }
+// ── Registre ──
+window._sfF={y:String(new Date().getFullYear()),t:'',w:'',s:''};
+function _sfEnsureModals(){
+  if(!document.getElementById('m-sfreg')){ const d=document.createElement('div'); d.className='mbg'; d.id='m-sfreg';
+    d.innerHTML=`<div class="modal sf-modal" style="max-width:1200px;width:96vw"><div class="sf-top"><div class="modal-title" style="margin:0;flex:1">📋 Registre sécurité</div><button class="btn btn-ghost btn-sm" onclick="_sfPdf()">🖨 PDF</button><button class="btn btn-cyan btn-sm" onclick="_sfEdit()">＋ Déclarer un événement</button><button class="btn btn-ghost btn-sm" onclick="closeM('m-sfreg')">✕</button></div><div id="sf-reg"></div></div>`; document.body.appendChild(d); }
+  if(!document.getElementById('m-sfev')){ const d=document.createElement('div'); d.className='mbg'; d.id='m-sfev'; d.innerHTML=`<div class="modal sf-modal" style="max-width:900px;width:96vw"><div id="sf-ev"></div></div>`; document.body.appendChild(d); }
+}
+function _sfRegOpen(){ _sfEnsureModals(); _sfRegRender(); openM('m-sfreg'); }
+function _sfFiltered(){ const sf=_sfNorm(), F=window._sfF; return sf.events.filter(e=>(!F.y||String(e.date||'').startsWith(F.y))&&(!F.t||e.type===F.t)&&(!F.w||(F.w==='int'?e.interim:!e.interim))&&(!F.s||(F.s==='ouvert'?e.statut!=='clos':e.statut==='clos'))).sort((a,b)=>(b.date+(b.heure||'')).localeCompare(a.date+(a.heure||''))); }
+function _sfTag(t,c){ return `<span class="bv-tag sf-tag" style="color:${c};border-color:${hexRgba(c,.45)}">${t}</span>`; }
+function _sfLieu(e){ return [e.lieu,e.lieuTxt].filter(Boolean).join(' · ')||'—'; }
+function _sfRegRender(){
+  const el=document.getElementById('sf-reg'); if(!el) return; const sf=_sfNorm(), F=window._sfF, L=_sfFiltered();
+  const years=[...new Set(sf.events.map(e=>String(e.date||'').slice(0,4)).filter(Boolean).concat([String(new Date().getFullYear())]))].sort().reverse();
+  const sel=(id,opts,v)=>`<select class="sf-sel" onchange="window._sfF.${id}=this.value;_sfRegRender()">${opts.map(([k,l])=>`<option value="${k}" ${v===k?'selected':''}>${l}</option>`).join('')}</select>`;
+  const n=t=>L.filter(e=>e.type===t).length, ja=L.reduce((a,e)=>a+(+e.joursArret||0),0), ni=L.filter(e=>e.interim).length;
+  el.innerHTML=`<div class="sf-filt">${sel('y',[['','Toutes les années'],...years.map(y=>[y,y])],F.y)}${sel('t',[['','Tous les types'],...Object.entries(_SF_T).map(([k,v])=>[k,v.l])],F.t)}${sel('w',[['','Salariés + intérimaires'],['sal','Salariés'],['int','Intérimaires']],F.w)}${sel('s',[['','Ouverts + clos'],['ouvert','En cours'],['clos','Clos']],F.s)}
+    <div class="sf-sum">${_sfTag(`${n('arret')} avec arrêt${ja?' · '+ja+' j':''}`,_SF_T.arret.c)}${_sfTag(`${n('sans')} sans arrêt`,_SF_T.sans.c)}${_sfTag(`${n('soin')} soin${n('soin')>1?'s':''} bénin${n('soin')>1?'s':''}`,_SF_T.soin.c)}${_sfTag(`${ni} intérimaire${ni>1?'s':''}`,'#ffd166')}</div></div>
+  ${L.length?`<div class="sf-tw"><table class="sf-tb"><thead><tr><th>Date</th><th>Type</th><th>Personne</th><th>Lieu</th><th>Faits</th><th>Lésion</th><th>Arrêt</th><th>Actions</th></tr></thead><tbody>${L.map(e=>{ const late=_sfLate(e), open=(e.actions||[]).filter(a=>!a.done).length;
+    const act=e.statut==='clos'?_sfTag('✓ Clos','#6effc4'):(e.actions||[]).length?_sfTag(`${e.actions.length} action${e.actions.length>1?'s':''}${late?' · '+late+' en retard':open?' · '+open+' à faire':' · faites'}`,late?'#ff8fa3':'#ffb340'):_sfTag('En cours','#ffb340');
+    return `<tr onclick="_sfEdit('${e.id}')"><td><b>${disp(e.date)}</b>${e.heure?`<br><small>${_bfEsc(e.heure)}</small>`:''}</td><td>${_sfTag(_SF_T[e.type].l,_SF_T[e.type].c)}</td><td>${_bfEsc(_sfName(e))}${e.interim?'<br>'+_sfTag('Intérim','#ffd166'):''}</td><td>${_bfEsc(_sfLieu(e))}</td><td class="sf-txt">${_bfEsc(e.faits||'')}</td><td>${_bfEsc([e.lesNature,e.lesSiege].filter(Boolean).join(' · ')||'—')}</td><td>${+e.joursArret?`${+e.joursArret} j${e.reprise?`<br><small>reprise ${disp(e.reprise)}</small>`:''}`:'—'}</td><td>${act}</td></tr>`; }).join('')}</tbody></table></div>`:'<div class="bv-mut" style="padding:18px 4px">Aucun événement pour ces filtres.</div>'}
+  <div class="bv-mut" style="font-size:11px;margin-top:10px">Clique sur une ligne pour ouvrir sa fiche. Les noms et les lésions n'apparaissent que dans ce registre et son PDF, jamais dans le brief imprimé ou envoyé.</div>`;
+}
+// ── Fiche d'un événement ──
+let _sfCur=null;
+function _sfEdit(id){
+  _sfEnsureModals(); const sf=_sfNorm(); const e=id?sf.events.find(x=>x.id===id):null;
+  _sfCur=e?JSON.parse(JSON.stringify(e)):{id:null,date:fmt(new Date()),heure:'',type:'sans',empId:'',nomLibre:'',interim:false,lieu:'',lieuTxt:'',faits:'',temoins:'',lesNature:'',lesSiege:'',joursArret:'',reprise:'',analyse:'',actions:[],statut:'ouvert'};
+  _sfEvRender(); openM('m-sfev');
+}
+function _sfLieux(){ const L=['Position 1','Position 2','Position 3']; (S.chantiers||[]).filter(c=>c.msn&&c.statut==='encours').forEach(c=>L.push(`MSN ${c.msn}${c.client?' · '+String(c.client).trim():''}`)); return L.concat(['Atelier','Magasin','Parking avion','Tarmac','Bureaux','Autre']); }
+function _sfEvRender(){
+  const e=_sfCur, el=document.getElementById('sf-ev'); if(!el||!e) return;
+  const ppl=_sortByNom((S.personnel||[]).filter(p=>!p.archived||p.id===e.empId));
+  const lieux=_sfLieux(); if(e.lieu&&!lieux.includes(e.lieu)) lieux.unshift(e.lieu);
+  const f=(l,inp,span)=>`<div class="field"${span?` style="grid-column:${span==='1/-1'?'1/-1':'span '+span}"`:''}><label>${l}</label>${inp}</div>`;
+  const v=k=>_bfEsc(e[k]==null?'':String(e[k]));
+  el.innerHTML=`<div class="modal-title">🦺 ${e.id?'Événement sécurité — '+disp(e.date):'Déclarer un événement sécurité'}</div>
+  <div class="fgrid sf-grid">
+    ${f('Date *',`<input type="date" id="sf-date" value="${v('date')}">`)}${f('Heure',`<input type="time" id="sf-heure" value="${v('heure')}">`)}
+    ${f('Type *',`<select id="sf-type">${Object.entries(_SF_T).map(([k,t])=>`<option value="${k}" ${e.type===k?'selected':''}>${t.l}</option>`).join('')}</select>`,2)}
+    ${f('Personne *',`<select id="sf-emp" onchange="_sfEmpChange(this.value)"><option value="">— Choisir —</option>${ppl.map(p=>`<option value="${p.id}" ${e.empId===p.id?'selected':''}>${_bfEsc(p.nom+' '+p.prenom)} — ${_bfEsc((CATS[p.categorie]||{}).lbl||p.categorie||'')}</option>`).join('')}<option value="__libre" ${!e.empId&&e.nomLibre?'selected':''}>Autre personne (saisie libre)…</option></select>`,2)}
+    <div class="field" id="sf-libre-w" style="grid-column:span 1;${!e.empId&&e.nomLibre?'':'display:none'}"><label>Nom (saisie libre)</label><input type="text" id="sf-libre" value="${v('nomLibre')}" placeholder="Nom Prénom · société"></div>
+    <div class="field" style="grid-column:span 1"><label>Intérimaire ?</label><select id="sf-int" title="Compte dans les compteurs intérimaires"><option value="0" ${e.interim?'':'selected'}>Non</option><option value="1" ${e.interim?'selected':''}>Oui (compteurs intérim)</option></select></div>
+    ${f('Lieu',`<select id="sf-lieu"><option value="">—</option>${lieux.map(x=>`<option ${e.lieu===x?'selected':''}>${_bfEsc(x)}</option>`).join('')}</select>`,2)}${f('Précision du lieu',`<input type="text" id="sf-lieutxt" value="${v('lieuTxt')}" placeholder="Soute avant, escabeau zone B…">`,2)}
+    ${f('Faits / circonstances',`<textarea id="sf-faits" rows="3" placeholder="Ce qui s'est passé, ce que faisait la personne…">${v('faits')}</textarea>`,'1/-1')}
+    ${f('Témoins',`<input type="text" id="sf-temoins" value="${v('temoins')}">`,2)}${f('Nature de la lésion',`<input type="text" id="sf-lesn" value="${v('lesNature')}" placeholder="Coupure, entorse…">`)}${f('Siège de la lésion',`<input type="text" id="sf-less" value="${v('lesSiege')}" placeholder="Main gauche…">`)}
+    ${f("Jours d'arrêt",`<input type="number" min="0" id="sf-ja" value="${v('joursArret')}">`)}${f('Date de reprise',`<input type="date" id="sf-rep" value="${v('reprise')}">`)}
+    ${f('Statut',`<select id="sf-stat"><option value="ouvert" ${e.statut!=='clos'?'selected':''}>En cours</option><option value="clos" ${e.statut==='clos'?'selected':''}>Clos</option></select>`,2)}
+    ${f('Analyse',`<textarea id="sf-ana" rows="2" placeholder="Causes, ce qui a manqué…">${v('analyse')}</textarea>`,'1/-1')}
+  </div>
+  <div class="sf-ah"><b>Actions correctives</b><button type="button" class="btn btn-ghost btn-sm" onclick="_sfActAdd()">＋ Action</button></div>
+  <div id="sf-acts">${_sfActsHtml()}</div>
+  <div class="mfooter">${e.id?`<button class="btn btn-ghost" style="margin-right:auto;color:#ff8fa3" onclick="_sfDel()">Supprimer</button>`:''}<button class="btn btn-ghost" onclick="closeM('m-sfev')">Annuler</button><button class="btn btn-cyan" onclick="_sfSave()">Enregistrer</button></div>`;
+}
+function _sfEmpChange(v){ const w=document.getElementById('sf-libre-w'); if(w) w.style.display=v==='__libre'?'':'none'; const p=v&&v!=='__libre'?byId(v):null; if(p){ const c=document.getElementById('sf-int'); if(c) c.value=p.categorie==='interimaire'?'1':'0'; } }
+function _sfActsHtml(){ const A=_sfCur.actions||[], t=fmt(new Date()); const ppl=_sortByNom((S.personnel||[]).filter(p=>!p.archived&&['chef','responsable','expert'].includes(p.categorie))); const me=(_currentUser&&_currentUser.nom)||'';
+  if(!A.length) return '<div class="bv-mut" style="font-size:12px">Aucune action pour l\'instant.</div>';
+  return `<div class="sf-acts">${A.map((a,i)=>`<div class="sf-act${!a.done&&a.due&&a.due<t?' late':''}"><input type="text" value="${_bfEsc(a.txt||'')}" placeholder="Action" oninput="_sfCur.actions[${i}].txt=this.value"><input type="text" list="sf-resp-l" value="${_bfEsc(a.resp||'')}" placeholder="Responsable" oninput="_sfCur.actions[${i}].resp=this.value"><input type="date" value="${_bfEsc(a.due||'')}" onchange="_sfCur.actions[${i}].due=this.value;document.getElementById('sf-acts').innerHTML=_sfActsHtml()"><button type="button" class="btn btn-ghost btn-sm sf-done${a.done?' on':''}" onclick="_sfCur.actions[${i}].done=!_sfCur.actions[${i}].done;document.getElementById('sf-acts').innerHTML=_sfActsHtml()">${a.done?'✅ Fait':'☐ À faire'}</button><button type="button" class="md-x" title="Retirer" onclick="_sfCur.actions.splice(${i},1);document.getElementById('sf-acts').innerHTML=_sfActsHtml()">✕</button></div>`).join('')}</div><datalist id="sf-resp-l">${me?`<option value="${_bfEsc(me)}">`:''}${ppl.map(p=>`<option value="${_bfEsc(p.nom+' '+p.prenom)}">`).join('')}</datalist>`; }
+function _sfActAdd(){ _sfGrab(); _sfCur.actions.push({id:uid(),txt:'',resp:'',due:'',done:false}); document.getElementById('sf-acts').innerHTML=_sfActsHtml(); }
+function _sfGrab(){ const g=id=>document.getElementById(id); const e=_sfCur; if(!g('sf-date')) return;
+  e.date=g('sf-date').value; e.heure=g('sf-heure').value; e.type=g('sf-type').value; const emp=g('sf-emp').value; e.empId=emp&&emp!=='__libre'?emp:''; e.nomLibre=emp==='__libre'?g('sf-libre').value.trim():''; e.interim=g('sf-int').value==='1';
+  e.lieu=g('sf-lieu').value; e.lieuTxt=g('sf-lieutxt').value.trim(); e.faits=g('sf-faits').value.trim(); e.temoins=g('sf-temoins').value.trim(); e.lesNature=g('sf-lesn').value.trim(); e.lesSiege=g('sf-less').value.trim(); e.joursArret=g('sf-ja').value; e.reprise=g('sf-rep').value; e.statut=g('sf-stat').value; e.analyse=g('sf-ana').value.trim(); }
+function _sfSave(){ _sfGrab(); const e=_sfCur; if(!e.date){ toast('Indique la date'); return; } if(!e.empId&&!e.nomLibre){ toast('Indique la personne'); return; }
+  e.actions=(e.actions||[]).filter(a=>(a.txt||'').trim()); e.desc=e.faits; e.arret=e.type==='arret';
+  const sf=_sfNorm(); if(e.id){ const i=sf.events.findIndex(x=>x.id===e.id); if(i>=0) sf.events[i]=e; else sf.events.push(e); } else { e.id=uid(); e.createdAt=new Date().toISOString(); sf.events.push(e); }
+  save(); closeM('m-sfev'); try{ _briefRender(); }catch(_){} _sfRegRender(); toast(e.type==='soin'?'🦺 Soin bénin enregistré (les compteurs ne bougent pas)':'🦺 Événement enregistré : compteurs mis à jour'); }
+function _sfDel(){ const e=_sfCur; if(!e||!e.id) return; if(!confirm('Supprimer cet événement du registre ?\nLes compteurs seront recalculés.')) return; const sf=_sfNorm(); sf.events=sf.events.filter(x=>x.id!==e.id); save(); closeM('m-sfev'); try{ _briefRender(); }catch(_){} _sfRegRender(); toast('Événement supprimé'); }
+function _sfPdf(){ const L=_sfFiltered(), F=window._sfF, C=_sfCount(fmt(new Date()));
+  const rows=L.map(e=>`<tr><td>${disp(e.date)}${e.heure?' '+_bfEsc(e.heure):''}</td><td>${_SF_T[e.type].l}</td><td>${_bfEsc(_sfName(e))}${e.interim?' (intérim)':''}</td><td>${_bfEsc(_sfLieu(e))}</td><td>${_bfEsc(e.faits||'')}${e.temoins?`<br><i>Témoins : ${_bfEsc(e.temoins)}</i>`:''}</td><td>${_bfEsc([e.lesNature,e.lesSiege].filter(Boolean).join(' · '))}</td><td>${+e.joursArret?+e.joursArret+' j':''}${e.reprise?'<br>reprise '+disp(e.reprise):''}</td><td>${_bfEsc(e.analyse||'')}${(e.actions||[]).length?'<ul>'+e.actions.map(a=>`<li>${a.done?'☑':'☐'} ${_bfEsc(a.txt)}${a.resp?' — '+_bfEsc(a.resp):''}${a.due?' · '+disp(a.due):''}</li>`).join('')+'</ul>':''}</td><td>${e.statut==='clos'?'Clos':'En cours'}</td></tr>`).join('');
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>Registre sécurité</title><style>body{font-family:Arial,sans-serif;font-size:10.5px;color:#0f1e3d;margin:18px}h1{font-size:17px;margin:0 0 4px}.k{display:flex;gap:8px;margin:8px 0 12px}.k div{border:1px solid #c9d5e3;border-radius:6px;padding:5px 9px}.k b{font-size:15px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #c9d5e3;padding:4px 5px;vertical-align:top;text-align:left}th{background:#eef3f9}ul{margin:3px 0 0;padding-left:14px}@page{size:A4 landscape;margin:10mm}</style></head><body>
+    <h1>🦺 Registre sécurité — Tarmacaerosave LFBF</h1><div>Édité le ${disp(fmt(new Date()))}${F.y?' · année '+F.y:''}${F.t?' · '+_SF_T[F.t].l:''}${F.w?' · '+(F.w==='int'?'intérimaires':'salariés'):''} · ${L.length} événement${L.length>1?'s':''} · document confidentiel</div>
+    <div class="k">${_SF_C.map(([k,who,lbl])=>`<div><b>${C[k].cur} j</b> ${who.toLowerCase()} ${lbl} <small>(record ${C[k].rec} j)</small></div>`).join('')}</div>
+    <table><thead><tr><th>Date</th><th>Type</th><th>Personne</th><th>Lieu</th><th>Faits</th><th>Lésion</th><th>Arrêt</th><th>Analyse et actions</th><th>Statut</th></tr></thead><tbody>${rows||'<tr><td colspan="9">Aucun événement</td></tr>'}</tbody></table></body></html>`;
+  openPrintView(html,'Registre sécurité'); }
+
 // ── La semaine en chiffres
 function _bwWeekStats(mon){
   const ABS=new Set(['conge','conge_prev','maladie','absence','ecole']);
@@ -21335,14 +21482,8 @@ function _bwWeekStats(mon){
 }
 function _bwBoxes(R,print,box){
   const d=parseLocal(R.ds), mon=getMon(d); let h='';
-  // Sécurité
-  const sf=_bwSafety(R.ds);
-  const cnt=(c,lbl,col)=>`<div class="bw-sc"><div class="bw-big" style="color:${col};${print?'':`text-shadow:0 0 26px ${hexRgba(col,.35)}`}">${c.cur}</div><div class="bw-cl">${lbl}</div><div class="bw-rec">Record : <b>${c.rec} j</b>${c.cur>=c.rec&&c.cur>0?' 🏆':''}</div><div class="bw-prog"><i style="width:${Math.min(100,c.rec?c.cur/c.rec*100:100)}%;background:${col}"></i></div></div>`;
-  let sb=`<div class="bw-safety">${cnt(sf.arret,'jours sans accident avec arrêt','#6effc4')}${cnt(sf.tout,'jours sans accident','#7fd4ff')}</div>`;
-  sb+=sf.last?`<div class="bv-mut" style="font-size:11.5px;margin-top:8px">Dernier événement : <b style="color:${print?'#0f1e3d':'#e8eef8'}">${disp(sf.last.date)}</b> · ${sf.last.arret?'avec arrêt':'sans arrêt'}${sf.last.desc?' — '+_bfEsc(sf.last.desc):''}</div>`:`<div class="bv-mut" style="font-size:11.5px;margin-top:8px">Compteur démarré le ${disp(S.safety.since)} · aucun événement déclaré</div>`;
-  if(!print && window._bwSafeForm) sb+=`<div class="bw-form"><input type="date" id="bw-sf-date" value="${fmt(new Date())}"><select id="bw-sf-type"><option value="arret">Accident avec arrêt</option><option value="sans">Accident sans arrêt</option><option value="since">Date de départ du compteur</option></select><input type="text" id="bw-sf-desc" placeholder="Description (facultatif)"><button class="bv-okb" onclick="_bwSafeSave()">Enregistrer</button></div>
-    ${sf.ev.length?`<div class="bw-hist">${sf.ev.slice().reverse().slice(0,8).map(e=>`<div>${disp(e.date)} · ${e.arret?'avec arrêt':'sans arrêt'}${e.desc?' — '+_bfEsc(e.desc):''} <a href="#" onclick="event.preventDefault();_bwSafeDel('${e.id}')" title="Supprimer">✕</a></div>`).join('')}</div>`:''}`;
-  h+=box('🦺','Sécurité',sb,print?'':`<a href="#" onclick="event.preventDefault();_bwSafeToggle()">${window._bwSafeForm?'Fermer':'✎ Déclarer un événement'}</a>`);
+  // Sécurité : 4 compteurs + registre
+  h+=_sfBox(R,print,box);
   // Semaine en chiffres
   const A=_bwWeekStats(mon), B=_bwWeekStats(addD(mon,-7));
   const tr=(v,w,goodUp,unit)=>{ if(!B.work) return ''; const df=v-w; if(Math.abs(df)<0.5) return `<span class="bw-tr" style="color:#9fb0c8">=</span>`; const good=goodUp?df>0:df<0; return `<span class="bw-tr" style="color:${good?'#6effc4':'#ffb340'}">${df>0?'▲':'▼'} ${Math.round(Math.abs(df))}${unit||''}</span>`; };
@@ -21382,9 +21523,12 @@ function _briefHtml(R,print){
   const _wxIc=(()=>{ try{ const D=_mto&&_mto.data&&_mto.data.daily; const i=D?D.time.indexOf(R.ds):-1; return i>=0?_mtoWx(D.weather_code[i])[0]:''; }catch(_){ return ''; } })();
   let h=`<div class="bv-hd"><div class="bv-sun">${_wxIc||(R.we||R.hol?'🌙':'☀️')}</div><div><div class="bv-date">${J[d.getDay()]} ${d.getDate()} ${MO_[d.getMonth()]} ${d.getFullYear()}</div><div class="bv-sub">Semaine ${wkN(getMon(d))} · Site LFBF${R.ds===today?' · aujourd\'hui':''}</div></div>${_mtoHeader(R.ds)}</div>`;
   if(R.we||R.hol) h+=`<div class="bv-warn">${R.hol?'Jour férié':'Week-end'} — le brief reflète ce qui est saisi au planning.</div>`;
-  const kp=(v,l,c,sub)=>`<div class="bv-k"><i style="background:${c}"></i><b style="${sub?'':''}">${v}</b><span>${l}</span></div>`;
+  if(!print) window._briefLastR=R;
+  let _kn=0; const _kk=['pres','aff','abs','form','om'];
+  const kp=(v,l,c,sub)=>{ const k=_kk[_kn++]; return print?`<div class="bv-k"><i style="background:${c}"></i><b>${v}</b><span>${l}</span></div>`:`<div class="bv-k bv-kclick${window._bvKdK===k?' on':''}" role="button" tabindex="0" title="Voir le détail" onclick="_bvKd('${k}')" onkeydown="if(event.key==='Enter')_bvKd('${k}')"><i style="background:${c}"></i><b>${v}</b><span>${l}</span><em class="bv-kmore">${window._bvKdK===k?'▴':'▾'} détail</em></div>`; };
   const absDet=Object.keys(R.abs).map(k=>`${R.abs[k].length} ${(HD_LBL[k]||k).toLowerCase()}`).join(' · ');
   h+=`<div class="bv-kp">${kp(pres,'présents','#6effc4')}${kp(nAff+(besT?`<small> / ${besT}</small>`:''),'affectés'+(besT?' / besoin chantiers':''),'#00d2ff')}${kp(R.nbAbsFull,'absents'+(absDet?` <span class="bv-mut">(${_bfEsc(absDet)})</span>`:''),'#ff8fa3')}${kp(R.nbForm,'en formation','#c084fc')}${kp(R.om.length,'ordres de mission à faire',R.om.length?'#ffd166':'#56657c')}</div>`;
+  if(!print) h+=`<div id="bv-kd">${window._bvKdK?_bvKdHtml(window._bvKdK,R):''}</div>`;
   h+=_mtoBanner(R.ds,print);
   // ── colonne gauche : message + chantiers
   let L='';
@@ -21440,6 +21584,43 @@ function _briefHtml(R,print){
   return h;
 }
 
+// ── Détail des chiffres du brief (clic sur une tuile) ──
+function _bvKd(k){ window._bvKdK=window._bvKdK===k?null:k; const el=document.getElementById('bv-kd'); const R=window._briefLastR;
+  document.querySelectorAll('#m-brief .bv-kclick').forEach((t,i)=>{ const on=['pres','aff','abs','form','om'][i]===window._bvKdK; t.classList.toggle('on',on); const m=t.querySelector('.bv-kmore'); if(m) m.textContent=(on?'▴':'▾')+' détail'; });
+  if(el&&R){ el.innerHTML=window._bvKdK?_bvKdHtml(window._bvKdK,R):''; if(window._bvKdK) setTimeout(()=>el.scrollIntoView({block:'nearest',behavior:'smooth'}),30); } }
+function _bvKdHtml(k,R){
+  const ds=R.ds, cell=(p,h)=>S.planning[`${p.id}_${ds}_${h}`]||{}, nm=p=>_bfEsc(_bfNom(p));
+  const chip=(p,extra)=>`<span class="bv-kc" title="${_bfEsc((p.prenom||'')+' '+(p.nom||''))}">${_bfAv(p)}<span>${nm(p)}</span>${extra?`<small>${_bfEsc(extra)}</small>`:''}</span>`;
+  const grp=(t,ps,ext,col)=>ps.length?`<div class="bv-kg"><div class="bv-kgt"${col?` style="color:${col}"`:''}>${t} <span>${ps.length}</span></div><div class="bv-kcs">${ps.map(x=>chip(x.p||x,ext?ext(x):'')).join('')}</div></div>`:'';
+  const head=(ic,t,sub)=>`<div class="bv-kdh"><b>${ic} ${t}</b>${sub?`<span class="bv-mut">${sub}</span>`:''}<button type="button" class="bv-kx" onclick="_bvKd(null)" title="Fermer">✕</button></div>`;
+  const staff=_sortByNom((S.personnel||[]).filter(p=>!_empHorsEffectif(p.id)&&_presentSemaine(p,parseLocal(ds),parseLocal(ds))));
+  const absFull=p=>_BRIEF_ABS.has(cell(p,'AM').type||'')&&_BRIEF_ABS.has(cell(p,'PM').type||'');
+  const catLbl=c=>(typeof CATS!=='undefined'&&CATS[c]&&CATS[c].lbl)||c||'Autre';
+  let h='';
+  if(k==='pres'){ const pres=staff.filter(p=>!absFull(p)), half=pres.filter(p=>_BRIEF_ABS.has(cell(p,'AM').type||'')||_BRIEF_ABS.has(cell(p,'PM').type||''));
+    const by={}; pres.forEach(p=>{ (by[p.categorie||'autre']=by[p.categorie||'autre']||[]).push(p); });
+    const order=Object.keys(by).sort((a,b)=>by[b].length-by[a].length);
+    h=head('🟢',`${pres.length} présents`,`sur ${staff.length} personnes sous contrat ce jour · ${R.nbAbsFull} absent${R.nbAbsFull>1?'s':''} toute la journée`)
+      +order.map(c=>grp(_bfEsc(catLbl(c)),by[c],null,_ncolCol(c))).join('')
+      +(half.length?grp('Absents une demi-journée (comptés présents)',half,p=>{ const a=_BRIEF_ABS.has(cell(p,'AM').type||''); const t=a?cell(p,'AM').type:cell(p,'PM').type; return `${(HD_LBL[t]||t).toLowerCase()} ${a?'le matin':"l'après-midi"}`; },'#ffb340'):'')
+      +`<div class="bv-kn bv-mut">Les personnes en formation sont comptées présentes. Hors effectif (archivés, hors contrat) non comptés.</div>`; }
+  else if(k==='aff'){ const besT=R.cards.reduce((a,c)=>a+(c.besoin||0),0); const all=new Set(); Object.values(R.sites).forEach(x=>x.forEach(i=>all.add(i)));
+    h=head('🔧',`${all.size} affectés`,besT?`besoin renseigné sur les chantiers : ${besT}`:'aucun besoin renseigné sur les chantiers');
+    h+=R.cards.map(c=>{ const st=c.besoin==null?'<span class="bv-mut">besoin non renseigné</span>':c.manque?`<span class="bv-pill" style="background:rgba(255,179,64,.15);color:#ffb340">${c.n} / ${c.besoin} · manque ${c.manque}</span>`:`<span class="bv-pill" style="background:rgba(110,255,196,.14);color:#6effc4">${c.n} / ${c.besoin}${c.n>c.besoin?' · +'+(c.n-c.besoin):' ✓'}</span>`;
+      return `<div class="bv-kg"><div class="bv-kgt" style="color:${c.col}">${_bfEsc(c.label)}${c.client?' · '+_bfEsc(c.client):''} <span>${c.n}</span> ${st}</div><div class="bv-kcs">${_sortByNom(c.team).map(p=>chip(p,c.chef&&c.chef.id===p.id?'chef':'')).join('')||'<span class="bv-mut">personne</span>'}</div></div>`; }).join('');
+    h+=R.autres.map(a=>grp(_bfEsc(a.label),_sortByNom(a.ids.map(byId).filter(Boolean)),null,'#6d8fb0')).join('');
+    if(R.sansAff.length) h+=grp('Sans affectation',_sortByNom(R.sansAff),null,'#ff8fa3');
+    h+=`<div class="bv-kn bv-mut">Une personne sur deux chantiers dans la journée compte une fois dans le total. Le besoin ne compte que les chantiers où il est renseigné.</div>`; }
+  else if(k==='abs'){ const types=Object.keys(R.abs); h=head('🔴',`${R.nbAbsFull} absent${R.nbAbsFull>1?'s':''} toute la journée`,types.length?'':'aucune absence ce jour');
+    h+=types.map(t=>grp(_bfEsc(HD_LBL[t]||t),R.abs[t],x=>x.when||'journée',{conge:'#ff8fa3',conge_prev:'#ffb3c1',maladie:'#ff5a78',absence:'#ff9f43',deplacement:'#60b4ff',ecole:'#c084fc'}[t]||'#ff8fa3')).join('');
+    h+=`<div class="bv-kn bv-mut">Le chiffre compte les absences de la journée entière ; les demi-journées sont listées avec « matin » ou « après-midi ».</div>`; }
+  else if(k==='form'){ const fk=Object.keys(R.form); h=head('📚',`${R.nbForm} en formation`,fk.length?_mdqPl?_mdqPl(fk.length,'formation'):fk.length+' formations':'aucune formation ce jour');
+    h+=fk.map(f=>grp('📖 '+_bfEsc(f),R.form[f],x=>x.when||'journée','#c084fc')).join(''); }
+  else if(k==='om'){ h=head('🧾',`${R.om.length} ordre${R.om.length>1?'s':''} de mission à faire`,'formations externes et déplacements à venir, pas encore traités');
+    h+=R.om.length?`<div class="bv-kom">${R.om.map(b=>{ const p=byId(b.empId); if(!p) return ''; return `<div class="bv-kor">${_bfAv(p)}<span class="bv-nm">${nm(p)}</span><span class="bv-tag" style="color:${b.type==='formation'?'#c084fc':'#60b4ff'};border-color:${b.type==='formation'?'rgba(192,132,252,.45)':'rgba(96,180,255,.45)'}">${b.type==='formation'?'Formation externe':'Déplacement'}</span><span>${b.start===b.end?_bfEsc(_mdDayTxt?_mdDayTxt(parseLocal(b.start)):b.start):`du ${_bfEsc(_mdDayTxt(parseLocal(b.start)))} au ${_bfEsc(_mdDayTxt(parseLocal(b.end)))}`}</span><span class="bv-mut">${b.j===0?"aujourd'hui":b.j===1?'demain':'dans '+b.j+' j'}${b.notes.length?' · '+_bfEsc(b.notes.join(', ')):''}</span></div>`; }).join('')}</div>`:'<div class="bv-mut">Rien à faire.</div>';
+    h+=`<div class="bv-kn bv-mut">Coche ou écarte chaque ordre dans la carte « Ordres de mission » du brief.</div>`; }
+  return `<div class="bv-box bv-kd">${h}</div>`;
+}
 function openBrief(ds){ try{ _mtoFetch(); }catch(_){} _briefDs=ds||fmt(new Date()); let f=false; try{ f=localStorage.getItem('bf_full')==='1'; }catch(_){} _briefFull(f); _briefRender(); openM('m-brief'); }
 function _briefShift(n){ _briefDs=fmt(addD(parseLocal(_briefDs),n)); _briefRender(); }
 function _briefRender(){
@@ -27585,6 +27766,8 @@ const _CK_TABS=[['dashboard','🏠','Tableau de bord'],['programme','📊','Prog
 const _CK_ACTIONS=[
   ['☀️','Brief du jour','brief matin point equipe',()=>openBrief()],
   ['🗓','Brief de la semaine','brief semaine hebdo recap production envoyer personnel formations absences hangar',()=>openBriefWeek()],
+  ['🦺','Registre sécurité','securite accident arret registre interimaire soin incident compteur',()=>_sfRegOpen()],
+  ['🦺','Déclarer un événement sécurité','declarer accident securite arret blessure soin',()=>_sfEdit()],
   ['📺','Mode TV atelier','tv ecran atelier diaporama plein ecran',()=>tvOpen()],
   ['🪄','Proposer les équipes','auto planning composition equipes semaine',()=>{ goTab('weekly'); openAutoPlan(); }],
   ['➕','Nouveau congé / saisir une case','conge absence saisie planning case',()=>{ goTab('weekly'); toast('Clique sur la case de la personne dans le planning'); }],
@@ -28772,7 +28955,7 @@ function _mdWordsToNum(toks){
   return out;
 }
 function _mdNorm(s){
-  let n=_mdStrip(s).replace(/[’`´]/g,"'").replace(/(\d)\s*(h|heures?)\s*(\d{2})?/g,(m,a,b,c)=>` ${a}h${c||'00'} `)
+  let n=_mdStrip(String(s||'').replace(/œ/g,'oe').replace(/Œ/g,'OE').replace(/æ/g,'ae')).replace(/[’`´]/g,"'").replace(/(^|[^\d])(\d{1,2})\s*(heures?|h)(?![a-z])\s*(\d{2})?/g,(m,p0,a,b,c)=>`${p0} ${a}h${c||'00'} `)
     .replace(/(\d{1,2})\s*\/\s*(\d{1,2})(\s*\/\s*(\d{2,4}))?/g,(m,a,b,c,d)=>` ${a}/${b}${d?'/'+d:''} `)
     .replace(/\b1er\b|\bpremier\b/g,' 1 ').replace(/quatre[- ]vingts?/g,'quatre vingt').replace(/-/g,' ')
     .replace(/[^a-z0-9'\/:h ?]/g,' ').replace(/'/g,' ').replace(/\s+/g,' ').trim();
@@ -28914,6 +29097,8 @@ function _mdTime(T){
   const days=[]; for(let i=0;i<T.length;i++){ const r=_mdDayAt(T,i,today,weekShift&&!/\d/.test(T[i+1]||'')?weekShift:0); if(r){ r.at=i; days.push(r); i=r.end-1; } }
   const between=(a,b)=>T.slice(a,b).join(' ');
   if(days.length>=2){ const a=days[0], b=days[1], mid=' '+between(a.at,b.at)+' ';
+    // « du 4 au 18 janvier » : le mois n'est dit qu'une fois, à la fin → le début prend le même mois
+    { const hasMo=r=>T.slice(r.at,r.end).some(t=>_MD_MO.includes(t)), num=T.slice(a.at,a.end).find(t=>/^\d{1,2}$/.test(t)); if(num&&!hasMo(a)&&hasMo(b)){ let f=_mdYmd(b.d.getFullYear(),b.d.getMonth(),+num); if(f>b.d) f=_mdYmd(b.d.getFullYear(),b.d.getMonth()-1,+num); a.d=f; } }
     if(/ (du|de|entre) /.test(' '+T.slice(Math.max(0,a.at-1),a.at+1).join(' ')+' ')||/ (au|a|et|jusqu) /.test(mid)) R.range={from:a.d,to:b.d<a.d?addD(b.d,7):b.d,a,b}; }
   if(!R.range&&days.length){ const a=days[0];
     if(/ a partir (de |d )?/.test(n)) R.range={from:a.d,to:_mdFri(a.d),a,open:true};
@@ -28931,6 +29116,7 @@ function _mdTime(T){
 }
 // ── Écrans de l'app ──
 const _MD_SCREENS=[
+  ['sfreg',/ registre (de |des )?(securite|accidents?)|registre accident|registre securite/,'Registre sécurité'],
   ['briefw',/ brief (de la |pour la )?semaine|brief hebdo/,'Brief de la semaine'],
   ['briefj',/ brief( du jour| de ce matin| d aujourd hui)?( |$)/,'Brief du jour'],
   ['aff',/ affectations?( du jour)?( |$)/,'Affectations du jour'],
@@ -28975,7 +29161,7 @@ function _mdDayTxt(d){ return `${_MD_JL[d.getDay()]} ${d.getDate()===1?'1er':d.g
 function _mdPName(p){ return p?`${p.prenom||''} ${(p.nom||'').toUpperCase()}`.trim():''; }
 // ── Compréhension : phrase → plan (sans rien exécuter) ──
 const _MD_NAVV=/ (ouvre|ouvrir|affiche|afficher|montre|montrer|va|vas|aller|emmene|amene|lance|lancer|passe en|mets moi sur|je veux voir|fais moi voir|voir|retourne|retour|reviens|reviens sur|apparaitre|remonte|remonter|balance|ramene|sors moi|fais voir) /;
-const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer|bouge|bouger|repasse|rallonge|rallonger|valide|valider)( |$)/;
+const _MD_ACTV=/^(mets|mettre|met|affecte|affecter|inscris|inscrire|ajoute|ajouter|rajoute|supprime|supprimer|enleve|enlever|retire|retirer|deplace|deplacer|passe|copie|copier|prolonge|prolonger|cree|creer|note|noter|coche|cocher|repousse|reporte|archive|archiver|sors|sortir|change|changer|modifie|modifier|programme|programmer|annule la|annule le|efface|vide|recopie|libere|positionne|place|renouvelle|mets a jour|met a jour|inscrit|pose|poser|prevois|prevoir|cale|caler|declare|declarer|enregistre|rappelle moi|fais moi penser|desinscris|desinscrire|vire|virer|ecris|ecrire|envoie|envoyer|colle|coller|bascule|basculer|bouge|bouger|repasse|rallonge|rallonger|valide|valider|remets|remettre|reinitialise|refuse|refuser|accepte|accepter|reintegre|reintegrer|cloture|cloturer|clos|clore|termine|terminer|ferme|fermer|recopie|duplique|dupliquer|rentre|rentrer|signale|signaler|attribue|nomme|bascule|recupere|recuperer|decale|decaler|avance|avancer|repousse|demarre|ouvre un|lance un)( |$)/;
 const _MD_QW=/^(qui|ou|quand|combien|quel|quelle|quels|quelles|est ce|est ce que|y a t il|il y a|on a|on est|c est quand|a quelle|pourquoi|comment|donne moi|fais moi le point|dis moi)( |$)/;
 function _mdDictFix(n){
   // dictée : « Mets » entendu « Mais », « Mes », « Mai » ; « Mets Léo » entendu « Météo » ; « Affecte » entendu « Affect »
@@ -28986,7 +29172,7 @@ function _mdParse(raw){
   const P={raw,n,T,kind:'unknown'};
   if(!T.length) return P;
   // Contrôle
-  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6&&!/ (tache|taches|formation|autorisation|prolongation|position) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'yes'});
+  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6&&!/ (tache|taches|formation|autorisation|prolongation|position|conge|conges|demande|demandes|check|checklist|note|action|compteur|chantier) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'yes'});
   if(/ (annule|defais|reviens en arriere sur) (ce que tu viens de faire|la derniere action|ta derniere action) |^ ?(reviens en arriere|defais) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'undo'});
   if(/ (tais toi|coupe le son|coupe la voix|silence|chut|mode silencieux|arrete de parler) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'mute'});
   if(/ (remets le son|reparle|tu peux parler|active le son|remets la voix) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'unmute'});
@@ -29009,6 +29195,9 @@ function _mdParse(raw){
   // Questions et actions : reconnues, livrées aux étapes suivantes
   // « Baou est malade demain » : une modification sans verbe
   if(ppl.length&&!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sera|seront|sont) (malade|malades|en conges?|en vacances|absent|absente|absents|en arret|en deplacement|a l ecole) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&A.a==='abs') return Object.assign(P,{kind:'act',A}); }
+  { const C=_mdCmdParse(P,raw); if(C) return Object.assign(P,C); }
+  if(!/\?/.test(raw)&&!_MD_QW.test(T.join(' '))&&!_MD_ACTV.test(T.join(' '))){ const V=_mdV2Parse(P,raw); if(V&&['ch_close','ch_upd','ch_new','pers_upd','pers_back','sto_out','sto_new','rec_new','ab_new','nt_done','cl_done','form_done','sf_act_done','sf_start','aut_add','conge_ok','conge_ko','hol_add','pers_arch','pers_hp'].includes(V.a)) return Object.assign(P,{kind:'act',A:V}); }
+  if(!/\?/.test(raw)&&!/^(qui|quand|combien|quel|quelle|quels|est ce|y a t il|c est quand|ou|depuis)( |$)/.test(T.join(' '))&&(/ (accident|s est (blesse|blessee|coupe|coupee|brule|brulee|tordu|tordue|cogne|cognee|pince|pincee|ecrase|ecrasee|pique|piquee|fait mal|entaille|entaillee)|est tombe|est tombee|il y a eu|on a eu) /.test(nn)||/^(accident|soin benin|petit accident) /.test(T.join(' '))||/^(ferme|fermer|clos|clore|cloture|cloturer|signale|signaler|classe|solde) /.test(T.join(' ')))){ P.raw=raw; const A=_mdSfParse(P,raw); if(A) return Object.assign(P,{kind:'act',A}); }
   if(!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&(msn.length&&/ (sort|sortira|sortent|rentre|rentrera) /.test(nn)||/^(nouveau|nouvel|nouvelle|une nouvelle|un nouveau) /.test(T.join(' '))||ppl.length&&/ (a|ont) (repasse|renouvele|revalide|passe son|passe sa|passe ses|refait) /.test(nn))){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&['slot_out','slot_set','pers_new','form_upd','aut_upd'].includes(A.a)) return Object.assign(P,{kind:'act',A}); }
   if(!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sont|a ete|ont ete) (faite?s?|terminee?s?|finie?s?|reglee?s?|renouvelee?s?|revalidee?s?|repassee?s?) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&['todo_done','form_upd','aut_upd'].includes(A.a)) return Object.assign(P,{kind:'act',A}); }
   // Questions (étape 1) : la réponse est calculée par l'app
@@ -29053,6 +29242,7 @@ function _mdNavRun(P){
   else if(scr==='master'){ const m=P.month||{m:new Date().getMonth(),y:new Date().getFullYear()}; S.masterMonth=m.m; S.masterYear=m.y; goTab('master'); const yr=document.getElementById('mp-year'); if(yr) yr.value=String(m.y);
     if(P.person&&P.person.ids.length===1){ const em=document.getElementById('mp-emp'); if(em) em.value=P.person.ids[0]; }
     const cs=cats(); try{ renderMaster(); }catch(_){} say=`Voici le master de ${_MD_ML[m.m]} ${m.y}${cs}.`; setTimeout(()=>_mdFlash(document.getElementById('masterGrid')||pg()),80); }
+  else if(scr==='sfreg'){ _sfRegOpen(); say="J'ouvre le registre sécurité."; }
   else if(scr==='briefw'){ openBriefWeek(fmt(P.date||new Date())); say=`Voici le brief de la semaine ${wkN(P.date||new Date())}.`; }
   else if(scr==='briefj'){ openBrief(); say='Voici le brief du jour.'; }
   else if(scr==='aff'){ affOpen(fmt(P.date||new Date())); say=`J'ouvre les affectations de ${_mdDayTxt(P.date||_mdToday())}.`; }
@@ -29085,7 +29275,7 @@ const _MD_FEM=/(amelie|amélie|audrey|aurelie|aurélie|marie|julie|hortense|deni
 function _mdVoices(){ try{ return speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang)); }catch(_){ return []; } }
 function _mdVoice(){ const vs=_mdVoices(), c=_mdCfg(); if(c.voice){ const f=vs.find(v=>v.name===c.voice); if(f) return f; }
   return vs.find(v=>_MD_FEM.test(v.name)&&/fr.FR/i.test(v.lang)&&/natural|online|premium|enhanced|amélioré/i.test(v.name))||vs.find(v=>_MD_FEM.test(v.name)&&/fr.FR/i.test(v.lang))||vs.find(v=>_MD_FEM.test(v.name))||vs.find(v=>/fr.FR/i.test(v.lang))||vs[0]||null; }
-function _mdSpeak(t,force){ const c=_mdCfg(); if((c.mute&&!force)||!('speechSynthesis' in window)||!t) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/<[^>]+>/g,'').replace(/MSN/g,'M S N')); u.lang='fr-FR'; const v=_mdVoice(); if(v) u.voice=v; u.rate=1.04; u.pitch=1.02; speechSynthesis.speak(u); }catch(_){} }
+function _mdSpeak(t,force){ const c=_mdCfg(); if((c.mute&&!force)||!('speechSynthesis' in window)||!t){ const f=MD.afterSpeak; MD.afterSpeak=null; if(f) setTimeout(f,300); return; } try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/<[^>]+>/g,'').replace(/MSN/g,'M S N')); u.lang='fr-FR'; const v=_mdVoice(); if(v) u.voice=v; u.rate=1.04; u.pitch=1.02; const f=MD.afterSpeak; MD.afterSpeak=null; if(f) u.onend=()=>setTimeout(f,150); speechSynthesis.speak(u); }catch(_){} }
 try{ if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>{ if(document.getElementById('md-set')) _mdRenderSettings(); }; }catch(_){}
 // ── Panneau ──
 const _MD_MIC=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/></svg>`;
@@ -29127,7 +29317,8 @@ function _mdListen(){
 }
 // ── Traitement d'une demande ──
 async function _mdHandle(text,alts){
-  _mdOpen(); _mdYou(text); MD.hist.push({who:'me',html:_bfEsc(text),at:Date.now()});
+  _mdOpen(); _mdYou(text); MD.hist.push({who:'me',html:_bfEsc(text),at:Date.now()}); MD.viaVoice=Array.isArray(alts);
+  if(MD.pending&&MD.pending.answer){ const pend=MD.pending; MD.curSaid=text; pend.answer(text); return; }
   // Réponse à une question en attente (confirmation ou choix)
   if(MD.pending){ const q=_mdParse(text); const pend=MD.pending;
     if(pend.choices){ const pick=_mdPickChoice(pend.choices,q); if(pick){ MD.pending=null; pick.fn(); return; } }
@@ -29147,7 +29338,7 @@ async function _mdHandle(text,alts){
   let P=_mdParse(text);
   if(P.kind==='unknown'&&alts&&alts.length>1){ for(const a of alts.slice(1)){ const q=_mdParse(a); if(q.kind!=='unknown'){ P=q; break; } } }
   let how='local';
-  if(P.kind==='unknown'&&_mdAIready()){ MD.aiErr=null; _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; }
+  if((P.kind==='unknown'||P.kind==='later')&&_mdAIready()){ MD.aiErr=null; _mdState('Je réfléchis…'); const r=await _mdAI(text,P); _mdState(''); if(r){ P=r; how='ia'; }
     else if(MD.aiErr&&['credit','key','token','nokey','trunc'].includes(MD.aiErr.k)){ const m=_MD_USE_ERR[MD.aiErr.k]; _mdMiss(text,'IA indisponible : '+m.t); _mdReply(`Je n'ai pas compris seule, et je ne peux pas demander à l'IA : <b>${m.t}</b>. ${m.d}`, m.say, [{l:'Voir le compteur',fn:()=>{ goTab('ai'); setTimeout(()=>_mdFlash(document.getElementById('md-use')),300); }}]); _mdLog({said:text,how:'local',label:'IA indisponible',result:m.t}); return; } }
   _mdExec(P,said,how);
 }
@@ -29161,7 +29352,7 @@ function _mdExec(P,text,how){
     if(a==='mute'){ const c=_mdCfg(); c.mute=true; try{save();}catch(_){} try{ speechSynthesis.cancel(); }catch(_){} _mdMuteBtn(); _mdReply('Voix coupée. Je continue à te répondre par écrit.',''); }
     else if(a==='unmute'){ const c=_mdCfg(); c.mute=false; try{save();}catch(_){} _mdMuteBtn(); _mdReply('Voix remise.'); }
     else if(a==='detail'){ _mdDetail(); }
-    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais <b>modifier le planning</b> après ton « oui » (« affecte Baou sur le 55304 demain », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain ») et <b>ton pense-bête</b> (« rappelle-moi d'appeler Larbi demain »), le <b>hangar</b> (« mets le 55283 en position 2 jeudi et vendredi », « sors le 9388 vendredi »), ta <b>to-do</b>, les <b>prolongations</b>, les <b>formations renouvelées</b> et les <b>nouveaux profils</b>. Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Les questions arrivent à l'étape 1, les modifications du planning à l'étape 2.`,"Pour l'instant je sais ouvrir tous les écrans et filtrer les catégories. Les questions arrivent bientôt.");
+    else if(a==='help') _mdReply(`Je sais <b>répondre à tes questions</b> (« qui est absent cette semaine ? », « quand est la prochaine formation EWIS ? », « qui est sur le 55304 demain ? », « le contrat de Dupont finit quand ? », « qu'est-ce qu'il y a en position 2 jeudi ? », « est-ce que je suis en sous-effectif la semaine prochaine ? »), dis « le détail » pour que je lise les noms. Je sais <b>modifier le planning</b> après ton « oui » (« affecte Baou sur le 55304 demain », « mets Léo en visite médicale vendredi à 8h20 », « inscris Guérin à la formation EWIS mardi », « Baou est malade demain ») et <b>ton pense-bête</b> (« rappelle-moi d'appeler Larbi demain »), le <b>hangar</b> (« mets le 55283 en position 2 jeudi et vendredi », « sors le 9388 vendredi »), ta <b>to-do</b>, les <b>prolongations</b>, les <b>formations renouvelées</b>, les <b>nouveaux profils</b> et la <b>sécurité</b> (« déclare un accident sans arrêt pour Baou ce matin, coupure à la main », « combien de jours sans accident ? ») : s'il manque des informations pour le registre, je te pose les questions une par une. Je sais aussi <b>ouvrir tous les écrans</b> (« ouvre le planning de la semaine prochaine », « montre-moi le master de janvier », « ouvre la fiche de Dupont », « ouvre le brief de la semaine »…) et <b>filtrer les catégories</b> (« affiche seulement les techniciens »). Et tout le reste de l'application : <b>chantiers</b> (créer, modifier, clôturer), <b>personnel</b> (catégorie, téléphone, archiver, réintégrer), <b>congés</b> à valider, <b>check-list</b>, <b>notes</b>, <b>autorisations</b>, <b>stockage, recyclage, Airbus</b>, <b>jours fériés</b>, recopier une semaine, <b>exports PDF et Excel</b>, thème, Drive et sauvegarde. Le détail est dans la Notice, onglet Mardam.`,"Je sais répondre à tes questions, ouvrir les écrans, et piloter toute l'application : planning, chantiers, personnel, congés, check-list, sécurité, avions, exports et réglages. Je te demande toujours confirmation avant de modifier.");
     else if(a==='reset'){ MD.ctx={last:null,at:0}; MD.pending=null; _mdReply('C\'est noté, on repart de zéro.'); }
     else if(a==='journal'){ const L=(S.mardam?.journal||[]).filter(j=>new Date(j.at).toDateString()===new Date().toDateString()); _mdReply(L.length?`Aujourd'hui j'ai traité <b>${L.length}</b> demande${L.length>1?'s':''} : `+L.slice(0,5).map(j=>_bfEsc(j.label||j.said)).join(', ')+(L.length>5?'…':'')+'. Le détail est dans mon journal.':"Je n'ai encore rien fait aujourd'hui.",null,[{l:'Voir le journal',fn:()=>{ goTab('ai'); }}]); }
     else if(a==='undo'){ _mdaUndo(); }
@@ -29169,6 +29360,7 @@ function _mdExec(P,text,how){
     else if(a==='yes'||a==='no') _mdReply("Je n'avais rien en attente. Dis-moi ce que tu veux faire.");
     _mdLog({said:text,how,label:'contrôle : '+a,result:'ok'}); return;
   }
+  if(P.kind==='cmd'){ _mdCmdRun(P,text,how); return; }
   if(P.kind==='nav'){
     if(P.screen==='fiche'&&(!P.person||P.person.ids.length!==1)){ return _mdAskPerson(P,text,how); }
     if(P.tm?.mismatch){ const m=P.tm.mismatch; const pick=d=>{ P.date=getMon(d); if(['aff','quiou'].includes(P.screen)) P.date=d; if(P.screen==='master') P.month={m:d.getMonth(),y:d.getFullYear()}; const s=_mdNavRun(P); _mdReply(s); _mdLog({said:text,how,label:P.label,result:'ok'}); };
@@ -29180,8 +29372,8 @@ function _mdExec(P,text,how){
   }
   if(P.kind==='filter'){ const s=_mdFilterRun(P); _mdReply(s); _mdLog({said:text,how,label:'filtre catégories',result:'ok'}); return; }
   if(P.kind==='act'){ _mdActRun(P,text,how); return; }
-  if(P.kind==='later'){ const what=P.stage===1?'répondre à ce genre de question':P.stage===2?'modifier le planning':'faire cette action'; const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore ${what} : ça arrive à l'<b>étape ${P.stage}</b>. Je sais déjà répondre à tes questions, ouvrir les écrans, filtrer, modifier le planning, le hangar, la to-do, le pense-bête, les contrats, les formations et autorisations, et créer un profil.`;
-    _mdReply(s,`Je ne sais pas encore ${what}. Ça arrive à l'étape ${P.stage}.`); _mdLog({said:text,how,label:`étape ${P.stage} (${P.what})`,result:'pas encore'}); return; }
+  if(P.kind==='later'){ const s=`J'ai compris que tu veux ${P.what==='question'?'une réponse':'une modification'}, mais je ne sais pas encore faire celle-là. Je sais déjà répondre à tes questions, ouvrir les écrans, filtrer, modifier le planning, le hangar, la to-do, le pense-bête, les contrats, les formations et autorisations, créer un profil et déclarer un événement sécurité.`;
+    _mdReply(s,"Je ne sais pas encore faire celle-là."); _mdLog({said:text,how,label:`pas encore géré (${P.what})`,result:'pas encore'}); return; }
   if(P.kind==='q'){ _mdQRun(P,text,how); return; }
   if(P.qHint){ _mdMiss(text,'question non reconnue'); _mdLog({said:text,how,label:'question non reconnue',result:'pas compris'}); _mdReply(`J'ai compris que c'est une question, mais je ne sais pas encore y répondre. Je l'ai notée pour l'apprendre.${_mdAIready()?'':'<br><small>L\'IA traductrice n\'est pas branchée : elle m\'aide pour les phrases inhabituelles.</small>'}`,"Je ne sais pas encore répondre à cette question. Je l'ai notée."); return; }
   _mdMiss(text,'non compris'); _mdLog({said:text,how,label:'',result:'pas compris'});
@@ -29206,7 +29398,7 @@ function _mdAnon(raw,P){
   caps.forEach(w=>{ const nw=_mdNorm(w); if(!_MD_STOP.has(nw)&&!FT.has(nw)){ const k=T.indexOf(nw); if(k>=0){ const code='X'+(Object.keys(map).length+1); map[code]={type:'x',words:nw}; T[k]='['+code+']'; } } });
   return {text:T.join(' '),map};
 }
-const _MD_AI_HINT={dashboard:"page d'accueil, tableau de bord",weekly:'planning de la semaine, planning hebdo, effectifs semaine par semaine',master:"vue d'ensemble du mois ou de l'année, planning mensuel",briefw:'récap à envoyer au personnel pour la semaine',briefj:'récap du jour, point du matin',aff:"affectations du jour par chantier, qui travaille sur quel avion aujourd'hui",quiou:"où sont les gens, qui est où aujourd'hui",tv:'affichage écran atelier',slot:'positions des avions dans le hangar, plan du hangar',stockage:'avions en stockage',recycling:'avions en recyclage / démantèlement',airbus:'activité Airbus Part 21',personnel:'liste du personnel, effectifs, annuaire',fiche:"fiche d'une personne précise (mettre person)",certif:'certifying staff, habilitations B1 B2',formations:'formations, sessions de formation, échéances de formation',autorisations:'autorisations, droits, habilitations internes',todo:'liste de tâches, to-do',checklist:'check-list',kpi:'chiffres clés, indicateurs, statistiques, KPI',programme:"programme d'activité, charge prévue",chantiers:'liste des chantiers / avions en cours',simulation:'simulation de charge',notice:"mode d'emploi, aide de l'application",forecast:'prévision à 3 mois',aeromargin:'calcul MPA moteurs',docairbus:'documentation Airbus',docatr:'documentation ATR',docboeing:'documentation Boeing',mardam:'page de l’assistant Mardam (journal, réglages)'};
+const _MD_AI_HINT={sfreg:'registre sécurité, accidents',dashboard:"page d'accueil, tableau de bord",weekly:'planning de la semaine, planning hebdo, effectifs semaine par semaine',master:"vue d'ensemble du mois ou de l'année, planning mensuel",briefw:'récap à envoyer au personnel pour la semaine',briefj:'récap du jour, point du matin',aff:"affectations du jour par chantier, qui travaille sur quel avion aujourd'hui",quiou:"où sont les gens, qui est où aujourd'hui",tv:'affichage écran atelier',slot:'positions des avions dans le hangar, plan du hangar',stockage:'avions en stockage',recycling:'avions en recyclage / démantèlement',airbus:'activité Airbus Part 21',personnel:'liste du personnel, effectifs, annuaire',fiche:"fiche d'une personne précise (mettre person)",certif:'certifying staff, habilitations B1 B2',formations:'formations, sessions de formation, échéances de formation',autorisations:'autorisations, droits, habilitations internes',todo:'liste de tâches, to-do',checklist:'check-list',kpi:'chiffres clés, indicateurs, statistiques, KPI',programme:"programme d'activité, charge prévue",chantiers:'liste des chantiers / avions en cours',simulation:'simulation de charge',notice:"mode d'emploi, aide de l'application",forecast:'prévision à 3 mois',aeromargin:'calcul MPA moteurs',docairbus:'documentation Airbus',docatr:'documentation ATR',docboeing:'documentation Boeing',mardam:'page de l’assistant Mardam (journal, réglages)'};
 function _mdAISys(){
   const scr=[..._MD_SCREENS.map(x=>x[0]),'fiche'].filter((v,i,a)=>a.indexOf(v)===i).map(k=>`${k}=${_MD_AI_HINT[k]||((_MD_SCREENS.find(x=>x[0]===k)||[])[2]||'Fiche personnel')}`).join(' ; ');
   return `Aujourd'hui : {TODAY}.
@@ -29218,9 +29410,9 @@ Formats :
 {"type":"question","intent":"<code question>","person":"P1 ou null","msn":"A1 ou null","formation":"nom de la formation/autorisation tel que dit, ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM ou null","pos":1|2|3 ou null,"cats":[catégories] ou null}
   codes question : ${Object.entries(_MDQ_LBL).map(([k,v])=>k+' = '+v).join(' ; ')}
   (date = un jour précis ; from/to = une période ; sans date, laisse null : l'app prend aujourd'hui ou la période par défaut)
-{"type":"action","act":"assign|unassign|abs|abs_del|form|form_del|vm|vm_del|note|slot_set|slot_out|slot_move|slot_del|todo_add|todo_done|todo_del|prolong|form_upd|aut_upd|pers_new","pos":1|2|3 ou null,"person":["P1","P2"] ou null,"msn":"A1 ou null","formation":"nom dit ou null","abs":"conge|conge_prev|maladie|absence|deplacement|ecole ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM|day ou null","time":"HH:MM ou null","text":"texte de la note ou null"}
-  (assign/unassign = affecter/retirer d'un avion ; abs = congé/maladie/absence ; form = inscrire en formation ; vm = visite médicale ; note = pense-bête ; slot_* = hangar (position, sortie, déplacement) ; todo_* = to-do ; prolong = prolonger un contrat ; form_upd/aut_upd = nouvelle date de formation/autorisation ; pers_new = nouveau profil (text = prénom nom) ; *_del = supprimer. L'app confirme toujours.)
-{"type":"action","stage":3,"what":"résumé court"}  (autres modifications pas encore possibles)
+{"type":"action","act":"assign|unassign|abs|abs_del|form|form_del|vm|vm_del|note|slot_set|slot_out|slot_move|slot_del|todo_add|todo_done|todo_del|prolong|form_upd|aut_upd|pers_new|sf_add|sf_close","pos":1|2|3 ou null,"sftype":"arret|sans|soin ou null","person":["P1","P2"] ou null,"msn":"A1 ou null","formation":"nom dit ou null","abs":"conge|conge_prev|maladie|absence|deplacement|ecole ou null","date":"AAAA-MM-JJ ou null","from":"AAAA-MM-JJ ou null","to":"AAAA-MM-JJ ou null","half":"AM|PM|day ou null","time":"HH:MM ou null","text":"texte de la note ou null"}
+  (assign/unassign = affecter/retirer d'un avion ; abs = congé/maladie/absence ; form = inscrire en formation ; vm = visite médicale ; note = pense-bête ; slot_* = hangar (position, sortie, déplacement) ; todo_* = to-do ; prolong = prolonger un contrat ; form_upd/aut_upd = nouvelle date de formation/autorisation ; pers_new = nouveau profil (text = prénom nom) ; sf_add = déclarer un accident ou un soin (text = les faits) ; sf_close = clore un événement sécurité ; *_del = supprimer. L'app confirme toujours.)
+{"type":"say","text":"phrase"}  (toute autre demande sur l'application — chantiers, personnel, congés, check-list, notes, stockage, recyclage, exports, réglages… — : reformule-la en une phrase simple et directe en français, en gardant les codes, ex. « clôture le chantier [A1] », « valide les congés de [P1] », « exporte le planning de la semaine en PDF »)
 {"type":"unknown"}  (seulement si la demande n'a vraiment aucun rapport)
 Écrans (code=sens) :
 ${scr}
@@ -29265,6 +29457,7 @@ function _mdFromAI(o,map,P){
     if(o.screen==='master'&&!out.month&&out.date) out.month={m:out.date.getMonth(),y:out.date.getFullYear()};
     const known=_MD_CATW.map(x=>x[0]); if(Array.isArray(o.cats)&&['weekly','master'].includes(o.screen)){ const c=o.cats.filter(x=>known.includes(x)); if(c.length) out.cats=c; }
     return out; }
+  if(o.type==='say'&&o.text){ const t=_v2Deanon(o.text,map); const P2=_mdParse(t); if(P2.kind!=='unknown'&&P2.kind!=='later'){ P2.via='ia'; P2.aiSaid=t; return P2; } return Object.assign(out,{kind:'unknown'}); }
   if(o.type==='filter') return Object.assign(out,{kind:'filter',cats:o.cats});
   if(o.type==='control') return Object.assign(out,{kind:'ctl',act:o.act});
   if(o.type==='question'){
@@ -29294,6 +29487,7 @@ function _mdFromAI(o,map,P){
     if(/^(form_upd|aut_upd)$/.test(o.act)&&o.formation){ const f=_mdqFindForm(_mdNorm(String(o.formation)).split(' '),o.act==='aut_upd'?'a':'f'); A.fx=f; }
     if(o.act==='pers_new'&&o.text){ const w=String(o.text).trim().split(/\s+/); if(w.length>=2) A.nm={prenom:w[0].charAt(0).toUpperCase()+w[0].slice(1).toLowerCase(),nom:w.slice(1).join(' ').toUpperCase()}; }
     if(/^todo_/.test(o.act)&&o.text){ out.raw='to do '+String(o.text); out.T=_mdNorm(String(o.text)).split(' '); }
+    if(o.act==='sf_add'){ A.type=['arret','sans','soin'].includes(o.sftype)?o.sftype:''; if(o.text){ let t=String(o.text); Object.entries(map).forEach(([c,v])=>{ const e=v.type==='p'&&v.ids&&v.ids.length===1?byId(v.ids[0]):null; t=t.split('['+c+']').join(e?_mdPName(e):(v.words||v.msn||'')); }); A.faits=t; } }
     if(o.act==='note'){ let t=String(o.text||''); Object.entries(map).forEach(([c,v])=>{ const e=v.type==='p'&&v.ids&&v.ids.length===1?byId(v.ids[0]):null; t=t.split('['+c+']').join(e?_mdPName(e):(v.words||v.msn||'')); }); A.text=t.trim(); }
     return Object.assign(out,{kind:'act',A}); }
   if(o.type==='action') return Object.assign(out,{kind:'later',stage:o.stage===2?2:3,what:'action'});
@@ -29450,6 +29644,8 @@ function _mdqFindForm(T,kind){
 function _mdqFormMatch(fx,txt){ if(!fx) return true; const k=_mdNorm(txt||''); return fx.keys.some(x=>k===x||(' '+k+' ').includes(' '+x+' ')); }
 // ── Reconnaître la question ──
 function _mdQDetect(P){
+  { const sq=_mdSfQ(P); if(sq) return sq; }
+  { const vq=_mdV2Q(P); if(vq) return vq; }
   const T=P.T||[], nn=' '+T.join(' ')+' ', per=!!(P.ppl&&P.ppl.length), msn=!!(P.msn&&P.msn.length), has=re=>re.test(nn);
   const Tx=T.slice(); (P.ppl||[]).forEach(h=>{ for(let i=h.span[0];i<h.span[1];i++) Tx[i]=''; }); (P.msn||[]).forEach(m=>{ if(m.i!=null) Tx[m.i]=''; });
   const catOf=()=>{ const c=_MD_CATW.filter(([k,re])=>re.test(nn)).map(([k])=>k); return c.length?c:null; };
@@ -29687,7 +29883,7 @@ function _mdQRun(P,text,how){
 }
 
 // ═══ Mardam 0.6 — apprendre : mauvaises réponses, export pour Claude, raccourcis personnels ═══
-const _MD_VER='1.0.1';
+const _MD_VER='2.0';
 function _mdBad(){ _mdCfg(); if(!Array.isArray(S.mardam.bad)) S.mardam.bad=[]; return S.mardam.bad; }
 function _mdShorts(){ _mdCfg(); if(!Array.isArray(S.mardam.short)) S.mardam.short=[]; return S.mardam.short; }
 function _mdTxt(h){ const d=document.createElement('div'); d.innerHTML=String(h||'').replace(/<li>/g,' • ').replace(/<br\s*\/?>/g,' '); return (d.textContent||'').replace(/\s+/g,' ').trim(); }
@@ -29776,6 +29972,8 @@ function _mdaDel(nn){ return / (supprime|supprimer|annule|annuler|enleve|enlever
 // Reconnaît une modification
 function _mdAParse(P,raw){
   const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), del=_mdaDel(nn), per=P.ppl&&P.ppl.length, msn=P.msn&&P.msn.length;
+  const SF=_mdSfParse(P,raw); if(SF) return SF;
+  const V2=_mdV2Parse(P,raw); if(V2) return V2;
   const A3=_mdA3Parse(P,raw); if(A3) return A3;
   if(has(/ (positions?|hangar) /)) return null;
   if(has(/ (pense bete|post it|postit|notes? de bord|une note|ma note|mes notes|rappelle moi|fais moi penser|rappel dans|un rappel) /)&&!del){
@@ -29824,11 +30022,15 @@ function _mdActRun(P,text,how){
   try{ r=_MDA_BUILD[A.a](P,text,how,A,nn,tm); }catch(e){ console.warn('Mardam action',e); _mdReply("Je n'ai pas réussi à préparer cette modification. Rien n'a été changé."); _mdLog({said:text,how,label:_MDA_LBL[A.a]||A.a,result:'erreur'}); return; }
   if(!r) return;                                                          // une question a été posée
   if(r.err){ _mdReply(r.err,r.errSay||r.err.replace(/<[^>]+>/g,''),[],{noBad:false}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'impossible'}); return; }
-  if(!r.changes.length&&!r.note&&!(r.objs&&r.objs.length)){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
+  if(!r.changes.length&&!r.note&&!(r.objs&&r.objs.length)&&!r.mut){ _mdReply(`${r.empty||'Il n\'y a rien à changer : c\'est déjà comme ça.'}${r.warn&&r.warn.length?_mdqUl(r.warn):''}`,(r.empty||"Rien à changer, c'est déjà comme ça.").replace(/<[^>]+>/g,'')); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'rien à changer'}); return; }
   const go=v=>{ if(v){ r.objs=v.objs; r.doneNote=v.done; } _mdaApply(r,text,how,A); };
   const no={l:'✕ Non',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord, je ne touche à rien.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); }};
   const yes=r.variants?r.variants.map(v=>({l:v.l,fn:()=>{ MD.pending=null; go(v); },match:q=>v.match.test(' '+q.n+' ')})):[{l:'✓ Oui, je confirme',fn:()=>{ MD.pending=null; go(); }}];
   MD.pending={label:_MDA_LBL[A.a],run:()=>go(r.variants?r.variants[0]:null),base:P.raw||text,choices:yes.concat([no])};
+  if(r.danger){ const second=()=>{ const ok={l:"🗑 Je confirme, c'est définitif",fn:()=>{ MD.pending=null; go(); },match:q=>/ (je confirme|confirme|confirmer|c est definitif|definitivement|vas y supprime) /.test(' '+q.n+' ')};
+      MD.pending={label:_MDA_LBL[A.a]+' (2e confirmation)',run:()=>second(),choices:[ok,no]};
+      _mdReply(`⚠️ <b>Dernière vérification</b> : c'est définitif${r.noUndo?' et ça ne pourra pas être annulé':''}. Dis « je confirme » pour continuer, ou « non ».`,"Attention, c'est définitif. Dis : je confirme.",[{l:ok.l,fn:ok.fn,primary:true},{l:no.l,fn:no.fn}],{noBad:true}); };
+    yes[0].fn=()=>{ MD.pending=null; second(); }; MD.pending.run=()=>second(); MD.pending.choices[0].fn=yes[0].fn; }
   const det=(r.lines||[]).concat((r.warn||[]).map(w=>`<span class="md-warn">⚠ ${w}</span>`));
   _mdReply(`<b>${r.html||_bfEsc(r.say)}</b>${det.length?_mdqUl(det,40):''}${r.ask?`<div style="margin-top:6px">${_bfEsc(r.ask)}</div>`:''}<div class="md-mut" style="margin-top:6px">${r.changes.length?_mdqPl(r.changes.length,'demi-journée modifiée','demi-journées modifiées')+' · ':''}Rien n'est changé tant que tu n'as pas confirmé.</div>`,r.say+(r.ask?' '+r.ask:' Je confirme ?'),MD.pending.choices.map((c,i)=>({l:c.l,fn:c.fn,primary:i===0})),{noBad:true});
 }
@@ -29921,10 +30123,13 @@ function _mdaApply(r,text,how,A){
   if(r.untrack&&S.formTracking){ r.changes.forEach(c=>{ const b=c.before; if(b&&b.type==='formation_int'){ const i=S.formTracking.findIndex(t=>t.empId===c.emp.id&&t.date===c.ds&&t.formInt===b.formInt&&t.status==='planned'&&!r.changes.some(x=>x.emp.id===c.emp.id&&x.ds===c.ds&&x.after&&x.after.type==='formation_int')); if(i>=0){ rec.untracked.push(S.formTracking[i]); S.formTracking.splice(i,1); } } }); }
   rec.objs=(r.objs||[]).map(o=>({coll:o.coll,id:o.id,before:o.before,after:o.after}));
   (r.objs||[]).forEach(o=>{ const arr=_mdaColl(o.coll); const i=arr.findIndex(x=>x.id===o.id); if(o.after===null){ if(i>=0) arr.splice(i,1); } else if(i>=0) arr[i]=o.after; else arr.push(o.after); });
+  if(r.mut){ const b=r.noUndo?null:_v2SnapK(); const q=_v2Quiet(r.mut); if(q.err){ if(b) Object.keys(b).forEach(k=>{ S[k]=JSON.parse(b[k]); }); try{ save(); }catch(_){} _v2Rerender(); _mdReply(`Je n'ai pas pu le faire : ${_bfEsc(q.err)}. Rien n'a été changé.`,"Je n'ai pas pu le faire. Rien n'a été changé."); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'erreur'}); return; }
+    rec.mut=true; rec.noUndo=!!r.noUndo; if(b){ MD.snaps=MD.snaps||{}; MD.snaps[rec.id]={b}; } }
   if(r.note){ const me=_ntMe(); const n={id:'nt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:r.note.t,c:'y',due:r.note.due||'',sh:false,by:me.login,byN:me.nom,at:Date.now(),done:0,doneDs:''}; _ntAll().push(n); rec.notes.push(n.id); }
   _mdaEnsure(); S.mardam.changes=(S.mardam.changes||[]); S.mardam.changes.unshift(rec); if(S.mardam.changes.length>30) S.mardam.changes.length=30;
-  save(); _mdaRefresh();
-  const view=r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:r.view==='slot'?{l:'Voir le hangar',fn:()=>{ goTab('slot'); try{ renderSlotGrid(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('#pg-slot .slot-grid, #pg-slot table')||document.querySelector('.page.on')),200); }}
+  save(); _mdaRefresh(); if(rec.mut&&MD.snaps&&MD.snaps[rec.id]){ MD.snaps[rec.id].a=_v2SnapK(); setTimeout(()=>{ try{ MD.snaps[rec.id].a=_v2SnapK(); MD.snaps[rec.id].fin=true; }catch(_){} },900); }
+  const view=r.viewObj?r.viewObj:r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:r.view==='slot'?{l:'Voir le hangar',fn:()=>{ goTab('slot'); try{ renderSlotGrid(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('#pg-slot .slot-grid, #pg-slot table')||document.querySelector('.page.on')),200); }}
+    :r.view==='sf'?{l:'Voir la fiche',fn:()=>{ try{ _sfEdit(r.sfId); }catch(_){} }}
     :r.view==='todo'?{l:'Voir la to-do',fn:()=>{ goTab('todo'); try{ renderTodo(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('.page.on')),150); }}
     :r.view==='fiche'&&r.emps&&r.emps[0]?{l:'Voir la fiche',fn:()=>{ goTab('personnel'); try{ renderPersonnel(); }catch(_){} setTimeout(()=>{ try{ openPanel(r.emps[0].id); }catch(_){ try{ editPersonnel(r.emps[0].id); }catch(__){} } },120); }}
     :r.view==='form'||r.view==='aut'?_mdqVForms(r.view==='aut'?'a':'f',r.emps&&r.emps[0],''):_mdaView(r);
@@ -29932,15 +30137,22 @@ function _mdaApply(r,text,how,A){
   _mdLog({said:text,how,label:'modification : '+_MDA_LBL[A.a],result:'fait',undo:rec.id});
   setTimeout(()=>{ try{ if(r.view!=='fiche'&&typeof closePanel==='function') closePanel(); }catch(_){} try{ view.fn(); }catch(_){} },350);                   // la preuve à l'écran
 }
-function _mdaDone(s){ return String(s).replace(/^Je crée /,"J'ai créé ").replace(/^Je prolonge /,"J'ai prolongé ").replace(/^Je coche /,"J'ai coché ").replace(/^J'ajoute /,"J'ai ajouté ").replace(/^Je passe /,"J'ai passé ").replace(/^Je mets à jour /,"J'ai mis à jour ").replace(/^Le (\S+) sort /,'Le $1 sort désormais ').replace(/^Je mets /,"J'ai mis ").replace(/^J'inscris /,"J'ai inscrit ").replace(/^J'affecte /,"J'ai affecté ").replace(/^Je retire /,"J'ai retiré ").replace(/^Je supprime /,"J'ai supprimé ").replace(/^Je note /,"J'ai noté ").replace(/ Les cases redeviennent vides\./,' Les cases sont vides.'); }
+function _mdaDone(s){ return String(s).replace(/^Je rentre /,"J'ai rentré ").replace(/^Je clôture /,"J'ai clôturé ").replace(/^J'archive /,"J'ai archivé ").replace(/^Je valide /,"J'ai validé ").replace(/^Je refuse /,"J'ai refusé ").replace(/^Je recopie /,"J'ai recopié ").replace(/^Je réintègre /,"J'ai réintégré ").replace(/^Je note /,"J'ai noté ").replace(/^Je récupère /,"J'ai lancé la récupération ").replace(/^Je crée /,"J'ai créé ").replace(/^Je prolonge /,"J'ai prolongé ").replace(/^Je coche /,"J'ai coché ").replace(/^J'ajoute /,"J'ai ajouté ").replace(/^Je passe /,"J'ai passé ").replace(/^Je mets à jour /,"J'ai mis à jour ").replace(/^Le (\S+) sort /,'Le $1 sort désormais ').replace(/^Je mets /,"J'ai mis ").replace(/^J'inscris /,"J'ai inscrit ").replace(/^J'affecte /,"J'ai affecté ").replace(/^Je retire /,"J'ai retiré ").replace(/^Je supprime /,"J'ai supprimé ").replace(/^Je note /,"J'ai noté ").replace(/ Les cases redeviennent vides\./,' Les cases sont vides.'); }
 function _mdaView(r){ const e=r.emps&&r.emps.length===1?r.emps[0]:null, d=r.d0||(r.changes[0]?parseLocal(r.changes[0].ds):_mdToday());
   return {l:'Voir le planning',fn:()=>{ S.weekStart=getMon(d); goTab('weekly'); const i=document.getElementById('week-search'); if(i) i.value=e?(e.nom||''):''; try{ renderWeekly(); }catch(_){}
     setTimeout(()=>{ (r.changes||[]).forEach(c=>{ document.querySelectorAll(`.hd[data-emp="${c.emp.id}"][data-ds="${c.ds}"][data-half="${c.h}"]`).forEach(el=>_mdFlash(el)); }); _mdFlash(document.getElementById('weeklyGrid')); },150); }}; }
-function _mdaRefresh(){ try{ if(document.querySelector('#pg-slot.on')){ renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels(); } }catch(_){} try{ if(document.querySelector('#pg-todo.on')) renderTodo(); }catch(_){} try{ if(document.querySelector('#pg-personnel.on')) renderPersonnel(); }catch(_){} try{ if(document.querySelector('#pg-formations.on')) renderForms(); }catch(_){} try{ if(document.querySelector('#pg-autorisations.on')&&typeof renderAutorisations==='function') renderAutorisations(); }catch(_){} try{ popSelects(); }catch(_){} try{ renderDash(); }catch(_){} try{ if(document.querySelector('#pg-weekly.on')) renderWeekly(); }catch(_){} try{ if(document.querySelector('#pg-master.on')) renderMaster(); }catch(_){} try{ _ntRefresh(); }catch(_){} try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){} try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#pg-dashboard.on')&&typeof renderDashboard==='function') renderDashboard(); }catch(_){} }
+function _mdaRefresh(){ _v2Rerender(); try{ if(document.querySelector('#m-brief.on')) _briefRender(); }catch(_){} try{ if(document.querySelector('#m-sfreg.on')) _sfRegRender(); }catch(_){} try{ if(document.querySelector('#pg-slot.on')){ renderSlotGrid(); renderSlotHistorique(); updateSlotPositionLabels(); } }catch(_){} try{ if(document.querySelector('#pg-todo.on')) renderTodo(); }catch(_){} try{ if(document.querySelector('#pg-personnel.on')) renderPersonnel(); }catch(_){} try{ if(document.querySelector('#pg-formations.on')) renderForms(); }catch(_){} try{ if(document.querySelector('#pg-autorisations.on')&&typeof renderAutorisations==='function') renderAutorisations(); }catch(_){} try{ popSelects(); }catch(_){} try{ renderDash(); }catch(_){} try{ if(document.querySelector('#pg-weekly.on')) renderWeekly(); }catch(_){} try{ if(document.querySelector('#pg-master.on')) renderMaster(); }catch(_){} try{ _ntRefresh(); }catch(_){} try{ if(typeof updateFormConfirmBadge==='function') updateFormConfirmBadge(); }catch(_){} try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#pg-dashboard.on')&&typeof renderDashboard==='function') renderDashboard(); }catch(_){} }
 function _mdaUndo(id){
   const L=(S.mardam&&S.mardam.changes)||[]; const rec=id?L.find(x=>x.id===id):L.find(x=>!x.undone);
   if(!rec){ _mdReply("Je n'ai aucune modification récente à annuler.",null,[],{noBad:true}); return; }
   if(rec.undone){ _mdReply('Cette modification est déjà annulée.',null,[],{noBad:true}); return; }
+  if(rec.mut){ const sn=MD.snaps&&MD.snaps[rec.id]; if(sn&&sn.a&&!sn.fin){ setTimeout(()=>_mdaUndo(rec.id),1000); return; }
+    if(rec.noUndo||!sn||!sn.a){ _mdReply(rec.noUndo?"Celle-ci ne peut pas s'annuler.":"Je ne peux plus annuler celle-ci : l'application a été rechargée depuis. Corrige-la à la main.",null,[],{noBad:true}); return; }
+    const cur=_v2SnapK(), keys=[...new Set(Object.keys(sn.b).concat(Object.keys(sn.a)))].filter(k=>sn.b[k]!==sn.a[k]);
+    if(keys.some(k=>cur[k]!==sn.a[k])){ _mdReply("Les mêmes données ont été modifiées depuis : je ne peux pas annuler sans effacer ces changements. Corrige à la main.",null,[],{noBad:true}); return; }
+    keys.forEach(k=>{ if(sn.b[k]===undefined) delete S[k]; else S[k]=JSON.parse(sn.b[k]); });
+    rec.undone=new Date().toISOString(); const j0=(S.mardam.journal||[]).find(x=>x.undo===rec.id); if(j0) j0.undone=true; save(); _mdaRefresh();
+    _mdReply(`↩ <b>Annulé</b> : « ${_bfEsc(rec.said)} ». Tout est revenu comme avant.`,'Annulé, tout est revenu comme avant.',[],{noBad:true}); _mdLog({said:'annule',how:'local',label:'annulation : '+rec.label,result:'ok'}); return; }
   let moved=0; rec.cells.forEach(c=>{ const cur=S.planning[c.k]||null; if(JSON.stringify(cur)!==JSON.stringify(c.after)) moved++; if(c.before===null) delete S.planning[c.k]; else S.planning[c.k]=c.before; });
   if(rec.tracks.length&&S.formTracking) S.formTracking=S.formTracking.filter(t=>!rec.tracks.includes(t.id));
   if(rec.untracked.length){ if(!S.formTracking) S.formTracking=[]; rec.untracked.forEach(t=>S.formTracking.push(t)); }
@@ -29955,7 +30167,7 @@ function _mdaUndo(id){
 // ═══ Mardam — étape 3 : hangar, to-do, prolongations, formations/autorisations, nouveau profil ═══
 Object.assign(_MDA_LBL,{slot_set:'positionner un avion',slot_out:'sortir un avion du hangar',slot_move:'changer un avion de position',slot_del:'retirer un avion du hangar',todo_add:'ajouter une tâche',todo_done:'cocher une tâche',todo_del:'supprimer une tâche',prolong:'prolonger un contrat',form_upd:'mettre à jour une formation',aut_upd:'mettre à jour une autorisation',pers_new:'créer un profil'});
 const _MDA_CATN=[['interimaire',/ (interimaire|interimaires|interim) /],['chef',/ (chef d equipe|chef equipe|team leader|tl) /],['sheetmetal',/ (sheet metal|sheetmetal|tolier|structure) /],['alternant',/ (alternant|alternante|apprenti) /],['stagiaire',/ (stagiaire) /],['expert',/ (expert) /],['prestataire',/ (prestataire|presta) /],['recycling',/ (recyclage) /],['part21',/ (part ?21) /],['technicien',/ (technicien|technicienne|mecano|mecanicien|meca) /]];
-function _mdaColl(c){ if(c==='slot'){ if(!S.slot) S.slot={entries:[]}; if(!Array.isArray(S.slot.entries)) S.slot.entries=[]; return S.slot.entries; } if(c==='todos'){ if(!Array.isArray(S.todos)) S.todos=[]; return S.todos; } if(c==='autorisations'){ if(!Array.isArray(S.autorisations)) S.autorisations=[]; return S.autorisations; } return S[c]; }
+function _mdaColl(c){ if(c==='safety') return _sfNorm().events; if(c==='chantiers'){ if(!Array.isArray(S.chantiers)) S.chantiers=[]; return S.chantiers; } if(c==='cltasks') return _clInit().tasks; if(c==='notes') return _ntAll(); if(c==='slot'){ if(!S.slot) S.slot={entries:[]}; if(!Array.isArray(S.slot.entries)) S.slot.entries=[]; return S.slot.entries; } if(c==='todos'){ if(!Array.isArray(S.todos)) S.todos=[]; return S.todos; } if(c==='autorisations'){ if(!Array.isArray(S.autorisations)) S.autorisations=[]; return S.autorisations; } return S[c]; }
 const _mdaCp=o=>o?JSON.parse(JSON.stringify(o)):null;
 function _mdaWd(a,b){ let n=0; for(let d=parseLocal(a);d<=parseLocal(b);d=addD(d,1)){ const wd=d.getDay(); if(wd&&wd!==6&&!isHol(fmt(d))) n++; } return n; }
 function _mdaLastDay(tm){ return tm.range?tm.range.to:tm.day?tm.day.d:tm.week?tm.week.to:null; }
@@ -30083,6 +30295,516 @@ Object.assign(_MDA_BUILD,{
       say:`Je crée la fiche de ${o.prenom} ${o.nom}, ${String(lbl).toLowerCase()}${cat==='interimaire'&&a?`, en mission du ${_mdDayTxt(a)}${b?' au '+_mdDayTxt(b):''}`:''}. Tu pourras compléter l'agence, le téléphone et le reste sur sa fiche.`}; },
 });
 
+// ── Déclaration sécurité : questions du registre une par une ──
+function _sfCap(t){ t=String(t||'').trim(); return t?t.charAt(0).toUpperCase()+t.slice(1):''; }
+function _sfLieuFrom(nn,P){ const pm=nn.match(/ (?:position|pos|p) ?(1|2|3) /); const m=P?_mdqMsn(P):null;
+  if(pm) return 'Position '+pm[1]; if(m){ const c=(S.chantiers||[]).find(x=>x.msn===m.msn); return `MSN ${m.msn}${c&&c.client?' · '+String(c.client).trim():''}`; }
+  const L=[['atelier','Atelier'],['magasin','Magasin'],['parking','Parking avion'],['tarmac','Tarmac'],['bureau','Bureaux'],['hangar','Hangar']]; const f=L.find(([k])=>nn.includes(' '+k)); return f?f[1]:''; }
+function _sfLesFrom(nn,loose){ const ln=nn.match(_SF_LES); let nature=ln?_sfCap(ln[1]):'';
+  if(!nature){ const V=[[/ s est (coupe|coupee|entaille|entaillee) /,'coupure'],[/ s est (brule|brulee) /,'brûlure'],[/ s est (tordu|tordue|tord) /,'entorse'],[/ s est (cogne|cognee) /,'choc'],[/ s est (pince|pincee|fait pincer) /,'pincement'],[/ s est (ecrase|ecrasee) /,'écrasement'],[/ s est (pique|piquee) /,'piqûre'],[/ (s est fait mal|a mal|mal au|mal a la|mal aux) /,'douleur'],[/ (est tombe|est tombee|chute) /,'chute'],[/ (poussiere|poussieres|copeau|copeaux|corps etranger|limaille|eclat) /,'corps étranger']];
+    if(loose) V.push([/ (coupe|coupee|entaille) /,'coupure'],[/ (brule|brulee) /,'brûlure'],[/ (tordu|tordue|torsion) /,'entorse'],[/ (cogne|cognee|coup) /,'choc'],[/ (pince|pincee|pincement) /,'pincement'],[/ (ecrase|ecrasee) /,'écrasement'],[/ (pique|piquee) /,'piqûre'],[/ (mal|douleur) /,'douleur'],[/ (rien|aucune|pas de lesion|indemne) /,'aucune lésion']);
+    const v=V.find(([r])=>r.test(nn)); if(v) nature=_sfCap(v[1]); }
+  const sg=nn.match(_SF_SIEGE); return {nature,siege:sg?_sfCap(sg[0].trim().replace(/\boeil\b/,'œil')):''}; }
+function _mdSfQueue(ev,hasDay){ const Q=[];
+  if(!hasDay) Q.push('quand'); else if(!ev.heure) Q.push('heure');
+  if(!ev.lieu) Q.push('lieu'); if(!ev.faits) Q.push('faits'); if(!ev.lesNature||!ev.lesSiege) Q.push('les'); Q.push('temoins');
+  if(ev.type==='arret'){ if(!ev.joursArret) Q.push('ja'); Q.push('reprise'); }
+  Q.push('analyse','act'); return Q; }
+const _SF_QTXT={ quand:()=>"C'était quand, et à quelle heure ?", heure:()=>'À quelle heure ?', lieu:()=>'Où ? (position, MSN, atelier…)', faits:()=>"Que s'est-il passé ?",
+  les:ev=>ev.lesNature&&!ev.lesSiege?'À quel endroit du corps ?':!ev.lesNature&&ev.lesSiege?'Quel type de lésion ? (coupure, entorse, choc…)':'Quelle lésion, et où ? (ex. coupure main gauche)',
+  temoins:()=>'Des témoins ?', ja:()=>"Combien de jours d'arrêt ?", reprise:()=>'Date de reprise prévue ?', analyse:()=>'Une cause identifiée ?', act:()=>'Une action corrective ? (quoi, qui, pour quand)', act2:()=>'Une autre action ?' };
+const _SF_QBTN={ lieu:[['Position 1','position 1'],['Position 2','position 2'],['Position 3','position 3'],['Atelier','atelier']], temoins:[['Aucun','aucun']], act2:[["Non, c'est tout",'non']] };
+function _mdSfAsk(st,pre){
+  const k=st.Q[0]; if(!k) return _mdSfFinish(st);
+  const q=_SF_QTXT[k](st.ev); st.n=st.tot-st.Q.length+1;
+  MD.pending={label:'déclaration sécurité',answer:t=>_mdSfAnswer(st,t)};
+  const tap=v=>()=>{ _mdYou(v); MD.hist.push({who:'me',html:_bfEsc(v),at:Date.now()}); _mdSfAnswer(st,v); };
+  const B=(_SF_QBTN[k]||[]).map(([l,v])=>({l,fn:tap(v)}));
+  const ctl=[{l:'Passer',fn:tap('passe')},{l:"✓ C'est tout",fn:tap("c'est tout")},{l:'✕ Annuler',fn:tap('annule')}];
+  if(k==='act2') ctl.shift();
+  if(st.voice) MD.afterSpeak=()=>{ if(MD.pending&&MD.pending.answer&&!MD.listening) _mdListen(); };
+  _mdReply(`${pre?`<div class="md-mut">${pre}</div>`:''}<b>${_bfEsc(q)}</b><div class="md-mut" style="margin-top:4px">Fiche sécurité · question ${Math.min(st.n,st.tot)}/${st.tot} — « passe » pour sauter, « c'est tout » pour finir.</div>`,(pre?pre.replace(/<[^>]+>/g,'')+' ':'')+q,B.concat(ctl),{noBad:true});
+}
+function _mdSfAnswer(st,t){
+  MD.pending=null; const raw=String(t||'').trim(), n=' '+_mdNorm(raw).replace(/\?/g,' ').replace(/\s+/g,' ').trim()+' ', T=n.trim(), W=T.split(' ').filter(Boolean).length, ev=st.ev, k=st.Q[0];
+  if(/^(annule|annuler|laisse tomber|oublie|oublie ca|abandonne|on annule)( |$)/.test(T)){ MD.afterSpeak=null; _mdReply("D'accord, je n'enregistre rien.","D'accord, je n'enregistre rien.",[],{noBad:true}); _mdLog({said:st.text,how:st.how,label:_MDA_LBL.sf_add,result:'annulé'}); return; }
+  if(/^(c est tout|ca suffit|ca ira|termine|c est fini|fini|on arrete( la)?|plus de questions?|stop|c est bon)( |$)/.test(T)&&W<=5){ st.Q=[]; return _mdSfFinish(st); }
+  const yesOnly=/^(oui|ouais|ok|si|bien sur|yes)$/.test(T);
+  const skip=/^(passe|passer|suivant|suivante|je sais pas|je ne sais pas|sais pas|j en sais rien|aucune idee|on verra|plus tard|pas encore|nsp|rien|non|aucun|aucune|personne|pas de temoins?|pas d action|pas pour l instant|pas maintenant|inconnu|inconnue)( |$)/.test(T)&&W<=6;
+  const next=pre=>{ st.Q.shift(); st.retry=0; _mdSfAsk(st,pre); };
+  const again=msg=>{ if(st.retry++>=1) return next('Je laisse cette case vide.'); _mdSfAsk(st,msg); };
+  if(k==='act2'){ if(yesOnly){ st.Q[0]='act'; return _mdSfAsk(st); } if(skip) return next(); }
+  if(skip&&!(k==='les'&&/^(rien|aucune)( |$)/.test(T))) return next();
+  if(yesOnly) return _mdSfAsk(st,k==='temoins'?'Qui ?':k==='analyse'?'Laquelle ?':k==='act'?'Laquelle ? Dis-moi quoi, qui, pour quand.':'Dis-moi.');
+  const P2=_mdParse(raw), tm2=P2.tm||{}, d2=tm2.day?tm2.day.d:tm2.range?tm2.range.from:null, cap=_sfCap(raw.replace(/[.!\s]+$/,''));
+  if(k==='quand'||k==='heure'){ const h=_mdaHour(raw,tm2);
+    if(d2&&fmt(d2)>fmt(_mdToday())) return again("C'est dans le futur : redis-moi quand ça s'est passé.");
+    if(k==='quand'&&d2) ev.date=fmt(d2); if(h) ev.heure=h;
+    if(!(k==='quand'&&(d2||/ (ce matin|cet apres midi|apres midi|ce soir|aujourd hui|tout a l heure) /.test(n)))&&!h) return again("Je n'ai pas compris. Dis par exemple « hier à 14h » ou « 9h30 ».");
+    return next(); }
+  if(k==='lieu'){ const L=_sfLieuFrom(n,P2); if(L) ev.lieu=L; if(!L||W>3) ev.lieuTxt=cap; return next(); }
+  if(k==='faits'){ ev.faits=ev.desc=cap; return next(); }
+  if(k==='les'){ const r=_sfLesFrom(n,true); if(r.nature&&!ev.lesNature) ev.lesNature=r.nature; if(r.siege&&!ev.lesSiege) ev.lesSiege=r.siege; if(!r.nature&&!r.siege){ if(!ev.lesNature) ev.lesNature=cap; else ev.lesSiege=cap; } return next(); }
+  if(k==='temoins'){ const H=(P2.ppl||[]).filter(h=>h.ids.length===1).map(h=>_mdPName(byId(h.ids[0]))); ev.temoins=H.length&&W<=H.length*3+2?H.join(', '):cap; return next(); }
+  if(k==='ja'){ const m=n.match(/ (\d+) /); if(!m) return again("Je n'ai pas compris le nombre. Dis par exemple « 5 jours »."); ev.joursArret=m[1]; return next(); }
+  if(k==='reprise'){ if(!d2) return again("Je n'ai pas compris la date. Dis par exemple « lundi 7 décembre »."); ev.reprise=fmt(d2); return next(); }
+  if(k==='analyse'){ ev.analyse=cap; return next(); }
+  if(k==='act'||k==='act2'){ const seg=raw.split(/\s*[,;]\s*/).filter(Boolean); const txt=seg[0]||raw; let resp='', due=d2?fmt(d2):'';
+    const H=(P2.ppl||[]).filter(h=>h.ids.length===1); if(H.length) resp=_mdPName(byId(H[0].ids[0]));
+    seg.slice(1).forEach(x=>{ const tx=_mdParse(x).tm||{}; if(tx.day||tx.range) return; if(!resp&&x.split(' ').length<=3) resp=_sfCap(x); });
+    ev.actions.push({id:uid(),txt:_sfCap(txt),resp,due,done:false}); st.Q.shift(); st.Q.unshift('act2'); st.tot++; st.retry=0;
+    return _mdSfAsk(st,`Action notée : ${_bfEsc(_sfCap(txt))}${resp?' · '+_bfEsc(resp):''}${due?' · pour le '+disp(due):''}.`); }
+  next();
+}
+function _mdSfFinish(st){ MD.pending=null; MD.afterSpeak=st.voice?()=>{ if(MD.pending&&MD.pending.run&&!MD.listening) _mdListen(); }:null; st.A.draft=st.ev; st.A.asked=true; _mdActRun(st.P,st.text,st.how); }
+function _mdSfConfirm(ev,asked){
+  const emp=ev.empId?byId(ev.empId):null, who=emp?_mdPName(emp):ev.nomLibre||'?', d=parseLocal(ev.date), type=ev.type;
+  const whoSay=emp?who:/^(sous|prestataire|visiteur|chauffeur|livreur|client|stagiaire|apprenti|auditeur|externe)/i.test(who)?(/(e|euse|ice|ante|iente)$/.test(who.toLowerCase())&&!/^(stagiaire|externe|prestataire)/i.test(who)?'une ':'un ')+who.toLowerCase():who;
+  const reset=type==='soin'?'Aucun compteur ne bouge (soin bénin).':`Remet à zéro : ${type==='arret'?'« avec arrêt » et « sans accident »':'« sans accident »'} de tout le personnel${ev.interim?' et des intérimaires':''}.`;
+  const E=_bfEsc, h=ev.heure?' à '+ev.heure.replace(':','h'):'';
+  const lines=[`Personne : <b>${E(who)}</b>${ev.interim?' · intérimaire':''}`,`Date : ${E(_mdDayTxt(d))}${h}${ev.lieu||ev.lieuTxt?' · lieu : '+E([ev.lieu,ev.lieuTxt].filter(Boolean).join(' — ')):''}`]
+    .concat(ev.faits?[`Faits : ${E(ev.faits)}`]:[]).concat(ev.lesNature||ev.lesSiege?[`Lésion : ${E([ev.lesNature,ev.lesSiege].filter(Boolean).join(' · '))}`]:[])
+    .concat(ev.temoins?[`Témoins : ${E(ev.temoins)}`]:[]).concat(ev.joursArret||ev.reprise?[`Arrêt : ${ev.joursArret?ev.joursArret+' jour'+(+ev.joursArret>1?'s':''):'durée à préciser'}${ev.reprise?' · reprise le '+disp(ev.reprise):''}`]:[])
+    .concat(ev.analyse?[`Cause : ${E(ev.analyse)}`]:[]).concat(ev.actions.map(a=>`Action : ${E(a.txt)}${a.resp?' · '+E(a.resp):''}${a.due?' · pour le '+disp(a.due):''}`)).concat([`<i>${reset}</i>`]);
+  const miss=[!ev.faits&&'faits',!(ev.lesNature||ev.lesSiege)&&'lésion',type==='arret'&&!ev.joursArret&&"jours d'arrêt"].filter(Boolean);
+  return {changes:[],objs:[{coll:'safety',id:ev.id,before:null,after:ev}],view:'sf',sfId:ev.id,lines,warn:miss.length?['Pas encore renseigné : '+miss.join(', ')+'.']:[],
+    say:`Je déclare un ${_SF_T[type].l.toLowerCase()} pour ${whoSay}, ${_mdDayTxt(d)}${h}.${asked?'':' Tu pourras compléter la fiche ensuite.'}`}; }
+
+// ═══ Mardam — sécurité à la voix : déclarer / clore un événement, questions sur les compteurs ═══
+Object.assign(_MDA_LBL,{sf_add:'déclarer un événement sécurité',sf_close:'clore un événement sécurité'});
+Object.assign(_MDQ_LBL,{sf_count:'compteurs sécurité',sf_last:'dernier événement sécurité',sf_late:'actions sécurité en retard'});
+const _SF_LES=/\b(entorses?|coupures?|brulures?|fractures?|contusions?|hematomes?|douleurs?|lumbagos?|ecrasements?|piqures?|plaies?|eraflures?|egratignures?|irritations?|chocs?|lesions?|foulures?|tendinites?|claquages?|projections?)\b/;
+const _SF_SIEGE=/\b(main|mains|doigt|doigts|pouce|poignet|bras|avant bras|coude|epaule|epaules|dos|lombaires|cou|nuque|tete|front|visage|oeil|yeux|nez|bouche|levre|oreille|genou|genoux|cheville|chevilles|pied|pieds|orteil|jambe|jambes|cuisse|hanche|torse|thorax|ventre)\b( (gauches?|droites?|droits?)\b)?/;
+function _mdSfType(nn){ if(/ (soin benin|soins benins|infirmerie|bobo|petit soin|premiers soins|sans gravite) /.test(nn)) return 'soin'; if(/ (sans arret|pas d arret|sans arret de travail) /.test(nn)) return 'sans'; if(/ (avec arret|arret de travail|en arret|jours? d arret|arrete) /.test(nn)) return 'arret'; return ''; }
+function _mdSfParse(P,raw){
+  const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn);
+  if(has(/ actions? /)&&!has(/ (declare|declarer|signale|signaler|il y a eu|on a eu) /)) return null;
+  if(!has(/ (accident|accidente|blesse|blessee|blessure|soin benin|infirmerie|presque accident|evenement securite|incident securite|s est (blesse|blessee|coupe|coupee|brule|brulee|tordu|tordue|cogne|cognee|pince|pincee|ecrase|ecrasee|pique|piquee|fait mal|entaille|entaillee)|est tombe|est tombee|chute) /)) return null;
+  if(has(/ (clos|clore|cloture|cloturer|ferme|fermer|classe|classer|solde|solder) /)&&has(/ (accident|evenement|incident|soin) /)) return {a:'sf_close'};
+  if(has(/ (declare|declarer|note|noter|enregistre|enregistrer|ajoute|ajouter|signale|signaler|mets|saisis|cree|il y a eu|on a eu|a eu|s est (blesse|blessee|coupe|coupee|brule|brulee|tordu|tordue|cogne|cognee|pince|pincee|ecrase|ecrasee|pique|piquee|fait mal|entaille|entaillee)|est tombe|est tombee|blesse|blessee) /)||/^(accident|soin benin|petit accident|un accident|un soin benin) /.test(T.join(' '))) return {a:'sf_add'};
+  return null;
+}
+function _mdSfQ(P){
+  const nn=' '+(P.T||[]).join(' ')+' ', has=re=>re.test(nn);
+  if(!has(/ (accident|accidents|securite|sans accident|registre securite|soin benin|soins benins|compteurs? securite|jours sans|blesse|blessee|blesses|blessure|blessures|correctives?) /)) return null;
+  if(has(/ (actions?|en retard|retard) /)&&has(/ (securite|accident|accidents|correctives?) /)) return {i:'sf_late'};
+  if(has(/ (dernier|derniere|le plus recent|quand a eu lieu|c etait quand|qui s est blesse|qui a eu) /)) return {i:'sf_last'};
+  if(has(/ (combien|depuis quand|jours sans|on en est|ou en est|compteur|compteurs|record|sans accident) /)) return {i:'sf_count'};
+  return null;
+}
+Object.assign(_MDQ_RUN,{
+  sf_count(P){ const C=_sfCount(fmt(new Date())), a=C.all_arret, t=C.all_tout, ia=C.int_arret, it=C.int_tout;
+    const j=n=>n+(n>1?' jours':' jour'); const s=`${j(a.cur)} sans accident avec arrêt et ${j(t.cur)} sans accident pour tout le personnel. Pour les intérimaires : ${j(ia.cur)} sans accident avec arrêt, ${j(it.cur)} sans accident.`;
+    _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:_SF_C.map(([k,who,lbl])=>`${who} · ${lbl} : <b>${C[k].cur} j</b> <small>(record ${C[k].rec} j, depuis le ${disp(C[k].start)})</small>`),title:'Compteurs sécurité',view:{l:'Voir le registre',fn:()=>_sfRegOpen()}}); return 'ok'; },
+  sf_last(P){ const L=_sfNorm().events.slice().sort((a,b)=>(b.date+(b.heure||'')).localeCompare(a.date+(a.heure||''))); const e=L[0];
+    if(!e){ const s='Aucun événement sécurité enregistré.'; _mdAns({say:s,html:s,view:{l:'Voir le registre',fn:()=>_sfRegOpen()}}); return 'ok'; }
+    const s=`Dernier événement : ${_SF_T[e.type].l.toLowerCase()} le ${_mdDayTxt(parseLocal(e.date))}, ${_sfName(e)}${e.interim?' (intérimaire)':''}${e.faits?' : '+e.faits:''}.`;
+    _mdAns({say:s,html:_bfEsc(s),view:{l:'Voir la fiche',fn:()=>_sfEdit(e.id)}}); return 'ok'; },
+  sf_late(P){ const t=fmt(new Date()), L=[]; _sfNorm().events.forEach(e=>(e.actions||[]).forEach(a=>{ if(!a.done&&a.due&&a.due<t) L.push({e,a}); }));
+    const s=L.length?`${_mdqPl(L.length,'action corrective','actions correctives')} en retard.`:'Aucune action corrective en retard.';
+    _mdAns({say:s,html:`<b>${s}</b>`,items:L.map(x=>`${_bfEsc(x.a.txt)}${x.a.resp?' — '+_bfEsc(x.a.resp):''} · prévue le ${disp(x.a.due)} <small>(événement du ${disp(x.e.date)})</small>`),title:'Actions en retard',view:{l:'Voir le registre',fn:()=>{ window._sfF.s='ouvert'; _sfRegOpen(); }}}); return 'ok'; },
+});
+Object.assign(_MDA_BUILD,{
+  sf_add(P,text,how,A,nn,tm){
+    if(A.draft) return _mdSfConfirm(A.draft,A.asked);
+    const type=A.type||_mdSfType(nn); if(!type) return _mdaAsk(text,how,'Accident avec arrêt, sans arrêt, ou soin bénin ?','Avec arrêt, sans arrêt, ou soin bénin ?',[{l:'Avec arrêt',add:'avec arrêt'},{l:'Sans arrêt',add:'sans arrêt'},{l:'Soin bénin',add:'soin bénin'}]);
+    const H=P.ppl||[]; let emp=null, libre=A.libre||'';
+    if(H.length){ const h=H[0]; if(h.ids.length>1){ MD.pending={label:'choix personne',choices:h.ids.slice(0,4).map(id=>({l:_bfEsc(_mdPName(byId(id))),fn:()=>{ MD.pending=null; h.ids=[id]; _mdActRun(P,text,how); }}))}; _mdReply(`Il y a ${h.ids.length} personnes qui correspondent à « ${_bfEsc(h.words)} ». Laquelle ?`,'Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; } emp=byId(h.ids[0]); }
+    if(!emp&&!libre){ const X=nn.match(/ (?:un|une|le|la) (sous traitant|sous traitante|prestataire|visiteur|visiteuse|chauffeur|livreur|client|cliente|stagiaire|apprenti|apprentie|auditeur|auditrice|externe) /); if(X) libre=X[1].replace('sous traitant','sous-traitant').replace('sous traitante','sous-traitante').replace(/^./,c=>c.toUpperCase()); }
+    if(!emp&&!libre) return _mdaAsk(text,how,'Qui est concerné ? Donne un nom de l\'équipe, ou dis « un sous-traitant », « un visiteur »…','Qui est concerné ?');
+    const d=tm.day?tm.day.d:tm.range?tm.range.from:_mdToday(); if(fmt(d)>fmt(_mdToday())||/ (demain|apres demain|semaine prochaine|semaine suivante|mois prochain) /.test(nn)) return {err:'La date est dans le futur : redis-moi quand ça s\'est passé.'};
+    const heure=_mdaHour(P.raw||text,tm);
+    const lieu=_sfLieuFrom(nn,P);
+    const nnF=nn+(A.faits?_mdNorm(A.faits)+' ':''); const les=_sfLesFrom(nnF,false), ja=(nn.match(/ (\d+) jours? d arret /)||[])[1]||'';
+    let faits=A.faits?String(A.faits):String(P.raw||text); let cut=A.faits?0:faits.search(/ (il|elle) s['’]est | s['’]est | (est|sont) tomb| en (tombant|voulant|portant|montant|descendant|retirant|manipulant)/i); if(cut<0&&!A.faits) cut=faits.search(/[,:;]/); faits=A.faits?faits:cut>=0?faits.slice(cut).replace(/^[,:;]\s*/,'').trim():'';
+    faits=faits.replace(/[,;]?\s*\d+\s*jours?\s*d['’]arr[eê]t[^,;.]*/gi,'').replace(/[,;]?\s*\b(avec|sans|pas d['’])\s*arr[eê]ts?( de travail)?\b/gi,'').replace(/[,;]?\s*\bsoins? b[ée]nins?\b/gi,'').replace(/^[,;:\s]+/,'').replace(/[,;.!\s]+$/,'').replace(/\s{2,}/g,' ');
+    faits=faits.replace(/\b(ce matin|cet apr[eè]s[- ]midi|ce soir|cette nuit|aujourd['’]hui|hier|avant[- ]hier|tout [àa] l['’]heure|[àa] l['’]instant)\b/gi,'').replace(/\b(vers |[àa] )?\d{1,2}\s*h(\s*\d{2})?\b/gi,'').replace(/\s{2,}/g,' ').replace(/[,;.!\s]+$/,'').trim();
+    if(faits.split(/\s+/).filter(Boolean).length<4) faits=''; faits=_sfCap(faits);
+    const interim=emp?emp.categorie==='interimaire':/ interimaire /.test(nn);
+    const ev={id:uid(),date:fmt(d),heure,type,empId:emp?emp.id:'',nomLibre:emp?'':libre,interim,lieu,lieuTxt:'',faits,temoins:'',lesNature:les.nature,lesSiege:les.siege,joursArret:ja,reprise:'',analyse:'',actions:[],statut:'ouvert',createdAt:new Date().toISOString(),desc:faits,arret:type==='arret'};
+    const hasDay=!!(tm.day||tm.range)||/ (ce matin|cet apres midi|apres midi|ce soir|cette nuit|aujourd hui|tout a l heure|a l instant|il y a (une|1|2|3|deux|trois|\d+) (heure|heures|minutes?)) /.test(nn);
+    const Q=_mdSfQueue(ev,hasDay);
+    if(!Q.length||A.noAsk) return _mdSfConfirm(ev,false);
+    _mdSfAsk({P,text,how,A,ev,Q,n:0,tot:Q.length,voice:!!MD.viaVoice,retry:0}); return null; },
+  sf_close(P,text,how,A,nn,tm){ const sf=_sfNorm(); const H=P.ppl||[]; let L=sf.events.filter(e=>e.statut!=='clos');
+    if(H.length&&H[0].ids.length===1) L=L.filter(e=>e.empId===H[0].ids[0]); if(tm.day) L=L.filter(e=>e.date===fmt(tm.day.d));
+    if(!L.length) return {err:'Je ne trouve pas d\'événement en cours qui corresponde.'};
+    L.sort((a,b)=>b.date.localeCompare(a.date)); const e=L[0]; const open=(e.actions||[]).filter(a=>!a.done).length;
+    return {changes:[],objs:[{coll:'safety',id:e.id,before:_mdaCp(e),after:Object.assign(_mdaCp(e),{statut:'clos'})}],view:'sf',sfId:e.id,warn:open?[`${_mdqPl(open,'action corrective','actions correctives')} pas encore faite${open>1?'s':''}.`]:[],
+      say:`Je clos l'événement du ${_mdDayTxt(parseLocal(e.date))} (${_SF_T[e.type].l.toLowerCase()}, ${_sfName(e)}).`}; },
+});
+
+// ═══ Mardam 2.0 — toute l'application à la voix ═══
+Object.assign(_MDA_LBL,{ch_new:'créer un chantier',ch_upd:'modifier un chantier',ch_close:'clôturer un chantier',ch_del:'supprimer un chantier',
+  pers_upd:'modifier une fiche',pers_arch:'archiver une personne',pers_back:'réintégrer une personne',pers_hp:'passer hors production',pers_del:'supprimer une personne',
+  conge_ok:'valider des congés',conge_ko:'refuser des congés',cl_add:'ajouter à la check-list',cl_done:'cocher la check-list',cl_del:'retirer de la check-list',
+  nt_done:'cocher une note',nt_del:'supprimer une note',form_done:'formation faite',aut_add:'ajouter une autorisation',aut_del:'supprimer une autorisation',
+  sf_start:'départ des compteurs sécurité',sf_act_add:'ajouter une action sécurité',sf_act_done:'action sécurité faite',
+  hol_add:'ajouter un jour férié',hol_del:'retirer un jour férié',week_copy:'recopier une semaine',
+  sto_new:'entrer un avion en stockage',sto_out:'départ d\'un avion',sto_rec:'stockage vers recyclage',rec_new:'entrer un avion au recyclage',ab_new:'ajouter un MSN Airbus',gas_pull:'récupérer depuis le Drive'});
+Object.assign(_MDQ_LBL,{pushback:'qui a le pushback',stock:'avions en stockage, recyclage, Airbus',crs:'qui peut signer le CRS',cl_today:'check-list du jour',conge_req:'demandes de congé'});
+// ── Outils ──
+const _V2_SKIP=new Set(['mardam','weekStart']);
+function _v2Snap(){ const o={}; Object.keys(S).forEach(k=>{ if(!_V2_SKIP.has(k)&&typeof S[k]!=='function') o[k]=S[k]; }); return JSON.stringify(o); }
+function _v2Restore(js){ const o=JSON.parse(js); Object.keys(S).forEach(k=>{ if(!_V2_SKIP.has(k)&&typeof S[k]!=='function'&&!(k in o)) delete S[k]; }); Object.keys(o).forEach(k=>{ S[k]=o[k]; }); }
+function _v2Quiet(fn){ // exécute une fonction de l'application sans ses boîtes de dialogue (la confirmation a déjà eu lieu dans Mardam)
+  const W=window, sv={a:W.alert,c:W.confirm,p:W.prompt,d:W.confirmDel}, msg=[];
+  W.alert=m=>{ msg.push(String(m||'')); }; W.confirm=()=>true; W.prompt=(m,d)=>d==null?'':d; W.confirmDel=(t,m,cb)=>{ try{ cb&&cb(); }catch(e){ msg.push(e.message); } };
+  let err=null; try{ fn(); }catch(e){ console.warn('Mardam',e); err=e.message||String(e); }
+  W.alert=sv.a; W.confirm=sv.c; W.prompt=sv.p; W.confirmDel=sv.d;
+  const bad=msg.find(m=>/⚠|obligatoire|requis|déjà|impossible|erreur|sélectionn/i.test(m));
+  return {err:err||bad||null,msg}; }
+function _v2Rerender(){ try{ const cur=[...document.body.classList].find(c=>c.startsWith('tab-')); const n=cur&&cur.slice(4); if(n&&RENDERS[n]) RENDERS[n](); }catch(_){} try{ if(typeof popSelects==='function') popSelects(); }catch(_){} try{ renderDash(); }catch(_){} }
+function _v2Sel(id,txt){ const el=document.getElementById(id); if(!el) return false; const k=_mdNorm(String(txt||'')).replace(/\s/g,''); if(!k) return false;
+  const o=[...el.options].find(o=>_mdNorm(o.value).replace(/\s/g,'')===k)||[...el.options].find(o=>_mdNorm(o.textContent).replace(/\s/g,'')===k)||[...el.options].find(o=>o.value&&_mdNorm(o.textContent).replace(/\s/g,'').includes(k));
+  if(!o) return false; el.value=o.value; el.dispatchEvent(new Event('change',{bubbles:true})); return true; }
+function _v2Set(id,v){ const el=document.getElementById(id); if(!el) return; el.value=v==null?'':v; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); }
+function _v2Opts(id){ const el=document.getElementById(id); return el?[...el.options].filter(o=>o.value&&!/^—/.test(o.textContent)).map(o=>o.textContent.trim()):[]; }
+function _v2Toks(s){ return _mdNorm(String(s||'')).split(' ').filter(w=>w.length>2&&!_MD_STOP.has(w)); }
+function _v2Best(list,txt,lab){ const q=_v2Toks(txt); let best=null,bs=0; list.forEach(x=>{ const w=_v2Toks(lab(x)); let s=0; q.forEach(t=>{ if(w.some(v=>v===t||(t.length>4&&v.startsWith(t.slice(0,5))))) s++; }); if(s>bs){ bs=s; best=x; } }); return bs?best:null; }
+function _v2Ch(P,nn,all){ const m=_mdqMsn(P); const L=(S.chantiers||[]).filter(c=>all||c.statut!=='termine'); if(m){ const c=m.ch&&(all||m.ch.statut!=='termine')?m.ch:L.find(c=>String(c.msn).trim()===String(m.msn)); if(c) return c; }
+  const d=nn.match(/ (?:msn |le |du |chantier )(\d{3,5}) /); return d?L.find(c=>String(c.msn).trim()===d[1])||null:null; }
+function _v2NewMsn(nn){ const t=nn.replace(/ (janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre) (20\d\d) /g,' $1 ').replace(/ \d{1,2}h\d{2} /g,' '); const m=t.match(/ (?:msn )?(\d{3,5}) /); return m?m[1]:''; }
+function _v2Clients(){ return [...new Set((S.chantiers||[]).concat((S.stockage&&S.stockage.avions)||[],(S.recycling&&S.recycling.avions)||[]).map(c=>String(c.client||'').trim()).filter(Boolean))]; }
+function _v2Client(nn,raw){ const L=_v2Clients().sort((a,b)=>b.length-a.length); const c=L.find(x=>{ const k=_mdNorm(x); return k&&nn.includes(' '+k+' '); }); if(c) return c;
+  const m=String(raw||'').match(/\b(?:client|pour le client|pour)\s*:?\s+((?:[A-Z][\w'’&-]*|[A-Z]{2,})(?:\s+(?:[A-Z][\w'’&-]*|[A-Z]{2,}))*)/); return m?m[1].trim():''; }
+function _v2Type(nn,opts){ const S2=opts.map(o=>({o,k:_mdNorm(o)})).sort((a,b)=>b.k.length-a.k.length); const n2=nn.replace(/ (\d{3}) (neo|ceo) /,' a$1 $2 ');
+  let f=S2.find(x=>n2.includes(' '+x.k+' ')); if(f) return f.o; f=S2.find(x=>{ const a=x.k.replace(/\s/g,''); return a.length>2&&n2.replace(/\s/g,'').includes(a); }); return f?f.o:''; }
+function _v2Ask(P,text,how,key,q,choices,parse){ const A=P.A; const run=v=>{ MD.pending=null; A[key]=v; _mdActRun(P,text,how); };
+  MD.pending={label:'complément',answer:t=>{ MD.pending=null; const T=_mdNorm(t).trim(); if(/^(annule|laisse tomber|oublie|stop)( |$)/.test(T)){ _mdReply("D'accord, je ne touche à rien.","D'accord.",[],{noBad:true}); _mdLog({said:text,how,label:_MDA_LBL[A.a],result:'annulé'}); return; }
+    const v=parse?parse(t):String(t).trim(); if((v==null||v==='')&&String(t).trim().split(/\s+/).length>=4){ const P3=_mdParse(t); if(P3.kind!=='unknown'&&P3.kind!=='later'){ MD.curSaid=t; _mdExec(P3,t,'local'); return; } }
+    if(v==null||v===''){ if(A['_r'+key]){ A[key]=''; return _mdActRun(P,text,how); } A['_r'+key]=1; return _v2Ask(P,text,how,key,"Je n'ai pas compris. "+q,choices,parse); } run(v); }};
+  _mdReply(`<b>${q}</b>`,q.replace(/<[^>]+>/g,''),(choices||[]).map(c=>({l:c.l,fn:()=>{ _mdYou(c.l); run(c.v); }})).concat([{l:'✕ Annuler',fn:()=>{ MD.pending=null; _mdReply("D'accord, je ne touche à rien.","D'accord.",[],{noBad:true}); }}]),{noBad:true}); return null; }
+function _v2Date(t){ const P2=_mdParse(t), tm=P2.tm||{}; const d=tm.day?tm.day.d:tm.range?tm.range.from:tm.week?tm.week.from:null; return d?fmt(d):null; }
+function _v2Range(t){ const P2=_mdParse(t), tm=P2.tm||{}; if(tm.range) return {from:fmt(tm.range.from),to:fmt(tm.range.to)}; if(tm.week) return {from:fmt(tm.week.from),to:fmt(tm.week.to)}; if(tm.day) return {from:fmt(tm.day.d),to:''}; return null; }
+function _v2Who(P,cat){ const H=(P.ppl||[]).filter(h=>h.ids.length===1).map(h=>byId(h.ids[0])).filter(Boolean); return cat?H.filter(e=>e.categorie===cat):H; }
+const _V2_MOTIF=[[/ demission /,'Démission'],[/ (fin de contrat|fin de cdd|fin de mission|fin d interim|fin de son contrat) /,'Fin de contrat (CDD)'],[/ retraite /,'Retraite'],[/ licenciement|licencie /,'Licenciement'],[/ rupture /,'Rupture conventionnelle'],[/ mutation|mute /,'Mutation']];
+const _V2_CATS=[['responsable',/ (responsable|resp) /],['workshop',/ (workshop|atelier) /],['iq',/ ( iq |inspecteur qualite|qualite) /]].concat(_MDA_CATN);
+const _V2_CATL={responsable:'responsable',chef:"chef d'équipe",technicien:'technicien',expert:'expert',workshop:'workshop',sheetmetal:'sheet metal',alternant:'alternant',stagiaire:'stagiaire',interimaire:'intérimaire',prestataire:'prestataire',recycling:'recyclage',part21:'Part 21',iq:'IQ'};
+
+// ── Reconnaissance des nouvelles actions ──
+function _mdV2Parse(P,raw){
+  const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), per=!!(P.ppl&&P.ppl.length), hasMsn=!!(P.msn&&P.msn.length)||/ (msn )?\d{3,5} /.test(nn);
+  const del=/ (supprime|supprimer|efface|effacer|enleve|enlever|retire|retirer|vire|virer) /.test(nn);
+  // Drive / jours fériés / semaine
+  if(has(/ (recupere|recuperer|rapatrie|telecharge|recharge|restaure|reprends) /)&&has(/ drive /)) return {a:'gas_pull'};
+  if(has(/ (jour ferie|jours feries|ferie) /)) return {a:del?'hol_del':'hol_add'};
+  if(has(/ (copie|copier|recopie|recopier|duplique|dupliquer|reprends|reporte|reporter) /)&&has(/ semaine /)&&!has(/ (to ?do|tache) /)) return {a:'week_copy'};
+  // Sécurité : compteurs, actions correctives
+  if(has(/ compteurs? /)&&has(/ (depart|demarre|demarrer|debut|a zero|a 0|remise a zero|remise a 0|reinitialise|reinitialiser|reset|redemarre|repart) /)) return {a:'sf_start'};
+  if(has(/ actions? (corrective|correctives|securite) |action de l accident|action sur l accident| a l accident | de l accident | l evenement securite /)&&has(/ actions? /)){
+    if(has(/ (faite|fait|faites|terminee|realisee|realise|cochee|coche|cocher|soldee|close) /)) return {a:'sf_act_done'};
+    if(has(/ (ajoute|ajouter|rajoute|note|noter|mets|cree|enregistre|prevois) /)) return {a:'sf_act_add'}; }
+  // Check-list
+  if(has(/ check ?list | checklist /)){ if(del) return {a:'cl_del'}; if(has(/ (coche|cocher|fait|faite|valide|valider|termine|terminee|ok) /)&&!has(/ (ajoute|ajouter|rajoute|cree|mets|nouvelle|nouveau) /)) return {a:'cl_done'}; if(has(/ (ajoute|ajouter|rajoute|cree|creer|mets|nouvelle|nouveau|note|programme|prevois) /)) return {a:'cl_add'}; }
+  // Notes du pense-bête
+  if(has(/ (la note|le post it|le postit|la note du pense bete|post it) /)&&!has(/ (note dans|note sur|note que|note de |mets moi une note|ajoute une note|nouvelle note) /)){ if(del) return {a:'nt_del'}; if(has(/ (faite|fait|cochee|coche|cocher|terminee|traitee|ok|reglee|validee|valide) /)) return {a:'nt_done'}; }
+  // Congés
+  if(has(/ (conge|conges|demande de conge|demandes de conge|demandes de conges|demande|demandes) /)&&has(/ (valide|valider|valides|accepte|accepter|ok pour|refuse|refuser|rejette|rejeter|decline) /)&&!has(/ (tache|to ?do) /)) return {a:has(/ (refuse|refuser|rejette|rejeter|decline) /)?'conge_ko':'conge_ok'};
+  // Autorisations
+  if(per&&has(/ (autorisation|autorisations|habilitation|habilitations|pushback|push back|tractage|isto|badge) /)){
+    const fxA=_mdqFindForm(T,'a')||(has(/ (pushback|push back|tractage) /)?{names:[(S.autorisations||[]).map(a=>a.type).find(t=>_isPushback(t)||t===TRACTAGE_LABEL)||TRACTAGE_LABEL],keys:['pushback'],lbl:'pushback',sure:true,full:true}:null);
+    if(del) return {a:'aut_del',fx:fxA};
+    if(has(/ (ajoute|ajouter|rajoute|donne|donner|attribue|cree|nouvelle|enregistre|obtenu|a obtenu|a eu) /)&&!has(/ (renouvele|renouvelle|mets a jour|met a jour|repasse) /)) return {a:'aut_add',fx:fxA}; }
+  // Formation planifiée faite
+  if(per&&has(/ (a fait|a bien fait|a suivi|a termine|a valide|est alle a|a participe a|ont fait|ont suivi) /)&&has(/ (formation|form|session|ewis|caces|sst|fh|facteurs humains|incendie|extincteur) /)){ const fx=_mdqFindForm(T,'f'); if(fx) return {a:'form_done',fx}; }
+  // Stockage / recyclage / Airbus
+  const zone=has(/ (airbus|part 21|part21) /)?'ab':has(/ (stockage|parking|stocke|stocker) /)?'sto':has(/ (recyclage|recycling|recycle|demantelement) /)?'rec':'';
+  if(zone&&hasMsn){
+    if(zone!=='ab'&&has(/ (passe|passer|envoie|envoyer|bascule|basculer|transfere|transferer|mets|deplace) /)&&has(/ (stockage|parking) /)&&has(/ (recyclage|recycling) /)) return {a:'sto_rec'};
+    if(has(/ (quitte|quitter|parti|partie|est parti|part |depart|s en va|a quitte|sort du site|sorti du site|livre) /)&&!has(/ (rentre|entre|arrive|ajoute|nouveau) /)) return {a:'sto_out',zone};
+    if(has(/ (rentre|rentrer|entre|entrer|ajoute|ajouter|mets|mettre|place|placer|arrive|arrivee|nouveau|nouvel|cree|enregistre|range|ranger) /)&&!(zone==='ab'&&has(/ (affecte|affecter|equipe) /))) return {a:zone==='sto'?'sto_new':zone==='rec'?'rec_new':'ab_new'}; }
+  if(hasMsn&&has(/ (est parti|a quitte le site|quitte le site|parti du site|est livre|a ete livre) /)) return {a:'sto_out',zone:''};
+  // Chantiers
+  const chW=has(/ (chantier|chantiers) /);
+  if(chW&&del&&!per) return {a:'ch_del'};
+  if(has(/ (cree|creer|ajoute|ajouter|nouveau|ouvre un|ouvrir un|demarre un|lance un|enregistre) /)&&chW&&!has(/ (affecte|affecter|equipe de|sur le chantier) /)&&!per) return {a:'ch_new'};
+  if(hasMsn&&(has(/ (cloture|cloturer|clos|clore|ferme le chantier|fermer le chantier|solde|solder) /)||(has(/ (est termine|est fini|est terminee|termine le chantier|chantier termine|chantier fini|a fini|c est fini pour) /)&&!(P.tm&&(P.tm.day||P.tm.range))))) return {a:'ch_close'};
+  if(hasMsn&&!per&&has(/ (finit|finira|fin |fin du|termine le|terminera|sortie prevue|commence|commencera|debut|demarre|demarrera|arrive le|decale|decaler|repousse|repousser|avance|avancer) /)&&(P.tm&&(P.tm.day||P.tm.range))&&!has(/ (position|hangar|p1|p2|p3|sors|sort|sortie du hangar) /)) return {a:'ch_upd'};
+  if(hasMsn&&has(/ (chef d equipe|chef equipe|team leader|tl|responsable|resp|client) /)&&!has(/ (qui est|c est qui|quel est) /)&&(per||has(/ client /))&&!has(/ (affecte|affecter|retire|enleve) /)) return {a:'ch_upd'};
+  if(hasMsn&&chW&&has(/ (passe|mets|bascule) /)&&has(/ (en cours|a venir|prevision|futur) /)) return {a:'ch_upd'};
+  // Personnel
+  if(!per&&has(/ (reintegre|reintegrer|desarchive|desarchiver|remets? dans les effectifs|fais revenir|refait partie|revient dans l equipe) /)){ const X=(S.personnel||[]).filter(e=>(e.archived||e.actif===false)&&e.nom&&nn.includes(' '+_mdNorm(e.nom)+' ')); if(X.length) return {a:'pers_back',eids:X.map(e=>e.id)}; }
+  if(per){
+    if(has(/ (reintegre|reintegrer|desarchive|desarchiver|remets? dans les effectifs|fais revenir|refait partie|revient dans l equipe) /)) return {a:'pers_back'};
+    if(has(/ (archive|archiver|archives|sort des effectifs|sors des effectifs|retire des effectifs|enleve des effectifs) /)) return {a:'pers_arch'};
+    if(has(/ hors (production|prod) /)) return {a:'pers_hp'};
+    if(del&&has(/ (definitivement|la fiche|le profil|la personne|du personnel|de la base|de l application|le salarie) /)&&!has(/ (formation|autorisation|conge|absence|chantier|tache|note|visite) /)) return {a:'pers_del'};
+    if(has(/ (numero|telephone|tel|portable|mail|email|e mail|adresse mail) /)&&(/\d{2}[ .]?\d{2}[ .]?\d{2}/.test(raw)||/@/.test(raw))) return {a:'pers_upd',f:'contact'};
+    if(has(/ (passe|passer|devient|est maintenant|est devenu|est devenue|change|changer|nomme|nommer|mets|bascule) /)&&_V2_CATS.some(([c,re])=>re.test(nn))&&!has(/ (en conge|en formation|en maladie|en arret|en deplacement|en visite|sur le|en position|chef d equipe sur|chef d equipe du|chef d equipe de) /)) return {a:'pers_upd',f:'cat'}; }
+  return null;
+}
+
+// ── Construction des nouvelles actions (confirmation, puis application) ──
+const _V2_E=_bfEsc;
+function _v2ChLbl(c){ return `${c.msn?'MSN '+c.msn:c.nom||'chantier'}${c.client?' · '+String(c.client).trim():''}`; }
+Object.assign(_MDA_BUILD,{
+  // ─── Chantiers ───
+  ch_new(P,text,how,A,nn,tm){
+    if(!document.getElementById('c-avion')) return {err:"Le formulaire des chantiers n'est pas disponible."};
+    const msn=A.msn||_v2NewMsn(nn); if(!msn) return _v2Ask(P,text,how,'msn','Quel MSN ?',[],t=>_v2NewMsn(' '+_mdNorm(t)+' '));
+    const dup=(S.chantiers||[]).find(c=>String(c.msn).trim()===msn&&c.statut!=='termine'); if(dup) return {err:`Le MSN ${msn} a déjà un chantier en cours (${_V2_E(dup.nom||'')}).`};
+    const types=_v2Opts('c-avion').filter(o=>o!=='Autre');
+    const type=A.type!=null?A.type:_v2Type(nn,types); if(!type&&A.type==null) return _v2Ask(P,text,how,'type','Quel type d\'avion ?',types.slice(0,8).map(t=>({l:t,v:t})),t=>_v2Type(' '+_mdNorm(t)+' ',types)||null);
+    const client=A.client!=null?A.client:_v2Client(nn,P.raw||text); if(!client&&A.client==null) return _v2Ask(P,text,how,'client','Pour quel client ?',_v2Clients().slice(0,6).map(c=>({l:c,v:c})),t=>String(t).trim().replace(/^(c est|pour|le client)\s+/i,''));
+    let deb=tm.range?fmt(tm.range.from):tm.day?fmt(tm.day.d):A.deb||'', fin=tm.range?fmt(tm.range.to):A.fin||'';
+    if(!deb&&A.deb==null) return _v2Ask(P,text,how,'deb','Du combien au combien ?',[],t=>{ const r=_v2Range(t); if(r){ A.fin=r.to; return r.from; } return null; });
+    if(deb&&!fin&&A.fin==null) return _v2Ask(P,text,how,'fin','Fin prévue le ?',[{l:'Je ne sais pas encore',v:''}],t=>/^(je ne sais pas|je sais pas|pas encore|passe)/i.test(String(t).trim())?'':_v2Date(t));
+    const ch=_v2Who(P,'chef')[0]||null, rs=_v2Who(P,'responsable')[0]||null;
+    const statut=/ (prevision|prospect|en prevision) /.test(nn)?'prevision':deb&&deb<=fmt(_mdToday())?'encours':'futur';
+    const SL={prevision:'Prévision',futur:'À venir',encours:'En cours'};
+    return {changes:[],mut:()=>{ openChantierNew(); _v2Set('c-client',client); _v2Set('c-msn',msn); if(type) _v2Sel('c-avion',type); _v2Set('c-debut',deb); _v2Set('c-fin',fin); _v2Sel('c-statut',statut); if(rs) _v2Set('c-resp',rs.id); if(ch) _v2Set('c-chef',ch.id); saveChantier(); try{ closeM('m-chantier'); }catch(_){}
+        if(!(S.chantiers||[]).some(c=>String(c.msn).trim()===msn)) throw new Error("le chantier n'a pas été enregistré"); },
+      viewObj:{l:'Voir les chantiers',fn:()=>goTab('chantiers')},
+      lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${client?' · '+_V2_E(client):''}`,`Du ${deb?disp(deb):'?'} au ${fin?disp(fin):'(fin à préciser)'} · ${SL[statut]}`].concat(ch?[`Chef d'équipe : ${_V2_E(_mdPName(ch))}`]:[]).concat(rs?[`Responsable : ${_V2_E(_mdPName(rs))}`]:[]),
+      warn:_v2Who(P).filter(e=>e!==ch&&e!==rs).map(e=>`${_V2_E(_mdPName(e))} n'est ni chef d'équipe ni responsable dans sa fiche : je ne l'ai pas mis sur le chantier.`),
+      say:`Je crée le chantier ${msn}${client?' '+client:''}.`}; },
+  ch_upd(P,text,how,A,nn,tm){
+    const c=_v2Ch(P,nn); if(!c) return {err:'Je ne trouve pas ce chantier. Donne-moi son MSN.'};
+    const after=_mdaCp(c), L=[]; const H=_v2Who(P);
+    if(/ (chef d equipe|chef equipe|team leader|tl) /.test(nn)&&H[0]){ after.chef=H[0].id; L.push(`Chef d'équipe : ${_V2_E(_mdPName(H[0]))}`); }
+    if(/ (responsable|resp) /.test(nn)&&H.length){ const r=H[H.length-1]; if(!/ (chef d equipe|chef equipe|team leader|tl) /.test(nn)||H.length>1){ after.resp=r.id; L.push(`Responsable : ${_V2_E(_mdPName(r))}`); } }
+    const cl=String(P.raw||text).match(/client\s*(?:c'est|c’est|est|:|=|devient)?\s*(.+)$/i); if(/ client /.test(nn)&&cl&&!H.length){ after.client=cl[1].trim().replace(/[.!]$/,''); L.push(`Client : ${_V2_E(after.client)}`); }
+    if(tm.range){ after.debut=fmt(tm.range.from); after.fin=fmt(tm.range.to); L.push(`Du ${disp(after.debut)} au ${disp(after.fin)}`); }
+    else if(tm.day){ const d=fmt(tm.day.d); if(/ (commence|commencera|debut|demarre|demarrera|arrive) /.test(nn)){ after.debut=d; L.push(`Début : ${disp(d)}`); } else { after.fin=d; L.push(`Fin : ${disp(d)}`); } }
+    const st=/ en cours /.test(nn)?'encours':/ (a venir|futur) /.test(nn)?'futur':/ prevision /.test(nn)?'prevision':''; if(st&&/ (passe|mets|bascule) /.test(nn)){ after.statut=st; L.push(`Statut : ${({encours:'en cours',futur:'à venir',prevision:'prévision'})[st]}`); }
+    if(!L.length) return {err:"Je n'ai pas compris ce qu'il faut changer sur ce chantier (chef d'équipe, responsable, client, dates ou statut)."};
+    const w=[]; if(after.chef&&after.chef!==c.chef){ const e=byId(after.chef); if(e&&e.categorie!=='chef') w.push(`${_V2_E(_mdPName(e))} n'est pas « chef d'équipe » dans sa fiche.`); } if(after.debut&&after.fin&&after.fin<after.debut) return {err:'La fin serait avant le début.'};
+    return {changes:[],objs:[{coll:'chantiers',id:c.id,before:_mdaCp(c),after}],viewObj:{l:'Voir les chantiers',fn:()=>goTab('chantiers')},lines:L,warn:w,say:`Je mets à jour le chantier ${_v2ChLbl(c)}.`}; },
+  ch_close(P,text,how,A,nn,tm){
+    const c=_v2Ch(P,nn); if(!c) return {err:'Je ne trouve pas de chantier en cours avec ce MSN.'};
+    const dest=A.dest||(/ (stockage|parking|stocke) /.test(nn)?'stockage':/ (parti|part|quitte|s en va|depart|livre|rendu) /.test(nn)?'parti':'');
+    if(!dest&&c.msn) return _v2Ask(P,text,how,'dest',`L'avion ${_V2_E(c.msn)} part en stockage, ou il quitte le site ?`,[{l:'🅿️ En stockage',v:'stockage'},{l:'🛫 Il quitte le site',v:'parti'}],t=>/stock|parking/i.test(t)?'stockage':/part|quitt|site|vol/i.test(t)?'parti':null);
+    return {changes:[],mut:()=>{ editChantier(c.id); _v2Sel('c-statut','termine'); saveChantier(); try{ closeM('m-chantier'); }catch(_){} if(_clotureCtx) _clotureChoix(dest==='stockage'?'stockage':'parti'); },
+      viewObj:{l:dest==='stockage'?'Voir le stockage':'Voir les chantiers',fn:()=>goTab(dest==='stockage'?'stockage':'chantiers')},
+      lines:[`Chantier : <b>${_V2_E(_v2ChLbl(c))}</b>`,dest==='stockage'?"L'avion passe en stockage (le chantier sort des chantiers actifs).":dest==='parti'?"L'avion est marqué parti aujourd'hui dans tous les modules.":'Chantier marqué terminé.'],
+      say:`Je clôture le chantier ${_v2ChLbl(c)}.`}; },
+  ch_del(P,text,how,A,nn,tm){ const c=_v2Ch(P,nn,true); if(!c) return {err:'Je ne trouve pas ce chantier. Donne-moi son MSN.'};
+    const n=Object.values(S.planning||{}).filter(e=>e&&(e.chantierId===c.id||e.chantierId2===c.id)).length;
+    return {changes:[],danger:true,mut:()=>{ S.chantiers=S.chantiers.filter(x=>x.id!==c.id); },viewObj:{l:'Voir les chantiers',fn:()=>goTab('chantiers')},
+      lines:[`Chantier : <b>${_V2_E(c.nom||_v2ChLbl(c))}</b>`],warn:[`Suppression définitive.${n?` ${n} demi-journée${n>1?'s':''} du planning pointe${n>1?'nt':''} encore dessus.`:''}${c.statut!=='termine'?' Ce chantier n\'est pas terminé : pense plutôt à le clôturer.':''}`],say:`Je supprime le chantier ${_v2ChLbl(c)}.`}; },
+  // ─── Personnel ───
+  pers_upd(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0], after=_mdaCp(e), L=[];
+    if(A.f==='contact'){ const raw=String(P.raw||text); const ph=raw.match(/(\+?\d[\d .]{7,}\d)/), em=raw.match(/[\w.+-]+@[\w-]+\.[\w.]+/);
+      if(ph&&/ (numero|telephone|tel|portable) /.test(nn)){ after.tel=ph[1].replace(/[ .]/g,'').replace(/(\d{2})(?=\d)/g,'$1 ').trim(); L.push(`Téléphone : ${_V2_E(after.tel)}`); }
+      if(em){ after.email=em[0]; L.push(`E-mail : ${_V2_E(after.email)}`); } }
+    else { let cat=''; const iv=nn.search(/ (passe|passer|devient|est maintenant|est devenu|est devenue|change|changer|nomme|nommer|mets|bascule) /), tail=iv>=0?nn.slice(iv):nn; for(const [c,re] of _V2_CATS){ if(re.test(tail)){ cat=c; break; } } if(!cat) return {err:'Je n\'ai pas compris la nouvelle catégorie.'};
+      if(cat===e.categorie) return {empty:`${_V2_E(_mdPName(e))} est déjà ${_V2_CATL[cat]||cat}.`,changes:[]}; after.categorie=cat; L.push(`Catégorie : ${_V2_E(_V2_CATL[e.categorie]||e.categorie||'?')} → <b>${_V2_E(_V2_CATL[cat]||cat)}</b>`); }
+    if(!L.length) return {err:"Je n'ai pas trouvé le numéro ou l'adresse dans ta phrase."};
+    return {changes:[],objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after}],view:'fiche',emps:[e],lines:L,say:`Je mets à jour la fiche de ${_mdPName(e)}.`}; },
+  pers_arch(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0]; if(e.archived) return {empty:`${_V2_E(_mdPName(e))} est déjà archivé(e).`,changes:[]};
+    const mo=A.motif||(_V2_MOTIF.find(([re])=>re.test(nn))||[])[1]; if(!mo) return _v2Ask(P,text,how,'motif',`Pour quel motif j'archive ${_V2_E(_mdPName(e))} ?`,['Démission','Fin de contrat (CDD)','Retraite','Licenciement','Rupture conventionnelle','Mutation','Autre'].map(v=>({l:v,v})),t=>{ const n=' '+_mdNorm(t)+' '; return (_V2_MOTIF.find(([re])=>re.test(n))||[])[1]||(/ autre /.test(n)?'Autre':null); });
+    const d=tm.day?fmt(tm.day.d):fmt(new Date()); const after=Object.assign(_mdaCp(e),{actif:false,archived:true,archiveDate:d,archiveMotif:mo});
+    return {changes:[],objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after}],view:'fiche',emps:[e],lines:[`Motif : ${_V2_E(mo)} · date : ${disp(d)}`,'Sa fiche, ses formations et son historique sont conservés.'],say:`J'archive ${_mdPName(e)}.`}; },
+  pers_back(P,text,how,A,nn,tm){ let E; if(A.eids&&A.eids.length){ if(A.eids.length>1){ MD.pending={label:'choix personne',choices:A.eids.slice(0,4).map(id=>({l:_V2_E(_mdPName(byId(id))),fn:()=>{ MD.pending=null; A.eids=[id]; _mdActRun(P,text,how); }}))}; _mdReply('Laquelle ?','Laquelle ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; } E=[byId(A.eids[0])]; } else E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0]; if(!e.archived&&e.actif!==false) return {empty:`${_V2_E(_mdPName(e))} est déjà dans les effectifs.`,changes:[]};
+    const after=_mdaCp(e); after.actif=true; after.archived=false; delete after.archiveDate; delete after.archiveMotif; delete after.archiveNote;
+    return {changes:[],objs:[{coll:'personnel',id:e.id,before:_mdaCp(e),after}],view:'fiche',emps:[e],lines:['Retour dans les effectifs actifs.'],say:`Je réintègre ${_mdPName(e)}.`}; },
+  pers_hp(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0]; if(e.actif===false) return {empty:`${_V2_E(_mdPName(e))} est déjà hors production.`,changes:[]};
+    return {changes:[],mut:()=>setHorsProd(e.id),view:'fiche',emps:[e],lines:['Il ou elle sort de la production (planning, effectifs, Certifying Staff).'],say:`Je passe ${_mdPName(e)} hors production.`}; },
+  pers_del(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const e=E[0];
+    return {changes:[],danger:true,mut:()=>delPersonnel(e.id),viewObj:{l:'Voir le personnel',fn:()=>goTab('personnel')},lines:[`Personne : <b>${_V2_E(_mdPName(e))}</b>`],warn:['Suppression définitive : ses formations, autorisations et son planning sont aussi supprimés. Pour un départ, « archive » garde l\'historique.'],say:`Je supprime ${_mdPName(e)}.`}; },
+  // ─── Congés ───
+  conge_ok(P,t,h,A,nn,tm){ return _MDA_BUILD._conge(P,t,h,A,nn,tm,true); },
+  conge_ko(P,t,h,A,nn,tm){ return _MDA_BUILD._conge(P,t,h,A,nn,tm,false); },
+  _conge(P,text,how,A,nn,tm,ok){ let R=_collectCongePrev(); const H=_v2Who(P);
+    if(H.length) R=R.filter(r=>H.some(e=>e.id===r.empId));
+    const d0=tm.range?fmt(tm.range.from):tm.day?fmt(tm.day.d):tm.week?fmt(tm.week.from):'', d1=tm.range?fmt(tm.range.to):tm.day?fmt(tm.day.d):tm.week?fmt(tm.week.to):'';
+    if(d0) R=R.filter(r=>r.to>=d0&&r.from<=d1);
+    if(!R.length) return {err:H.length?`Aucune demande de congé en attente pour ${_V2_E(H.map(_mdPName).join(', '))}.`:'Aucune demande de congé en attente.'};
+    if(R.length>1&&!H.length&&!/ (toutes|tous|tout|les demandes|l ensemble) /.test(nn)&&!A.all) { MD.pending={label:'choix demandes',choices:[{l:`Les ${R.length} demandes`,fn:()=>{ MD.pending=null; A.all=1; _mdActRun(P,text,how); }}].concat(R.slice(0,4).map(r=>({l:_V2_E(_mdPName(byId(r.empId))),fn:()=>{ MD.pending=null; P.ppl=[{ids:[r.empId],words:'',span:[0,0]}]; _mdActRun(P,text,how); }})))};
+      _mdReply(`Il y a <b>${R.length}</b> demandes en attente. Lesquelles ?`,`Il y a ${R.length} demandes. Lesquelles ?`,MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+    const ch=[]; R.forEach(r=>{ const e=byId(r.empId); Object.keys(S.planning||{}).forEach(k=>{ const x=S.planning[k]; if(!x||x.type!=='conge_prev') return; const p=k.split('_'); if(p[0]!==r.empId) return; const ds=p.slice(1,-1).join('_'); if(ds<r.from||ds>r.to) return; ch.push({k,before:_mdaCp(x),after:ok?Object.assign(_mdaCp(x),{type:'conge'}):null,emp:e,ds,h:p[p.length-1]}); }); });
+    return {changes:ch,lines:R.map(r=>`${_V2_E(_mdPName(byId(r.empId)))} : du ${disp(r.from)} au ${disp(r.to)}`),d0:parseLocal(R[0].from),say:`Je ${ok?'valide':'refuse'} ${R.length>1?R.length+' demandes de congé':'la demande de congé de '+_mdPName(byId(R[0].empId))}.`}; },
+  // ─── Check-list ───
+  cl_add(P,text,how,A,nn,tm){ _clInit(); const raw=String(P.raw||text);
+    let lab=(raw.match(/[:«"]\s*(.+?)\s*[»"]?\s*$/)||[])[1]||raw.replace(/^.*?check[- ]?list\s*(?:de |d'|:)?\s*/i,'');
+    lab=lab.replace(/\b(tous les|chaque)\s+(jours?|matins?|soirs?|semaines?|mois|lundis?|mardis?|mercredis?|jeudis?|vendredis?|samedis?|dimanches?)(\s+(et|,)\s+(lundis?|mardis?|mercredis?|jeudis?|vendredis?))*\b/gi,'').replace(/\b(le|au)\s+(\d{1,2}|1er)\s+(du mois|de chaque mois)\b/gi,'').replace(/(^|\s)(à|a|vers)\s+\d{1,2}\s*h(\s*\d{2})?\b/gi,' ').replace(/\b(le |pour le )?(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre)\b/gi,'').replace(/^(de |d'|qu'il faut |que je dois |il faut )/i,'').replace(/[\s,;.]+$/,'').trim();
+    if(!lab||lab.length<3) return _v2Ask(P,text,how,'_lab','Quelle tâche j\'ajoute à la check-list ?',[],t=>t.trim()); if(A._lab) lab=A._lab; lab=_sfCap(lab);
+    const DOW={dimanche:0,lundi:1,mardi:2,mercredi:3,jeudi:4,vendredi:5,samedi:6}; let recur={type:'daily'}, rl='tous les jours';
+    const wd=[...nn.matchAll(/ (lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)s? /g)].map(m=>DOW[m[1]]);
+    const dom=nn.match(/ (?:le |au )?(\d{1,2}) (?:du mois|de chaque mois|de tous les mois) /);
+    if(/ (tous les|chaque) /.test(nn)&&wd.length){ recur={type:'weekly',days:[...new Set(wd)]}; rl='chaque '+[...new Set(wd)].map(d=>Object.keys(DOW).find(k=>DOW[k]===d)).join(', '); }
+    else if(dom||/ (chaque mois|tous les mois) /.test(nn)){ recur={type:'monthly',dom:dom?+dom[1]:1}; rl=`le ${dom?dom[1]:1} de chaque mois`; }
+    else if(/ (en semaine|jours ouvres|du lundi au vendredi) /.test(nn)){ recur={type:'weekly',days:[1,2,3,4,5]}; rl='du lundi au vendredi'; }
+    else if(tm.day&&!/ (tous les|chaque) /.test(nn)){ recur={type:'once',date:fmt(tm.day.d)}; rl='une fois, le '+disp(fmt(tm.day.d)); }
+    const time=_mdaHour(raw,tm); const t={id:uid(),label:lab,time,timeEnd:'',recur,remind:!!time,order:S.checklist.tasks.length};
+    return {changes:[],objs:[{coll:'cltasks',id:t.id,before:null,after:t}],viewObj:{l:'Voir la check-list',fn:()=>goTab('checklist')},lines:[`Tâche : <b>${_V2_E(lab)}</b>`,`Quand : ${rl}${time?' à '+time.replace(':','h'):''}`],say:`J'ajoute « ${lab} » à la check-list.`}; },
+  cl_done(P,text,how,A,nn,tm){ _clInit(); const today=new Date(); const L=S.checklist.tasks.filter(t=>{ try{ return _clActiveOn(t,today); }catch(_){ return true; } });
+    const q=String(P.raw||text).replace(/check[- ]?list/ig,' ').replace(/\b(coche|cocher|fait|faite|valide|valider|termin[ée]e?|ok|dans|la|de|sur)\b/ig,' ');
+    const t=_v2Best(L.length?L:S.checklist.tasks,q,x=>x.label); if(!t) return {err:"Je ne trouve pas cette tâche dans la check-list d'aujourd'hui."};
+    const dm=_clDoneMap(fmt(today)); if(dm[t.id]) return {empty:`« ${_V2_E(t.label)} » est déjà cochée aujourd'hui.`,changes:[]};
+    return {changes:[],mut:()=>clToggle(t.id),viewObj:{l:'Voir la check-list',fn:()=>goTab('checklist')},lines:[`Tâche : <b>${_V2_E(t.label)}</b> · aujourd'hui`],say:`Je coche « ${t.label} ».`}; },
+  cl_del(P,text,how,A,nn,tm){ _clInit(); const q=String(P.raw||text).replace(/check[- ]?list/ig,' ').replace(/\b(supprime|supprimer|enl[eè]ve|enlever|retire|retirer|efface|effacer|de|la|dans)\b/ig,' ');
+    const t=_v2Best(S.checklist.tasks,q,x=>x.label); if(!t) return {err:'Je ne trouve pas cette tâche dans la check-list.'};
+    return {changes:[],objs:[{coll:'cltasks',id:t.id,before:_mdaCp(t),after:null}],viewObj:{l:'Voir la check-list',fn:()=>goTab('checklist')},lines:[`Tâche : <b>${_V2_E(t.label)}</b>`],say:`Je retire « ${t.label} » de la check-list.`}; },
+  // ─── Pense-bête ───
+  nt_done(P,t,h,A,nn,tm){ return _MDA_BUILD._nt(P,t,h,A,nn,tm,true); },
+  nt_del(P,t,h,A,nn,tm){ return _MDA_BUILD._nt(P,t,h,A,nn,tm,false); },
+  _nt(P,text,how,A,nn,tm,done){ const q=String(P.raw||text).replace(/\b(la note|le post-?it|pense-?b[eê]te|note|supprime|supprimer|efface|effacer|enl[eè]ve|retire|coche|cocher|faite?|termin[ée]e|trait[ée]e|est|du|de|sur|mon|ma)\b/ig,' ');
+    const L=_ntAll().filter(n=>!done||!n.done); const n=_v2Best(L,q,x=>x.t); if(!n) return {err:'Je ne trouve pas cette note sur le pense-bête.'};
+    const after=done?Object.assign(_mdaCp(n),{done:1,doneDs:fmt(new Date()),doneBy:_ntMe().login}):null;
+    return {changes:[],objs:[{coll:'notes',id:n.id,before:_mdaCp(n),after}],viewObj:{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }},lines:[`Note : « ${_V2_E(String(n.t).slice(0,90))} »`],say:done?`Je coche la note « ${String(n.t).slice(0,50)} ».`:`Je supprime la note « ${String(n.t).slice(0,50)} ».`}; },
+  // ─── Formations / autorisations ───
+  form_done(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const fx=A.fx;
+    const tr=(S.formTracking||[]).filter(t=>E.some(e=>e.id===t.empId)&&t.status==='planned'&&_mdqFormMatch(fx,t.formInt)).sort((a,b)=>b.date.localeCompare(a.date));
+    if(!tr.length){ A.a='form_upd'; return _MDA_BUILD.form_upd(P,text,how,A,nn,tm); }
+    const by=new Map(); tr.forEach(t=>{ if(!by.has(t.empId)||t.date<=fmt(_mdToday())&&by.get(t.empId).date>fmt(_mdToday())) by.set(t.empId,t); }); const X=[...by.values()];
+    return {changes:[],mut:()=>X.forEach(t=>confirmFormDone(t.id,true)),view:'form',emps:E,lines:X.map(t=>`${_V2_E(_mdPName(byId(t.empId)))} : ${_V2_E(t.formInt)} du ${disp(t.date)} → faite, la date de validité est mise à jour`),say:`Je note la formation ${X[0].formInt} comme faite.`}; },
+  aut_add(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const fx=A.fx; if(!fx) return {err:'Quelle autorisation ? Je ne la trouve pas dans la liste.'};
+    const name=fx.names[0], pb=fx.keys&&fx.keys[0]==='pushback', ex=(S.autorisations||[]).filter(a=>E.some(e=>e.id===a.empId)&&(a.type===name||pb&&(a.grp==='tractage'||_isPushback(a.type)))); if(ex.length){ A.a='aut_upd'; return _MDA_BUILD.aut_upd(P,text,how,A,nn,tm); }
+    const obt=tm.day&&!/ (jusqu|valable|expire) /.test(nn)?fmt(tm.day.d):tm.range?fmt(tm.range.from):fmt(new Date());
+    let exp=tm.range?fmt(tm.range.to):tm.day&&/ (jusqu|valable|expire) /.test(nn)?fmt(tm.day.d):A.exp||'';
+    if(!exp&&A.exp==null) return _v2Ask(P,text,how,'exp',`Jusqu'à quand est valable ${_V2_E(name)} ?`,[{l:'Pas de date de fin',v:''}],t=>/^(pas|aucune|sans|illimit|je sais pas)/i.test(String(t).trim())?'':_v2Date(t));
+    const grp=(name===TRACTAGE_LABEL||_isPushback(name))?'tractage':undefined;
+    const objs=E.map(e=>({coll:'autorisations',id:uid(),before:null,after:Object.assign({empId:e.id,type:name,dateObtention:obt,dateExpiration:exp,notes:''},grp?{grp}:{})})); objs.forEach(o=>o.after.id=o.id);
+    return {changes:[],objs,view:'aut',emps:E,lines:E.map(e=>`${_V2_E(_mdPName(e))} : <b>${_V2_E(name)}</b> obtenue le ${disp(obt)}${exp?', valable jusqu\'au '+disp(exp):''}`),say:`J'ajoute l'autorisation ${name} à ${E.map(_mdPName).join(', ')}.`}; },
+  aut_del(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; const fx=A.fx; if(!fx) return {err:'Quelle autorisation ?'};
+    const pb=fx.keys&&fx.keys[0]==='pushback'; const R=(S.autorisations||[]).filter(a=>E.some(e=>e.id===a.empId)&&(_mdqFormMatch(fx,a.type)||pb&&(a.grp==='tractage'||_isPushback(a.type)||a.type===TRACTAGE_LABEL))); if(!R.length) return {err:`${_V2_E(E.map(_mdPName).join(', '))} n'a pas cette autorisation.`};
+    return {changes:[],objs:R.map(a=>({coll:'autorisations',id:a.id,before:_mdaCp(a),after:null})),view:'aut',emps:E,lines:R.map(a=>`${_V2_E(_mdPName(byId(a.empId)))} : ${_V2_E(a.type)}${a.dateExpiration?' (valable jusqu\'au '+disp(a.dateExpiration)+')':''}`),say:`Je supprime l'autorisation ${R[0].type}.`}; },
+});
+
+Object.assign(_MDA_BUILD,{
+  // ─── Sécurité ───
+  sf_start(P,text,how,A,nn,tm){ const sf=_sfNorm(); const d=tm.day?fmt(tm.day.d):/ (a zero|a 0|aujourd hui|maintenant|reset|reinitialise|reinitialiser) /.test(nn)?fmt(new Date()):null;
+    if(!d) return _v2Ask(P,text,how,'_d','À partir de quelle date ?',[{l:"Aujourd'hui",v:'auj'}],t=>/auj/i.test(t)?'auj':_v2Date(t));
+    const dd=A._d?(A._d==='auj'?fmt(new Date()):A._d):d; if(dd>fmt(new Date())) return {err:'La date de départ ne peut pas être dans le futur.'};
+    const who=/ (interimaire|interimaires|interim) /.test(nn)?['int']:/ (tous|tout le personnel|tout le monde|salaries) /.test(nn)&&!/ (les quatre|tous les compteurs) /.test(nn)?['all']:['all','int'];
+    const kind=/ avec arret /.test(nn)?['arret']:/ (sans accident|tout accident|tous accidents) /.test(nn)&&!/ avec arret /.test(nn)?['tout']:['arret','tout'];
+    const K=[]; who.forEach(w=>kind.forEach(k=>K.push(w+'_'+k)));
+    return {changes:[],mut:()=>{ const s=_sfNorm(); K.forEach(k=>{ s.starts[k]=dd; }); },viewObj:{l:'Voir le registre',fn:()=>_sfRegOpen()},
+      lines:K.map(k=>{ const c=_SF_C.find(x=>x[0]===k); return `${c?c[1]+' · '+c[2]:k} : départ le <b>${disp(dd)}</b>`; }),say:`Je mets le départ ${K.length>1?'des compteurs':'du compteur'} au ${_mdDayTxt(parseLocal(dd))}.`}; },
+  _sfEv(P,nn,noDay){ const L=_sfNorm().events.slice().sort((a,b)=>b.date.localeCompare(a.date)); const H=_v2Who(P); let R=H.length?L.filter(e=>H.some(h=>h.id===e.empId)):L; if(!noDay&&P.tm&&P.tm.day){ const R2=R.filter(e=>e.date===fmt(P.tm.day.d)); if(R2.length) R=R2; } return R; },
+  sf_act_add(P,text,how,A,nn,tm){ const R=_MDA_BUILD._sfEv(P,nn,true).filter(e=>e.statut!=='clos'); const e=R[0]; if(!e) return {err:'Je ne trouve pas d\'événement sécurité en cours qui corresponde.'};
+    const raw=String(P.raw||text); let txt=(raw.match(/:\s*(.+)$/)||[])[1]; if(!txt) return _v2Ask(P,text,how,'_t','Quelle action ? Dis-moi quoi, qui, pour quand.',[],t=>t.trim()); if(A._t) txt=A._t;
+    const seg=txt.split(/\s*[,;]\s*/).filter(Boolean); const P2=_mdParse(txt), d2=P2.tm&&(P2.tm.day||P2.tm.range)?fmt((P2.tm.day&&P2.tm.day.d)||P2.tm.range.from):''; const H=(P2.ppl||[]).filter(h=>h.ids.length===1); const resp=H.length?_mdPName(byId(H[0].ids[0])):'';
+    const a={id:uid(),txt:_sfCap(seg[0]),resp,due:d2,done:false}; const after=_mdaCp(e); after.actions=(after.actions||[]).concat([a]);
+    return {changes:[],objs:[{coll:'safety',id:e.id,before:_mdaCp(e),after}],view:'sf',sfId:e.id,lines:[`Événement : ${_V2_E(_SF_T[e.type].l)} du ${disp(e.date)} · ${_V2_E(_sfName(e))}`,`Action : <b>${_V2_E(a.txt)}</b>${resp?' · '+_V2_E(resp):''}${d2?' · pour le '+disp(d2):''}`],say:`J'ajoute l'action « ${a.txt} ».`}; },
+  sf_act_done(P,text,how,A,nn,tm){ const R=_MDA_BUILD._sfEv(P,nn); const all=[]; R.forEach(e=>(e.actions||[]).filter(a=>!a.done).forEach(a=>all.push({e,a})));
+    if(!all.length) return {err:'Aucune action corrective ouverte ne correspond.'};
+    const q=String(P.raw||text).replace(/\b(l'?action|actions?|corrective|s[ée]curit[ée]|de|du|l'accident|accident|est|faite?|termin[ée]e|r[ée]alis[ée]e|coch[ée]e?|sold[ée]e)\b/ig,' ');
+    const x=all.length===1?all[0]:_v2Best(all,q,y=>y.a.txt+' '+(y.a.resp||'')); if(!x) return {err:`Il y a ${all.length} actions ouvertes : dis-moi laquelle (un mot de son intitulé).`};
+    const after=_mdaCp(x.e); after.actions=after.actions.map(a=>a.id===x.a.id?Object.assign({},a,{done:true,doneDate:fmt(new Date())}):a);
+    return {changes:[],objs:[{coll:'safety',id:x.e.id,before:_mdaCp(x.e),after}],view:'sf',sfId:x.e.id,lines:[`Action : <b>${_V2_E(x.a.txt)}</b>${x.a.resp?' · '+_V2_E(x.a.resp):''}`,`Événement du ${disp(x.e.date)} · ${_V2_E(_sfName(x.e))}`],say:`Je note l'action « ${x.a.txt} » comme faite.`}; },
+  // ─── Jours fériés, semaine ───
+  hol_add(P,text,how,A,nn,tm){ const d=tm.day?fmt(tm.day.d):null; if(!d) return {err:'Quelle date pour le jour férié ?'}; if((S.holidays||[]).some(h=>h.date===d)) return {empty:`Le ${disp(d)} est déjà un jour férié.`,changes:[]};
+    const nm=(String(P.raw||text).match(/(?:pour|:|nommé|appelé)\s+(?:la |le |l')?([^,.]+)$/i)||[])[1]||'Jour férié';
+    return {changes:[],mut:()=>{ if(!S.holidays) S.holidays=[]; S.holidays.push({date:d,name:_sfCap(nm.trim())}); S.holidays.sort((a,b)=>a.date.localeCompare(b.date)); },viewObj:{l:'Voir le planning',fn:()=>{ S.weekStart=getMon(parseLocal(d)); goTab('weekly'); }},lines:[`${_V2_E(_mdDayTxt(parseLocal(d)))} : ${_V2_E(_sfCap(nm.trim()))}`,'Ce jour ne sera plus compté comme travaillé.'],say:`J'ajoute un jour férié le ${_mdDayTxt(parseLocal(d))}.`}; },
+  hol_del(P,text,how,A,nn,tm){ const d=tm.day?fmt(tm.day.d):null; const h=(S.holidays||[]).find(x=>x.date===d); if(!h) return {err:d?`Le ${disp(d)} n'est pas un jour férié.`:'Quelle date ?'};
+    return {changes:[],mut:()=>{ S.holidays=S.holidays.filter(x=>x.date!==d); },lines:[`${_V2_E(_mdDayTxt(parseLocal(d)))} : ${_V2_E(h.name||'')}`],say:`Je retire le jour férié du ${_mdDayTxt(parseLocal(d))}.`}; },
+  week_copy(P,text,how,A,nn,tm){ const mon0=getMon(_mdToday()); const i=Math.max(nn.lastIndexOf(' sur '),nn.lastIndexOf(' vers '),nn.lastIndexOf(' dans ')), after=i>=0?nn.slice(i):'';
+    const tgt=/ (prochaine|suivante) /.test(after)?addD(mon0,7):/ semaine d apres /.test(after)?addD(mon0,14):mon0;
+    const src=addD(tgt,-7), ch=[]; let skip=0;
+    S.personnel.filter(p=>p.actif!==false&&!p.archived).forEach(p=>{ for(let i=0;i<7;i++){ const cur=fmt(addD(tgt,i)), prv=fmt(addD(src,i)); if(isHol(cur)) continue; ['AM','PM'].forEach(h=>{ const k=`${p.id}_${cur}_${h}`; if(S.planning[k]) return; const s=S.planning[`${p.id}_${prv}_${h}`]; if(!s||!s.type) return; if(!COPY_WEEK_TYPES.has(s.type)){ skip++; return; } if(typeof _enContrat==='function'&&!_enContrat(p,cur)) return; const c=_mdaCp(s); c.vm=''; ch.push({k,before:null,after:c,emp:p,ds:cur,h}); }); } });
+    if(!ch.length) return {empty:`Rien à recopier : la semaine du ${disp(fmt(tgt))} est déjà remplie ou la semaine d'avant est vide.`,changes:[]};
+    return {changes:ch,d0:tgt,lines:[`De la semaine du ${disp(fmt(src))} vers celle du <b>${disp(fmt(tgt))}</b>`,`Seules les cases vides sont remplies.${skip?` ${skip} événement${skip>1?'s':''} ponctuel${skip>1?'s':''} (congés, formations…) non recopié${skip>1?'s':''}.`:''}`],say:`Je recopie la semaine du ${disp(fmt(src))} sur celle du ${disp(fmt(tgt))}.`}; },
+  // ─── Stockage, recyclage, Airbus ───
+  sto_new(P,t,h,A,nn,tm){ return _MDA_BUILD._av(P,t,h,A,nn,tm,'sto'); },
+  rec_new(P,t,h,A,nn,tm){ return _MDA_BUILD._av(P,t,h,A,nn,tm,'rec'); },
+  ab_new(P,t,h,A,nn,tm){ return _MDA_BUILD._av(P,t,h,A,nn,tm,'ab'); },
+  _av(P,text,how,A,nn,tm,z){ const Z={sto:{sel:'av-type',lbl:'en stockage',tab:'stockage',list:()=>(S.stockage&&S.stockage.avions)||[]},rec:{sel:'avr-type',lbl:'au recyclage',tab:'recycling',list:()=>(S.recycling&&S.recycling.avions)||[]},ab:{sel:'airbus-msn-type',lbl:'dans l\'activité Airbus',tab:'airbus',list:()=>(S.airbus&&S.airbus.msns)||[]}}[z];
+    const msn=A.msn||_v2NewMsn(nn)||(_mdqMsn(P)||{}).msn; if(!msn) return _v2Ask(P,text,how,'msn','Quel MSN ?',[],t=>_v2NewMsn(' '+_mdNorm(t)+' '));
+    if(Z.list().some(a=>String(a.msn)===String(msn)&&!a.dateDepart&&a.statut!=='parti')) return {err:`Le MSN ${msn} est déjà ${Z.lbl}.`};
+    let opts=_v2Opts(Z.sel); if(!opts.length) opts=_v2Opts('c-avion'); const type=A.type!=null?A.type:_v2Type(nn,opts);
+    if(!type&&A.type==null) return _v2Ask(P,text,how,'type',"Quel type d'avion ?",opts.slice(0,8).map(o=>({l:o,v:o})),t=>_v2Type(' '+_mdNorm(t)+' ',opts)||null);
+    const act=z!=='ab'?'':A.act||(/ peinture /.test(nn)?'peinture':/ (stockage|frc) /.test(nn)?'stockage_frc':''); if(z==='ab'&&!act) return _v2Ask(P,text,how,'act','Pour quelle activité : peinture ou stockage FRC ?',[{l:'🎨 Peinture',v:'peinture'},{l:'📦 Stockage FRC',v:'stockage_frc'}],t=>/peint/i.test(t)?'peinture':/stock|frc/i.test(t)?'stockage_frc':null);
+    const client=A.client!=null?A.client:_v2Client(nn,P.raw||text); const d=tm.day?fmt(tm.day.d):fmt(new Date());
+    const mut={sto:()=>{ openAvionNew(); _v2Sel('av-type',type); _v2Set('av-msn',msn); _v2Set('av-client',client); _v2Set('av-entree',d); saveAvion(); },
+      rec:()=>{ openAvionRecycNew(); _v2Sel('avr-type',type); _v2Set('avr-msn',msn); _v2Set('avr-client',client); _v2Set('avr-debut-calc',d); saveAvionRec(); },
+      ab:()=>{ openAirbusNewMSN(); _v2Sel('airbus-msn-type',type); _v2Set('airbus-msn-num',msn); _v2Set('airbus-msn-client',client); _v2Set('airbus-msn-entree',d); selectAirbusAct(act); saveAirbusMSN(); }}[z];
+    return {changes:[],mut:()=>{ mut(); ['m-avion','m-avion-recyc','m-airbus-msn'].forEach(m=>{ try{ closeM(m); }catch(_){} }); if(!Z.list().some(a=>String(a.msn)===String(msn))) throw new Error("l'avion n'a pas été enregistré"); },
+      viewObj:{l:'Voir',fn:()=>goTab(Z.tab)},lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${client?' · '+_V2_E(client):''}${act?' · '+(act==='peinture'?'peinture':'stockage FRC'):''}`,`Entrée le ${disp(d)}`],say:`Je rentre le MSN ${msn} ${Z.lbl}.`}; },
+  sto_out(P,text,how,A,nn,tm){ const msn=(_mdqMsn(P)||{}).msn||_v2NewMsn(nn); const sa=((S.stockage&&S.stockage.avions)||[]).find(a=>String(a.msn)===String(msn)), ab=((S.airbus&&S.airbus.msns)||[]).find(a=>String(a.msn)===String(msn)&&!a.sortie);
+    const z=A.zone||(sa?'sto':ab?'ab':''); if(z==='sto'&&sa) return {changes:[],mut:()=>stockageDepartNow(sa.id),viewObj:{l:'Voir le stockage',fn:()=>goTab('stockage')},lines:[`MSN <b>${_V2_E(msn)}</b>${sa.type?' · '+_V2_E(sa.type):''} · stockage`,"Marqué parti aujourd'hui dans tous les modules."],say:`Je note le départ du MSN ${msn}.`};
+    if(z==='ab'&&ab) return {changes:[],mut:()=>airbusDepartNow(ab.id),viewObj:{l:'Voir Airbus',fn:()=>goTab('airbus')},lines:[`MSN <b>${_V2_E(msn)}</b> · Airbus`,"Marqué parti aujourd'hui dans tous les modules."],say:`Je note le départ du MSN ${msn}.`};
+    const c=(S.chantiers||[]).find(x=>String(x.msn)===String(msn)&&x.statut!=='termine'); if(c){ A.a='ch_close'; A.dest='parti'; return _MDA_BUILD.ch_close(P,text,how,A,nn,tm); }
+    return {err:`Je ne trouve pas le MSN ${_V2_E(msn||'?')} en stockage, chez Airbus ou en chantier.`}; },
+  sto_rec(P,text,how,A,nn,tm){ const msn=(_mdqMsn(P)||{}).msn||_v2NewMsn(nn); const sa=((S.stockage&&S.stockage.avions)||[]).find(a=>String(a.msn)===String(msn)); if(!sa) return {err:`Le MSN ${_V2_E(msn||'?')} n'est pas en stockage.`};
+    return {changes:[],mut:()=>{ stockageToRecyclage(sa.id); if(typeof _confirmStockRecy==='function') _confirmStockRecy(); try{ closeM('m-stock-recy'); }catch(_){} },viewObj:{l:'Voir le recyclage',fn:()=>goTab('recycling')},lines:[`MSN <b>${_V2_E(msn)}</b>${sa.type?' · '+_V2_E(sa.type):''} : stockage → recyclage`],say:`Je passe le MSN ${msn} du stockage au recyclage.`}; },
+  gas_pull(P,text,how,A,nn,tm){ if(!(S.gdrive&&S.gdrive.connected&&S.gdrive.gasUrl)) return {err:"Le Drive n'est pas connecté sur cet appareil."};
+    return {changes:[],danger:true,noUndo:true,mut:()=>gasPull(),lines:['Les données du Drive remplacent celles de cet appareil.'],warn:['Ce qui a été saisi ici et pas encore envoyé sur le Drive sera perdu. Je ne pourrai pas annuler.'],say:'Je récupère les données depuis le Drive.'}; },
+});
+
+// ── Nouvelles questions ──
+function _mdV2Q(P){ const nn=' '+(P.T||[]).join(' ')+' ', has=re=>re.test(nn);
+  if(has(/ (pushback|push back|tractage|tracter|tracteur) /)&&has(/ (qui|quels?|quelles?|combien|liste|habilite|habilites|autorise|autorises|peut|peuvent|a le|ont le) /)) return {i:'pushback'};
+  if(has(/ (stockage|parking avion|recyclage|recycling|airbus) /)&&has(/ (combien|quels?|quelles?|liste|qu est ce qu il y a|qu y a t il|y a quoi|c est quoi les) /)&&!has(/ (qui|personne|equipe|mecanos|techniciens|monde) /)) return {i:'stock'};
+  if(has(/ (crs|certifier|certifie|certifiant|certifiants|certifying|signer|signe|releaser|release|b1|b2) /)&&has(/ (qui|quels?|combien|liste|peut|peuvent) /)) return {i:'crs'};
+  if(has(/ (check ?list|checklist) /)&&has(/ (qu est ce|quoi|reste|restent|a faire|aujourd hui|il me reste|liste|quelles?|combien) /)) return {i:'cl_today'};
+  if(has(/ (demandes? de conges?|conges? a valider|conges? en attente|demandes? en attente) /)) return {i:'conge_req'};
+  return null; }
+Object.assign(_MDQ_RUN,{
+  pushback(P){ const t=fmt(new Date()), soon=fmt(addD(new Date(),60)), by=new Map();
+    (S.autorisations||[]).forEach(a=>{ if(!(a.grp==='tractage'||a.type===TRACTAGE_LABEL||_isPushback(a.type))) return; const e=byId(a.empId); if(!e||e.archived||e.actif===false) return; const c=by.get(e.id); if(!c||(a.dateExpiration||'9999')>(c.dateExpiration||'9999')) by.set(e.id,a); });
+    const ok=[...by.values()].filter(a=>!a.dateExpiration||a.dateExpiration>=t), ko=[...by.values()].filter(a=>a.dateExpiration&&a.dateExpiration<t);
+    const s=ok.length?`${_mdqPl(ok.length,'personne a','personnes ont')} le pushback valide.`:"Personne n'a le pushback valide.";
+    _mdAns({say:s,html:`<b>${s}</b>`,items:ok.sort((a,b)=>_mdPName(byId(a.empId)).localeCompare(_mdPName(byId(b.empId)))).map(a=>`${_bfEsc(_mdPName(byId(a.empId)))}${a.dateExpiration?` <small>· jusqu'au ${disp(a.dateExpiration)}${a.dateExpiration<=soon?' ⚠':''}</small>`:''}`).concat(ko.map(a=>`<s>${_bfEsc(_mdPName(byId(a.empId)))}</s> <small>· expiré le ${disp(a.dateExpiration)}</small>`)),title:'Pushback',view:{l:'Voir la liste',fn:()=>{ goTab('autorisations'); _showPushbackList(); }}}); return 'ok'; },
+  stock(P){ const nn=' '+(P.T||[]).join(' ')+' '; const Z=[['stockage','🅿️ Stockage',((S.stockage&&S.stockage.avions)||[]).filter(a=>a.statut!=='parti'&&!a.dateDepart)],['recyclage','♻️ Recyclage',((S.recycling&&S.recycling.avions)||[]).filter(a=>a.statut!=='termine'&&a.statut!=='parti')],['airbus','🛩 Airbus',((S.airbus&&S.airbus.msns)||[]).filter(a=>!a.sortie||a.sortie>=fmt(new Date()))]];
+    const pick=Z.filter(z=>nn.includes(' '+z[0])||(z[0]==='recyclage'&&/ recycling /.test(nn))); const L=pick.length?pick:Z;
+    const s=L.map(z=>`${_mdqPl(z[2].length,'avion','avions')} ${z[0]==='airbus'?'chez Airbus':z[0]==='stockage'?'en stockage':'au recyclage'}`).join(', ')+'.';
+    _mdAns({say:_sfCap(s),html:`<b>${_bfEsc(_sfCap(s))}</b>`,items:[].concat(...L.map(z=>z[2].map(a=>`${z[1]} · MSN <b>${_bfEsc(a.msn||'?')}</b>${a.type?' · '+_bfEsc(a.type):''}${a.client?' · '+_bfEsc(String(a.client).trim()):''}`))),title:'Avions',view:{l:'Voir',fn:()=>goTab(L.length===1?(L[0][0]==='recyclage'?'recycling':L[0][0]):'stockage')}}); return 'ok'; },
+  crs(P){ const tm=P.tm||{}, d=tm.day?tm.day.d:_mdToday(), ds=fmt(d), nn=' '+(P.T||[]).join(' ')+' ';
+    const types=[...new Set([].concat(...(S.certifiants||[]).map(c=>(c.types||[]).map(t=>t.type))))].filter(Boolean); const ty=_v2Type(nn,types);
+    const L=(S.certifiants||[]).map(c=>({c,e:byId(c.empId)})).filter(x=>x.e&&!x.e.archived&&x.e.actif!==false&&(!x.c.licExp||x.c.licExp>=ds)).map(x=>({...x,t:(x.c.types||[]).filter(t=>(!ty||t.type===ty)&&(!t.exp||t.exp>=ds))})).filter(x=>x.t.length);
+    const pres=L.filter(x=>{ const a=_mdqCell(x.e.id,ds,'AM'), b=_mdqCell(x.e.id,ds,'PM'); return !(a&&_MDQ_ABSET.has(a.type)&&b&&_MDQ_ABSET.has(b.type))&&(typeof _enContrat!=='function'||_enContrat(x.e,ds)); });
+    const s=!(S.certifiants||[]).length?'Aucun Certifying Staff enregistré dans l\'application.':`${pres.length?_mdqPl(pres.length,'personne peut','personnes peuvent'):'Personne ne peut'} signer le CRS${ty?' sur '+ty:''} ${_mdDayTxt(d)}.${L.length>pres.length?` ${L.length-pres.length} autre${L.length-pres.length>1?'s sont absentes':' est absente'}.`:''}`;
+    _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:pres.map(x=>`${_bfEsc(_mdPName(x.e))} <small>· ${_bfEsc(x.t.map(t=>t.type+(t.cats&&t.cats.length?' '+t.cats.join('/'):'')).join(', '))}</small>`),title:'Certifying Staff',view:{l:'Voir Certifying Staff',fn:()=>goTab('certif')}}); return 'ok'; },
+  cl_today(P){ _clInit(); const d=new Date(), dm=_clDoneMap(fmt(d)); const L=S.checklist.tasks.filter(t=>{ try{ return _clActiveOn(t,d); }catch(_){ return false; } }); const todo=L.filter(t=>!dm[t.id]);
+    const s=L.length?(todo.length?`Il te reste ${_mdqPl(todo.length,'tâche','tâches')} sur ${L.length} dans la check-list aujourd'hui.`:`Tout est fait dans la check-list aujourd'hui (${L.length}).`):"Rien dans la check-list aujourd'hui.";
+    _mdAns({say:s,html:`<b>${s}</b>`,items:L.map(t=>`${dm[t.id]?'✅':'☐'} ${t.time?t.time.replace(':','h')+' · ':''}${_bfEsc(t.label)}`),title:'Check-list',view:{l:'Voir la check-list',fn:()=>goTab('checklist')}}); return 'ok'; },
+  conge_req(P){ const R=_collectCongePrev(); const s=R.length?`${_mdqPl(R.length,'demande de congé','demandes de congé')} en attente.`:'Aucune demande de congé en attente.';
+    _mdAns({say:s,html:`<b>${s}</b>`,items:R.map(r=>`${_bfEsc(_mdPName(byId(r.empId)))} · du ${disp(r.from)} au ${disp(r.to)}`),title:'Demandes de congé',view:{l:'Voir les demandes',fn:()=>{ goTab('weekly'); openCongePrevList(); }}}); return 'ok'; },
+});
+// ── Commandes : exports, impressions, outils, réglages (rien n'est modifié dans les données) ──
+const _V2_EXP=[ // [sujet, onglet, pdf, excel, libellé, semaine]
+  [/ brief (de la |pour la |de |pour )?semaine | brief hebdo /,null,()=>{ openBriefWeek(); setTimeout(()=>{ try{ briefWeekPDF(); }catch(_){} },500); },null,'le brief de la semaine'],
+  [/ brief /,null,()=>{ openBrief(); setTimeout(()=>{ try{ briefPrint(); }catch(_){} },500); },null,'le brief du jour'],
+  [/ extrait (du |de )?jour | extrait du jour /,'weekly',()=>openDayExtract(),()=>openDayExtract(),"l'extrait du jour"],
+  [/ extrait (du |de l )?hangar | plan (du )?hangar /,'slot',()=>openHangarExtract(),()=>openHangarExtract(),"l'extrait hangar"],
+  [/ (registre|securite|accidents?) /,null,()=>{ _sfRegOpen(); setTimeout(()=>_sfPdf(),200); },null,'le registre sécurité'],
+  [/ (pushback|push back|tractage) /,'autorisations',()=>_exportPushbackPdf(),()=>_exportPushbackXls(),'la liste pushback'],
+  [/ prolongations? /,'personnel',()=>exportProlongationsPDF(),null,'les prolongations'],
+  [/ (interimaires|interim) /,'personnel',null,()=>exportInterimXls(),'les intérimaires'],
+  [/ (certifying|certif|crs|certifiants) /,'certif',()=>exportCertifWeekPDF(),()=>exportCertifWeekXls(),'le Certifying Staff',1],
+  [/ (autorisations?|habilitations?) /,'autorisations',()=>exportAutoMatrixPDF(),()=>exportAutoXls(),'les autorisations'],
+  [/ (matrice|formations?) /,'formations',()=>exportFormMatrixPDF(),()=>exportFormXls(),'les formations'],
+  [/ (kpi|indicateurs) /,'kpi',()=>exportKPIpdf(),()=>exportKPIxls(),'les KPI'],
+  [/ master /,'master',()=>exportMasterPDF(),()=>exportMasterXls(),'le master planning'],
+  [/ gantt /,'chantiers',()=>exportGanttPDF(),null,'le Gantt des chantiers'],
+  [/ programme /,'programme',()=>runProgPdf(),()=>runProgXls(),'le programme activité'],
+  [/ (slot|hangar) /,'slot',()=>exportSlotPDF(),()=>exportSlotXls(),'le slot hangar',1],
+  [/ alertes? /,'dashboard',()=>_exportAlertsPdf(),()=>_exportAlertsXls(),'les alertes'],
+  [/ (sauvegarde|backup) /,null,()=>exportAll(),()=>exportAll(),'une sauvegarde'],
+  [/ (planning|hebdo|semaine) /,'weekly',()=>exportWeekHtml(),()=>exportWeekXls(),'le planning de la semaine',1],
+];
+function _v2File(id,lbl){ return {l:'📂 '+lbl,fn:()=>{ const el=document.getElementById(id); if(el) el.click(); }}; }
+function _mdCmdParse(P,raw){ const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), tm=P.tm||{};
+  const C=(id,label,run,say,extra)=>Object.assign({kind:'cmd',cmd:id,label,run,say},extra||{});
+  const expV=/ (exporte|exporter|imprime|imprimer|telecharge|telecharger|genere|generer|sors|sortir|edite|editer|fais|fait|donne|envoie|envoyer|prepare|preparer|pdf|excel) /.test(nn), fmtW=/ (pdf|excel|xls|xlsx|tableur|impression|imprime|imprimer|png|image) /.test(nn);
+  if(expV&&(fmtW||has(/ (exporte|exporter|imprime|imprimer|telecharge|telecharger) /))&&!has(/ (qui|quand|combien) /)){
+    const xls=has(/ (excel|xls|xlsx|tableur) /); const E=_V2_EXP.find(e=>e[0].test(nn));
+    if(E){ const fn=xls?(E[3]||E[2]):(E[2]||E[3]); const fmtL=xls&&E[3]?'Excel':E[0].source.includes('sauvegarde')?'fichier':'PDF';
+      return C('exp',`${E[4]} (${fmtL})`,()=>{ if(E[5]){ const d=tm.day?tm.day.d:tm.week?tm.week.from:tm.range?tm.range.from:null; if(d) S.weekStart=getMon(d); } if(E[1]) goTab(E[1]); setTimeout(()=>{ try{ fn(); }catch(e){ console.warn(e); toast('Export impossible : '+e.message); } },E[1]?250:0); },`Je prépare ${E[4]}${fmtL==='fichier'?'':' en '+fmtL}.`); } }
+  if(has(/ (propose|proposer|proposes|compose|composer|prepare|fais|fait|genere) (moi )?(les |des )?equipes | planning auto | auto planning /)) return C('ap','Proposer les équipes',()=>{ goTab('weekly'); openAutoPlan(); },"J'ouvre la proposition d'équipes.");
+  if(has(/ (oublis|cases vides|trous du planning|trous dans le planning) /)&&!has(/ (qui|combien) /)) return C('gaps','Repérer les oublis',()=>{ goTab('master'); _toggleGaps(); },'Je surligne les oublis du planning.');
+  if(has(/ (demandes? de conges?|conges? a valider) /)&&has(/ (montre|ouvre|affiche|voir|liste) /)) return C('cprev','Demandes de congé',()=>{ goTab('weekly'); openCongePrevList(); },"J'ouvre les demandes de congé.");
+  if(has(/ meteo /)&&has(/ (actualise|actualiser|rafraichis|rafraichir|mets a jour|recharge|recharger|refais) /)) return C('mto','Actualiser la météo',()=>{ _mtoRefresh(); },"J'actualise la météo.");
+  { const m=nn.match(/ (?:seuil|limite|vent|rafales?)[^0-9]{0,30}(\d{2,3})( km h| km| kmh)? /); if(m&&has(/ (nacelle|nacelles|hauteur|seuil|rafale|rafales) /)) { const v=+m[1]; if(v<10||v>150) return null; return C('nac',`Seuil nacelles : ${v} km/h`,()=>{ _mtoSetNacelle(v); try{ if(document.querySelector('#m-brief.on')) _briefRender(); }catch(_){} },`Seuil des nacelles réglé à ${v} kilomètres heure.`); } }
+  { const th=nn.match(/ (cockpit|bento) /); if(th&&has(/ (theme|passe|mets|bascule|change|active|affichage|mode) /)) return C('theme','Thème '+th[1],()=>setTheme(th[1]),`Je passe en thème ${th[1]==='bento'?'Bento':'Cockpit'}.`); }
+  if(has(/ (fond d ecran|apparence|wallpaper) /)) return C('wp','Apparence',()=>openWallpaperPicker(),"J'ouvre l'apparence : choisis ton fond d'écran.");
+  if(has(/ drive /)&&has(/ (envoie|envoyer|pousse|pousser|synchronise|synchroniser|sauvegarde|sauvegarder|sauve|sauver|mets|enregistre|enregistrer|balance) /)&&!has(/ (recupere|recuperer|telecharge|recharge|restaure) /)) return C('push','Envoyer sur le Drive',()=>gasPush(),"J'envoie tes données sur le Drive.");
+  if(has(/ (restaure|restaurer|importe une sauvegarde|importer une sauvegarde|charge une sauvegarde|charger une sauvegarde|recharge une sauvegarde) /)) return C('restore','Restaurer une sauvegarde',null,'Choisis le fichier de sauvegarde. La restauration remplace toutes les données : elle te demandera confirmation.',{btn:_v2File('jsonIn','Choisir la sauvegarde')});
+  if(has(/ (import|importe|importer|charge|charger) /)&&has(/ (rh|ressources humaines|fichier rh|extraction rh) /)) return C('rh','Import RH',()=>goTab('personnel'),"Choisis le fichier RH. L'import te montrera un rapport avant de l'appliquer.",{btn:_v2File('xlsRhIn','Choisir le fichier RH')});
+  if(has(/ (pointage|pointages|heures reelles) /)&&has(/ (import|importe|importer|charge|charger) /)) return C('point','Import pointage',null,'Choisis le fichier de pointage.',{btn:_v2File('xlsPointIn','Choisir le fichier')});
+  if(has(/ (fais|faire|lance|lancer|telecharge|cree|creer) (moi )?(une )?sauvegarde | sauvegarde (moi )?(tout|les donnees|l application) | backup /)&&!has(/ drive /)) return C('bak','Sauvegarde',()=>exportAll(),'Je télécharge une sauvegarde complète.');
+  if(has(/ (aide|guide|explique) (de |sur |moi )?(cet |cette |l |le )?(onglet|ecran|page) /)) return C('help','Aide de l\'onglet',()=>openGuideForCurrentTab(),"J'ouvre l'aide de cet onglet.");
+  if(has(/ (prevision|previsions) (a |sur |de )?(3|trois) mois /)) return C('fc','Prévision 3 mois',()=>openForecast(),"J'ouvre la prévision à 3 mois.");
+  return null; }
+function _mdCmdRun(P,text,how){ try{ if(P.run) P.run(); }catch(e){ console.warn(e); _mdReply(`Je n'ai pas réussi : ${_bfEsc(e.message)}.`); _mdLog({said:text,how,label:'commande : '+P.label,result:'erreur'}); return; }
+  _mdReply(_bfEsc(P.say),P.say,P.btn?[Object.assign({primary:true},P.btn)]:[]); _mdLog({said:text,how,label:'commande : '+P.label,result:'ok'}); }
+
+function _v2SnapK(){ const o={}; Object.keys(S).forEach(k=>{ if(!_V2_SKIP.has(k)&&typeof S[k]!=='function') o[k]=JSON.stringify(S[k]); }); return o; }
+function _v2Deanon(t,map){ return String(t).replace(/\[([PAX]\d+)\]/g,(m,c)=>{ const v=map[c]; if(!v) return m; if(v.type==='p'){ const e=v.ids&&v.ids.length===1?byId(v.ids[0]):null; return e?_mdPName(e):(v.words||''); } if(v.type==='a') return v.msn||''; return v.words||''; }); }
+
 // ── Page Mardam (remplace l'ancien « Assistant IA ») ──
 function renderAI(){ _mdRenderTab(); }
 function _mdRenderTab(){
@@ -30135,6 +30857,15 @@ function _mdBenchCases(){
   const W3=(()=>{ let y=today.getFullYear(); if(3<wkN(today)-8) y++; return addD(getMon(_mdYmd(y,0,4)),14); })();
   const later=st=>p=>p.kind==='later'&&p.stage===st;
   const L=[
+    ...(()=>{ const act=x=>p=>p.kind==='act'&&p.A.a===x, cmd=x=>p=>p.kind==='cmd'&&p.cmd===x, q=x=>p=>p.kind==='q'&&p.q.i===x; const ch=(S.chantiers||[]).find(x=>x.msn&&x.statut==='encours'); const M=ch?ch.msn:'2341'; return [
+      ['crée un nouveau chantier MSN 9412 ATR 72 pour Air France du 4 au 18 janvier',act('ch_new')],[`mets ${a.nom} chef d'équipe sur le ${M}`,act('ch_upd')],[`le ${M} finit le 20 décembre`,act('ch_upd')],[`clôture le chantier ${M}`,act('ch_close')],[`supprime le chantier ${M}`,act('ch_del')],
+      [`archive ${c.nom}, démission`,act('pers_arch')],[`passe ${b.nom} hors production`,act('pers_hp')],[`le numéro de ${b.nom} c'est 06 12 34 56 78`,act('pers_upd')],[`valide les congés de ${a.nom}`,act('conge_ok')],[`refuse la demande de congé de ${b.nom}`,act('conge_ko')],
+      ['ajoute à la check-list : vérifier les extincteurs tous les lundis à 8h',act('cl_add')],['coche les extincteurs dans la check-list',act('cl_done')],['la note Larbi est faite',act('nt_done')],['supprime la note Larbi',act('nt_del')],
+      [`ajoute l'autorisation pushback à ${a.nom} jusqu'au 30 juin`,act('aut_add')],[`${b.nom} a fait sa formation EWIS`,act('form_done')],['mets le départ des compteurs sécurité au 1er janvier',act('sf_start')],[`ajoute une action corrective à l'accident de ${a.nom} : rappel port des gants`,act('sf_act_add')],
+      ['ajoute un jour férié le 26 décembre',act('hol_add')],['copie cette semaine sur la semaine prochaine',act('week_copy')],['rentre le MSN 5566 ATR 72 en stockage',act('sto_new')],['ajoute le MSN 7788 au recyclage',act('rec_new')],['récupère les données depuis le Drive',act('gas_pull')],
+      ['exporte le planning de la semaine en PDF',cmd('exp')],['sors-moi le master en Excel',cmd('exp')],['propose-moi les équipes',cmd('ap')],['passe en thème bento',cmd('theme')],['envoie tout sur le Drive',cmd('push')],['fais une sauvegarde',cmd('bak')],
+      ['qui a le pushback ?',q('pushback')],["combien d'avions en stockage ?",q('stock')],['qui peut signer le CRS demain ?',q('crs')],["qu'est-ce qu'il me reste dans la check-list ?",q('cl_today')],
+      ['mets '+a.nom+' en congé du 4 au 18 janvier',p=>p.kind==='act'&&p.A.a==='abs'&&p.tm&&p.tm.range&&p.tm.range.from.getMonth()===0]]; })(),
     ["Fais moi apparaître l'écran des chiffres clés ?",nav('kpi')],['balance moi les stats',nav('kpi')],["Remonte moi à la vue d'ensemble du mois de février.",nav('master',p=>p.month&&p.month.m===1)],
     ['Je veux voir les gars en intérim la semaine prochaine.',nav('weekly',p=>wk(nextMon)(p)&&p.cats&&p.cats.join()==='interimaire')],['montre moi le master de janvier avec seulement les techniciens',nav('master',p=>p.month&&p.month.m===0&&p.cats&&p.cats.includes('technicien'))],['je veux voir que les gains d’intérim',p=>p.kind==='filter'&&p.cats.includes('interimaire')],
     ['ouvre le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['montre-moi le planning de la semaine prochaine',nav('weekly',wk(nextMon))],['le planning de la semaine prochaine',nav('weekly',wk(nextMon))],
@@ -30178,6 +30909,8 @@ function _mdBenchCases(){
     [`Mets moi ${a.nom} en visite médicale vendredi à 08h20.`,p=>act('vm')(p)&&_mdaHour(p.raw,p.tm)==='08:20'],[`ajoute la visite médicale à ${b.nom} le 25 janvier à 12h30`,act('vm')],[`annule la visite médicale de ${b.nom}`,act('vm_del')],[`supprime la formation de ${c.nom} du jeudi 3 avril`,act('form_del')],
     [`${a.nom} est malade demain`,p=>act('abs')(p)&&p.A.type==='maladie'],[`pose une absence à ${b.nom} lundi matin`,p=>act('abs')(p)&&p.A.type==='absence'],[`enlève le congé de ${a.nom} vendredi`,act('abs_del')],[`retire ${c.nom} du 55304 demain`,act('unassign')],[`mets ${a.nom} sur le 55304 demain matin`,act('assign')],
     [`Mais ${a.nom} en congé le 11 décembre matin ?`,p=>act('abs')(p)&&p.tm&&p.tm.half==='AM'],[`Peux-tu mettre ${b.nom} en congé du 23 décembre au 31 décembre ?`,act('abs')],[`Affect ${b.nom}, en congé toute la journée du 23 décembre au 31 décembre.`,act('abs')],[`Météo ${a.nom} en visite médicale vendredi à 08h20.`,act('vm')],
+    [`déclare un accident avec arrêt pour ${a.nom} hier, chute de l'escabeau en soute, entorse cheville droite, 5 jours d'arrêt`,p=>act('sf_add')(p)],[`${b.nom} s'est coupé à la main ce matin en position 2`,act('sf_add')],[`note un soin bénin pour ${c.nom}, poussière dans l'œil`,act('sf_add')],[`clos l'accident de ${a.nom}`,act('sf_close')],
+    ['combien de jours sans accident ?',p=>p.kind==='q'&&p.q.i==='sf_count'],['c\'était quand le dernier accident ?',p=>p.kind==='q'&&p.q.i==='sf_last'],['quelles actions sécurité sont en retard ?',p=>p.kind==='q'&&p.q.i==='sf_late'],['ouvre le registre sécurité',nav('sfreg')],
     ['Inscris Mohamed en formation et oui, le 7 décembre. toute la journée',p=>act('form')(p)&&p.A.fx&&p.A.fx.names.some(n=>/ewis/i.test(n))],
     ["Mets moi une note dans mon pense-bête de rappeler Larbi demain matin à 08h00.",p=>act('note')(p)&&/^rappeler Larbi/i.test(p.A.text)],['rappelle-moi de commander les joints vendredi',p=>act('note')(p)&&/^commander les joints/.test(p.A.text)]]; })(),
     ...(()=>{ const act=x=>p=>p.kind==='act'&&p.A.a===x; return [['mets le 55283 en position 2 de jeudi à vendredi de la semaine prochaine',p=>act('slot_set')(p)&&p.A.pos===2],["rajoute dans ma to do list la préparation de l'ODM de Callard",act('todo_add')],[`prolonge le contrat d'intérim de ${c.nom} jusqu'au 4 décembre`,act('prolong')],
