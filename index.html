@@ -694,7 +694,7 @@ body.th-bento #m-brief .bv-kclick.on{box-shadow:0 0 0 3px rgba(255,255,255,.85),
 .bv-bt{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:#9fb0c8;display:flex;align-items:center;gap:7px;margin-bottom:9px}.bv-bt em{margin-left:auto;font-style:normal;color:#6f80a0;letter-spacing:0;text-transform:none;font-weight:700;font-size:11px}.bv-bt em a{color:#7fd4ff;text-decoration:none}
 .bv-man{margin:4px 0 2px;padding:5px 9px;border-radius:8px;background:rgba(255,179,64,.1);border:1px solid rgba(255,179,64,.35);color:#ffc266;font-size:11.5px;font-weight:700}
 .bw-safety{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.bw-safety.sf-4{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.sf-who{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;opacity:.7;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw-safety.sf-4{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.sf-who{font-size:10px;font-weight:800;letter-spacing:0!important;text-transform:uppercase;opacity:.7;margin-bottom:2px;white-space:normal;overflow-wrap:anywhere;line-height:1.15;min-height:2.3em;display:flex;align-items:center;justify-content:center;gap:3px;text-align:center}
 .sf-sc .bw-cl{min-height:2.4em}.sf-foot{font-size:11.5px;margin-top:8px;line-height:1.6}.sf-foot a{color:#7fd4ff;text-decoration:none;font-weight:700}.sf-b{color:#e8eef8}
 .sf-starts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px;align-items:end}.sf-starts .bv-okb{height:30px}.sf-starts label{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:#8fa3bf;font-weight:700}.sf-starts input{height:30px!important;padding:0 8px!important;font-size:12px!important;border-radius:8px!important}
 @media(max-width:900px){.bw-safety.sf-4{grid-template-columns:1fr 1fr}}
@@ -3107,14 +3107,16 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
         <option value="">— Sélectionner —</option>
         <option>ATR 42</option><option>ATR 72</option>
         <option>Boeing 737 CL</option><option>Boeing 737 NG</option><option>Boeing 737 MAX</option>
-        <option>A220</option><option>A320 CEO</option><option>A320 NEO</option>
+        <option>A220</option><option>A318 CEO</option><option>A319 CEO</option><option>A320 CEO</option><option>A321 CEO</option>
+        <option>A319 NEO</option><option>A320 NEO</option><option>A321 NEO</option>
         <option>Autre</option>
       </select>
     </div>
+    <div class="field" id="wrap-av-type-autre" style="display:none"><label>Préciser le type</label><input type="text" id="av-type-autre" placeholder="Ex: E190, Q400…"></div>
     <div class="field"><label>MSN *</label><input type="text" id="av-msn" placeholder="Ex: 12345"></div>
     <div class="field"><label>Client</label><input type="text" id="av-client" placeholder="Ex: Air France"></div>
     <div class="field" id="wrap-av-moteur" style="display:none"><label>Motorisation</label>
-      <select id="av-moteur"><option value="">— Sélectionner —</option></select>
+      <select id="av-moteur" onchange="_avMoteurAutreVis()"><option value="">— Sélectionner —</option></select>
     </div>
     <div class="field" id="wrap-av-moteur-autre" style="display:none"><label>Motorisation (saisie libre)</label>
       <input type="text" id="av-moteur-autre" placeholder="Ex: CF6...">
@@ -4127,7 +4129,8 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
       </div>
       <div class="notice-body" style="display:none;padding:0 16px 14px;font-size:13px;color:var(--t2);line-height:1.8;border-top:1px solid rgba(255,255,255,0.06)">
         <div style="padding-top:12px">
-        • <strong style="color:#ffd166">🦺 Sécurité : 4 compteurs et registre</strong> — dans le Brief du jour : compteurs tout le personnel et intérimaires (avec arrêt / sans accident), chacun avec sa date de départ ; fiche complète par événement (personne, lieu, faits, témoins, lésion, jours d'arrêt, analyse, actions correctives avec échéance) ; <b>📋 Registre sécurité</b> filtrable et exportable en PDF (aussi par Ctrl+K). Les noms ne sortent jamais dans le brief imprimé.<br>
+        • <strong style="color:#ffd060">✍️ Orthographe</strong> — tous les champs de texte (pense-bête, déclaration d'accident, notes, to-do…) utilisent le correcteur français de ton appareil : les mots fautifs sont soulignés en rouge. <b>PC (Edge)</b> : clic droit sur le mot → suggestions ; si rien n'est souligné : Paramètres → Langues → « Activer l'assistance grammaticale et orthographique » (le mode « Rédacteur Microsoft » envoie le texte chez Microsoft, le mode « Basique » reste sur le PC). <b>PC (Firefox)</b> : Paramètres → Général → « Vérifier l'orthographe lors de la saisie », puis clic droit dans un champ → « Langues » → Français ; s'il n'y a pas le français, installer le dictionnaire français depuis les modules complémentaires. <b>iPad / iPhone (Safari)</b> : Réglages → Général → Clavier → « Correction automatique » ; touche le mot souligné pour choisir la correction.<br>
+        • <strong style="color:#ffd166">🦺 Sécurité : 4 compteurs et registre</strong> — dans le Brief du jour : compteurs des embauchés (CDI, CDD, alternants) et des intérimaires (avec arrêt / sans accident), chacun avec sa date de départ ; les stagiaires, prestataires et personnes extérieures restent au registre sans faire bouger les compteurs ; fiche complète par événement (personne, lieu, faits, témoins, lésion, jours d'arrêt, analyse, actions correctives avec échéance) ; <b>📋 Registre sécurité</b> filtrable et exportable en PDF (aussi par Ctrl+K). Les noms ne sortent jamais dans le brief imprimé.<br>
         • <strong style="color:#60b4ff">🔎 Chiffres du brief cliquables</strong> — présents, affectés / besoin, absents, en formation, ordres de mission : un clic affiche le détail nominatif.<br>
         • <strong style="color:#b9a8ff">🎙 Mardam, assistant vocal</strong> — remplace l'Assistant interne : ouvre les écrans, filtre, répond à tes questions (formations, absences, intérim, hangar, chantiers, sous-effectif…) avec la preuve à l'écran, et fait les modifications après ton « oui » (planning, hangar, to-do, pense-bête, prolongations, formations renouvelées, nouveaux profils), avec ↩ Annuler. IA traductrice facultative, compteur de crédits, « Mauvaise réponse », phrases à apprendre et raccourcis personnels. Voir la section dédiée.<br>
         • <strong style="color:#60b4ff">🗓 Brief de la semaine</strong> — bouton du tableau de bord : une page à envoyer au personnel après la réunion de production (tes infos, schéma du hangar avec chaque avion et ses jours, chantiers avec leur chef d'équipe, formations, absences, arrivées / départs d'intérimaires, visites médicales), en PDF ou en image.<br>
@@ -4579,6 +4582,7 @@ body:not(.th-bento) .md-use-bar{border-radius:3px}body:not(.th-bento) .md-use-ba
         • <strong style="color:#ffd060">Formations, autorisations, sécurité</strong> — « Baou a fait sa formation EWIS », « ajoute le pushback à Baou jusqu'au 30 juin », « supprime l'autorisation pushback de Baou », « mets le départ des compteurs sécurité au 1er janvier », « ajoute une action à l'accident de Baou : rappel port des gants, Walid, vendredi », « l'action gants est faite ».<br>
         • <strong style="color:#ffd060">Planning, hangar, avions</strong> — « copie cette semaine sur la semaine prochaine » (seules les cases vides), « ajoute un jour férié le 26 décembre », « rentre le MSN 5566 ATR 72 en stockage », « passe le 4321 du stockage au recyclage », « le 4321 quitte le site », « nouveau MSN Airbus 12345 A320 NEO peinture ».<br>
         • <strong style="color:#ffd060">Exports et outils</strong> — « exporte le planning de la semaine prochaine en PDF », « sors le master en Excel », « imprime le brief du jour », « exporte le registre sécurité », « propose-moi les équipes », « repère les oublis », « actualise la météo », « seuil des nacelles à 45 », « passe en thème Bento », « envoie tout sur le Drive », « fais une sauvegarde ».<br>
+        • <strong style="color:#ffd060">Ordres de mission</strong> — « l'ODM de Yosmel pour Delta Leap est fait », « pas besoin d'ODM pour Julien », « quels ordres de mission sont à faire ? », « ouvre l'historique des ordres de mission ».<br>
         • <strong style="color:#ffd060">Questions en plus</strong> — « qui a le pushback ? », « combien d'avions en stockage ? », « qui peut signer le CRS demain ? », « qu'est-ce qu'il me reste dans la check-list ? », « des demandes de congé en attente ? ».<br>
         • <strong style="color:#ffd060">Garde-fous</strong> — suppression définitive et récupération depuis le Drive : double confirmation (« je confirme »). Restaurer une sauvegarde, importer le fichier RH ou un pointage : Mardam ouvre le bouton pour choisir le fichier. Les comptes et les mots de passe ne se gèrent jamais à la voix. Une annulation de clôture, de création de chantier ou d'avion n'est possible que tant que l'application n'a pas été rechargée.
         <div style="margin-top:10px;padding:8px 12px;background:rgba(41,121,255,0.06);border-left:3px solid #34c759;border-radius:0 8px 8px 0;font-size:12px;color:var(--t3)">🔒 <strong>Ce qui sort de l'application</strong> — uniquement ta phrase, envoyée à l'IA <b>seulement si l'app ne l'a pas comprise seule</b>, avec les noms des personnes et les MSN remplacés par des codes ([P1], [A1]). Aucun fichier, aucun planning, aucune liste du personnel. La dictée passe par le service vocal de l'appareil (Apple ou Microsoft). Les réponses sont toujours calculées par l'app sur tes données : l'IA n'invente rien et ne modifie rien.</div>
@@ -7664,6 +7668,14 @@ document.addEventListener('mouseup', e=>{
   if(_slotMoved){ _slotSuppressClick=true; _slotSelBar(); }
   else { SLOTSEL={active:false,anchor:null,focus:null}; _slotApplyHighlight(); _slotSelBar(); }
 });
+// Orthographe : correcteur du navigateur / du clavier en français sur tous les champs de texte libre
+// (pas sur identifiant, mot de passe, MSN, téléphone, e-mail, dates, nombres ni recherches)
+function _spellOn(el){ try{ if(!el||!el.matches) return; if(!el.matches('textarea, input[type="text"], input:not([type])')) return;
+  const k=(el.id||'')+' '+(el.name||'')+' '+(el.getAttribute('autocomplete')||'')+' '+(el.getAttribute('placeholder')||'');
+  if(el.dataset.nospell!==undefined||(/(^|[^\p{L}])(luser|lpass|username|password|msn|immat|tel|phone|e?mail|login|pwd|pass|url|gas|cle|key|code|search|filtre|filter|recherche\p{L}*)([^\p{L}]|$)/iu.test(k)||k.includes('🔍'))){ if(el.dataset.nospell===undefined) el.spellcheck=false; return; }
+  if(el.spellcheck!==true) el.spellcheck=true; if(!el.getAttribute('lang')) el.setAttribute('lang','fr'); el.setAttribute('autocorrect','on'); if(el.tagName==='TEXTAREA'&&!el.getAttribute('autocapitalize')) el.setAttribute('autocapitalize','sentences'); }catch(_){} }
+document.addEventListener('focusin', e=>_spellOn(e.target), true);
+document.addEventListener('DOMContentLoaded', ()=>{ document.querySelectorAll('textarea, input[type="text"], input:not([type])').forEach(_spellOn); });
 document.addEventListener('click', e=>{ if(_slotSuppressClick && e.target.closest && e.target.closest('#slot-grid')){ e.preventDefault(); e.stopPropagation(); _slotSuppressClick=false; } }, true);
 document.addEventListener('keydown', e=>{
   if(!SLOTSEL.active) return;
@@ -9230,8 +9242,8 @@ const GUIDE_DATA = {
     {t:"Brief du jour", d:"Le bouton <b>☀️ Brief du jour</b> ouvre le point du jour : chiffres clés, <b>📣 message du brief</b> (consigne sécurité ou info du jour, enregistrée pour la date et imprimée), <b>chantiers en cartes</b> (chef d'équipe, équipe en trigrammes — inspecteurs en cyan —, effectif / besoin, avancement), présences & mouvements, formations et visites, <b>✈️ entrées / sorties d'avions</b> à 7 jours, échéances et tâches. Les rubriques vides sont masquées. Flèches pour changer de jour, <b>🖨 Imprimer / PDF</b> pour le partager.", ill:null},
     {t:"Météo et alertes", d:"Le brief affiche la <b>météo de Francazal</b> (modèles Météo-France via Open-Meteo) : conditions actuelles, 4 jours et le déroulé heure par heure. Des <b>bandeaux d'alerte</b> apparaissent en cas de <b>risque d'orage</b> ⛈️, <b>vent fort / coup de vent / tempête</b> 💨🌪️ (rafales ≥ 60 / 80 / 100 km/h), de rafales au-dessus du <b>seuil nacelles</b> (réglable, 45 km/h par défaut), de brouillard ou de gel — pour le jour du brief et le lendemain. Lien direct vers la <b>vigilance officielle Météo-France</b>. Connexion Internet nécessaire.", ill:null},
     {t:"Suivre les avions", d:"Dans le brief, rubrique <b>📡 Suivi des avions</b> : tape une <b>immatriculation</b> (F-HBNA, EC-NAZ…) ou un <b>n° de vol</b> (AFR1234…) puis <b>Entrée</b> — l'app reconnaît le type et ouvre l'avion ou le vol sur <b>Flightradar24</b>. Les recherches récentes restent en raccourcis (✕ pour les retirer). Le bouton <b>📡 Radar LFBF</b> ouvre Flightradar24 centré sur Francazal, et la carte <b>Trafic en direct</b> (▶ Afficher la carte) montre les avions en vol autour du site directement dans le brief. <b>⛶ Plein écran</b> agrandit le brief sur tout l'écran.", ill:null},
-    {t:"Widgets du brief", d:"<b>🦺 Sécurité</b> : quatre compteurs (tout le personnel et intérimaires : sans accident avec arrêt / sans accident) avec leur record et leur propre date de départ (⚙️ Dates de départ). « ✎ Déclarer un événement » ouvre la fiche (personne, lieu, faits, témoins, lésion, arrêt, analyse, actions correctives) ; un accident d'intérimaire remet aussi à zéro les compteurs de tout le personnel, un soin bénin ne remet rien à zéro. <b>📋 Registre sécurité</b> : historique filtrable et PDF ; les noms et les lésions n'apparaissent jamais dans le brief imprimé. <b>📊 La semaine en chiffres</b> : taux de présence, part d'intérim, heures planifiées (7 h / jour) face au besoin, absentéisme maladie, avec l'écart à la semaine précédente. <b>🏖 Congés à valider</b> : valide ou refuse les congés prévisionnels, avec alerte si le seuil de la catégorie est dépassé ou si c'est un chef d'équipe. <b>🧑‍🔧 Fins de mission intérim</b> (15 jours) : ⟳ Prolonger (+1 / +3 mois) ou Laisser finir.", ill:null},
-    {t:"Ordres de mission", d:"Chaque <b>formation externe</b> ou <b>déplacement</b> saisi au planning déclenche un rappel « ordre de mission ». Les jours d'école des alternants se saisissent en <b>🎒 École</b> : pas d'ordre de mission. Si une demande n'est pas utile, clique <b>Pas besoin</b>. Il apparaît dans la rubrique <b>📝 Ordres de mission à faire</b> du brief (en rouge à J-2) et en pastille jaune sur le bouton ☀️ Brief du jour, <b>jusqu'à ce que tu cliques ✓ Fait</b> ou au plus tard <b>jusqu'au jour J</b> (premier jour de la formation ou du déplacement) : ensuite le rappel disparaît.", ill:null},
+    {t:"Widgets du brief", d:"<b>🦺 Sécurité</b> : quatre compteurs (embauchés — CDI, CDD, alternants — et intérimaires : sans accident avec arrêt / sans accident ; stagiaires, prestataires et extérieurs vont au registre sans faire bouger les compteurs) avec leur record et leur propre date de départ (⚙️ Dates de départ). « ✎ Déclarer un événement » ouvre la fiche (personne, lieu, faits, témoins, lésion, arrêt, analyse, actions correctives) ; un accident d'intérimaire remet aussi à zéro les compteurs de tout le personnel, un soin bénin ne remet rien à zéro. <b>📋 Registre sécurité</b> : historique filtrable et PDF ; les noms et les lésions n'apparaissent jamais dans le brief imprimé. <b>📊 La semaine en chiffres</b> : taux de présence, part d'intérim, heures planifiées (7 h / jour) face au besoin, absentéisme maladie, avec l'écart à la semaine précédente. <b>🏖 Congés à valider</b> : valide ou refuse les congés prévisionnels, avec alerte si le seuil de la catégorie est dépassé ou si c'est un chef d'équipe. <b>🧑‍🔧 Fins de mission intérim</b> (15 jours) : ⟳ Prolonger (+1 / +3 mois) ou Laisser finir.", ill:null},
+    {t:"Ordres de mission", d:"Chaque <b>formation externe</b> ou <b>déplacement</b> saisi au planning déclenche un rappel « ordre de mission ». Les jours d'école des alternants se saisissent en <b>🎒 École</b> : pas d'ordre de mission. Si une demande n'est pas utile, clique <b>Pas besoin</b>. Il apparaît dans la rubrique <b>📝 Ordres de mission à faire</b> du brief (en rouge à J-2) et en pastille jaune sur le bouton ☀️ Brief du jour, <b>jusqu'à ce que tu cliques ✓ Fait</b> ou au plus tard <b>jusqu'au jour J</b> (premier jour de la formation ou du déplacement) : ensuite le rappel disparaît. Une formation = un ordre de mission, même si deux formations se suivent. Le lien <b>Historique</b> de la carte (ou Ctrl+K) liste tous les ordres de mission : faits, pas besoin, en attente et non traités, avec la date et qui a cliqué. À la voix : « l'ODM de Yosmel pour Delta Leap est fait », « pas besoin d'ODM pour Julien », « quels ordres de mission sont à faire ? », « ouvre l'historique des ordres de mission ».", ill:null},
     {t:"Compétences critiques", d:"La carte <b>🎯 Compétences critiques</b> compte, pour chaque compétence choisie, combien de détenteurs valides sont présents le pire jour de chaque semaine, sur 8 semaines. <b>Rouge</b> = personne, <b>orange</b> = sous le seuil. Clique un chiffre pour le détail, <b>⚙️</b> pour choisir les compétences et les seuils.", ill:null},
     {t:"Besoin d'aide", d:"Sur n'importe quelle page, le bouton <b>❓ Aide</b> de la barre d'onglets ouvre ce guide <b>directement sur l'onglet où tu es</b>.", ill:null},
     {t:"Prévision 3 mois", d:"Le bouton <b>📈 Prévision 3 mois</b> compare, semaine par semaine sur 13 semaines, les techniciens <b>disponibles</b> au <b>besoin</b>. Deux écarts : l'actuel, et celui obtenu <b>si tous les congés prévisionnels sont validés</b>. Les fins de contrat sont listées, et l'app propose quoi arbitrer ou qui prolonger.", ill:null},
@@ -17218,25 +17230,30 @@ function stockageWeekOffset(dir){
 }
 
 /* ── CRUD Avions ── */
+// Mêmes types et mêmes motorisations que la fiche chantier ; moteur unique pré-rempli
+const _AV_MOTEURS={'ATR 42':['PW120','PW124','PW127'],'ATR 72':['PW120','PW124','PW127'],'A318 CEO':['CFM56','V2500'],'A319 CEO':['CFM56','V2500'],'A320 CEO':['CFM56','V2500'],'A321 CEO':['CFM56','V2500'],'A319 NEO':['PW1100G','LEAP-1A'],'A320 NEO':['PW1100G','LEAP-1A'],'A321 NEO':['PW1100G','LEAP-1A'],'Boeing 737 CL':['CFM56-3'],'Boeing 737 NG':['CFM56-7'],'Boeing 737 MAX':['LEAP-1B'],'A220':['PW1500G']};
 function toggleAvionStockMoteur(val){
-  const MOTEURS={'ATR 42':['PW120','PW124','PW127'],'ATR 72':['PW120','PW124','PW127'],'A320 CEO':['CFM56','V2500'],'A320 NEO':['PW1100G','LEAP-1A']};
   const wm=document.getElementById('wrap-av-moteur');
   const wma=document.getElementById('wrap-av-moteur-autre');
   const sel=document.getElementById('av-moteur');
+  const wta=document.getElementById('wrap-av-type-autre'); if(wta){ wta.style.display=val==='Autre'?'':'none'; if(val!=='Autre') document.getElementById('av-type-autre').value=''; }
   sel.innerHTML='<option value="">— Sélectionner —</option>';
   document.getElementById('av-moteur-autre').value='';
-  if(MOTEURS[val]){
-    MOTEURS[val].forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o);});
+  const L=_AV_MOTEURS[val];
+  if(L){
+    L.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o);});
     const o=document.createElement('option');o.value='Autre...';o.textContent='Autre...';sel.appendChild(o);
+    if(L.length===1) sel.value=L[0];
     wm.style.display='';wma.style.display='none';
   } else if(val==='Autre'){wm.style.display='none';wma.style.display='';}
   else{wm.style.display='none';wma.style.display='none';}
 }
+function _avMoteurAutreVis(){ const v=document.getElementById('av-moteur').value; document.getElementById('wrap-av-moteur-autre').style.display=v==='Autre...'?'':'none'; }
 
 function openAvionNew(){
   document.getElementById('av-id').value='';
-  ['av-msn','av-notes','av-moteur-autre','av-client'].forEach(i=>document.getElementById(i).value='');
-  document.getElementById('av-type').value='';
+  ['av-msn','av-notes','av-moteur-autre','av-client','av-type-autre'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  document.getElementById('av-type').value=''; { const w=document.getElementById('wrap-av-type-autre'); if(w) w.style.display='none'; }
   document.getElementById('av-statut').value='parking';
   document.getElementById('av-entree').value=fmt(new Date());
   document.getElementById('wrap-av-moteur').style.display='none';
@@ -17250,26 +17267,30 @@ function openAvionEdit(id){
   document.getElementById('av-msn').value=av.msn||'';
   document.getElementById('av-client').value=av.client||'';
   document.getElementById('av-notes').value=av.notes||'';
-  document.getElementById('av-type').value=av.type||'';
+  const tSel=document.getElementById('av-type'), known=[...tSel.options].some(o=>o.value===av.type);
+  tSel.value=av.type?(known?av.type:'Autre'):'';
   document.getElementById('av-statut').value=av.statut||'parking';
   document.getElementById('av-entree').value=av.entree||'';
-  toggleAvionStockMoteur(av.type||'');
+  toggleAvionStockMoteur(tSel.value);
+  if(av.type&&!known) document.getElementById('av-type-autre').value=av.type;
   // Load moteur
   const sel=document.getElementById('av-moteur');
   const motVal=av.moteur||'';
   let found=false;
   for(let o of sel.options){if(o.value===motVal){sel.value=motVal;found=true;break;}}
-  if(!found&&motVal){sel.value='Autre...';document.getElementById('av-moteur-autre').value=motVal;document.getElementById('wrap-av-moteur-autre').style.display='';}
+  if(!found&&motVal){ if([...sel.options].some(o=>o.value==='Autre...')) sel.value='Autre...'; document.getElementById('av-moteur-autre').value=motVal;document.getElementById('wrap-av-moteur-autre').style.display='';}
+  else if(!found&&!motVal){ const L=_AV_MOTEURS[tSel.value]; sel.value=L&&L.length===1?L[0]:''; }
   openM('m-avion');
 }
 
 function saveAvion(){
   const msn=document.getElementById('av-msn').value.trim();
-  const type=document.getElementById('av-type').value;
+  const typeSel=document.getElementById('av-type').value, typeAutre=(document.getElementById('av-type-autre')?.value||'').trim();
+  const type=typeSel==='Autre'&&typeAutre?typeAutre:typeSel;
   if(!type||!msn){alert('Type et MSN obligatoires');return;}
   const motSel=document.getElementById('av-moteur').value;
   const motAutre=document.getElementById('av-moteur-autre').value.trim();
-  const moteur=motSel==='Autre...'?motAutre:motSel;
+  const moteur=motSel==='Autre...'||(!motSel&&motAutre)?motAutre:motSel;
   const data={type,msn,client:document.getElementById('av-client').value.trim(),moteur,entree:document.getElementById('av-entree').value,statut:document.getElementById('av-statut').value,notes:document.getElementById('av-notes').value};
   const id=document.getElementById('av-id').value;
   // Init stockage si besoin
@@ -20339,13 +20360,7 @@ function _kpiWeekData(mon){
   // ── Flux avions : arrivées / départs dont la date tombe dans la semaine ──
   let arrivees=0, departs=0;
   const inWk=d=>d&&d>=monStr&&d<=endStr;
-  S.chantiers.forEach(c=>{
-    if(inWk(c.arrivee||c.debut)) arrivees++;
-    if(inWk(c.dateSortie)) departs++;
-  });
-  (S.stockage?.avions||[]).forEach(a=>{ if(inWk(a.entree)) arrivees++; if(inWk(a.sortie)) departs++; });
-  (S.recycling?.avions||[]).forEach(a=>{ if(inWk(a.entree)) arrivees++; });
-  (S.airbus?.msns||[]).forEach(m=>{ if(inWk(m.entree)) arrivees++; if(inWk(m.sortie)) departs++; });
+  { const t0=fmt(new Date()); _siteVisits().forEach(v=>{ if(inWk(v.start)&&v.start<=t0) arrivees++; if(!v.recy&&v.end&&inWk(v.end)&&v.end<=t0) departs++; }); }
 
   // Avions sur site à la fin de la semaine (snapshot approximatif : présents à wEnd)
   const surSite=(()=>{
@@ -20382,59 +20397,45 @@ function _kpiYearWeeks(year){
   }
   return out;
 }
+// Présences sur site par MSN : on assemble toutes les fiches (chantier, stockage, Airbus, recyclage) en séjours.
+// Un passage parking → chantier → parking reste UN séjour : seule l'entrée sur le site compte comme arrivée,
+// seule la sortie du site compte comme départ. Les dates futures (prévues) ne comptent pas.
+function _siteVisits(){
+  const by={}, add=(msn,type,s,e,extra)=>{ const k=(msn||'').toString().trim(); if(!k||!s) return; (by[k]=by[k]||{type:'',recs:[]}); if(type&&!by[k].type) by[k].type=type; by[k].recs.push(Object.assign({s,e:e||null},extra||{})); };
+  (S.chantiers||[]).forEach(c=>{ if(c.statut==='prevision'||c.statut==='futur') return; add(c.msn,c.avion,c.arrivee||c.debut,(c.sortie==='parti'&&c.dateSortie)||(c.statut==='termine'?c.fin:null)); });
+  (S.airbus?.msns||[]).forEach(m=>add(m.msn,m.type,m.entree,m.sortie));
+  (S.stockage?.avions||[]).forEach(a=>add(a.msn,a.type,a.entree,a.sortie));
+  (S.recycling?.avions||[]).forEach(a=>{ const st=a.entree||a.debutChantier; add(a.msn,a.type,st,null,{recy:a.statut==='termine',recyDate:a.dateReelleFin||a.finChantier||a.finPrev||st}); });
+  const out=[];
+  Object.entries(by).forEach(([msn,o])=>{ const R=o.recs.sort((a,b)=>a.s.localeCompare(b.s)); let cur=null;
+    R.forEach(r=>{ if(cur&&(cur.end===null||r.s<=fmt(addD(parseLocal(cur.end),3)))){ if(cur.end!==null) cur.end=r.e===null?null:(r.e>cur.end?r.e:cur.end); if(r.recy){ cur.recy=true; cur.recyDate=r.recyDate; } return; }
+      if(cur) out.push(cur); cur={msn,type:o.type,start:r.s,end:r.e,recy:!!r.recy,recyDate:r.recyDate||null}; });
+    if(cur) out.push(cur); });
+  return out;
+}
 // Flux avions annuel : arrivées / départs / recyclés par avion physique (MSN)
 function _fluxAvionsAnnuel(year){
-  const inYear=ds=>ds && parseInt(ds.slice(0,4))===year;
-  // Map par MSN : { arrivees:[dates], departs:[dates], recycled:bool, recycledDate }
+  const inYear=ds=>ds && parseInt(ds.slice(0,4))===year, t0=fmt(new Date());
   const byMsn={};
-  const ensure=(msn,type)=>{ const k=(msn||'').trim(); if(!k) return null; if(!byMsn[k]) byMsn[k]={arr:[],dep:[],recy:false,recyDate:null,type:''}; if(type&&!byMsn[k].type) byMsn[k].type=type; return byMsn[k]; };
-
-  // 1) Chantiers de maintenance — uniquement le RÉEL (en cours / terminé), pas les prévisions/futurs
-  (S.chantiers||[]).forEach(c=>{
-    if(c.statut==='prevision'||c.statut==='futur') return;   // prévisionnel : l'avion n'est pas (encore) arrivé
-    const o=ensure(c.msn,c.avion); if(!o) return;
-    if(c.debut) o.arr.push(c.debut);
-    if(c.sortie==='parti' && c.dateSortie) o.dep.push(c.dateSortie);
-    else if(c.statut==='termine' && c.fin) o.dep.push(c.fin);
-  });
-  // 2) Airbus Part 21 FRC
-  (S.airbus?.msns||[]).forEach(m=>{
-    const o=ensure(m.msn,m.type); if(!o) return;
-    if(m.entree) o.arr.push(m.entree);
-    if(m.sortie) o.dep.push(m.sortie);
-  });
-  // 3) Stockage
-  (S.stockage?.avions||[]).forEach(a=>{
-    const o=ensure(a.msn,a.type); if(!o) return;
-    if(a.entree) o.arr.push(a.entree);
-    if(a.sortie) o.dep.push(a.sortie);
-  });
-  // 4) Recyclage — arrivée sur site, PAS de départ (cassé sur site)
-  (S.recycling?.avions||[]).forEach(a=>{
-    const o=ensure(a.msn,a.type); if(!o) return;
-    const arrivee=a.debutChantier||a.entree;
-    if(arrivee) o.arr.push(arrivee);
-    if(a.statut==='termine'){ o.recy=true; o.recyDate=a.dateReelleFin||a.finChantier||a.finPrev||arrivee; }
-  });
-
-  // Comptage par avion physique
+  _siteVisits().forEach(v=>{ const o=(byMsn[v.msn]=byMsn[v.msn]||{type:v.type,arr:[],dep:[],recy:false,recyDate:null});
+    if(v.start<=t0) o.arr.push(v.start);
+    if(v.recy){ o.recy=true; o.recyDate=v.recyDate; } else if(v.end&&v.end<=t0) o.dep.push(v.end); });
   let arrivees=0, departs=0, recycles=0;
   const detArr=[], detDep=[], detRecy=[];
   Object.entries(byMsn).forEach(([msn,o])=>{
-    // Arrivée : première date d'arrivée de l'année
+    // Arrivée : première entrée sur le site dans l'année
     const arrYear=o.arr.filter(inYear).sort();
     if(arrYear.length){ arrivees++; detArr.push({msn,type:o.type,date:arrYear[0]}); }
     // Recyclé : si terminé dans l'année (prime sur départ)
-    if(o.recy && inYear(o.recyDate)){ recycles++; detRecy.push({msn,type:o.type,date:o.recyDate}); }
+    if(o.recy && inYear(o.recyDate) && o.recyDate<=t0){ recycles++; detRecy.push({msn,type:o.type,date:o.recyDate}); }
     else {
-      // Départ : dernière date de départ de l'année (seulement si pas recyclé)
+      // Départ : dernière sortie du site dans l'année (seulement si pas recyclé)
       const depYear=o.dep.filter(inYear).sort();
       if(depYear.length){ departs++; detDep.push({msn,type:o.type,date:depYear[depYear.length-1]}); }
     }
   });
   return {arrivees,departs,recycles,detArr,detDep,detRecy};
 }
-// Bloc listing (MSN · type · date) pour arrivées/départs/recyclés
 function _fluxListBlock(titre, items, col){
   const lignes = items.length
     ? items.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(it=>
@@ -21134,7 +21135,7 @@ function _briefData(ds){
 
 /* ── Brief du jour v2 : chantiers en cartes, avions entrées/sorties, message du brief, ordres de mission ── */
 // Ordres de mission : un bloc par personne ET par formation (ou déplacement), jours ouvrés consécutifs (week-ends et fériés ignorés)
-function _omBlocks(){
+function _omBlocks(all){
   const t0=fmt(new Date()), from=fmt(addD(new Date(),-45)), to=fmt(addD(new Date(),180));
   const by={}, byOld={}, nk=t=>_mdNorm?_mdNorm(String(t||'')).trim():String(t||'').toLowerCase().trim();
   Object.entries(S.planning||{}).forEach(([k,e])=>{ if(!e||(e.type!=='formation'&&e.type!=='deplacement')) return;
@@ -21151,10 +21152,11 @@ function _omBlocks(){
     const o=old.find(x=>x.empId===b.empId&&x.type===b.type&&x.start<=b.start&&b.start<=x.end);
     b.done=!!(S.omDone&&(S.omDone[b.key]||(o&&S.omDone[o.key]))); b.j=Math.round((parseLocal(b.start)-parseLocal(t0))/86400000); });
   // Rappel jusqu'au jour J (premier jour de la formation / du déplacement), puis il disparaît
+  if(all) return out;
   return out.filter(b=>!b.done && b.start>=t0).sort((a,b)=>a.start.localeCompare(b.start)||String(a.empId).localeCompare(String(b.empId))||String(a.form||'').localeCompare(String(b.form||'')));
 }
-function _omSkip(key){ if(!S.omDone) S.omDone={}; S.omDone[key]='nr:'+fmt(new Date()); save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('Demande d\'ordre de mission écartée'); }
-function _omValidate(key){ if(!S.omDone) S.omDone={}; S.omDone[key]=fmt(new Date()); save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('📝 Ordre de mission noté comme fait'); }
+function _omSkip(key){ if(!S.omDone) S.omDone={}; S.omDone[key]='nr:'+fmt(new Date()); try{ _omRecord(key,'nr'); }catch(_){} save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('Demande d\'ordre de mission écartée'); }
+function _omValidate(key){ if(!S.omDone) S.omDone={}; S.omDone[key]=fmt(new Date()); try{ _omRecord(key,'fait'); }catch(_){} save(); _briefRender(); try{ _briefBadge(); }catch(_){} toast('📝 Ordre de mission noté comme fait'); }
 function _briefBadge(){ const b=document.getElementById('brief-om-badge'); if(!b) return; const n=_omBlocks().length; b.textContent=n; b.style.display=n?'inline-flex':'none'; b.title=n+' ordre(s) de mission à faire'; }
 let _bfMsgT=null;
 function _briefMsgInput(v){ if(!S.briefMsg) S.briefMsg={}; const t=(v||'').trim(); if(t) S.briefMsg[_briefDs]=v; else delete S.briefMsg[_briefDs]; clearTimeout(_bfMsgT); _bfMsgT=setTimeout(()=>{ try{save();}catch(_){} },600); }
@@ -21355,9 +21357,11 @@ function _bwSafeSave(){
 }
 function _bwSafeDel(id){ if(!S.safety) return; S.safety.events=S.safety.events.filter(e=>e.id!==id); save(); _briefRender(); }
 
-// ═══ 🦺 Sécurité : 4 compteurs (tout le personnel / intérimaires), registre et fiches d'événement ═══
+// ═══ 🦺 Sécurité : 4 compteurs (embauchés CDI·CDD·alternants / intérimaires), registre et fiches d'événement ═══
 const _SF_T={arret:{l:'Accident avec arrêt',c:'#6effc4'},sans:{l:'Accident sans arrêt',c:'#7fd4ff'},soin:{l:'Soin bénin',c:'#c3cfdf'}};
-const _SF_C=[['all_arret','Tous','sans accident avec arrêt','#6effc4'],['all_tout','Tous','sans accident','#7fd4ff'],['int_arret','Intérimaires','sans accident avec arrêt','#ffd166'],['int_tout','Intérimaires','sans accident','#ffb38a']];
+// « Embauchés » = CDI, CDD et alternants (ni intérimaires, ni stagiaires, ni prestataires, ni personnes extérieures)
+function _sfEmb(e){ if(!e||e.interim) return false; const p=e.empId?byId(e.empId):null; if(!p) return false; if(['interimaire','prestataire','stagiaire'].includes(p.categorie)) return false; const c=p.contrat||_contratDefault(p.categorie); return c==='CDI'||c==='CDD'||c==='Alternance'||p.categorie==='alternant'; }
+const _SF_C=[['all_arret','Embauchés','sans accident avec arrêt','#6effc4'],['all_tout','Embauchés','sans accident','#7fd4ff'],['int_arret','Intérimaires','sans accident avec arrêt','#ffd166'],['int_tout','Intérimaires','sans accident','#ffb38a']];
 function _sfNorm(){
   if(!S.safety) S.safety={since:fmt(new Date()),events:[]};
   const sf=S.safety; if(!Array.isArray(sf.events)) sf.events=[];
@@ -21371,7 +21375,7 @@ function _sfLate(e){ const t=fmt(new Date()); return (e.actions||[]).filter(a=>!
 function _sfCount(ds){
   const sf=_sfNorm(), out={};
   _SF_C.forEach(([k])=>{ const start=sf.starts[k], intOnly=k.startsWith('int'), arretOnly=k.endsWith('arret');
-    const dates=sf.events.filter(e=>e.date&&e.date<=ds&&e.date>=start&&(!intOnly||e.interim)&&(arretOnly?e.type==='arret':(e.type==='arret'||e.type==='sans'))).map(e=>e.date).sort();
+    const dates=sf.events.filter(e=>e.date&&e.date<=ds&&e.date>=start&&(intOnly?e.interim:_sfEmb(e))&&(arretOnly?e.type==='arret':(e.type==='arret'||e.type==='sans'))).map(e=>e.date).sort();
     let prev=start, rec=0; dates.forEach(d=>{ rec=Math.max(rec,Math.round((parseLocal(d)-parseLocal(prev))/864e5)); prev=d; });
     const cur=ds<start?0:Math.max(0,Math.round((parseLocal(ds)-parseLocal(prev))/864e5)); out[k]={cur,rec:Math.max(rec,cur),start,last:dates[dates.length-1]||null}; });
   return out;
@@ -21552,7 +21556,8 @@ function _briefHtml(R,print){
   let Rt='';
   try{ Rt+=_bwBoxes(R,print,box); }catch(err){ console.warn('widgets brief',err); }
   if(R.om.length) Rt+=box('📝','Ordres de mission à faire',R.om.slice(0,_bfLim('om',12,print)).map(b=>{ const p=byId(b.empId); const late=b.j<=2;
-      return `<div class="bv-om${late?' late':''}">${_bfAv(p,print)}<div style="flex:1;min-width:0"><div><b>${nm(p)}</b> · ${b.type==='deplacement'?'🚗 Déplacement':'🎓 Formation externe'}${b.notes.length?` <span class="bv-mut">— ${_bfEsc(b.notes.join(', '))}</span>`:''}</div><div class="bv-mut">${disp(b.start)}${b.end!==b.start?' → '+disp(b.end):''} · ${b.j===0?'<b style="color:#ff8fa3">aujourd\'hui — dernier rappel</b>':rel(b.start)}</div></div>${print?'<span class="bv-ck">☐</span>':`<span class="bv-omact"><button class="bv-okb" onclick="_omValidate('${b.key}')" title="Ordre de mission fait">✓ Fait</button><button class="bv-nob" onclick="_omSkip('${b.key}')" title="Pas besoin d'ordre de mission pour celui-ci">Pas besoin</button></span>`}</div>`; }).join('')+(_bfMore('om',R.om.length,12,print)),`${R.om.length} en attente`,'bv-ombox');
+      return `<div class="bv-om${late?' late':''}">${_bfAv(p,print)}<div style="flex:1;min-width:0"><div><b>${nm(p)}</b> · ${b.type==='deplacement'?'🚗 Déplacement':'🎓 Formation externe'}${b.notes.length?` <span class="bv-mut">— ${_bfEsc(b.notes.join(', '))}</span>`:''}</div><div class="bv-mut">${disp(b.start)}${b.end!==b.start?' → '+disp(b.end):''} · ${b.j===0?'<b style="color:#ff8fa3">aujourd\'hui — dernier rappel</b>':rel(b.start)}</div></div>${print?'<span class="bv-ck">☐</span>':`<span class="bv-omact"><button class="bv-okb" onclick="_omValidate('${b.key}')" title="Ordre de mission fait">✓ Fait</button><button class="bv-nob" onclick="_omSkip('${b.key}')" title="Pas besoin d'ordre de mission pour celui-ci">Pas besoin</button></span>`}</div>`; }).join('')+(_bfMore('om',R.om.length,12,print)),`${R.om.length} en attente${print?'':' · <a style="cursor:pointer;color:var(--cyan);font-style:normal" onclick="_omHistOpen()">Historique</a>'}`,'bv-ombox');
+  else if(!print&&((S.omHist||[]).length||Object.keys(S.omDone||{}).length)) Rt+=box('📝','Ordres de mission','<div class="bv-mut">Aucun ordre de mission à faire.</div>','<a style="cursor:pointer;color:var(--cyan);font-style:normal" onclick="_omHistOpen()">Historique</a>','bv-ombox');
   const mv=[]; R.retours.forEach(p=>mv.push({p,t:'↩ retour',c:'#6effc4'}));
   (S.personnel||[]).forEach(p=>{ const a=p.debutContrat||p.dateEmbauche; if(a===R.ds && p.actif!==false) mv.push({p,t:'★ 1er jour',c:'#7fd4ff'}); });
   R.departs.forEach(x=>mv.push({p:x.p,t:`${(x.why||'absent').toLowerCase()} dès demain`,c:'#ff8fa3'}));
@@ -27767,6 +27772,7 @@ const _CK_ACTIONS=[
   ['☀️','Brief du jour','brief matin point equipe',()=>openBrief()],
   ['🗓','Brief de la semaine','brief semaine hebdo recap production envoyer personnel formations absences hangar',()=>openBriefWeek()],
   ['🦺','Registre sécurité','securite accident arret registre interimaire soin incident compteur',()=>_sfRegOpen()],
+  ['📝','Historique des ordres de mission','odm ordre mission historique suivi fait pas besoin formation externe deplacement',()=>_omHistOpen()],
   ['🦺','Déclarer un événement sécurité','declarer accident securite arret blessure soin',()=>_sfEdit()],
   ['📺','Mode TV atelier','tv ecran atelier diaporama plein ecran',()=>tvOpen()],
   ['🪄','Proposer les équipes','auto planning composition equipes semaine',()=>{ goTab('weekly'); openAutoPlan(); }],
@@ -29116,6 +29122,7 @@ function _mdTime(T){
 }
 // ── Écrans de l'app ──
 const _MD_SCREENS=[
+  ['omhist',/ historique (des |de |d )?(ordres? de mission|odm|o d m)| suivi des (ordres? de mission|odm)/,'Historique des ordres de mission'],
   ['sfreg',/ registre (de |des )?(securite|accidents?)|registre accident|registre securite/,'Registre sécurité'],
   ['briefw',/ brief (de la |pour la )?semaine|brief hebdo/,'Brief de la semaine'],
   ['briefj',/ brief( du jour| de ce matin| d aujourd hui)?( |$)/,'Brief du jour'],
@@ -29172,7 +29179,7 @@ function _mdParse(raw){
   const P={raw,n,T,kind:'unknown'};
   if(!T.length) return P;
   // Contrôle
-  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6&&!/ (tache|taches|formation|autorisation|prolongation|position|conge|conges|demande|demandes|check|checklist|note|action|compteur|chantier) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'yes'});
+  if(/^(oui|ouais|ok|okay|vas y|go|c est bon|valide|confirme|d accord|parfait|exactement|c est ca|yes|bien sur)( |$)/.test(T.join(' '))&&T.length<=6&&!/ (tache|taches|formation|autorisation|prolongation|position|conge|conges|demande|demandes|check|checklist|note|action|compteur|chantier|odm|ordre|mission) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'yes'});
   if(/ (annule|defais|reviens en arriere sur) (ce que tu viens de faire|la derniere action|ta derniere action) |^ ?(reviens en arriere|defais) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'undo'});
   if(/ (tais toi|coupe le son|coupe la voix|silence|chut|mode silencieux|arrete de parler) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'mute'});
   if(/ (remets le son|reparle|tu peux parler|active le son|remets la voix) /.test(nn)) return Object.assign(P,{kind:'ctl',act:'unmute'});
@@ -29196,6 +29203,7 @@ function _mdParse(raw){
   // « Baou est malade demain » : une modification sans verbe
   if(ppl.length&&!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&/ (est|sera|seront|sont) (malade|malades|en conges?|en vacances|absent|absente|absents|en arret|en deplacement|a l ecole) /.test(nn)){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&A.a==='abs') return Object.assign(P,{kind:'act',A}); }
   { const C=_mdCmdParse(P,raw); if(C) return Object.assign(P,C); }
+  if(!/\?/.test(raw)&&!_MD_QW.test(T.join(' '))){ const O=_mdOmParse(P); if(O) return Object.assign(P,{kind:'act',A:O}); }
   if(!/\?/.test(raw)&&!_MD_QW.test(T.join(' '))&&!_MD_ACTV.test(T.join(' '))){ const V=_mdV2Parse(P,raw); if(V&&['ch_close','ch_upd','ch_new','pers_upd','pers_back','sto_out','sto_new','rec_new','ab_new','nt_done','cl_done','form_done','sf_act_done','sf_start','aut_add','conge_ok','conge_ko','hol_add','pers_arch','pers_hp'].includes(V.a)) return Object.assign(P,{kind:'act',A:V}); }
   if(!/\?/.test(raw)&&!/^(qui|quand|combien|quel|quelle|quels|est ce|y a t il|c est quand|ou|depuis)( |$)/.test(T.join(' '))&&(/ (accident|s est (blesse|blessee|coupe|coupee|brule|brulee|tordu|tordue|cogne|cognee|pince|pincee|ecrase|ecrasee|pique|piquee|fait mal|entaille|entaillee)|est tombe|est tombee|il y a eu|on a eu) /.test(nn)||/^(accident|soin benin|petit accident) /.test(T.join(' '))||/^(ferme|fermer|clos|clore|cloture|cloturer|signale|signaler|classe|solde) /.test(T.join(' ')))){ P.raw=raw; const A=_mdSfParse(P,raw); if(A) return Object.assign(P,{kind:'act',A}); }
   if(!_MD_QW.test(T.join(' '))&&!/\?/.test(raw)&&(msn.length&&/ (sort|sortira|sortent|rentre|rentrera) /.test(nn)||/^(nouveau|nouvel|nouvelle|une nouvelle|un nouveau) /.test(T.join(' '))||ppl.length&&/ (a|ont) (repasse|renouvele|revalide|passe son|passe sa|passe ses|refait) /.test(nn))){ P.raw=raw; const A=_mdAParse(P,raw); if(A&&['slot_out','slot_set','pers_new','form_upd','aut_upd'].includes(A.a)) return Object.assign(P,{kind:'act',A}); }
@@ -29243,6 +29251,7 @@ function _mdNavRun(P){
     if(P.person&&P.person.ids.length===1){ const em=document.getElementById('mp-emp'); if(em) em.value=P.person.ids[0]; }
     const cs=cats(); try{ renderMaster(); }catch(_){} say=`Voici le master de ${_MD_ML[m.m]} ${m.y}${cs}.`; setTimeout(()=>_mdFlash(document.getElementById('masterGrid')||pg()),80); }
   else if(scr==='sfreg'){ _sfRegOpen(); say="J'ouvre le registre sécurité."; }
+  else if(scr==='omhist'){ _omHistOpen(); say="J'ouvre l'historique des ordres de mission."; }
   else if(scr==='briefw'){ openBriefWeek(fmt(P.date||new Date())); say=`Voici le brief de la semaine ${wkN(P.date||new Date())}.`; }
   else if(scr==='briefj'){ openBrief(); say='Voici le brief du jour.'; }
   else if(scr==='aff'){ affOpen(fmt(P.date||new Date())); say=`J'ouvre les affectations de ${_mdDayTxt(P.date||_mdToday())}.`; }
@@ -29645,6 +29654,7 @@ function _mdqFormMatch(fx,txt){ if(!fx) return true; const k=_mdNorm(txt||''); r
 // ── Reconnaître la question ──
 function _mdQDetect(P){
   { const sq=_mdSfQ(P); if(sq) return sq; }
+  { const oq=_mdOmQ(P); if(oq) return oq; }
   { const vq=_mdV2Q(P); if(vq) return vq; }
   const T=P.T||[], nn=' '+T.join(' ')+' ', per=!!(P.ppl&&P.ppl.length), msn=!!(P.msn&&P.msn.length), has=re=>re.test(nn);
   const Tx=T.slice(); (P.ppl||[]).forEach(h=>{ for(let i=h.span[0];i<h.span[1];i++) Tx[i]=''; }); (P.msn||[]).forEach(m=>{ if(m.i!=null) Tx[m.i]=''; });
@@ -29883,7 +29893,7 @@ function _mdQRun(P,text,how){
 }
 
 // ═══ Mardam 0.6 — apprendre : mauvaises réponses, export pour Claude, raccourcis personnels ═══
-const _MD_VER='2.0';
+const _MD_VER='2.1';
 function _mdBad(){ _mdCfg(); if(!Array.isArray(S.mardam.bad)) S.mardam.bad=[]; return S.mardam.bad; }
 function _mdShorts(){ _mdCfg(); if(!Array.isArray(S.mardam.short)) S.mardam.short=[]; return S.mardam.short; }
 function _mdTxt(h){ const d=document.createElement('div'); d.innerHTML=String(h||'').replace(/<li>/g,' • ').replace(/<br\s*\/?>/g,' '); return (d.textContent||'').replace(/\s+/g,' ').trim(); }
@@ -29973,6 +29983,7 @@ function _mdaDel(nn){ return / (supprime|supprimer|annule|annuler|enleve|enlever
 function _mdAParse(P,raw){
   const T=P.T||[], nn=' '+T.join(' ')+' ', has=re=>re.test(nn), del=_mdaDel(nn), per=P.ppl&&P.ppl.length, msn=P.msn&&P.msn.length;
   const SF=_mdSfParse(P,raw); if(SF) return SF;
+  const OM=_mdOmParse(P); if(OM) return OM;
   const V2=_mdV2Parse(P,raw); if(V2) return V2;
   const A3=_mdA3Parse(P,raw); if(A3) return A3;
   if(has(/ (positions?|hangar) /)) return null;
@@ -30050,7 +30061,8 @@ function _mdaRepl(changes){ // ce qui sera écrasé
 const _MDA_BUILD={
   note(P,text,how,A,nn,tm){ if(!A.text||A.text.length<2) return _mdaAsk(text,how,'Qu\'est-ce que je note ?','Qu\'est-ce que je note ?');
     const t=A.text.charAt(0).toUpperCase()+A.text.slice(1), due=tm.day?fmt(tm.day.d):(tm.range?fmt(tm.range.from):'');
-    return {changes:[],note:{t,due},say:`Je note sur ton pense-bête : « ${t} »${due?`, avec un rappel ${_mdqDayLbl(parseLocal(due))==="aujourd'hui"?"aujourd'hui":'le '+_mdDayTxt(parseLocal(due))}`:''}.`}; },
+    const fut=due&&due>fmt(new Date());
+    return {changes:[],note:{t,due},say:`Je note sur ton pense-bête : « ${t} »${due?`, avec un rappel ${_mdqDayLbl(parseLocal(due))==="aujourd'hui"?"aujourd'hui":'le '+_mdDayTxt(parseLocal(due))}`:''}.${fut?` Elle s'affichera sur le pense-bête ce jour-là ; d'ici là, elle est dans « Voir les rappels à venir ».`:''}`}; },
   vm(P,text,how,A,nn,tm){ const E=_mdaPeople(P,text,how); if(!E) return null; if(E.length>1) return {err:'Une visite médicale à la fois, s\'il te plaît : dis-la pour une seule personne.'};
     const days=_mdaDays(tm,{allowWeekend:true}); if(!days.length) return _mdaAsk(text,how,`Quel jour, la visite médicale de ${_bfEsc(_mdPName(E[0]))} ?`);
     if(days.length>1) return {err:'Une visite médicale se pose sur un seul jour : redis-moi le jour exact.'};
@@ -30128,7 +30140,7 @@ function _mdaApply(r,text,how,A){
   if(r.note){ const me=_ntMe(); const n={id:'nt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:r.note.t,c:'y',due:r.note.due||'',sh:false,by:me.login,byN:me.nom,at:Date.now(),done:0,doneDs:''}; _ntAll().push(n); rec.notes.push(n.id); }
   _mdaEnsure(); S.mardam.changes=(S.mardam.changes||[]); S.mardam.changes.unshift(rec); if(S.mardam.changes.length>30) S.mardam.changes.length=30;
   save(); _mdaRefresh(); if(rec.mut&&MD.snaps&&MD.snaps[rec.id]){ MD.snaps[rec.id].a=_v2SnapK(); setTimeout(()=>{ try{ MD.snaps[rec.id].a=_v2SnapK(); MD.snaps[rec.id].fin=true; }catch(_){} },900); }
-  const view=r.viewObj?r.viewObj:r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); setTimeout(()=>_mdFlash(document.getElementById('notesWidget')),150); }}:r.view==='slot'?{l:'Voir le hangar',fn:()=>{ goTab('slot'); try{ renderSlotGrid(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('#pg-slot .slot-grid, #pg-slot table')||document.querySelector('.page.on')),200); }}
+  const view=r.viewObj?r.viewObj:r.note?{l:'Voir le pense-bête',fn:()=>{ goTab('dashboard'); const nid=rec.notes[0]; setTimeout(()=>{ const n=_ntAll().find(x=>x.id===nid); if(n&&n.due&&n.due>fmt(new Date())){ window._ntLater=true; _ntRender(); } const w=document.getElementById('notesWidget'); const el=w&&[...w.querySelectorAll('.nt-pi,.nt-li')].find(x=>(x.getAttribute('onclick')||'').includes(nid)&&x.offsetParent); if(el){ el.scrollIntoView({block:'center',behavior:'smooth'}); _mdFlash(el); } else _mdFlash(w); },150); }}:r.view==='slot'?{l:'Voir le hangar',fn:()=>{ goTab('slot'); try{ renderSlotGrid(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('#pg-slot .slot-grid, #pg-slot table')||document.querySelector('.page.on')),200); }}
     :r.view==='sf'?{l:'Voir la fiche',fn:()=>{ try{ _sfEdit(r.sfId); }catch(_){} }}
     :r.view==='todo'?{l:'Voir la to-do',fn:()=>{ goTab('todo'); try{ renderTodo(); }catch(_){} setTimeout(()=>_mdFlash(document.querySelector('.page.on')),150); }}
     :r.view==='fiche'&&r.emps&&r.emps[0]?{l:'Voir la fiche',fn:()=>{ goTab('personnel'); try{ renderPersonnel(); }catch(_){} setTimeout(()=>{ try{ openPanel(r.emps[0].id); }catch(_){ try{ editPersonnel(r.emps[0].id); }catch(__){} } },120); }}
@@ -30360,7 +30372,8 @@ function _mdSfFinish(st){ MD.pending=null; MD.afterSpeak=st.voice?()=>{ if(MD.pe
 function _mdSfConfirm(ev,asked){
   const emp=ev.empId?byId(ev.empId):null, who=emp?_mdPName(emp):ev.nomLibre||'?', d=parseLocal(ev.date), type=ev.type;
   const whoSay=emp?who:/^(sous|prestataire|visiteur|chauffeur|livreur|client|stagiaire|apprenti|auditeur|externe)/i.test(who)?(/(e|euse|ice|ante|iente)$/.test(who.toLowerCase())&&!/^(stagiaire|externe|prestataire)/i.test(who)?'une ':'un ')+who.toLowerCase():who;
-  const reset=type==='soin'?'Aucun compteur ne bouge (soin bénin).':`Remet à zéro : ${type==='arret'?'« avec arrêt » et « sans accident »':'« sans accident »'} de tout le personnel${ev.interim?' et des intérimaires':''}.`;
+  const grp=ev.interim?'des intérimaires':_sfEmb(ev)?'des embauchés':'';
+  const reset=type==='soin'?'Aucun compteur ne bouge (soin bénin).':!grp?"Aucun compteur ne bouge (ni embauché CDI, CDD ou alternant, ni intérimaire) : l'événement va au registre.":`Remet à zéro : ${type==='arret'?'« avec arrêt » et « sans accident »':'« sans accident »'} ${grp}.`;
   const E=_bfEsc, h=ev.heure?' à '+ev.heure.replace(':','h'):'';
   const lines=[`Personne : <b>${E(who)}</b>${ev.interim?' · intérimaire':''}`,`Date : ${E(_mdDayTxt(d))}${h}${ev.lieu||ev.lieuTxt?' · lieu : '+E([ev.lieu,ev.lieuTxt].filter(Boolean).join(' — ')):''}`]
     .concat(ev.faits?[`Faits : ${E(ev.faits)}`]:[]).concat(ev.lesNature||ev.lesSiege?[`Lésion : ${E([ev.lesNature,ev.lesSiege].filter(Boolean).join(' · '))}`]:[])
@@ -30394,7 +30407,7 @@ function _mdSfQ(P){
 }
 Object.assign(_MDQ_RUN,{
   sf_count(P){ const C=_sfCount(fmt(new Date())), a=C.all_arret, t=C.all_tout, ia=C.int_arret, it=C.int_tout;
-    const j=n=>n+(n>1?' jours':' jour'); const s=`${j(a.cur)} sans accident avec arrêt et ${j(t.cur)} sans accident pour tout le personnel. Pour les intérimaires : ${j(ia.cur)} sans accident avec arrêt, ${j(it.cur)} sans accident.`;
+    const j=n=>n+(n>1?' jours':' jour'); const s=`${j(a.cur)} sans accident avec arrêt et ${j(t.cur)} sans accident pour les embauchés (CDI, CDD, alternants). Pour les intérimaires : ${j(ia.cur)} sans accident avec arrêt, ${j(it.cur)} sans accident.`;
     _mdAns({say:s,html:`<b>${_bfEsc(s)}</b>`,items:_SF_C.map(([k,who,lbl])=>`${who} · ${lbl} : <b>${C[k].cur} j</b> <small>(record ${C[k].rec} j, depuis le ${disp(C[k].start)})</small>`),title:'Compteurs sécurité',view:{l:'Voir le registre',fn:()=>_sfRegOpen()}}); return 'ok'; },
   sf_last(P){ const L=_sfNorm().events.slice().sort((a,b)=>(b.date+(b.heure||'')).localeCompare(a.date+(a.heure||''))); const e=L[0];
     if(!e){ const s='Aucun événement sécurité enregistré.'; _mdAns({say:s,html:s,view:{l:'Voir le registre',fn:()=>_sfRegOpen()}}); return 'ok'; }
@@ -30537,6 +30550,9 @@ function _mdV2Parse(P,raw){
 
 // ── Construction des nouvelles actions (confirmation, puis application) ──
 const _V2_E=_bfEsc;
+function _v2Eng(nn,type,A,P,text,how){ const L=_AV_MOTEURS[type]; if(!L) return {v:''}; if(L.length===1) return {v:L[0]}; if(A.eng!=null) return {v:A.eng};
+  const ns=nn.replace(/\s/g,''); const f=L.find(m=>ns.includes(_mdNorm(m).replace(/\s/g,''))); if(f) return {v:f};
+  return {ask:_v2Ask(P,text,how,'eng',`Quelle motorisation pour ${/^[aeiouy]/i.test(type)?'cet':'ce'} ${_V2_E(type)} ?`,L.map(m=>({l:m,v:m})).concat([{l:'Je ne sais pas',v:''}]),t=>{ const n2=_mdNorm(t).replace(/\s/g,''); return L.find(m=>n2.includes(_mdNorm(m).replace(/\s/g,'')))||(/sais pas|passe|inconnu/i.test(t)?'':null); })}; }
 function _v2ChLbl(c){ return `${c.msn?'MSN '+c.msn:c.nom||'chantier'}${c.client?' · '+String(c.client).trim():''}`; }
 Object.assign(_MDA_BUILD,{
   // ─── Chantiers ───
@@ -30546,6 +30562,7 @@ Object.assign(_MDA_BUILD,{
     const dup=(S.chantiers||[]).find(c=>String(c.msn).trim()===msn&&c.statut!=='termine'); if(dup) return {err:`Le MSN ${msn} a déjà un chantier en cours (${_V2_E(dup.nom||'')}).`};
     const types=_v2Opts('c-avion').filter(o=>o!=='Autre');
     const type=A.type!=null?A.type:_v2Type(nn,types); if(!type&&A.type==null) return _v2Ask(P,text,how,'type','Quel type d\'avion ?',types.slice(0,8).map(t=>({l:t,v:t})),t=>_v2Type(' '+_mdNorm(t)+' ',types)||null);
+    const EG=type?_v2Eng(nn,type,A,P,text,how):{v:''}; if(EG.ask!==undefined) return EG.ask; const eng=EG.v;
     const client=A.client!=null?A.client:_v2Client(nn,P.raw||text); if(!client&&A.client==null) return _v2Ask(P,text,how,'client','Pour quel client ?',_v2Clients().slice(0,6).map(c=>({l:c,v:c})),t=>String(t).trim().replace(/^(c est|pour|le client)\s+/i,''));
     let deb=tm.range?fmt(tm.range.from):tm.day?fmt(tm.day.d):A.deb||'', fin=tm.range?fmt(tm.range.to):A.fin||'';
     if(!deb&&A.deb==null) return _v2Ask(P,text,how,'deb','Du combien au combien ?',[],t=>{ const r=_v2Range(t); if(r){ A.fin=r.to; return r.from; } return null; });
@@ -30553,10 +30570,10 @@ Object.assign(_MDA_BUILD,{
     const ch=_v2Who(P,'chef')[0]||null, rs=_v2Who(P,'responsable')[0]||null;
     const statut=/ (prevision|prospect|en prevision) /.test(nn)?'prevision':deb&&deb<=fmt(_mdToday())?'encours':'futur';
     const SL={prevision:'Prévision',futur:'À venir',encours:'En cours'};
-    return {changes:[],mut:()=>{ openChantierNew(); _v2Set('c-client',client); _v2Set('c-msn',msn); if(type) _v2Sel('c-avion',type); _v2Set('c-debut',deb); _v2Set('c-fin',fin); _v2Sel('c-statut',statut); if(rs) _v2Set('c-resp',rs.id); if(ch) _v2Set('c-chef',ch.id); saveChantier(); try{ closeM('m-chantier'); }catch(_){}
+    return {changes:[],mut:()=>{ openChantierNew(); _v2Set('c-client',client); _v2Set('c-msn',msn); if(type) _v2Sel('c-avion',type); if(eng) _v2Sel('c-moteur',eng); _v2Set('c-debut',deb); _v2Set('c-fin',fin); _v2Sel('c-statut',statut); if(rs) _v2Set('c-resp',rs.id); if(ch) _v2Set('c-chef',ch.id); saveChantier(); try{ closeM('m-chantier'); }catch(_){}
         if(!(S.chantiers||[]).some(c=>String(c.msn).trim()===msn)) throw new Error("le chantier n'a pas été enregistré"); },
       viewObj:{l:'Voir les chantiers',fn:()=>goTab('chantiers')},
-      lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${client?' · '+_V2_E(client):''}`,`Du ${deb?disp(deb):'?'} au ${fin?disp(fin):'(fin à préciser)'} · ${SL[statut]}`].concat(ch?[`Chef d'équipe : ${_V2_E(_mdPName(ch))}`]:[]).concat(rs?[`Responsable : ${_V2_E(_mdPName(rs))}`]:[]),
+      lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${eng?' · '+_V2_E(eng):''}${client?' · '+_V2_E(client):''}`,`Du ${deb?disp(deb):'?'} au ${fin?disp(fin):'(fin à préciser)'} · ${SL[statut]}`].concat(ch?[`Chef d'équipe : ${_V2_E(_mdPName(ch))}`]:[]).concat(rs?[`Responsable : ${_V2_E(_mdPName(rs))}`]:[]),
       warn:_v2Who(P).filter(e=>e!==ch&&e!==rs).map(e=>`${_V2_E(_mdPName(e))} n'est ni chef d'équipe ni responsable dans sa fiche : je ne l'ai pas mis sur le chantier.`),
       say:`Je crée le chantier ${msn}${client?' '+client:''}.`}; },
   ch_upd(P,text,how,A,nn,tm){
@@ -30668,7 +30685,7 @@ Object.assign(_MDA_BUILD,{
   sf_start(P,text,how,A,nn,tm){ const sf=_sfNorm(); const d=tm.day?fmt(tm.day.d):/ (a zero|a 0|aujourd hui|maintenant|reset|reinitialise|reinitialiser) /.test(nn)?fmt(new Date()):null;
     if(!d) return _v2Ask(P,text,how,'_d','À partir de quelle date ?',[{l:"Aujourd'hui",v:'auj'}],t=>/auj/i.test(t)?'auj':_v2Date(t));
     const dd=A._d?(A._d==='auj'?fmt(new Date()):A._d):d; if(dd>fmt(new Date())) return {err:'La date de départ ne peut pas être dans le futur.'};
-    const who=/ (interimaire|interimaires|interim) /.test(nn)?['int']:/ (tous|tout le personnel|tout le monde|salaries) /.test(nn)&&!/ (les quatre|tous les compteurs) /.test(nn)?['all']:['all','int'];
+    const who=/ (interimaire|interimaires|interim) /.test(nn)?['int']:/ (tous|tout le personnel|tout le monde|salaries|embauches|embauche|cdi|cdd) /.test(nn)&&!/ (les quatre|tous les compteurs) /.test(nn)?['all']:['all','int'];
     const kind=/ avec arret /.test(nn)?['arret']:/ (sans accident|tout accident|tous accidents) /.test(nn)&&!/ avec arret /.test(nn)?['tout']:['arret','tout'];
     const K=[]; who.forEach(w=>kind.forEach(k=>K.push(w+'_'+k)));
     return {changes:[],mut:()=>{ const s=_sfNorm(); K.forEach(k=>{ s.starts[k]=dd; }); },viewObj:{l:'Voir le registre',fn:()=>_sfRegOpen()},
@@ -30706,13 +30723,14 @@ Object.assign(_MDA_BUILD,{
     if(Z.list().some(a=>String(a.msn)===String(msn)&&!a.dateDepart&&a.statut!=='parti')) return {err:`Le MSN ${msn} est déjà ${Z.lbl}.`};
     let opts=_v2Opts(Z.sel); if(!opts.length) opts=_v2Opts('c-avion'); const type=A.type!=null?A.type:_v2Type(nn,opts);
     if(!type&&A.type==null) return _v2Ask(P,text,how,'type',"Quel type d'avion ?",opts.slice(0,8).map(o=>({l:o,v:o})),t=>_v2Type(' '+_mdNorm(t)+' ',opts)||null);
+    const EG=z==='sto'&&type?_v2Eng(nn,type,A,P,text,how):{v:''}; if(EG.ask!==undefined) return EG.ask; const eng=EG.v;
     const act=z!=='ab'?'':A.act||(/ peinture /.test(nn)?'peinture':/ (stockage|frc) /.test(nn)?'stockage_frc':''); if(z==='ab'&&!act) return _v2Ask(P,text,how,'act','Pour quelle activité : peinture ou stockage FRC ?',[{l:'🎨 Peinture',v:'peinture'},{l:'📦 Stockage FRC',v:'stockage_frc'}],t=>/peint/i.test(t)?'peinture':/stock|frc/i.test(t)?'stockage_frc':null);
     const client=A.client!=null?A.client:_v2Client(nn,P.raw||text); const d=tm.day?fmt(tm.day.d):fmt(new Date());
-    const mut={sto:()=>{ openAvionNew(); _v2Sel('av-type',type); _v2Set('av-msn',msn); _v2Set('av-client',client); _v2Set('av-entree',d); saveAvion(); },
+    const mut={sto:()=>{ openAvionNew(); _v2Sel('av-type',type); if(eng) _v2Sel('av-moteur',eng); _v2Set('av-msn',msn); _v2Set('av-client',client); _v2Set('av-entree',d); saveAvion(); },
       rec:()=>{ openAvionRecycNew(); _v2Sel('avr-type',type); _v2Set('avr-msn',msn); _v2Set('avr-client',client); _v2Set('avr-debut-calc',d); saveAvionRec(); },
       ab:()=>{ openAirbusNewMSN(); _v2Sel('airbus-msn-type',type); _v2Set('airbus-msn-num',msn); _v2Set('airbus-msn-client',client); _v2Set('airbus-msn-entree',d); selectAirbusAct(act); saveAirbusMSN(); }}[z];
     return {changes:[],mut:()=>{ mut(); ['m-avion','m-avion-recyc','m-airbus-msn'].forEach(m=>{ try{ closeM(m); }catch(_){} }); if(!Z.list().some(a=>String(a.msn)===String(msn))) throw new Error("l'avion n'a pas été enregistré"); },
-      viewObj:{l:'Voir',fn:()=>goTab(Z.tab)},lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${client?' · '+_V2_E(client):''}${act?' · '+(act==='peinture'?'peinture':'stockage FRC'):''}`,`Entrée le ${disp(d)}`],say:`Je rentre le MSN ${msn} ${Z.lbl}.`}; },
+      viewObj:{l:'Voir',fn:()=>goTab(Z.tab)},lines:[`MSN <b>${_V2_E(msn)}</b>${type?' · '+_V2_E(type):''}${eng?' · '+_V2_E(eng):''}${client?' · '+_V2_E(client):''}${act?' · '+(act==='peinture'?'peinture':'stockage FRC'):''}`,`Entrée le ${disp(d)}`],say:`Je rentre le MSN ${msn} ${Z.lbl}.`}; },
   sto_out(P,text,how,A,nn,tm){ const msn=(_mdqMsn(P)||{}).msn||_v2NewMsn(nn); const sa=((S.stockage&&S.stockage.avions)||[]).find(a=>String(a.msn)===String(msn)), ab=((S.airbus&&S.airbus.msns)||[]).find(a=>String(a.msn)===String(msn)&&!a.sortie);
     const z=A.zone||(sa?'sto':ab?'ab':''); if(z==='sto'&&sa) return {changes:[],mut:()=>stockageDepartNow(sa.id),viewObj:{l:'Voir le stockage',fn:()=>goTab('stockage')},lines:[`MSN <b>${_V2_E(msn)}</b>${sa.type?' · '+_V2_E(sa.type):''} · stockage`,"Marqué parti aujourd'hui dans tous les modules."],say:`Je note le départ du MSN ${msn}.`};
     if(z==='ab'&&ab) return {changes:[],mut:()=>airbusDepartNow(ab.id),viewObj:{l:'Voir Airbus',fn:()=>goTab('airbus')},lines:[`MSN <b>${_V2_E(msn)}</b> · Airbus`,"Marqué parti aujourd'hui dans tous les modules."],say:`Je note le départ du MSN ${msn}.`};
@@ -30805,6 +30823,58 @@ function _mdCmdRun(P,text,how){ try{ if(P.run) P.run(); }catch(e){ console.warn(
 function _v2SnapK(){ const o={}; Object.keys(S).forEach(k=>{ if(!_V2_SKIP.has(k)&&typeof S[k]!=='function') o[k]=JSON.stringify(S[k]); }); return o; }
 function _v2Deanon(t,map){ return String(t).replace(/\[([PAX]\d+)\]/g,(m,c)=>{ const v=map[c]; if(!v) return m; if(v.type==='p'){ const e=v.ids&&v.ids.length===1?byId(v.ids[0]):null; return e?_mdPName(e):(v.words||''); } if(v.type==='a') return v.msn||''; return v.words||''; }); }
 
+// ═══ Historique des ordres de mission (suivi : fait / pas besoin / en attente / non traité) ═══
+window._omF=window._omF||{p:'3m',e:'',s:'',q:''};
+function _omMe(){ try{ return (_ntMe()||{}).login||''; }catch(_){ return ''; } }
+function _omRecord(key,status){ const b=_omBlocks(true).find(x=>x.key===key); if(!Array.isArray(S.omHist)) S.omHist=[];
+  S.omHist=S.omHist.filter(h=>h.key!==key); S.omHist.push({key,empId:b?b.empId:key.split('_')[0],type:b?b.type:key.split('_')[1],form:b?(b.form||''):'',start:b?b.start:key.split('_')[2],end:b?b.end:'',status,at:new Date().toISOString(),by:_omMe()}); }
+function _omRows(){ const t0=fmt(new Date()), all=_omBlocks(true), H=Array.isArray(S.omHist)?S.omHist:[], seen=new Set(), rows=[];
+  H.forEach(h=>{ seen.add(h.key); const b=all.find(x=>x.key===h.key); rows.push({key:h.key,empId:h.empId,type:h.type,form:h.form||(b&&b.form)||'',start:h.start,end:h.end||(b&&b.end)||h.start,status:h.status,at:h.at?h.at.slice(0,10):'',by:h.by||''}); });
+  Object.entries(S.omDone||{}).forEach(([k,v])=>{ if(seen.has(k)) return; seen.add(k); const pp=k.split('_'); const b=all.find(x=>x.key===k)||all.find(x=>x.empId===pp[0]&&x.type===pp[1]&&x.start===pp[2]); const nr=String(v).startsWith('nr:');
+    rows.push({key:k,empId:pp[0],type:pp[1],form:(b&&b.form)||(pp[3]?pp.slice(3).join(' ').replace(/-/g,' '):''),start:pp[2],end:(b&&b.end)||pp[2],status:nr?'nr':'fait',at:nr?String(v).slice(3):String(v),by:'',old:true}); });
+  all.forEach(b=>{ if(b.done||seen.has(b.key)) return; rows.push({key:b.key,empId:b.empId,type:b.type,form:b.form||'',start:b.start,end:b.end,status:b.start>=t0?'attente':'expire',at:'',by:''}); });
+  return rows; }
+const _OM_ST={fait:{l:'✅ Fait',c:'#6effc4'},nr:{l:'⊘ Pas besoin',c:'#9aa7b8'},attente:{l:'⏳ En attente',c:'#ffb340'},expire:{l:'⌛ Non traité',c:'#ff8fa3'}};
+function _omObj(r){ return `${r.type==='deplacement'?'🚗 Déplacement':'🎓 '+(r.form?_bfEsc(_sfCap(r.form)):'Formation externe')}${r.type==='deplacement'&&r.form?' <small>— '+_bfEsc(r.form)+'</small>':''}`; }
+function _omFiltered(){ const F=window._omF, t=new Date(), t0=fmt(t), m0=fmt(_mdYmd(t.getFullYear(),t.getMonth(),1)), m1=fmt(_mdYmd(t.getFullYear(),t.getMonth()+1,0)), p0=fmt(_mdYmd(t.getFullYear(),t.getMonth()-1,1)), p1=fmt(_mdYmd(t.getFullYear(),t.getMonth(),0)), d90=fmt(addD(t,-90));
+  const q=F.q?_mdNorm(F.q):'';
+  return _omRows().filter(r=>(F.p==='tout'||(F.p==='3m'&&r.end>=d90)||(F.p==='mois'&&r.start<=m1&&r.end>=m0)||(F.p==='prec'&&r.start<=p1&&r.end>=p0)||(F.p==='avenir'&&r.start>=t0))
+    &&(!F.e||r.empId===F.e)&&(!F.s||r.status===F.s)&&(!q||_mdNorm(_mdPName(byId(r.empId)||{nom:'',prenom:''})+' '+(r.form||'')+' '+(r.type==='deplacement'?'deplacement':'formation')).includes(q)))
+    .sort((a,b)=>(a.status==='attente')!==(b.status==='attente')?(a.status==='attente'?-1:1):a.status==='attente'?a.start.localeCompare(b.start):b.start.localeCompare(a.start)); }
+function _omHistEnsure(){ if(document.getElementById('m-omh')) return; const d=document.createElement('div'); d.className='mbg'; d.id='m-omh';
+  d.innerHTML=`<div class="modal sf-modal" style="max-width:1100px;width:96vw"><div class="sf-top"><div class="modal-title" style="margin:0;flex:1">📝 Historique des ordres de mission</div><button class="btn btn-ghost btn-sm" onclick="closeM('m-omh')">✕</button></div><div id="omh-body"></div></div>`; document.body.appendChild(d); }
+function _omHistOpen(){ _omHistEnsure(); _omHistRender(); openM('m-omh'); }
+function _omHistRender(){ const el=document.getElementById('omh-body'); if(!el) return; const F=window._omF, R=_omRows(), L=_omFiltered();
+  const emps=[...new Set(R.map(r=>r.empId))].map(byId).filter(Boolean).sort((a,b)=>_mdPName(a).localeCompare(_mdPName(b)));
+  const sel=(id,opts,v)=>`<select class="sf-sel" onchange="window._omF.${id}=this.value;_omHistRender()">${opts.map(([k,l])=>`<option value="${k}" ${v===k?'selected':''}>${l}</option>`).join('')}</select>`;
+  const n=s=>L.filter(r=>r.status===s).length;
+  el.innerHTML=`<div class="sf-filt">${sel('p',[['3m','3 derniers mois + à venir'],['mois','Ce mois-ci'],['prec','Le mois dernier'],['avenir','À venir'],['tout','Tout']],F.p)}${sel('e',[['','Toutes les personnes'],...emps.map(e=>[e.id,_bfEsc(_mdPName(e))])],F.e)}${sel('s',[['','Tous les statuts'],...Object.entries(_OM_ST).map(([k,v])=>[k,v.l])],F.s)}<input class="sf-sel" style="min-width:160px" placeholder="🔍 Rechercher…" value="${_bfEsc(F.q||'')}" oninput="window._omF.q=this.value;clearTimeout(window._omQt);window._omQt=setTimeout(()=>{ _omHistRender(); const i=document.querySelector('#omh-body input'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } },250)">
+    <div class="sf-sum">${Object.entries(_OM_ST).map(([k,v])=>_sfTag(`${v.l} · ${n(k)}`,v.c)).join('')}</div></div>
+  ${L.length?`<div class="sf-tw"><table class="sf-tb"><thead><tr><th>Décidé le</th><th>Personne</th><th>Objet</th><th>Dates</th><th>Statut</th><th>Par</th></tr></thead><tbody>${L.map(r=>{ const e=byId(r.empId), st=_OM_ST[r.status];
+    return `<tr title="Voir la semaine au planning" onclick="closeM('m-omh');S.weekStart=getMon(parseLocal('${r.start}'));goTab('weekly')"><td>${r.at?disp(r.at):'—'}</td><td><b>${_bfEsc(e?_mdPName(e):'(personne supprimée)')}</b></td><td>${_omObj(r)}</td><td>${disp(r.start)}${r.end&&r.end!==r.start?' → '+disp(r.end):''}</td><td>${_sfTag(st.l,st.c)}</td><td>${_bfEsc(r.by||(r.old?'—':''))}</td></tr>`; }).join('')}</tbody></table></div>`:`<div class="bv-mut" style="padding:18px 4px">Aucun ordre de mission pour ces filtres.</div>`}
+  <div class="bv-mut" style="font-size:11px;margin-top:10px">« En attente » : à faire, rappelé dans le brief jusqu'au premier jour. « Non traité » : le premier jour est passé sans « Fait » ni « Pas besoin ». Les ordres validés avant la création de l'historique apparaissent sans le nom de celui qui a cliqué. Clique sur une ligne pour voir la semaine au planning.</div>`; }
+// ── Voix : marquer fait / pas besoin, questions, historique ──
+Object.assign(_MDA_LBL,{om_done:'ordre de mission fait',om_nr:'pas besoin d\'ordre de mission'});
+Object.assign(_MDQ_LBL,{om_todo:'ordres de mission à faire'});
+const _OM_RE=/ (odm|o d m|ordre de mission|ordres de mission|ordre mission) /;
+function _mdOmParse(P){ const nn=' '+(P.T||[]).join(' ')+' '; if(!_OM_RE.test(nn)||/ (tache|taches|to ?do|todo|to do list|pense bete|note) /.test(nn)) return null; if(/ (historique|suivi|qui|quels|quelles|combien|liste|reste|a faire|en attente) /.test(nn)&&!/ (fait|faite|envoye|valide) /.test(nn.replace(/ a faire /,' '))) return null;
+  if(/ (pas besoin|pas la peine|inutile|pas necessaire|pas d odm|pas d ordre de mission|sans odm|sans ordre de mission|ecarte|ecarter) /.test(nn)) return {a:'om_nr'};
+  if(/ (fait|faite|faits|envoye|envoyee|valide|valider|termine|ok|c est fait|est fait|boucle|regle) /.test(nn)) return {a:'om_done'}; return null; }
+function _mdOmQ(P){ const nn=' '+(P.T||[]).join(' ')+' '; if(!_OM_RE.test(nn)||/ (tache|taches|to ?do|todo) /.test(nn)) return null; if(/ (quels|quelles|combien|liste|reste|a faire|en attente|qui|ou en est|on en est) /.test(nn)&&!/ historique /.test(nn)) return {i:'om_todo'}; return null; }
+Object.assign(_MDQ_RUN,{ om_todo(P){ const L=_omBlocks(); const s=L.length?`${_mdqPl(L.length,'ordre de mission','ordres de mission')} à faire.`:'Aucun ordre de mission à faire.';
+  _mdAns({say:s,html:`<b>${s}</b>`,items:L.map(b=>`${_bfEsc(_mdPName(byId(b.empId)))} · ${b.type==='deplacement'?'déplacement':_bfEsc(b.form||'formation externe')} · ${disp(b.start)}${b.end!==b.start?' → '+disp(b.end):''}${b.j<=2?' <b style="color:#ff8fa3">· urgent</b>':''}`),title:'Ordres de mission',view:{l:"Voir l'historique",fn:()=>_omHistOpen()}}); return 'ok'; } });
+function _mdOmBuild(P,text,how,A,nn,tm,st){ let L=_omBlocks(); const H=_v2Who(P); if(H.length) L=L.filter(b=>H.some(e=>e.id===b.empId));
+  if(tm.day) { const d=fmt(tm.day.d); const L2=L.filter(b=>b.start<=d&&b.end>=d); if(L2.length) L=L2; }
+  if(L.length>1){ const q=String(P.raw||text).replace(/\b(odm|ordres? de mission|fait|faite|pas besoin|pour|de|du|la|le|l'|est)\b/ig,' '); const best=_v2Best(L,q,b=>(b.form||'')+' '+(b.type==='deplacement'?'deplacement':'')); if(best&&_v2Toks(best.form||'').some(t=>_v2Toks(q).includes(t))) L=[best]; }
+  if(!L.length) return {err:H.length?`Aucun ordre de mission en attente pour ${_V2_E(H.map(_mdPName).join(', '))}.`:'Aucun ordre de mission en attente.'};
+  if(L.length>1&&!A.k){ MD.pending={label:'choix ordre de mission',choices:L.slice(0,4).map(b=>({l:`${_V2_E(_mdPName(byId(b.empId)))} · ${_V2_E(b.type==='deplacement'?'déplacement':b.form||'formation')} · ${disp(b.start)}`,fn:()=>{ MD.pending=null; A.k=b.key; _mdActRun(P,text,how); }}))};
+    _mdReply(`Il y a <b>${L.length}</b> ordres de mission en attente${H.length?' pour '+_V2_E(H.map(_mdPName).join(', ')):''}. Lequel ?`,'Lequel ?',MD.pending.choices.map(c=>({l:c.l,fn:c.fn})),{noBad:true}); return null; }
+  const b=A.k?L.find(x=>x.key===A.k)||_omBlocks().find(x=>x.key===A.k):L[0]; if(!b) return {err:"Cet ordre de mission n'est plus en attente."};
+  return {changes:[],mut:()=>{ if(!S.omDone) S.omDone={}; S.omDone[b.key]=st==='nr'?'nr:'+fmt(new Date()):fmt(new Date()); _omRecord(b.key,st); try{ _briefBadge(); }catch(_){} try{ if(document.querySelector('#m-brief.on')) _briefRender(); }catch(_){} },
+    viewObj:{l:"Voir l'historique",fn:()=>_omHistOpen()},lines:[`${_V2_E(_mdPName(byId(b.empId)))} · ${b.type==='deplacement'?'🚗 Déplacement':'🎓 '+_V2_E(b.form||'Formation externe')}`,`Du ${disp(b.start)}${b.end!==b.start?' au '+disp(b.end):''} → <b>${st==='nr'?'pas besoin':'fait'}</b>`],
+    say:st==='nr'?`Je note qu'il n'y a pas besoin d'ordre de mission pour ${_mdPName(byId(b.empId))}.`:`Je note l'ordre de mission de ${_mdPName(byId(b.empId))} comme fait.`}; }
+Object.assign(_MDA_BUILD,{ om_done(P,t,h,A,nn,tm){ return _mdOmBuild(P,t,h,A,nn,tm,'fait'); }, om_nr(P,t,h,A,nn,tm){ return _mdOmBuild(P,t,h,A,nn,tm,'nr'); } });
+
 // ── Page Mardam (remplace l'ancien « Assistant IA ») ──
 function renderAI(){ _mdRenderTab(); }
 function _mdRenderTab(){
@@ -30864,6 +30934,7 @@ function _mdBenchCases(){
       [`ajoute l'autorisation pushback à ${a.nom} jusqu'au 30 juin`,act('aut_add')],[`${b.nom} a fait sa formation EWIS`,act('form_done')],['mets le départ des compteurs sécurité au 1er janvier',act('sf_start')],[`ajoute une action corrective à l'accident de ${a.nom} : rappel port des gants`,act('sf_act_add')],
       ['ajoute un jour férié le 26 décembre',act('hol_add')],['copie cette semaine sur la semaine prochaine',act('week_copy')],['rentre le MSN 5566 ATR 72 en stockage',act('sto_new')],['ajoute le MSN 7788 au recyclage',act('rec_new')],['récupère les données depuis le Drive',act('gas_pull')],
       ['exporte le planning de la semaine en PDF',cmd('exp')],['sors-moi le master en Excel',cmd('exp')],['propose-moi les équipes',cmd('ap')],['passe en thème bento',cmd('theme')],['envoie tout sur le Drive',cmd('push')],['fais une sauvegarde',cmd('bak')],
+      [`l'ODM de ${a.nom} est fait`,act('om_done')],[`pas besoin d'ordre de mission pour ${b.nom}`,act('om_nr')],['quels ordres de mission sont à faire ?',q('om_todo')],["ouvre l'historique des ordres de mission",p=>p.kind==='nav'&&p.screen==='omhist'],
       ['qui a le pushback ?',q('pushback')],["combien d'avions en stockage ?",q('stock')],['qui peut signer le CRS demain ?',q('crs')],["qu'est-ce qu'il me reste dans la check-list ?",q('cl_today')],
       ['mets '+a.nom+' en congé du 4 au 18 janvier',p=>p.kind==='act'&&p.A.a==='abs'&&p.tm&&p.tm.range&&p.tm.range.from.getMonth()===0]]; })(),
     ["Fais moi apparaître l'écran des chiffres clés ?",nav('kpi')],['balance moi les stats',nav('kpi')],["Remonte moi à la vue d'ensemble du mois de février.",nav('master',p=>p.month&&p.month.m===1)],
